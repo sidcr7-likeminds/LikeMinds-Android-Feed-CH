@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">LikeMinds-Android-Feed-SX</string>
+    <string name="create_your_community">Create Your Community</string>
+    <string name="community_name">Community Name</string>
+    <string name="choose_a_name_that_personalizes_your_community">Choose a name that personalizes your community.</string>
+    <string name="e_g_avengers">e.g. Avengers</string>
+    <string name="community_headline">Community headline</string>
+    <string name="describe_your_community_in_a_line">Describe your community in a line</string>
+    <string name="e_g_the_most_sophisticated_community_for_superheroes">e.g. The most sophisticated community for superheroes</string>
+    <string name="branding">Branding</string>
+    <string name="brand_color">Brand color</string>
+    <string name="choose_your_brand_colour_and_customise_your_community">Choose your brand colour and customise your community.</string>
+    <string name="logo">Logo</string>
+    <string name="basic">Basic</string>
+    <string name="advanced">Advanced</string>
+    <string name="primary_color">Primary Color</string>
+    <string name="header_color">Header Color</string>
+    <string name="buttons_and_icons">Buttons and Icons</string>
+    <string name="text_links">Text Links</string>
+    <string name="recommended_dimensions_200_x_200">Recommended dimensions: 200 x 200</string>
+    <string name="upload_a_logo">Upload a logo</string>
+    <string name="all_caps_create">CREATE</string>
+
 </resources>

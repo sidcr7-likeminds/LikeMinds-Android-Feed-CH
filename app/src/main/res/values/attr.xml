@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="LikeMindsButton">
+        <attr name="font_type" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="LikeMindsExtendedFAB">
+        <attr name="font_Style" format="string" />
+    </declare-styleable>
+
+    <declare-styleable name="LikeMindsToolbar">
+    </declare-styleable>
+
+    <declare-styleable name="LikeMindsTextView">
+        <attr name="fontType" format="string" />
+    </declare-styleable>
+
+</resources>
