@@ -29,12 +29,7 @@ internal class LikeMindsTextView : AppCompatTextView {
     }
 
     private fun initiate(attrs: AttributeSet?) {
-
-        /**
-         * The following code sets the typeface of text on the extended fab button to the provided font.
-         * Uses roboto font by default.
-         * **/
-
+        // fonts
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsTextView)
         val currentFont = BrandingData.getCurrentFonts()
         val typeface = when (array.getString(R.styleable.LikeMindsTextView_fontType)) {

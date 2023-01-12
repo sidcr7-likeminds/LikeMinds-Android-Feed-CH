@@ -6,12 +6,12 @@ import com.likeminds.feedsx.Fonts
 
 internal object BrandingData {
 
-    const val COLOR_HEADER = "color_header"
-    const val COLOR_BUTTON_ICONS = "color_buttons_icons"
-    const val COLOR_TEXT_LINKS = "color_text_links"
-
-    val defaultColor by lazy {
+    private val defaultColor by lazy {
         Color.parseColor("#00897B")
+    }
+
+    private val defaultHeaderColor by lazy {
+        Color.WHITE
     }
 
     @JvmField
@@ -42,17 +42,20 @@ internal object BrandingData {
             )
         )
 
-        if (!branding?.basic?.primaryColor.isNullOrEmpty()) {
-            currentPrimary = parseOrGetDefault(branding?.basic?.primaryColor)
+        val basic = branding?.basic
+        val advanced = branding?.advanced
+
+        if (!basic?.primaryColor.isNullOrEmpty()) {
+            currentPrimary = parseOrGetDefault(basic?.primaryColor)
             isBrandingBasic = true
-        } else if (!branding?.advanced?.headerColor.isNullOrEmpty() &&
-            !branding?.advanced?.buttonsIconsColor.isNullOrEmpty() &&
-            !branding?.advanced?.textLinksColor.isNullOrEmpty()
+        } else if (!advanced?.headerColor.isNullOrEmpty() &&
+            !advanced?.buttonsIconsColor.isNullOrEmpty() &&
+            !advanced?.textLinksColor.isNullOrEmpty()
         ) {
             currentAdvanced = Triple(
-                parseOrGetDefault(branding?.advanced?.headerColor),
-                parseOrGetDefault(branding?.advanced?.buttonsIconsColor),
-                parseOrGetDefault(branding?.advanced?.textLinksColor),
+                parseOrGetDefault(advanced?.headerColor),
+                parseOrGetDefault(advanced?.buttonsIconsColor),
+                parseOrGetDefault(advanced?.textLinksColor),
             )
             Log.d("TAG", "fetchBranding: " + currentAdvanced.toString())
             isBrandingBasic = false
@@ -86,6 +89,17 @@ internal object BrandingData {
         }
     }
 
+    // returns header color
+    fun getHeaderColor(): Int {
+        return if (currentPrimary != null)
+            defaultHeaderColor
+        else if (currentAdvanced?.first != null)
+            currentAdvanced?.first!!
+        else
+            defaultHeaderColor
+    }
+
+    // returns button color
     fun getButtonsColor(): Int {
         return if (currentPrimary != null)
             currentPrimary!!
@@ -95,11 +109,8 @@ internal object BrandingData {
             defaultColor
     }
 
+    // returns paths of the current font
     fun getCurrentFonts(): Fonts? {
         return currentFont
-    }
-
-    fun isHeaderColorWhite(): Boolean {
-        return !isBrandingBasic && (currentAdvanced?.first == Color.WHITE)
     }
 }

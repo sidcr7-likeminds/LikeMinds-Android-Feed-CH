@@ -24,11 +24,7 @@ class LikeMindsProgressBar : ProgressBar {
     }
 
     private fun initiate() {
-
-        /**
-         * The following code sets the color of the progress bar to provided button color.
-         * **/
-
+        // color
         this.progressTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
     }
 }

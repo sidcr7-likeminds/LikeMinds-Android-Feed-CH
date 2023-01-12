@@ -30,19 +30,11 @@ class LikeMindsToolbar : Toolbar {
     }
 
     private fun initiate() {
+        // background color
+        this.setBackgroundColor(BrandingData.getHeaderColor())
 
-        /**
-         * The following code sets the background color of toolbar.
-         * **/
-
-        var bgColor = if(BrandingData.isBrandingBasic) Color.WHITE else BrandingData.currentAdvanced!!.first
-        this.setBackgroundColor(bgColor)
-
-        /**
-         * The following code sets the color of navigation icon and overflow menu icon on toolbar.
-         * **/
-
-        var color = if (BrandingData.isBrandingBasic) Color.WHITE else Color.BLACK
+        // icon color
+        val color = if (BrandingData.isBrandingBasic) Color.WHITE else Color.BLACK
         this.overflowIcon?.setTint(color)
         this.navigationIcon?.setTint(color)
     }
