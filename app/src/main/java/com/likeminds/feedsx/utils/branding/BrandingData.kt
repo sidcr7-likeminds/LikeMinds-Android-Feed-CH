@@ -57,7 +57,6 @@ internal object BrandingData {
                 parseOrGetDefault(advanced?.buttonsIconsColor),
                 parseOrGetDefault(advanced?.textLinksColor),
             )
-            Log.d("TAG", "fetchBranding: " + currentAdvanced.toString())
             isBrandingBasic = false
         } else {
             currentPrimary = parseOrGetDefault()
