@@ -14,11 +14,11 @@ import com.likeminds.feedsx.utils.branding.BrandingData
 
 class LikeMindsToolbar : Toolbar {
     constructor(context: Context) : super(context) {
-        initiate(null)
+        initiate()
     }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        initiate(attrs)
+        initiate()
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
@@ -26,11 +26,22 @@ class LikeMindsToolbar : Toolbar {
         attrs,
         defStyle
     ) {
-        initiate(attrs)
+        initiate()
     }
 
-    private fun initiate(attrs: AttributeSet?) {
-        this.setBackgroundColor(if(BrandingData.isBrandingBasic) Color.WHITE else BrandingData.currentAdvanced!!.first)
+    private fun initiate() {
+
+        /**
+         * The following code sets the background color of toolbar.
+         * **/
+
+        var bgColor = if(BrandingData.isBrandingBasic) Color.WHITE else BrandingData.currentAdvanced!!.first
+        this.setBackgroundColor(bgColor)
+
+        /**
+         * The following code sets the color of navigation icon and overflow menu icon on toolbar.
+         * **/
+
         var color = if (BrandingData.isBrandingBasic) Color.WHITE else Color.BLACK
         this.overflowIcon?.setTint(color)
         this.navigationIcon?.setTint(color)

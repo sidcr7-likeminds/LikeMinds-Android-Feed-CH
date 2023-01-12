@@ -3,10 +3,10 @@ package com.likeminds.feedsx.base.customview
 import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
-import android.widget.ProgressBar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.likeminds.feedsx.utils.branding.BrandingData
 
-class LikeMindsProgressBar : ProgressBar {
+class LikeMindsFab : FloatingActionButton {
     constructor(context: Context) : super(context) {
         initiate()
     }
@@ -26,9 +26,10 @@ class LikeMindsProgressBar : ProgressBar {
     private fun initiate() {
 
         /**
-         * The following code sets the color of the progress bar to provided button color.
+         * The following code sets the color of fab button to provided button color.
          * **/
 
-        this.progressTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
     }
+
 }

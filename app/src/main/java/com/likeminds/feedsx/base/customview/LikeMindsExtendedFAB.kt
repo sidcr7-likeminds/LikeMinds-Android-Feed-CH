@@ -27,6 +27,12 @@ internal class LikeMindsExtendedFAB : ExtendedFloatingActionButton {
     }
 
     private fun initiate(attrs: AttributeSet?) {
+
+        /**
+         * The following code sets the typeface of text on the extended fab button to the provided font.
+         * Uses roboto font by default.
+         * **/
+
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsExtendedFAB)
         val currentFont = BrandingData.getCurrentFonts()
         val typeface = when (array.getString(R.styleable.LikeMindsExtendedFAB_font_Style)) {
@@ -55,9 +61,13 @@ internal class LikeMindsExtendedFAB : ExtendedFloatingActionButton {
                 ResourcesCompat.getFont(context, R.font.roboto_regular)
             }
         }
-
-        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
         this.typeface = typeface
         array.recycle()
+
+        /**
+         * The following code sets the color of extended fab button to provided button color.
+         * **/
+
+        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
     }
 }

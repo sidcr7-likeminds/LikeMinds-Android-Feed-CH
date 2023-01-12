@@ -9,9 +9,6 @@
         <attr name="font_Style" format="string" />
     </declare-styleable>
 
-    <declare-styleable name="LikeMindsToolbar">
-    </declare-styleable>
-
     <declare-styleable name="LikeMindsTextView">
         <attr name="fontType" format="string" />
     </declare-styleable>

@@ -27,6 +27,12 @@ internal class LikeMindsButton : MaterialButton {
     }
 
     private fun initiate(attrs: AttributeSet?) {
+
+        /**
+         * The following code sets the typeface of text on the button to the provided font.
+         * Uses roboto font by default.
+         * **/
+
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsButton)
         val currentFont = BrandingData.getCurrentFonts()
         val typeface = when (array.getString(R.styleable.LikeMindsButton_font_type)) {
@@ -48,8 +54,13 @@ internal class LikeMindsButton : MaterialButton {
                 ResourcesCompat.getFont(context, R.font.roboto_regular)
             }
         }
-        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
         this.typeface = typeface
         array.recycle()
+
+        /**
+         * The following code sets the color of button to provided button color.
+         * **/
+
+        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
     }
 }
