@@ -1,38 +1,19 @@
-package com.likeminds.feedsx.base.customview
+package com.likeminds.feedsx.branding.util
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.Typeface
 import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.res.ResourcesCompat
-import com.likeminds.feedsx.utils.branding.BrandingData
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.BrandingData
 
-internal class LikeMindsTextView : AppCompatTextView {
+object BrandingUtil {
 
-    private val isHeader = false
-
-    constructor(context: Context) : super(context) {
-        initiate(null)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        initiate(attrs)
-    }
-
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(
-        context,
-        attrs,
-        defStyle
-    ) {
-        initiate(attrs)
-    }
-
-    private fun initiate(attrs: AttributeSet?) {
-        // fonts
-        val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsTextView)
+    fun getTypeFace(context: Context, array: TypedArray, fontType: Int): Typeface? {
         val currentFont = BrandingData.getCurrentFonts()
-        val typeface = when (array.getString(R.styleable.LikeMindsTextView_fontType)) {
+
+        val typeface = when (array.getString(fontType)) {
             "bold" -> {
                 if (currentFont != null) {
                     Typeface.createFromAsset(context.assets, currentFont.bold)
@@ -58,7 +39,7 @@ internal class LikeMindsTextView : AppCompatTextView {
                 ResourcesCompat.getFont(context, R.font.roboto_regular)
             }
         }
-        this.typeface = typeface
-        array.recycle()
+        return typeface
     }
+
 }

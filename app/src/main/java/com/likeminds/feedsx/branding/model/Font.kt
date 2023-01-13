@@ -1,4 +1,4 @@
-package com.likeminds.feedsx
+package com.likeminds.feedsx.branding.model
 
 import androidx.annotation.Keep
 

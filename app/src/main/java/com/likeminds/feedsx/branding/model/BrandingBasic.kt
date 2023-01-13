@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.utils.branding
+package com.likeminds.feedsx.branding.model
 
 import android.os.Parcelable
 import androidx.annotation.Keep

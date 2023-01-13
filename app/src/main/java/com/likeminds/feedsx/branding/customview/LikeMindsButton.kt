@@ -1,13 +1,15 @@
-package com.likeminds.feedsx.base.customview
+package com.likeminds.feedsx.branding.customview
 
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.util.AttributeSet
+import android.util.Log
 import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
-import com.likeminds.feedsx.utils.branding.BrandingData
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.util.BrandingUtil
 
 internal class LikeMindsButton : MaterialButton {
     constructor(context: Context) : super(context) {
@@ -29,27 +31,7 @@ internal class LikeMindsButton : MaterialButton {
     private fun initiate(attrs: AttributeSet?) {
         // fonts
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsButton)
-        val currentFont = BrandingData.getCurrentFonts()
-        val typeface = when (array.getString(R.styleable.LikeMindsButton_font_type)) {
-            "medium" -> {
-                if (currentFont != null) {
-                    Typeface.createFromAsset(context.assets, currentFont.medium)
-                } else {
-                    ResourcesCompat.getFont(context, R.font.roboto_medium)
-                }
-            }
-            "regular" -> {
-                if (currentFont != null) {
-                    Typeface.createFromAsset(context.assets, currentFont.regular)
-                } else {
-                    ResourcesCompat.getFont(context, R.font.roboto_regular)
-                }
-            }
-            else -> {
-                ResourcesCompat.getFont(context, R.font.roboto_regular)
-            }
-        }
-        this.typeface = typeface
+        this.typeface = BrandingUtil.getTypeFace(context, array, R.styleable.LikeMindsButton_font_type)
         array.recycle()
 
         // color

@@ -1,15 +1,10 @@
-package com.likeminds.feedsx.base.customview
+package com.likeminds.feedsx.branding.customview
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.util.AttributeSet
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.appcompat.widget.Toolbar
-import androidx.core.view.children
-import com.likeminds.feedsx.utils.branding.BrandingData
+import com.likeminds.feedsx.branding.model.BrandingData
 
 
 class LikeMindsToolbar : Toolbar {
