@@ -9,7 +9,9 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.databinding.ActivityMainBinding
 import com.likeminds.feedsx.utils.branding.BrandingData
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var colorsList: List<String> =
@@ -47,7 +49,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         if (BrandingData.isBrandingBasic) {
-            binding.btn.text = if (BrandingData.isBrandingBasic) "Basic Branding" else "Advanced Branding"
+            binding.btn.text =
+                if (BrandingData.isBrandingBasic) "Basic Branding" else "Advanced Branding"
         }
 
         binding.btn.setOnClickListener {
