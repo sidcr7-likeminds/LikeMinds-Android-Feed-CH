@@ -1,0 +1,22 @@
+ext.versions = [:]
+def versions = [:]
+versions.compile_sdk = 32
+versions.min_sdk = 26
+versions.target_sdk = 32
+versions.app_version_major = '1'
+versions.app_version_minor = '0'
+versions.app_version_patch = '0'
+versions.app_version_code = 1
+versions.core = "1.9.0"
+ext.versions = versions
+
+
+ext.deps = [:]
+def deps = [:]
+
+def android_core = [:]
+android_core.core = "androidx.core:core-ktx:$versions.core"
+android_core.appcompat = ""
+deps.android_core = android_core
+
+ext.deps = deps
