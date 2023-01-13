@@ -7,7 +7,13 @@ versions.app_version_major = '1'
 versions.app_version_minor = '0'
 versions.app_version_patch = '0'
 versions.app_version_code = 1
-versions.core = "1.9.0"
+versions.core = "1.8.0"
+versions.appcompat= "1.5.1"
+versions.material_design = "1.7.0"
+versions.constraint_layout = "2.1.4"
+versions.junit = "4.13.2"
+versions.android_junit = "1.1.5"
+versions.espresso_core = "3.5.1"
 ext.versions = versions
 
 
@@ -16,7 +22,19 @@ def deps = [:]
 
 def android_core = [:]
 android_core.core = "androidx.core:core-ktx:$versions.core"
-android_core.appcompat = ""
+android_core.appcompat = "androidx.appcompat:appcompat:$versions.appcompat"
 deps.android_core = android_core
+
+
+def ui = [:]
+ui.material_design = "com.google.android.material:material:$versions.material_design"
+ui.constraint_layout = "androidx.constraintlayout:constraintlayout:$versions.constraint_layout"
+deps.ui = ui
+
+def testing = [:]
+testing.junit = "junit:junit:$versions.junit"
+testing.android_junit = "androidx.test.ext:junit:$versions.android_junit"
+testing.espresso = "androidx.test.espresso:espresso-core:$versions.espresso_core"
+deps.testing = testing
 
 ext.deps = deps
