@@ -32,7 +32,8 @@ internal class LikeMindsTextView : AppCompatTextView {
     private fun initiate(attrs: AttributeSet?) {
         // fonts
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsTextView)
-        this.typeface = BrandingUtil.getTypeFace(context, array, R.styleable.LikeMindsTextView_fontType)
+        val fontStyle = array.getString(R.styleable.LikeMindsTextView_fontType)
+        this.typeface = BrandingUtil.getTypeFace(context, fontStyle)
         array.recycle()
     }
 }

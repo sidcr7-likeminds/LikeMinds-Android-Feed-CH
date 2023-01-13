@@ -31,7 +31,8 @@ internal class LikeMindsButton : MaterialButton {
     private fun initiate(attrs: AttributeSet?) {
         // fonts
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsButton)
-        this.typeface = BrandingUtil.getTypeFace(context, array, R.styleable.LikeMindsButton_font_type)
+        val fontStyle = array.getString(R.styleable.LikeMindsButton_font_type)
+        this.typeface = BrandingUtil.getTypeFace(context, fontStyle)
         array.recycle()
 
         // color

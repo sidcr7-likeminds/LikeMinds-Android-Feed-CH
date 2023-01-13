@@ -30,7 +30,8 @@ internal class LikeMindsExtendedFAB : ExtendedFloatingActionButton {
     private fun initiate(attrs: AttributeSet?) {
         // fonts
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsExtendedFAB)
-        this.typeface = BrandingUtil.getTypeFace(context, array, R.styleable.LikeMindsExtendedFAB_font_Style)
+        val fontStyle = array.getString(R.styleable.LikeMindsExtendedFAB_font_Style)
+        this.typeface = BrandingUtil.getTypeFace(context, fontStyle)
         array.recycle()
 
         // color

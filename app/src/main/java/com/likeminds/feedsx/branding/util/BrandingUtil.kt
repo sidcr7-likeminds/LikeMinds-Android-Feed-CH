@@ -10,10 +10,10 @@ import com.likeminds.feedsx.branding.model.BrandingData
 
 object BrandingUtil {
 
-    fun getTypeFace(context: Context, array: TypedArray, fontType: Int): Typeface? {
+    fun getTypeFace(context: Context, fontStyle: String?): Typeface? {
         val currentFont = BrandingData.getCurrentFonts()
 
-        val typeface = when (array.getString(fontType)) {
+        val typeface = when (fontStyle) {
             "bold" -> {
                 if (currentFont != null) {
                     Typeface.createFromAsset(context.assets, currentFont.bold)
