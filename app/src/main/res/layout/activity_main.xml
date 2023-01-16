@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.likeminds.feedsx.base.customview.LikeMindsToolbar
+        <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.likeminds.feedsx.base.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -69,20 +69,21 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.likeminds.feedsx.base.customview.LikeMindsToolbar>
+        </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
 
-        <com.likeminds.feedsx.base.customview.LikeMindsButton
+        <com.likeminds.feedsx.branding.customview.LikeMindsButton
             android:id="@+id/btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Advanced Branding"
+            android:text=""
             android:textAllCaps="false"
+            app:font_type="regular"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <com.likeminds.feedsx.base.customview.LikeMindsExtendedFAB
+        <com.likeminds.feedsx.branding.customview.LikeMindsExtendedFAB
             android:id="@+id/next_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,7 +103,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <com.likeminds.feedsx.base.customview.LikeMindsFAB
+        <com.likeminds.feedsx.branding.customview.LikeMindsFAB
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"

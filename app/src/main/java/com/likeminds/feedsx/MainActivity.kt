@@ -10,12 +10,24 @@ import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.databinding.ActivityMainBinding
 import com.likeminds.feedsx.utils.branding.BrandingData
 import dagger.hilt.android.AndroidEntryPoint
+import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.Fonts
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private var colorsList: List<String> =
         listOf("#ff0000", "#397c73", "#848659", "#ffcb00", "#bebb57")
+
+    private var fontsList: List<Fonts> =
+        listOf(
+            Fonts(
+                "fonts/montserrat-regular.ttf",
+                "fonts/montserrat-medium.ttf",
+                "fonts/montserrat-bold.ttf"
+            ),
+            Fonts("fonts/oswald-regular.ttf", "fonts/oswald-medium.ttf", "")
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,12 +43,16 @@ class MainActivity : AppCompatActivity() {
             // in this case I have set only basic settings
             var primaryColor = colorsList[(0..4).random()]
             BrandingData.invalidateColors(listOf(primaryColor, "", "", ""))
+            BrandingData.invalidateFonts(null)
             setStatusBarColor(Color.WHITE)
         } else {
             // in this case I have set only advanced settings
             var btnColor = colorsList[(0..4).random()]
             var headerColor = colorsList[(0..4).random()]
+            var selectedFont = fontsList[(0..1).random()]
+
             BrandingData.invalidateColors(listOf("", headerColor, btnColor, "#0d9579"))
+            BrandingData.invalidateFonts(selectedFont)
             setStatusBarColor(
                 if (BrandingData.isBrandingBasic) Color.WHITE else Color.parseColor(
                     headerColor
@@ -48,10 +64,10 @@ class MainActivity : AppCompatActivity() {
         binding.isBrandingBasic = BrandingData.isBrandingBasic
         setContentView(binding.root)
 
-        if (BrandingData.isBrandingBasic) {
+
             binding.btn.text =
                 if (BrandingData.isBrandingBasic) "Basic Branding" else "Advanced Branding"
-        }
+
 
         binding.btn.setOnClickListener {
             recreateSmoothly()

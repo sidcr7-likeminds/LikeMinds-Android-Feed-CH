@@ -1,8 +1,6 @@
-package com.likeminds.feedsx.utils.branding
+package com.likeminds.feedsx.branding.model
 
 import android.graphics.Color
-import android.util.Log
-import com.likeminds.feedsx.Fonts
 
 internal object BrandingData {
 
@@ -68,7 +66,7 @@ internal object BrandingData {
         currentPrimary = null
         currentAdvanced = null
 //        if (!communityId.isNullOrEmpty()) {
-            fetchBranding(colors)
+        fetchBranding(colors)
 //        }
     }
 
