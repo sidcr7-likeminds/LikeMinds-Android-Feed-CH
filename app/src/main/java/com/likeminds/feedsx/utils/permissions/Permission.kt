@@ -4,7 +4,7 @@ import android.Manifest
 import androidx.annotation.DrawableRes
 import com.likeminds.feedsx.R
 
-internal class Permission private constructor(
+class Permission private constructor(
     val permissionName: String,
     val requestCode: Int,
     val preDialogMessage: String,

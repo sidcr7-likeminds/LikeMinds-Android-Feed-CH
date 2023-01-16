@@ -17,7 +17,7 @@ import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.utils.ViewUtils
 import javax.inject.Inject
 
-internal abstract class BaseDialogFragment<B : ViewBinding, VM : ViewModel> : DialogFragment() {
+abstract class BaseDialogFragment<B : ViewBinding, VM : ViewModel> : DialogFragment() {
 
     private var _binding: B? = null
     protected val binding get() = _binding!!

@@ -16,7 +16,7 @@ import com.likeminds.feedsx.databinding.DialogPermissionBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import com.likeminds.feedsx.utils.permissions.PermissionManager.Companion.REQUEST_CODE_SETTINGS_PERMISSION
 
-internal class PermissionDialog(
+class PermissionDialog(
     private val activity: BaseAppCompatActivity,
     private val task: PermissionTask,
     private val permission: Permission,

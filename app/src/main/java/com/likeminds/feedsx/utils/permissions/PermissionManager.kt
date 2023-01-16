@@ -4,8 +4,7 @@ import android.os.Build
 import androidx.annotation.NonNull
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
-
-internal class PermissionManager {
+class PermissionManager {
 
     companion object {
         const val REQUEST_CODE_SETTINGS_PERMISSION = 100

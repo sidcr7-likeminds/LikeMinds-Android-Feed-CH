@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.utils.model
 
 
-internal interface BaseViewType {
+interface BaseViewType {
 
     @get:ViewType
     val viewType: Int

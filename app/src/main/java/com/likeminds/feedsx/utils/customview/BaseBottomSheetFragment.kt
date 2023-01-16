@@ -19,7 +19,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import javax.inject.Inject
 
-internal abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
+abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
     BottomSheetDialogFragment() {
 
     private var _binding: B? = null

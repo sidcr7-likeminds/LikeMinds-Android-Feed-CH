@@ -9,4 +9,4 @@ const val ITEM_NONE = 0
     ITEM_NONE
 )
 @Retention(AnnotationRetention.SOURCE)
-internal annotation class ViewType
+annotation class ViewType

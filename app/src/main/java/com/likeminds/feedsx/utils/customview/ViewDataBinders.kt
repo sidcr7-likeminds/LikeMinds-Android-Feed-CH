@@ -6,7 +6,7 @@ import androidx.databinding.ViewDataBinding
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ViewType
 
-internal abstract class ViewDataBinder<V : ViewDataBinding, T : BaseViewType> {
+abstract class ViewDataBinder<V : ViewDataBinding, T : BaseViewType> {
 
     @get:ViewType
     abstract val viewType: Int

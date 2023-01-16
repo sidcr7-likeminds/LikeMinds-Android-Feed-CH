@@ -18,7 +18,7 @@ import com.likeminds.feedsx.utils.snackbar.CustomSnackBar
 import javax.inject.Inject
 
 //todo add connectivity manager support for no internet
-internal open class BaseAppCompatActivity : AppCompatActivity() {
+open class BaseAppCompatActivity : AppCompatActivity() {
     /**
      * Dispatch onResume() to fragments.  Note that for better inter-operation
      * with older versions of the platform, at the point of this call the
