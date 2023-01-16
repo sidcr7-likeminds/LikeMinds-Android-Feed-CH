@@ -8,7 +8,6 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.databinding.ActivityMainBinding
-import com.likeminds.feedsx.utils.branding.BrandingData
 import dagger.hilt.android.AndroidEntryPoint
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.model.Fonts
