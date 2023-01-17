@@ -4,7 +4,7 @@ import android.graphics.Color
 
 internal object BrandingData {
 
-    private val defaultColor by lazy {
+    val defaultColor by lazy {
         Color.parseColor("#00897B")
     }
 
