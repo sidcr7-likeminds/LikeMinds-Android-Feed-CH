@@ -29,13 +29,9 @@ class PermissionDialog(
     init {
         setContentView(dialogPermissionBinding.root)
 
-        if (BrandingData.currentPrimary != null) {
-            dialogPermissionBinding.imageViewIcon.setBackgroundColor(BrandingData.currentPrimary!!)
-            dialogPermissionBinding.textViewPositiveButton.setTextColor(BrandingData.currentPrimary!!)
-        } else if (BrandingData.currentAdvanced != null) {
-            dialogPermissionBinding.imageViewIcon.setBackgroundColor(BrandingData.currentAdvanced!!.second)
-            dialogPermissionBinding.textViewPositiveButton.setTextColor(BrandingData.currentAdvanced!!.second)
-        }
+        //set branding to view
+        dialogPermissionBinding.imageViewIcon.setBackgroundColor(BrandingData.getButtonsColor())
+        dialogPermissionBinding.textViewPositiveButton.setTextColor(BrandingData.getButtonsColor())
 
         dialogPermissionBinding.imageViewIcon.setImageDrawable(
             ContextCompat.getDrawable(
