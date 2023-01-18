@@ -9,6 +9,7 @@ dependencies {
     implementation deps.ui.constraint_layout
     implementation deps.ui.recycler_view
     implementation deps.ui.circleimageview
+    implementation deps.ui.dot_indicator
 
     //hilt
     implementation deps.hilt.main
