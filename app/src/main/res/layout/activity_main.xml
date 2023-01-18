@@ -13,7 +13,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white_smoke">
 
         <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
             android:id="@+id/toolbar"
@@ -75,13 +76,25 @@
             android:id="@+id/btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:text=""
             android:textAllCaps="false"
             app:font_type="regular"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="10dp"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn"
+            app:layout_constraintBottom_toTopOf="@id/next_button"/>
 
         <com.likeminds.feedsx.branding.customview.LikeMindsExtendedFAB
             android:id="@+id/next_button"
@@ -89,6 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="20dp"
+            android:layout_marginTop="10dp"
             android:gravity="center"
             android:paddingHorizontal="20dp"
             android:text="Get Started"
@@ -99,6 +113,7 @@
             app:iconGravity="end"
             app:iconSize="16dp"
             app:iconTint="@color/white"
+            app:layout_constraintTop_toBottomOf="@id/recycler_view"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

@@ -5,7 +5,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:layout_marginBottom="12dp">
 
         <include
             android:id="@+id/author_frame"
@@ -13,7 +15,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -35,7 +36,7 @@
             tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
 
         <VideoView
-            android:id="@+id/video_loader"
+            android:id="@+id/video_post"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginTop="16dp"
@@ -52,10 +53,10 @@
             android:layout_height="wrap_content"
             android:padding="12dp"
             android:src="@drawable/ic_play"
-            app:layout_constraintBottom_toBottomOf="@id/video_loader"
+            app:layout_constraintBottom_toBottomOf="@id/video_post"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/video_loader"
+            app:layout_constraintTop_toTopOf="@id/video_post"
             tools:ignore="ContentDescription" />
 
         <include
@@ -63,10 +64,11 @@
             layout="@layout/grid_post_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:layout_marginHorizontal="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/video_loader" />
+            app:layout_constraintTop_toBottomOf="@id/video_post" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

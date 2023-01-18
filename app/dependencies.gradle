@@ -24,6 +24,10 @@ dependencies {
     implementation deps.navigation.main
     implementation deps.navigation.ui
 
+    //glide
+    implementation deps.glide.core
+    kapt deps.glide.compiler
+
     //testing
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit
