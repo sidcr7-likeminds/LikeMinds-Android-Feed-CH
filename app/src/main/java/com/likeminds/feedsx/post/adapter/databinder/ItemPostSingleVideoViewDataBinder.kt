@@ -9,15 +9,14 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
+import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 
-class PostSingleVideoItemViewDataBinder :
+class ItemPostSingleVideoViewDataBinder :
     ViewDataBinder<ItemPostSingleVideoBinding, BaseViewType>() {
 
     private var glideRequestManager: RequestManager? = null
@@ -38,7 +37,16 @@ class PostSingleVideoItemViewDataBinder :
 
     override fun bindData(binding: ItemPostSingleVideoBinding, data: BaseViewType, position: Int) {
         //TODO: Change Implementation
-        initAuthor(binding)
+        PostTypeUtil.initAuthor(
+            binding.authorFrame,
+            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+        )
+
+        PostTypeUtil.initActionsLayout(
+            binding.postActionsLayout,
+            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+        )
+
         val video: Uri =
             Uri.parse("https://media.geeksforgeeks.org/wp-content/uploads/20201217192146/Screenrecorder-2020-12-17-19-17-36-828.mp4?_=1")
 
@@ -49,24 +57,7 @@ class PostSingleVideoItemViewDataBinder :
             binding.videoPost.start()
         })
 
-        val actionsBinding = binding.postActionsGrid
-        actionsBinding.likesCount.text = "70 Likes"
-        actionsBinding.commentsCount.text = "5 Comments"
         binding.tvPostContent.text = "Let’s welcome our new joinees to this community."
-    }
-
-    private fun initAuthor(binding: ItemPostSingleVideoBinding) {
-        val data = "https://pics.freeicons.io/uploads/icons/png/5722348461605810028-512.png"
-        val authorFrameBinding = binding.authorFrame
-        authorFrameBinding.tvMemberName.text = "Siddharth"
-        authorFrameBinding.tvCustomTitle.text = "Admin"
-        glideRequestManager?.load(data)
-            ?.diskCacheStrategy(DiskCacheStrategy.NONE)
-            ?.transition(DrawableTransitionOptions.withCrossFade())
-            ?.placeholder(placeHolderDrawable)
-            ?.error(placeHolderDrawable)
-            ?.into(authorFrameBinding.memberImage)
-        authorFrameBinding.tvTime.text = "9d"
     }
 
 }

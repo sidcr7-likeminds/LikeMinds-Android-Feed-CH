@@ -1,4 +1,4 @@
-package com.likeminds.feedsx
+package com.likeminds.feedsx.post.model
 
 import com.likeminds.feedsx.utils.model.BaseViewType
 

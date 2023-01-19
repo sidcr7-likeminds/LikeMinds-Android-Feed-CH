@@ -12,6 +12,7 @@ import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
 import com.likeminds.feedsx.post.adapter.PostAdapter
+import com.likeminds.feedsx.post.model.SampleViewType
 import com.likeminds.feedsx.utils.model.*
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -85,13 +86,13 @@ class MainActivity : AppCompatActivity() {
             adapter = mPostAdapter
             layoutManager = LinearLayoutManager(context)
         }
-        mPostAdapter.add(SampleViewType(ITEM_POST_MULTIPLE_MEDIA));
-        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_VIDEO));
-        mPostAdapter.add(SampleViewType(ITEM_POST_LINK));
-        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_IMAGE));
-        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_IMAGE));
-        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_IMAGE));
-        mPostAdapter.add(SampleViewType(ITEM_POST_TEXT_ONLY));
+        mPostAdapter.add(SampleViewType(ITEM_POST_MULTIPLE_MEDIA))
+        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_VIDEO))
+        mPostAdapter.add(SampleViewType(ITEM_POST_LINK))
+        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_IMAGE))
+        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_IMAGE))
+        mPostAdapter.add(SampleViewType(ITEM_POST_SINGLE_IMAGE))
+        mPostAdapter.add(SampleViewType(ITEM_POST_TEXT_ONLY))
     }
 
     private fun setStatusBarColor(statusBarColor: Int) {

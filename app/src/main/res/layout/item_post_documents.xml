@@ -66,8 +66,8 @@
             tools:visibility="visible" />
 
         <include
-            android:id="@+id/post_actions_grid"
-            layout="@layout/grid_post_actions"
+            android:id="@+id/post_actions_layout"
+            layout="@layout/layout_post_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"

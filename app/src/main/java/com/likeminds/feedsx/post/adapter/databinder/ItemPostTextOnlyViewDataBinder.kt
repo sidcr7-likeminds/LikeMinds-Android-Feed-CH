@@ -6,15 +6,14 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
-import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
+import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_TEXT_ONLY
 
-class PostTextOnlyItemViewDataBinder :
+class ItemPostTextOnlyViewDataBinder :
     ViewDataBinder<ItemPostTextOnlyBinding, BaseViewType>() {
 
     private var glideRequestManager: RequestManager? = null
@@ -35,26 +34,18 @@ class PostTextOnlyItemViewDataBinder :
 
     override fun bindData(binding: ItemPostTextOnlyBinding, data: BaseViewType, position: Int) {
         //TODO: Change Implementation
-        initAuthor(binding)
-        binding.tvPostContent.text = "Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more"
-        val actionsBinding = binding.postActionsGrid
-        actionsBinding.likesCount.text = "30 Likes"
-        actionsBinding.commentsCount.text = "2 Comments"
-    }
+        PostTypeUtil.initAuthor(
+            binding.authorFrame,
+            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+        )
 
-    private fun initAuthor(binding: ItemPostTextOnlyBinding) {
-        val data = "https://pics.freeicons.io/uploads/icons/png/5722348461605810028-512.png"
-        val authorFrameBinding = binding.authorFrame
-        authorFrameBinding.tvMemberName.text = "Siddharth"
-        authorFrameBinding.tvCustomTitle.text = "Admin"
-        glideRequestManager?.load(data)
-            ?.diskCacheStrategy(DiskCacheStrategy.NONE)
-            ?.transition(DrawableTransitionOptions.withCrossFade())
-            ?.placeholder(placeHolderDrawable)
-            ?.error(placeHolderDrawable)
-            ?.into(authorFrameBinding.memberImage)
-        authorFrameBinding.tvTime.text = "10d"
+        PostTypeUtil.initActionsLayout(
+            binding.postActionsLayout,
+            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+        )
 
+        binding.tvPostContent.text =
+            "Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more"
     }
 
 }

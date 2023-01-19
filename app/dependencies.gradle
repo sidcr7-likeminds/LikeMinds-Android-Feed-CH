@@ -10,6 +10,7 @@ dependencies {
     implementation deps.ui.recycler_view
     implementation deps.ui.circleimageview
     implementation deps.ui.dot_indicator
+    implementation deps.ui.photo_view
 
     //hilt
     implementation deps.hilt.main

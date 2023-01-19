@@ -14,23 +14,23 @@ class PostAdapter : BaseRecyclerAdapter<BaseViewType>() {
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(6)
 
-        val postTextOnlyBinding = PostTextOnlyItemViewDataBinder()
+        val postTextOnlyBinding = ItemPostTextOnlyViewDataBinder()
         viewDataBinders.add(postTextOnlyBinding)
 
-        val postSingleImageItemViewDataBinder = PostSingleImageItemViewDataBinder()
-        viewDataBinders.add(postSingleImageItemViewDataBinder)
+        val itemPostSingleImageViewDataBinder = ItemPostSingleImageViewDataBinder()
+        viewDataBinders.add(itemPostSingleImageViewDataBinder)
 
-        val postSingleVideoItemViewDataBinder = PostSingleVideoItemViewDataBinder()
-        viewDataBinders.add(postSingleVideoItemViewDataBinder)
+        val itemPostSingleVideoViewDataBinder = ItemPostSingleVideoViewDataBinder()
+        viewDataBinders.add(itemPostSingleVideoViewDataBinder)
 
-        val postLinkItemViewDataBinder = PostLinkItemViewDataBinder()
-        viewDataBinders.add(postLinkItemViewDataBinder)
+        val itemPostLinkViewDataBinder = ItemPostLinkViewDataBinder()
+        viewDataBinders.add(itemPostLinkViewDataBinder)
 
-        val postDocumentsItemViewDataBinder = PostDocumentsItemViewDataBinder()
-        viewDataBinders.add(postDocumentsItemViewDataBinder)
+        val itemPostDocumentsViewDataBinder = ItemPostDocumentsViewDataBinder()
+        viewDataBinders.add(itemPostDocumentsViewDataBinder)
 
-        val postMultipleMediaItemViewDataBinder = PostMultipleMediaItemViewDataBinder()
-        viewDataBinders.add(postMultipleMediaItemViewDataBinder)
+        val itemPostMultipleMediaViewDataBinder = ItemPostMultipleMediaViewDataBinder()
+        viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
 
         return viewDataBinders
     }
