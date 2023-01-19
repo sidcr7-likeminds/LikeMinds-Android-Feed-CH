@@ -1,9 +1,8 @@
 package com.likeminds.feedsx.branding.util
 
 import android.content.Context
-import android.content.res.TypedArray
+import android.graphics.Color
 import android.graphics.Typeface
-import android.util.AttributeSet
 import androidx.core.content.res.ResourcesCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -42,4 +41,22 @@ object BrandingUtil {
         return typeface
     }
 
+    fun getTextColor(defaultColor: Int, textType: String?): Int {
+        val color = when (textType) {
+            "title" -> {
+                if (BrandingData.isBrandingBasic) {
+                    Color.WHITE
+                } else {
+                    Color.BLACK
+                }
+            }
+            "special" -> {
+                BrandingData.getButtonsColor()
+            }
+            else -> {
+                defaultColor
+            }
+        }
+        return color
+    }
 }

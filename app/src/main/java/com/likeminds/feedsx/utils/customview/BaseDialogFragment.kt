@@ -17,16 +17,10 @@ import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.utils.ViewUtils
 import javax.inject.Inject
 
-abstract class BaseDialogFragment<B : ViewBinding, VM : ViewModel> : DialogFragment() {
+abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
 
     private var _binding: B? = null
     protected val binding get() = _binding!!
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    protected lateinit var viewModel: VM
-
-    protected abstract fun getViewModelClass(): Class<VM>?
 
     protected abstract fun getViewBinding(): B
 
@@ -56,7 +50,6 @@ abstract class BaseDialogFragment<B : ViewBinding, VM : ViewModel> : DialogFragm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        init()
         receiveExtras()
     }
 
@@ -92,17 +85,6 @@ abstract class BaseDialogFragment<B : ViewBinding, VM : ViewModel> : DialogFragm
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
-    }
-
-    private fun init() {
-        if (getViewModelClass() == null) {
-            return
-        }
-        viewModel = if (useSharedViewModel) {
-            ViewModelProvider(requireActivity(), viewModelFactory).get(getViewModelClass()!!)
-        } else {
-            ViewModelProvider(this, viewModelFactory).get(getViewModelClass()!!)
-        }
     }
 
     private fun callBranding() {

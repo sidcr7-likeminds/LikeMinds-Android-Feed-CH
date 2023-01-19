@@ -10,4 +10,6 @@
     <string name="edited">Edited</string>
     <string name="admin">Admin</string>
     <string name="pdf">PDF</string>
+    <string name="create_a_post">Create a post</string>
+    <string name="done">Done</string>
 </resources>

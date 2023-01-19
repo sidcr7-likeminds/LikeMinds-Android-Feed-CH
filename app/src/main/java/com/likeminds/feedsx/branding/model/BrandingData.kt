@@ -5,7 +5,7 @@ import android.graphics.Color
 internal object BrandingData {
 
     val defaultColor by lazy {
-        Color.parseColor("#00897B")
+        Color.parseColor("#5046E5")
     }
 
     private val defaultHeaderColor by lazy {
