@@ -12,6 +12,9 @@ class CommentsViewData private constructor(
     var level: Int,
     var likesCount: Int,
     var repliesCount: Int,
+    var user: UserViewData,
+    var createdAt: Long,
+    var updatedAt: Long,
     var menuItems: List<MenuItemsViewData>
 ) : Parcelable, BaseViewType {
     override val viewType: Int
@@ -23,6 +26,9 @@ class CommentsViewData private constructor(
         private var level: Int = 0
         private var likesCount: Int = 0
         private var repliesCount: Int = 0
+        private var user: UserViewData = UserViewData.Builder().build()
+        private var createdAt: Long = 0
+        private var updatedAt: Long = 0
         private var menuItems: List<MenuItemsViewData> = listOf()
 
         fun userId(userId: String) = apply { this.userId = userId }
@@ -30,6 +36,9 @@ class CommentsViewData private constructor(
         fun level(level: Int) = apply { this.level = level }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
         fun repliesCount(repliesCount: Int) = apply { this.repliesCount = repliesCount }
+        fun user(user: UserViewData) = apply { this.user = user }
+        fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
+        fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
         fun menuItems(menuItems: List<MenuItemsViewData>) = apply { this.menuItems = menuItems }
 
         fun build() = CommentsViewData(
@@ -38,6 +47,9 @@ class CommentsViewData private constructor(
             level,
             likesCount,
             repliesCount,
+            user,
+            createdAt,
+            updatedAt,
             menuItems
         )
     }
@@ -48,6 +60,9 @@ class CommentsViewData private constructor(
             .level(level)
             .likesCount(likesCount)
             .repliesCount(repliesCount)
+            .user(user)
+            .createdAt(createdAt)
+            .updatedAt(updatedAt)
             .menuItems(menuItems)
     }
 

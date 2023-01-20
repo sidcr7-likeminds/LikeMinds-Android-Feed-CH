@@ -11,13 +11,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
+import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 
 class ItemPostSingleVideoViewDataBinder :
-    ViewDataBinder<ItemPostSingleVideoBinding, BaseViewType>() {
+    ViewDataBinder<ItemPostSingleVideoBinding, PostViewData>() {
 
     private var glideRequestManager: RequestManager? = null
     private var placeHolderDrawable: ColorDrawable? = null
@@ -35,20 +35,20 @@ class ItemPostSingleVideoViewDataBinder :
         return binding
     }
 
-    override fun bindData(binding: ItemPostSingleVideoBinding, data: BaseViewType, position: Int) {
+    override fun bindData(binding: ItemPostSingleVideoBinding, data: PostViewData, position: Int) {
         //TODO: Change Implementation
-        PostTypeUtil.initAuthor(
+        PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+            data
         )
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+            data
         )
 
         val video: Uri =
-            Uri.parse("https://media.geeksforgeeks.org/wp-content/uploads/20201217192146/Screenrecorder-2020-12-17-19-17-36-828.mp4?_=1")
+            Uri.parse(data.attachments[0].fileUrl)
 
         binding.videoPost.setVideoURI(video)
         binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->

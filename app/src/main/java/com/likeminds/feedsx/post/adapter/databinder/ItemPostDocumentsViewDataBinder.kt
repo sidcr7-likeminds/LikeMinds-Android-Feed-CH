@@ -3,13 +3,13 @@ package com.likeminds.feedsx.post.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
+import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
 
 class ItemPostDocumentsViewDataBinder :
-    ViewDataBinder<ItemPostDocumentsBinding, BaseViewType>() {
+    ViewDataBinder<ItemPostDocumentsBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_DOCUMENTS
@@ -18,17 +18,17 @@ class ItemPostDocumentsViewDataBinder :
         return ItemPostDocumentsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
-    override fun bindData(binding: ItemPostDocumentsBinding, data: BaseViewType, position: Int) {
+    override fun bindData(binding: ItemPostDocumentsBinding, data: PostViewData, position: Int) {
         //TODO: Change Implementation
 
-        PostTypeUtil.initAuthor(
+        PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
-            "https://pics.freeicons.io/uploads/icons/png/5722348461605810028-512.png"
+            data
         )
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            "https://pics.freeicons.io/uploads/icons/png/5722348461605810028-512.png"
+            data
         )
 
         binding.tvPostContent.text = "Let’s welcome our new joinees to this community."

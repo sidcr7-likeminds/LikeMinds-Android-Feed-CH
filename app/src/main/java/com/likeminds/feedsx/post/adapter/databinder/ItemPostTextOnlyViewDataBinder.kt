@@ -8,13 +8,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
+import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_TEXT_ONLY
 
 class ItemPostTextOnlyViewDataBinder :
-    ViewDataBinder<ItemPostTextOnlyBinding, BaseViewType>() {
+    ViewDataBinder<ItemPostTextOnlyBinding, PostViewData>() {
 
     private var glideRequestManager: RequestManager? = null
     private var placeHolderDrawable: ColorDrawable? = null
@@ -32,16 +32,16 @@ class ItemPostTextOnlyViewDataBinder :
         return binding
     }
 
-    override fun bindData(binding: ItemPostTextOnlyBinding, data: BaseViewType, position: Int) {
+    override fun bindData(binding: ItemPostTextOnlyBinding, data: PostViewData, position: Int) {
         //TODO: Change Implementation
-        PostTypeUtil.initAuthor(
+        PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+            data
         )
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+            data
         )
 
         binding.tvPostContent.text =

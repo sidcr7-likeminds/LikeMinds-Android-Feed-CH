@@ -12,6 +12,7 @@ class PostViewData private constructor(
     var communityId: Int,
     var isPinned: Boolean,
     var isSaved: Boolean,
+    var isEdited: Boolean,
     var userId: String,
     var likesCount: Int,
     var commentsCount: Int,
@@ -19,10 +20,12 @@ class PostViewData private constructor(
     var comments: List<CommentsViewData>,
     var createdAt: Long,
     var updatedAt: Long,
-    var users: UserViewData
+    var user: UserViewData
 ) : Parcelable, BaseViewType {
 
     //TODO: For Link?
+    //TODO: isEdited not added in ED yet.
+
     override val viewType: Int
         get() = when {
             (attachments.size == 1 && attachments[0].fileType == 1) -> {
@@ -49,6 +52,7 @@ class PostViewData private constructor(
         private var communityId: Int = 0
         private var isPinned: Boolean = false
         private var isSaved: Boolean = false
+        private var isEdited: Boolean = false
         private var userId: String = ""
         private var likesCount: Int = 0
         private var commentsCount: Int = 0
@@ -56,7 +60,7 @@ class PostViewData private constructor(
         private var comments: List<CommentsViewData> = listOf()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
-        private var users: UserViewData = UserViewData.Builder().build()
+        private var user: UserViewData = UserViewData.Builder().build()
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
@@ -66,6 +70,7 @@ class PostViewData private constructor(
         fun communityId(communityId: Int) = apply { this.communityId = communityId }
         fun isPinned(isPinned: Boolean) = apply { this.isPinned = isPinned }
         fun isSaved(isSaved: Boolean) = apply { this.isSaved = isSaved }
+        fun isEdited(isEdited: Boolean) = apply { this.isEdited = isEdited }
         fun userId(userId: String) = apply { this.userId = userId }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
         fun commentsCount(commentsCount: Int) = apply { this.commentsCount = commentsCount }
@@ -73,7 +78,7 @@ class PostViewData private constructor(
         fun comments(comments: List<CommentsViewData>) = apply { this.comments = comments }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
-        fun users(users: UserViewData) = apply { this.users = users }
+        fun user(user: UserViewData) = apply { this.user = user }
 
         fun build() = PostViewData(
             id,
@@ -82,6 +87,7 @@ class PostViewData private constructor(
             communityId,
             isPinned,
             isSaved,
+            isEdited,
             userId,
             likesCount,
             commentsCount,
@@ -89,7 +95,7 @@ class PostViewData private constructor(
             comments,
             createdAt,
             updatedAt,
-            users
+            user
         )
     }
 
@@ -100,6 +106,7 @@ class PostViewData private constructor(
             .communityId(communityId)
             .isPinned(isPinned)
             .isSaved(isSaved)
+            .isEdited(isEdited)
             .userId(userId)
             .likesCount(likesCount)
             .commentsCount(commentsCount)
@@ -107,6 +114,6 @@ class PostViewData private constructor(
             .comments(comments)
             .createdAt(createdAt)
             .updatedAt(updatedAt)
-            .users(users)
+            .user(user)
     }
 }

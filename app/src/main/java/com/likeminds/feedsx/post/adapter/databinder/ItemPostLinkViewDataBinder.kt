@@ -3,13 +3,13 @@ package com.likeminds.feedsx.post.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostLinkBinding
+import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_LINK
 
 class ItemPostLinkViewDataBinder :
-    ViewDataBinder<ItemPostLinkBinding, BaseViewType>() {
+    ViewDataBinder<ItemPostLinkBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_LINK
@@ -18,16 +18,16 @@ class ItemPostLinkViewDataBinder :
         return ItemPostLinkBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
-    override fun bindData(binding: ItemPostLinkBinding, data: BaseViewType, position: Int) {
+    override fun bindData(binding: ItemPostLinkBinding, data: PostViewData, position: Int) {
         //TODO: Change Implementation
-        PostTypeUtil.initAuthor(
+        PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+            data
         )
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            "https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg?auto=compress&cs=tinysrgb&w=800"
+            data
         )
 
         binding.tvLinkDescription.text =
