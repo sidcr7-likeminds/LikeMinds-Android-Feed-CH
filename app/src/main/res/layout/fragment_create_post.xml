@@ -4,13 +4,161 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_parent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
-        tools:context=".post.view.CreatePostFragment">
+        android:background="@color/white">
+
+        <androidx.core.widget.NestedScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toTopOf="@id/layout_add_image"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:context=".post.view.CreatePostFragment">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white">
+
+                <include
+                    android:id="@+id/author_frame"
+                    layout="@layout/layout_post_creator"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.likeminds.feedsx.utils.customview.edittext.LikeMindsEditText
+                    android:id="@+id/et_post_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@null"
+                    android:ellipsize="end"
+                    android:hint="@string/write_something_here"
+                    android:inputType="textMultiLine"
+                    android:textColor="@color/dark_grey"
+                    android:textColorHint="@color/maastricht_blue_40"
+                    android:textSize="16sp"
+                    app:font_style="regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/author_frame" />
 
 
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+        <LinearLayout
+            android:id="@+id/layout_attach_files"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:elevation="4dp"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:src="@drawable/ic_attach_files"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:elevation="4dp"
+                android:fontFamily="@font/roboto_regular"
+                android:text="@string/attach_files"
+                android:textColor="@color/raisin_black"
+                android:textSize="14sp"
+                app:fontType="regular" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/video_file_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/cloudy_blue_50"
+            app:layout_constraintBottom_toTopOf="@+id/layout_attach_files" />
+
+        <LinearLayout
+            android:id="@+id/layout_add_video"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:elevation="4dp"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toTopOf="@id/video_file_separator">
+
+            <ImageView
+                android:id="@+id/iv_add_video"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add_video"
+                app:layout_constraintBottom_toTopOf="@id/video_file_separator"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:fontFamily="@font/roboto_regular"
+                android:text="@string/add_video"
+                android:textColor="@color/raisin_black"
+                android:textSize="14sp"
+                app:fontType="regular"
+                app:layout_constraintBottom_toBottomOf="@id/iv_add_video"
+                app:layout_constraintStart_toEndOf="@id/iv_add_video"
+                app:layout_constraintTop_toTopOf="@id/iv_add_video" />
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/video_image_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/cloudy_blue_50"
+            app:layout_constraintBottom_toTopOf="@+id/layout_add_video" />
+
+        <LinearLayout
+            android:id="@+id/layout_add_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:paddingVertical="10dp"
+            android:gravity="center_vertical"
+            app:layout_constraintBottom_toTopOf="@id/video_image_separator">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add_image" />
+
+            <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="18dp"
+                android:elevation="4dp"
+                android:fontFamily="@font/roboto_regular"
+                android:text="@string/add_photo"
+                android:textColor="@color/raisin_black"
+                android:textSize="14sp"
+                app:fontType="regular" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

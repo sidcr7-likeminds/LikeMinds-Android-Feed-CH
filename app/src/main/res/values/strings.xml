@@ -12,4 +12,9 @@
     <string name="pdf">PDF</string>
     <string name="create_a_post">Create a post</string>
     <string name="done">Done</string>
+    <string name="post">Post</string>
+    <string name="write_something_here">Write something here...</string>
+    <string name="attach_files">Attach Files</string>
+    <string name="add_video">Add Video</string>
+    <string name="add_photo">Add Photo</string>
 </resources>

@@ -14,4 +14,9 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
     }
+
+    override fun setUpViews() {
+        super.setUpViews()
+    }
+
 }
