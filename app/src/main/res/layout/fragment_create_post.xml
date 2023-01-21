@@ -49,7 +49,7 @@
                     app:layout_constraintTop_toBottomOf="@id/author_frame" />
 
                 <include
-                    android:id="@+id/single_image_post"
+                    android:id="@+id/single_image_attachment"
                     layout="@layout/layout_create_post_single_image"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
@@ -60,10 +60,63 @@
                     app:layout_constraintTop_toBottomOf="@id/et_post_content"
                     tools:visibility="visible" />
 
+                <include
+                    android:id="@+id/single_video_attachment"
+                    layout="@layout/layout_create_post_single_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/et_post_content"
+                    tools:visibility="gone" />
+
+                <include
+                    android:id="@+id/link_preview"
+                    layout="@layout/layout_create_post_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/et_post_content"
+                    tools:visibility="gone" />
+
+                <include
+                    android:id="@+id/documents_attachment"
+                    layout="@layout/layout_create_post_documents"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/et_post_content"
+                    tools:visibility="gone" />
+
+                <include
+                    android:id="@+id/multiple_media_attachment"
+                    layout="@layout/layout_create_post_multiple_media"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/et_post_content"
+                    tools:visibility="gone" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.core.widget.NestedScrollView>
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_add_attachments"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="layout_add_image, layout_add_video, layout_attach_files"/>
 
         <LinearLayout
             android:id="@+id/layout_attach_files"

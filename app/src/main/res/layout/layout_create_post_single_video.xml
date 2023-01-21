@@ -8,7 +8,7 @@
         android:layout_height="wrap_content">
 
         <VideoView
-            android:id="@+id/iv_single_video_post"
+            android:id="@+id/vv_single_video_post"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:scaleType="centerCrop"
@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:padding="8dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/iv_single_video_post"
+            app:layout_constraintTop_toTopOf="@+id/vv_single_video_post"
             app:srcCompat="@drawable/ic_cross"
             tools:ignore="ContentDescription" />
 
@@ -34,11 +34,31 @@
             android:layout_height="wrap_content"
             android:padding="12dp"
             android:src="@drawable/ic_play"
-            app:layout_constraintBottom_toBottomOf="@id/iv_single_video_post"
+            app:layout_constraintBottom_toBottomOf="@id/vv_single_video_post"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/iv_single_video_post"
+            app:layout_constraintTop_toTopOf="@id/vv_single_video_post"
             tools:ignore="ContentDescription" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsButton
+            android:id="@+id/btn_add_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/add_more"
+            android:textAllCaps="false"
+            android:textColor="@color/majorelle_blue"
+            android:drawableLeft="@drawable/ic_plus"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:font_type="medium"
+            android:paddingHorizontal="24dp"
+            android:background="@drawable/background_round_8dp"
+            tools:fontFamily="@font/roboto_medium"
+            tools:visibility="visible"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vv_single_video_post"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
