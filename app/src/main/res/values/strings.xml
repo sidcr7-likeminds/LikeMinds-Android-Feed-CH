@@ -17,4 +17,5 @@
     <string name="attach_files">Attach Files</string>
     <string name="add_video">Add Video</string>
     <string name="add_photo">Add Photo</string>
+    <string name="playing_this_video">Playing this video…</string>
 </resources>
