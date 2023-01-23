@@ -19,4 +19,10 @@
     <string name="add_photo">Add Photo</string>
     <string name="playing_this_video">Playing this video…</string>
     <string name="add_more">Add More</string>
+    <string name="documents">Documents</string>
+    <string name="action_search">Search</string>
+    <string name="sort">Sort</string>
+    <string name="browse_other_docs">Browse other docs…</string>
+    <string name="search_hint_text">Search…</string>
+
 </resources>

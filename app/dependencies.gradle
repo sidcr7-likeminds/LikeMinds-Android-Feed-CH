@@ -29,6 +29,10 @@ dependencies {
     implementation deps.glide.core
     kapt deps.glide.compiler
 
+    //rx
+    implementation deps.rxJava.main
+    implementation deps.rxJava.android
+
     //testing
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit

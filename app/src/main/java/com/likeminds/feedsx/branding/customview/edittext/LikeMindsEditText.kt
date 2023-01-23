@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.utils.customview.edittext
+package com.likeminds.feedsx.branding.customview.edittext
 
 import android.content.Context
 import android.util.AttributeSet
