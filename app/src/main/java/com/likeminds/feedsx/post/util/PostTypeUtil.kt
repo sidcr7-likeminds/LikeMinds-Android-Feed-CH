@@ -3,10 +3,8 @@ package com.likeminds.feedsx.post.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.View
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -32,6 +30,10 @@ object PostTypeUtil {
         binding: LayoutAuthorFrameBinding,
         data: PostViewData
     ) {
+        //TODO: Change pin filled drawable
+        if(data.isPinned) binding.ivPin.setImageResource(R.drawable.ic_pin_filled)
+        else binding.ivPin.setImageResource(R.drawable.ic_pin_unfilled)
+
         // creator data
         val user = data.user
         binding.tvMemberName.text = user.name
@@ -60,8 +62,33 @@ object PostTypeUtil {
         binding: LayoutPostActionsBinding,
         data: PostViewData
     ) {
-        binding.likesCount.text = data.likesCount.toString()
-        binding.commentsCount.text = data.commentsCount.toString()
+        //TODO: share post
+
+        val context = binding.root.context
+
+        if(data.isLiked) binding.ivLike.setImageResource(R.drawable.ic_liked_filled)
+        else binding.ivLike.setImageResource(R.drawable.ic_liked_unfilled)
+
+        if(data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+        else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+
+        binding.likesCount.text =
+            if (data.likesCount == 0) context.getString(R.string.like)
+            else
+                context.resources.getQuantityString(
+                    R.plurals.likes,
+                    data.likesCount,
+                    data.likesCount
+                )
+
+        binding.commentsCount.text =
+            if (data.commentsCount == 0) context.getString(R.string.add_comment)
+            else
+                context.resources.getQuantityString(
+                    R.plurals.comments,
+                    data.commentsCount,
+                    data.commentsCount
+                )
     }
 
     fun initViewPager(binding: ItemPostMultipleMediaBinding) {

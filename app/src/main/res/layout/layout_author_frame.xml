@@ -113,7 +113,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_post_options"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_pin" />
+            app:srcCompat="@drawable/ic_pin_unfilled" />
 
         <ImageView
             android:id="@+id/iv_post_options"

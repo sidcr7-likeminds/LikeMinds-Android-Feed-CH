@@ -15,6 +15,7 @@ class PostViewData private constructor(
     var isPinned: Boolean,
     var isSaved: Boolean,
     var isEdited: Boolean,
+    var isLiked: Boolean,
     var userId: String,
     var likesCount: Int,
     var commentsCount: Int,
@@ -25,7 +26,7 @@ class PostViewData private constructor(
     var user: UserViewData
 ) : Parcelable, BaseViewType {
 
-    //TODO: isEdited not added in ED yet.
+    //TODO: isEdited/isLiked not added in ED yet.
 
     override val viewType: Int
         get() = when {
@@ -57,6 +58,7 @@ class PostViewData private constructor(
         private var isPinned: Boolean = false
         private var isSaved: Boolean = false
         private var isEdited: Boolean = false
+        private var isLiked: Boolean = false
         private var userId: String = ""
         private var likesCount: Int = 0
         private var commentsCount: Int = 0
@@ -69,7 +71,9 @@ class PostViewData private constructor(
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
         fun shortText(shortText: String?) = apply { this.shortText = shortText }
-        fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) = apply { this.alreadySeenFullContent = alreadySeenFullContent }
+        fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) =
+            apply { this.alreadySeenFullContent = alreadySeenFullContent }
+
         fun attachments(attachments: List<AttachmentViewData>) =
             apply { this.attachments = attachments }
 
@@ -77,6 +81,7 @@ class PostViewData private constructor(
         fun isPinned(isPinned: Boolean) = apply { this.isPinned = isPinned }
         fun isSaved(isSaved: Boolean) = apply { this.isSaved = isSaved }
         fun isEdited(isEdited: Boolean) = apply { this.isEdited = isEdited }
+        fun isLiked(isLiked: Boolean) = apply { this.isLiked = isLiked }
         fun userId(userId: String) = apply { this.userId = userId }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
         fun commentsCount(commentsCount: Int) = apply { this.commentsCount = commentsCount }
@@ -96,6 +101,7 @@ class PostViewData private constructor(
             isPinned,
             isSaved,
             isEdited,
+            isLiked,
             userId,
             likesCount,
             commentsCount,
@@ -117,6 +123,7 @@ class PostViewData private constructor(
             .isPinned(isPinned)
             .isSaved(isSaved)
             .isEdited(isEdited)
+            .isLiked(isLiked)
             .userId(userId)
             .likesCount(likesCount)
             .commentsCount(commentsCount)
