@@ -25,7 +25,6 @@ class ItemPostSingleImageViewDataBinder :
     }
 
     override fun bindData(binding: ItemPostSingleImageBinding, data: PostViewData, position: Int) {
-        //TODO: Change Implementation
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data
@@ -35,14 +34,14 @@ class ItemPostSingleImageViewDataBinder :
             binding.postActionsLayout,
             data
         )
-        binding.tvPostContent.text = "Let’s welcome our new joinees to this community."
 
         ImageBindingUtil.loadImage(
             binding.ivPost,
-            data.attachments[0].fileUrl,
+            data.attachments.first().fileUrl,
             placeholder = R.drawable.image_placeholder
         )
 
+        //TODO: Testing data
         binding.tvPostContent.text = "Let’s welcome our new joinees to this community."
     }
 

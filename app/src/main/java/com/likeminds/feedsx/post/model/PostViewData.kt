@@ -16,29 +16,29 @@ class PostViewData private constructor(
     var userId: String,
     var likesCount: Int,
     var commentsCount: Int,
-    var menuItems: List<MenuItemsViewData>,
-    var comments: List<CommentsViewData>,
+    var menuItems: List<MenuItemViewData>,
+    var comments: List<CommentViewData>,
     var createdAt: Long,
     var updatedAt: Long,
     var user: UserViewData
 ) : Parcelable, BaseViewType {
 
-    //TODO: For Link?
     //TODO: isEdited not added in ED yet.
 
     override val viewType: Int
         get() = when {
-            (attachments.size == 1 && attachments[0].fileType == 1) -> {
+            //TODO: For Link?
+            (attachments.size == 1 && attachments.first().fileType == 1) -> {
                 ITEM_POST_SINGLE_IMAGE
             }
-            (attachments.size == 1 && attachments[0].fileType == 2) -> {
+            (attachments.size == 1 && attachments.first().fileType == 2) -> {
                 ITEM_POST_SINGLE_VIDEO
             }
-            (attachments.isNotEmpty() && attachments[0].fileType == 3) -> {
+            (attachments.isNotEmpty() && attachments.first().fileType == 3) -> {
                 ITEM_POST_DOCUMENTS
             }
-            (attachments.size > 1 && (attachments[0].fileType == 1 || attachments[0].fileType == 2)) -> {
-                ITEM_MULTIPLE_MEDIA_VIDEO
+            (attachments.size > 1 && (attachments.first().fileType == 1 || attachments.first().fileType == 2)) -> {
+                ITEM_POST_MULTIPLE_MEDIA
             }
             else -> {
                 ITEM_POST_TEXT_ONLY
@@ -56,8 +56,8 @@ class PostViewData private constructor(
         private var userId: String = ""
         private var likesCount: Int = 0
         private var commentsCount: Int = 0
-        private var menuItems: List<MenuItemsViewData> = listOf()
-        private var comments: List<CommentsViewData> = listOf()
+        private var menuItems: List<MenuItemViewData> = listOf()
+        private var comments: List<CommentViewData> = listOf()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
         private var user: UserViewData = UserViewData.Builder().build()
@@ -74,8 +74,8 @@ class PostViewData private constructor(
         fun userId(userId: String) = apply { this.userId = userId }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
         fun commentsCount(commentsCount: Int) = apply { this.commentsCount = commentsCount }
-        fun menuItems(menuItems: List<MenuItemsViewData>) = apply { this.menuItems = menuItems }
-        fun comments(comments: List<CommentsViewData>) = apply { this.comments = comments }
+        fun menuItems(menuItems: List<MenuItemViewData>) = apply { this.menuItems = menuItems }
+        fun comments(comments: List<CommentViewData>) = apply { this.comments = comments }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
         fun user(user: UserViewData) = apply { this.user = user }

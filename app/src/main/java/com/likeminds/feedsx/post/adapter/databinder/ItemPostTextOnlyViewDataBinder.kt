@@ -33,7 +33,6 @@ class ItemPostTextOnlyViewDataBinder :
     }
 
     override fun bindData(binding: ItemPostTextOnlyBinding, data: PostViewData, position: Int) {
-        //TODO: Change Implementation
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data
@@ -44,6 +43,7 @@ class ItemPostTextOnlyViewDataBinder :
             data
         )
 
+        //TODO: Testing data
         binding.tvPostContent.text =
             "Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more"
     }

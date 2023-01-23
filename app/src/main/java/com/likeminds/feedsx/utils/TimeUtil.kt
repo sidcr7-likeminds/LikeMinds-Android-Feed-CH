@@ -2,15 +2,15 @@ package com.likeminds.feedsx.utils
 
 object TimeUtil {
 
-    private const val MILLIS_IN_DAY = 24 * 60 * 60 * 1000
-    private const val MILLIS_IN_HOURS = 60 * 60 * 1000
-    private const val MILLIS_IN_MINUTES = 60 * 1000
+    private const val DAY_IN_MILLIS = 24 * 60 * 60 * 1000
+    private const val HOUR_IN_MILLIS = 60 * 60 * 1000
+    private const val MINUTE_IN_MILLIS = 60 * 1000
 
     fun getDaysHoursOrMinutes(timestamp: Long): String {
-        val days = (timestamp / MILLIS_IN_DAY).toInt()
-        val hours = ((timestamp - (days * MILLIS_IN_DAY)) / MILLIS_IN_HOURS).toInt()
+        val days = (timestamp / DAY_IN_MILLIS).toInt()
+        val hours = ((timestamp - (days * DAY_IN_MILLIS)) / HOUR_IN_MILLIS).toInt()
         val minutes =
-            ((timestamp - (days * MILLIS_IN_DAY) - (hours * MILLIS_IN_HOURS)) / MILLIS_IN_MINUTES).toInt()
+            ((timestamp - (days * DAY_IN_MILLIS) - (hours * HOUR_IN_MILLIS)) / MINUTE_IN_MILLIS).toInt()
         return when {
             days == 0 && hours == 0 && minutes > 0 -> "$minutes min"
             days == 0 && hours == 1 -> "$hours h"

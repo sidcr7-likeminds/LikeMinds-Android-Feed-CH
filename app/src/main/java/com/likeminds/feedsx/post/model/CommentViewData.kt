@@ -6,7 +6,7 @@ import com.likeminds.feedsx.utils.model.ITEM_COMMENT
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class CommentsViewData private constructor(
+class CommentViewData private constructor(
     var userId: String,
     var text: String,
     var level: Int,
@@ -15,7 +15,7 @@ class CommentsViewData private constructor(
     var user: UserViewData,
     var createdAt: Long,
     var updatedAt: Long,
-    var menuItems: List<MenuItemsViewData>
+    var menuItems: List<MenuItemViewData>
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_COMMENT
@@ -29,7 +29,7 @@ class CommentsViewData private constructor(
         private var user: UserViewData = UserViewData.Builder().build()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
-        private var menuItems: List<MenuItemsViewData> = listOf()
+        private var menuItems: List<MenuItemViewData> = listOf()
 
         fun userId(userId: String) = apply { this.userId = userId }
         fun text(text: String) = apply { this.text = text }
@@ -39,9 +39,9 @@ class CommentsViewData private constructor(
         fun user(user: UserViewData) = apply { this.user = user }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
-        fun menuItems(menuItems: List<MenuItemsViewData>) = apply { this.menuItems = menuItems }
+        fun menuItems(menuItems: List<MenuItemViewData>) = apply { this.menuItems = menuItems }
 
-        fun build() = CommentsViewData(
+        fun build() = CommentViewData(
             userId,
             text,
             level,

@@ -19,7 +19,6 @@ class ItemPostDocumentsViewDataBinder :
     }
 
     override fun bindData(binding: ItemPostDocumentsBinding, data: PostViewData, position: Int) {
-        //TODO: Change Implementation
 
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
@@ -31,6 +30,7 @@ class ItemPostDocumentsViewDataBinder :
             data
         )
 
+        //TODO: Testing data
         binding.tvPostContent.text = "Let’s welcome our new joinees to this community."
     }
 

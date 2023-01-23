@@ -6,7 +6,7 @@ import com.likeminds.feedsx.utils.model.ITEM_MENU_ITEM
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class MenuItemsViewData private constructor(
+class MenuItemViewData private constructor(
     var title: String
 ) : Parcelable, BaseViewType {
     override val viewType: Int
@@ -17,7 +17,7 @@ class MenuItemsViewData private constructor(
 
         fun title(title: String) = apply { this.title = title }
 
-        fun build() = MenuItemsViewData(
+        fun build() = MenuItemViewData(
             title
         )
     }

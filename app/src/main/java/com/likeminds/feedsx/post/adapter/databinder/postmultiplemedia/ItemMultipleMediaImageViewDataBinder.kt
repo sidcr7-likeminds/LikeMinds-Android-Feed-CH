@@ -28,7 +28,8 @@ class ItemMultipleMediaImageViewDataBinder :
         data: BaseViewType,
         position: Int
     ) {
-        //TODO: Change implementation
+
+        //TODO: Testing data
         ImageBindingUtil.loadImage(
             binding.ivPost,
             "https://picsum.photos/id/237/200/300",

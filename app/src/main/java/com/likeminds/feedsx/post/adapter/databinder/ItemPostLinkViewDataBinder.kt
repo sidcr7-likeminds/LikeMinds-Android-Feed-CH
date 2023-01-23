@@ -19,7 +19,6 @@ class ItemPostLinkViewDataBinder :
     }
 
     override fun bindData(binding: ItemPostLinkBinding, data: PostViewData, position: Int) {
-        //TODO: Change Implementation
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data
@@ -30,6 +29,7 @@ class ItemPostLinkViewDataBinder :
             data
         )
 
+        //TODO: Testing data
         binding.tvLinkDescription.text =
             "The new feature has already been implemented in the United States and Other Eu…"
         binding.tvLinkTitle.text = "Twitter will soon let you schedule your tweets"

@@ -25,7 +25,7 @@ class ItemMultipleMediaVideoViewDataBinder :
         data: BaseViewType,
         position: Int
     ) {
-        //TODO: Change implementation
+        //TODO: Testing data
         val video: Uri =
             Uri.parse("https://media.geeksforgeeks.org/wp-content/uploads/20201217192146/Screenrecorder-2020-12-17-19-17-36-828.mp4?_=1")
 

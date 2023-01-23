@@ -36,7 +36,6 @@ class ItemPostSingleVideoViewDataBinder :
     }
 
     override fun bindData(binding: ItemPostSingleVideoBinding, data: PostViewData, position: Int) {
-        //TODO: Change Implementation
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data
@@ -48,7 +47,7 @@ class ItemPostSingleVideoViewDataBinder :
         )
 
         val video: Uri =
-            Uri.parse(data.attachments[0].fileUrl)
+            Uri.parse(data.attachments.first().fileUrl)
 
         binding.videoPost.setVideoURI(video)
         binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
@@ -57,6 +56,7 @@ class ItemPostSingleVideoViewDataBinder :
             binding.videoPost.start()
         })
 
+        //TODO: Testing data
         binding.tvPostContent.text = "Let’s welcome our new joinees to this community."
     }
 

@@ -1,10 +1,11 @@
 package com.likeminds.feedsx.post.util
 
 import android.view.View
+import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
 import com.likeminds.feedsx.databinding.LayoutAuthorFrameBinding
 import com.likeminds.feedsx.databinding.LayoutPostActionsBinding
+import com.likeminds.feedsx.post.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.post.model.PostViewData
-import com.likeminds.feedsx.post.model.UserViewData
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
 
@@ -17,7 +18,7 @@ object PostTypeUtil {
         data: PostViewData,
     ) {
         // creator data
-        val user: UserViewData = data.user
+        val user = data.user
         binding.tvMemberName.text = user.name
         binding.tvCustomTitle.text = user.customTitle
         MemberImageUtil.setImage(
@@ -46,6 +47,13 @@ object PostTypeUtil {
     ) {
         binding.likesCount.text = data.likesCount.toString()
         binding.commentsCount.text = data.commentsCount.toString()
+    }
+
+    fun initViewPager(binding: ItemPostMultipleMediaBinding) {
+        binding.viewpagerMultipleMedia.isSaveEnabled = false
+        val multipleMediaPostAdapter = MultipleMediaPostAdapter()
+        binding.viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
+        binding.dotsIndicator.setViewPager2(binding.viewpagerMultipleMedia)
     }
 
 }
