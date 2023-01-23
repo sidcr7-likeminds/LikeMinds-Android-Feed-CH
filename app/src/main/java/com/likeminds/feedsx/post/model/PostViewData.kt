@@ -8,6 +8,8 @@ import kotlinx.parcelize.Parcelize
 class PostViewData private constructor(
     var id: String,
     var text: String,
+    var shortText: String?,
+    val alreadySeenFullContent: Boolean?,
     var attachments: List<AttachmentViewData>,
     var communityId: Int,
     var isPinned: Boolean,
@@ -28,16 +30,16 @@ class PostViewData private constructor(
     override val viewType: Int
         get() = when {
             //TODO: For Link?
-            (attachments.size == 1 && attachments.first().fileType == 1) -> {
+            (attachments.size == 1 && attachments.first().fileType == IMAGE) -> {
                 ITEM_POST_SINGLE_IMAGE
             }
-            (attachments.size == 1 && attachments.first().fileType == 2) -> {
+            (attachments.size == 1 && attachments.first().fileType == VIDEO) -> {
                 ITEM_POST_SINGLE_VIDEO
             }
-            (attachments.isNotEmpty() && attachments.first().fileType == 3) -> {
+            (attachments.isNotEmpty() && attachments.first().fileType == DOCUMENT) -> {
                 ITEM_POST_DOCUMENTS
             }
-            (attachments.size > 1 && (attachments.first().fileType == 1 || attachments.first().fileType == 2)) -> {
+            (attachments.size > 1 && (attachments.first().fileType == IMAGE || attachments.first().fileType == VIDEO)) -> {
                 ITEM_POST_MULTIPLE_MEDIA
             }
             else -> {
@@ -48,6 +50,8 @@ class PostViewData private constructor(
     class Builder {
         private var id: String = ""
         private var text: String = ""
+        private var shortText: String? = null
+        private var alreadySeenFullContent: Boolean? = null
         private var attachments: List<AttachmentViewData> = listOf()
         private var communityId: Int = 0
         private var isPinned: Boolean = false
@@ -64,6 +68,8 @@ class PostViewData private constructor(
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
+        fun shortText(shortText: String?) = apply { this.shortText = shortText }
+        fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) = apply { this.alreadySeenFullContent = alreadySeenFullContent }
         fun attachments(attachments: List<AttachmentViewData>) =
             apply { this.attachments = attachments }
 
@@ -83,6 +89,8 @@ class PostViewData private constructor(
         fun build() = PostViewData(
             id,
             text,
+            shortText,
+            alreadySeenFullContent,
             attachments,
             communityId,
             isPinned,
@@ -102,6 +110,8 @@ class PostViewData private constructor(
     fun toBuilder(): Builder {
         return Builder().id(id)
             .text(text)
+            .shortText(shortText)
+            .alreadySeenFullContent(alreadySeenFullContent)
             .attachments(attachments)
             .communityId(communityId)
             .isPinned(isPinned)

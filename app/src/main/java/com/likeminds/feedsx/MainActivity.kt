@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -12,10 +13,13 @@ import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
 import com.likeminds.feedsx.post.adapter.PostAdapter
+import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.post.model.PostViewData
+import com.likeminds.feedsx.utils.SeeMoreUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), PostAdapterListener {
 
     private var colorsList: List<String> =
         listOf("#ff0000", "#397c73", "#848659", "#ffcb00", "#bebb57")
@@ -79,11 +83,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initRecyclerView() {
-        mPostAdapter = PostAdapter()
+        mPostAdapter = PostAdapter(this)
         binding.recyclerView.apply {
             adapter = mPostAdapter
             layoutManager = LinearLayoutManager(context)
         }
+        val text =
+            "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .text(text)
+                .shortText(SeeMoreUtil.getShortContent(text, 10))
+                .build()
+        )
     }
 
     private fun setStatusBarColor(statusBarColor: Int) {
@@ -97,6 +109,18 @@ class MainActivity : AppCompatActivity() {
         startActivity(Intent(this, this::class.java))
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
         finish()
+    }
+
+    override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
+        val item = mPostAdapter[position]
+        if (item is PostViewData) {
+            val newViewData = item.toBuilder()
+                .alreadySeenFullContent(alreadySeenFullContent)
+                .build()
+            if (newViewData != null) {
+                mPostAdapter.update(position, newViewData)
+            }
+        }
     }
 
 }

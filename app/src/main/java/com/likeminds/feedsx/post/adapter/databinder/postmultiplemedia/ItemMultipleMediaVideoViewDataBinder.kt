@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
+import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
@@ -32,7 +33,7 @@ class ItemMultipleMediaVideoViewDataBinder :
         binding.videoPost.setVideoURI(video)
         binding.videoPost.setOnPreparedListener(MediaPlayer.OnPreparedListener { mp ->
             mp.isLooping = true
-            binding.iconVideoPlay.visibility = View.GONE
+            binding.iconVideoPlay.hide()
             binding.videoPost.start()
         })
     }

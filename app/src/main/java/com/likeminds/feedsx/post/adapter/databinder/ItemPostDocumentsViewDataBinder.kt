@@ -3,13 +3,15 @@ package com.likeminds.feedsx.post.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
+import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
 
-class ItemPostDocumentsViewDataBinder :
-    ViewDataBinder<ItemPostDocumentsBinding, PostViewData>() {
+class ItemPostDocumentsViewDataBinder constructor(
+    val listener: PostAdapterListener
+) : ViewDataBinder<ItemPostDocumentsBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_DOCUMENTS
@@ -25,13 +27,17 @@ class ItemPostDocumentsViewDataBinder :
             data
         )
 
+        PostTypeUtil.initTextContent(
+            binding.tvPostContent,
+            data,
+            itemPosition = position,
+            listener
+        )
+
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data
         )
-
-        //TODO: Testing data
-        binding.tvPostContent.text = "Let’s welcome our new joinees to this community."
     }
 
 }

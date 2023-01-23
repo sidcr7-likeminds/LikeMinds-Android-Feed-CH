@@ -7,6 +7,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import com.likeminds.feedsx.databinding.LayoutNoInternetBinding
 import com.likeminds.feedsx.databinding.LayoutSnackbarMessageBinding
+import com.likeminds.feedsx.utils.ViewUtils.hide
 import javax.inject.Inject
 
 class CustomSnackBar @Inject constructor() {
@@ -53,7 +54,7 @@ class CustomSnackBar @Inject constructor() {
         (snackBar?.view as? Snackbar.SnackbarLayout)?.addView(binding.root)
         binding.tvMessage.text = text
         if (hideIcon == true) {
-            binding.messageIcon.visibility = View.GONE
+            binding.messageIcon.hide()
         }
         snackBar?.addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar?>() {
             override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {

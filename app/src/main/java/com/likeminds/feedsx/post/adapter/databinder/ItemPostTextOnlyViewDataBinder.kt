@@ -8,13 +8,15 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
+import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_TEXT_ONLY
 
-class ItemPostTextOnlyViewDataBinder :
-    ViewDataBinder<ItemPostTextOnlyBinding, PostViewData>() {
+class ItemPostTextOnlyViewDataBinder constructor(
+    val listener: PostAdapterListener
+) : ViewDataBinder<ItemPostTextOnlyBinding, PostViewData>() {
 
     private var glideRequestManager: RequestManager? = null
     private var placeHolderDrawable: ColorDrawable? = null
@@ -38,14 +40,17 @@ class ItemPostTextOnlyViewDataBinder :
             data
         )
 
+        PostTypeUtil.initTextContent(
+            binding.tvPostContent,
+            data,
+            itemPosition = position,
+            listener
+        )
+
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data
         )
-
-        //TODO: Testing data
-        binding.tvPostContent.text =
-            "Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more"
     }
 
 }

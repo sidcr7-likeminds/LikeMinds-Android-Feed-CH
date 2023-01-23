@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class AttachmentViewData private constructor(
-    var fileType: Int,
+    @AttachmentType var fileType: Int,
     var fileUrl: String,
     var fileFormat: String?,
     var fileSize: String
@@ -17,12 +17,13 @@ class AttachmentViewData private constructor(
         get() = ITEM_POST_ATTACHMENT
 
     class Builder {
+        @AttachmentType
         private var fileType: Int = 0
         private var fileUrl: String = ""
         private var fileFormat: String? = null
         private var fileSize: String = ""
 
-        fun fileType(fileType: Int) = apply { this.fileType = fileType }
+        fun fileType(@AttachmentType fileType: Int) = apply { this.fileType = fileType }
         fun fileUrl(fileUrl: String) = apply { this.fileUrl = fileUrl }
         fun fileFormat(fileFormat: String?) = apply { this.fileFormat = fileFormat }
         fun fileSize(fileSize: String) = apply { this.fileSize = fileSize }
