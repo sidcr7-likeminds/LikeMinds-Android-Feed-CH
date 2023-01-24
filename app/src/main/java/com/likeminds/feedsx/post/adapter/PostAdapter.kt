@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.post.adapter
 
 import com.likeminds.feedsx.post.adapter.databinder.*
+import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.getItemInList
@@ -50,5 +51,6 @@ class PostAdapter constructor(
         fun savePost() {}
         fun likePost() {}
         fun onPostMenuItemClicked(postId: String, title: String)
+        fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
     }
 }

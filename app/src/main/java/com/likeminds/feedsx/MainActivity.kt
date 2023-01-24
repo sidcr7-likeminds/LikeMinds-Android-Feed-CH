@@ -14,8 +14,10 @@ import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
 import com.likeminds.feedsx.post.adapter.PostAdapter
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.post.model.AttachmentViewData
+import com.likeminds.feedsx.post.model.DOCUMENT
 import com.likeminds.feedsx.post.model.PostViewData
-import com.likeminds.feedsx.utils.SeeMoreUtil
+import com.likeminds.feedsx.utils.ViewUtils
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -110,6 +112,26 @@ class MainActivity :
                 .text(text)
                 .build()
         )
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .attachments(
+                    listOf(
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build()
+                    )
+                )
+                .id("4")
+                .text(text)
+                .build()
+        )
     }
 
     private fun setStatusBarColor(statusBarColor: Int) {
@@ -139,6 +161,34 @@ class MainActivity :
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
         Log.d("TAG", postId + title);
+    }
+
+    override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
+        if (position == mPostAdapter.items().size - 1) {
+            binding.recyclerView.post {
+                scrollToPositionWithOffset(position)
+            }
+        }
+
+        mPostAdapter.update(
+            position, postData.toBuilder().isExpanded(true).build()
+        )
+    }
+
+    /**
+     * Scroll to a position with offset from the top header
+     * @param position Index of the item to scroll to
+     */
+    private fun scrollToPositionWithOffset(position: Int) {
+        val px = if (binding.vTopBackground.height == 0) {
+            (ViewUtils.dpToPx(75) * 1.5).toInt()
+        } else {
+            (binding.vTopBackground.height * 1.5).toInt()
+        }
+        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
+            position,
+            px
+        )
     }
 
 }

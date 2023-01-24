@@ -3,6 +3,7 @@ package com.likeminds.feedsx.post.model
 import android.os.Parcelable
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_ATTACHMENT
+import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS_ITEM
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -14,7 +15,15 @@ class AttachmentViewData private constructor(
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
-        get() = ITEM_POST_ATTACHMENT
+    //TODO for multiple media
+        get() = when {
+            (fileType == DOCUMENT) -> {
+                ITEM_POST_DOCUMENTS_ITEM
+            }
+            else -> {
+                ITEM_POST_ATTACHMENT
+            }
+        }
 
     class Builder {
         @AttachmentType

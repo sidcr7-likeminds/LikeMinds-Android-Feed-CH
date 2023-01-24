@@ -8,15 +8,20 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.databinding.ItemDocumentBinding
+import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
 import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
 import com.likeminds.feedsx.databinding.LayoutAuthorFrameBinding
 import com.likeminds.feedsx.databinding.LayoutPostActionsBinding
+import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
+import com.likeminds.feedsx.post.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.post.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.post.model.AttachmentViewData
 import com.likeminds.feedsx.post.model.PostViewData
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ViewUtils
@@ -29,6 +34,7 @@ import com.likeminds.feedsx.utils.membertagging.MemberTaggingDecoder
 object PostTypeUtil {
 
     private const val TAG = "PostTypeUtil"
+    private const val SHOW_MORE_COUNT = 2
 
     fun initAuthorFrame(
         binding: LayoutAuthorFrameBinding,
@@ -75,6 +81,70 @@ object PostTypeUtil {
             -ivPostMenu.height / 2,
             Gravity.START
         )
+    }
+
+    fun initDocumentsRecyclerView(
+        binding: ItemPostDocumentsBinding,
+        mDocumentsAdapter: DocumentsPostAdapter,
+        postData: PostViewData,
+        postAdapterListener: PostAdapterListener,
+        position: Int
+    ) {
+        binding.rvDocuments.apply {
+            adapter = mDocumentsAdapter
+            layoutManager = LinearLayoutManager(binding.root.context)
+        }
+
+        val documents = postData.attachments
+
+        if (postData.isExpanded || documents.size <= SHOW_MORE_COUNT) {
+            binding.tvShowMore.hide()
+            mDocumentsAdapter.replace(postData.attachments)
+        } else {
+            binding.tvShowMore.show()
+            binding.tvShowMore.text = "+${documents.size - SHOW_MORE_COUNT} more"
+            mDocumentsAdapter.replace(documents.take(SHOW_MORE_COUNT))
+        }
+
+        binding.tvShowMore.setOnClickListener {
+            postAdapterListener.onMultipleDocumentsExpanded(postData, position)
+        }
+    }
+
+    fun initDocument(
+        binding: ItemDocumentBinding,
+        document: AttachmentViewData,
+    ) {
+        binding.tvMeta1.hide()
+        binding.viewMetaDot1.hide()
+        binding.tvMeta2.hide()
+        binding.viewMetaDot2.hide()
+        binding.tvMeta3.hide()
+        //TODO: set document meta once meta data is added 
+
+//        if (attachment.meta != null) {
+//            val noOfPage = attachment.meta()?.numberOfPage ?: 0
+//            val size = attachment.meta()?.size ?: 0
+//            val mediaType = attachment.type()
+//            if (noOfPage > 0) {
+//                binding.tvMeta1.show()
+//                binding.tvMeta1.text = binding.root.context.getString(
+//                    R.string.placeholder_pages, noOfPage
+//                )
+//            }
+//            if (size > 0) {
+//                binding.tvMeta2.show()
+//                binding.tvMeta2.text = MediaUtils.getFileSizeText(size)
+//                if (binding.tvMeta1.isVisible) {
+//                    binding.viewMetaDot1.show()
+//                }
+//            }
+//            if (!mediaType.isNullOrEmpty() && (binding.tvMeta1.isVisible || binding.tvMeta2.isVisible)) {
+//                binding.tvMeta3.show()
+//                binding.tvMeta3.text = mediaType
+//                binding.viewMetaDot2.show()
+//            }
+//        }
     }
 
     fun initActionsLayout(

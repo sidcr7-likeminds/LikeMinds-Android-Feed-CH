@@ -12,6 +12,7 @@ class PostViewData private constructor(
     var text: String,
     var shortText: String?,
     val alreadySeenFullContent: Boolean?,
+    val isExpanded: Boolean,
     var attachments: List<AttachmentViewData>,
     var communityId: Int,
     var isPinned: Boolean,
@@ -57,6 +58,7 @@ class PostViewData private constructor(
         private var text: String = ""
         private var shortText: String? = null
         private var alreadySeenFullContent: Boolean? = null
+        private var isExpanded: Boolean = false
         private var attachments: List<AttachmentViewData> = listOf()
         private var communityId: Int = 0
         private var isPinned: Boolean = false
@@ -78,6 +80,9 @@ class PostViewData private constructor(
         fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) =
             apply { this.alreadySeenFullContent = alreadySeenFullContent }
 
+        fun isExpanded(isExpanded: Boolean) =
+            apply { this.isExpanded = isExpanded }
+
         fun attachments(attachments: List<AttachmentViewData>) =
             apply { this.attachments = attachments }
 
@@ -89,7 +94,9 @@ class PostViewData private constructor(
         fun userId(userId: String) = apply { this.userId = userId }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
         fun commentsCount(commentsCount: Int) = apply { this.commentsCount = commentsCount }
-        fun menuItems(menuItems: List<OverflowMenuItemViewData>) = apply { this.menuItems = menuItems }
+        fun menuItems(menuItems: List<OverflowMenuItemViewData>) =
+            apply { this.menuItems = menuItems }
+
         fun comments(comments: List<CommentViewData>) = apply { this.comments = comments }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
@@ -100,6 +107,7 @@ class PostViewData private constructor(
             text,
             shortText,
             alreadySeenFullContent,
+            isExpanded,
             attachments,
             communityId,
             isPinned,
@@ -122,6 +130,7 @@ class PostViewData private constructor(
             .text(text)
             .shortText(SeeMoreUtil.getShortContent(text, 10))
             .alreadySeenFullContent(alreadySeenFullContent)
+            .isExpanded(isExpanded)
             .attachments(attachments)
             .communityId(communityId)
             .isPinned(isPinned)

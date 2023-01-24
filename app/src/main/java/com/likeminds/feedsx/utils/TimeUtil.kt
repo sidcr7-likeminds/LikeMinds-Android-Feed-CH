@@ -6,6 +6,11 @@ object TimeUtil {
     private const val HOUR_IN_MILLIS = 60 * 60 * 1000
     private const val MINUTE_IN_MILLIS = 60 * 1000
 
+    // Sets the time of the post as
+    // x min (if days & hours are 0 and min > 0)
+    // x h (if days are 0)
+    // x d (if days are greater than 1)
+    // Just Now (otherwise)
     fun getDaysHoursOrMinutes(timestamp: Long): String {
         val days = (timestamp / DAY_IN_MILLIS).toInt()
         val hours = ((timestamp - (days * DAY_IN_MILLIS)) / HOUR_IN_MILLIS).toInt()
