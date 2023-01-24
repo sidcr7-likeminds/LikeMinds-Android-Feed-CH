@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.post.view
+package com.likeminds.feedsx.overflowmenu.view
 
 import android.content.Context
 import android.graphics.Color
@@ -8,9 +8,9 @@ import android.view.View
 import android.widget.PopupWindow
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.likeminds.feedsx.databinding.PopupOverflowMenuBinding
-import com.likeminds.feedsx.post.adapter.OverflowMenuAdapter
-import com.likeminds.feedsx.post.adapter.OverflowMenuAdapterListener
-import com.likeminds.feedsx.post.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapter
+import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapterListener
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.isValidIndex
 

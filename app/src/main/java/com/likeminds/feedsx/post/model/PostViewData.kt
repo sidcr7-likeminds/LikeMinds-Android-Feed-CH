@@ -1,6 +1,8 @@
 package com.likeminds.feedsx.post.model
 
 import android.os.Parcelable
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.utils.SeeMoreUtil
 import com.likeminds.feedsx.utils.model.*
 import kotlinx.parcelize.Parcelize
 
@@ -27,6 +29,8 @@ class PostViewData private constructor(
 ) : Parcelable, BaseViewType {
 
     //TODO: isEdited/isLiked not added in ED yet.
+    //TODO: add post id while adding menu item
+    //TODO: limit for short text
 
     override val viewType: Int
         get() = when {
@@ -116,7 +120,7 @@ class PostViewData private constructor(
     fun toBuilder(): Builder {
         return Builder().id(id)
             .text(text)
-            .shortText(shortText)
+            .shortText(SeeMoreUtil.getShortContent(text, 10))
             .alreadySeenFullContent(alreadySeenFullContent)
             .attachments(attachments)
             .communityId(communityId)

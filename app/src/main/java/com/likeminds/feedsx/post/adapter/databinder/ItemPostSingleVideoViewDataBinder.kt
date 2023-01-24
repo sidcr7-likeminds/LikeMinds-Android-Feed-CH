@@ -5,12 +5,12 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
-import com.likeminds.feedsx.post.adapter.OverflowMenuAdapterListener
+import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapterListener
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.post.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
-import com.likeminds.feedsx.post.view.OverflowMenuPopup
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
@@ -67,7 +67,7 @@ class ItemPostSingleVideoViewDataBinder constructor(
     }
 
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        listener.onPostMenuItemClicked(postId, menu.title)
+        listener.onPostMenuItemClicked(menu.dataId, menu.title)
     }
 
 }

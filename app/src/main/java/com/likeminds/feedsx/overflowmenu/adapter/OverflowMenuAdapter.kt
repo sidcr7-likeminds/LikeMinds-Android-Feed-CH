@@ -1,7 +1,7 @@
-package com.likeminds.feedsx.post.adapter
+package com.likeminds.feedsx.overflowmenu.adapter
 
-import com.likeminds.feedsx.post.adapter.databinder.OverflowMenuItemBinder
-import com.likeminds.feedsx.post.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.overflowmenu.adapter.databinder.OverflowMenuItemBinder
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType

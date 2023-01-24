@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.post.model
 
 import android.os.Parcelable
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_COMMENT
 import kotlinx.parcelize.Parcelize

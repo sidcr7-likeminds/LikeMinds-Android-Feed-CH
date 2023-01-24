@@ -9,7 +9,7 @@
 
         <variable
             name="data"
-            type="com.likeminds.feedsx.post.model.OverflowMenuItemViewData" />
+            type="com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData" />
 
     </data>
 

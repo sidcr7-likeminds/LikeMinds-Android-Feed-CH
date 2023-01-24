@@ -16,7 +16,7 @@ import com.likeminds.feedsx.databinding.LayoutPostActionsBinding
 import com.likeminds.feedsx.post.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.post.model.PostViewData
-import com.likeminds.feedsx.post.view.OverflowMenuPopup
+import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ViewUtils
