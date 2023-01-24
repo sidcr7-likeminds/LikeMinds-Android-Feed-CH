@@ -3,7 +3,9 @@ package com.likeminds.feedsx.post.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.view.Gravity
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
@@ -14,8 +16,10 @@ import com.likeminds.feedsx.databinding.LayoutPostActionsBinding
 import com.likeminds.feedsx.post.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.post.model.PostViewData
+import com.likeminds.feedsx.post.view.OverflowMenuPopup
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.getValidTextForLinkify
@@ -28,11 +32,16 @@ object PostTypeUtil {
 
     fun initAuthorFrame(
         binding: LayoutAuthorFrameBinding,
-        data: PostViewData
+        data: PostViewData,
+        overflowMenu: OverflowMenuPopup
     ) {
         //TODO: Change pin filled drawable
-        if(data.isPinned) binding.ivPin.setImageResource(R.drawable.ic_pin_filled)
+        if (data.isPinned) binding.ivPin.setImageResource(R.drawable.ic_pin_filled)
         else binding.ivPin.setImageResource(R.drawable.ic_pin_unfilled)
+
+        binding.ivPostMenu.setOnClickListener {
+            showOverflowMenu(binding.ivPostMenu, overflowMenu)
+        }
 
         // creator data
         val user = data.user
@@ -58,6 +67,16 @@ object PostTypeUtil {
         }
     }
 
+    //to show the options on the post
+    private fun showOverflowMenu(ivPostMenu: ImageView, overflowMenu: OverflowMenuPopup) {
+        overflowMenu.showAsDropDown(
+            ivPostMenu,
+            -ViewUtils.dpToPx(16),
+            -ivPostMenu.height / 2,
+            Gravity.START
+        )
+    }
+
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
         data: PostViewData
@@ -66,10 +85,10 @@ object PostTypeUtil {
 
         val context = binding.root.context
 
-        if(data.isLiked) binding.ivLike.setImageResource(R.drawable.ic_liked_filled)
+        if (data.isLiked) binding.ivLike.setImageResource(R.drawable.ic_liked_filled)
         else binding.ivLike.setImageResource(R.drawable.ic_liked_unfilled)
 
-        if(data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+        if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
         else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
 
         binding.likesCount.text =

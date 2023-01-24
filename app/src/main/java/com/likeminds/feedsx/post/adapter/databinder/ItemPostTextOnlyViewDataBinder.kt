@@ -1,43 +1,42 @@
 package com.likeminds.feedsx.post.adapter.databinder
 
-import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.RequestManager
-import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
+import com.likeminds.feedsx.post.adapter.OverflowMenuAdapter
+import com.likeminds.feedsx.post.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.post.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
+import com.likeminds.feedsx.post.view.OverflowMenuPopup
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_TEXT_ONLY
 
 class ItemPostTextOnlyViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<ItemPostTextOnlyBinding, PostViewData>() {
+) : ViewDataBinder<ItemPostTextOnlyBinding, PostViewData>(),
+    OverflowMenuAdapterListener {
 
-    private var glideRequestManager: RequestManager? = null
-    private var placeHolderDrawable: ColorDrawable? = null
+    private lateinit var overflowMenu: OverflowMenuPopup
 
     override val viewType: Int
         get() = ITEM_POST_TEXT_ONLY
 
     override fun createBinder(parent: ViewGroup): ItemPostTextOnlyBinding {
-        val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemPostTextOnlyBinding.inflate(inflater, parent, false)
-
-        glideRequestManager = Glide.with(binding.root)
-        placeHolderDrawable =
-            ColorDrawable(ContextCompat.getColor(binding.root.context, R.color.bright_grey))
-        return binding
+        overflowMenu = OverflowMenuPopup.create(parent.context, this)
+        return ItemPostTextOnlyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
     override fun bindData(binding: ItemPostTextOnlyBinding, data: PostViewData, position: Int) {
+        //TODO: Testing data
+        val list = listOf(OverflowMenuItemViewData.Builder().title("Edit").build(), OverflowMenuItemViewData.Builder().title("Delete").build())
+        overflowMenu.setItems(list)
+
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
-            data
+            data,
+            overflowMenu
         )
 
         PostTypeUtil.initTextContent(
@@ -51,6 +50,10 @@ class ItemPostTextOnlyViewDataBinder constructor(
             binding.postActionsLayout,
             data
         )
+    }
+
+    override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
+        listener.onPostMenuItemClicked(postId, menu.title)
     }
 
 }

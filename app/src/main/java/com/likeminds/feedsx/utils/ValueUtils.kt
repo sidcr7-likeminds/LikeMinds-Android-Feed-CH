@@ -16,3 +16,11 @@ fun <T> List<T>.getItemInList(position: Int): T? {
     }
     return this[position]
 }
+
+fun Int.isValidIndex(items: List<*>? = null): Boolean {
+    return if (items != null) {
+        this > -1 && this < items.size
+    } else {
+        this > -1
+    }
+}

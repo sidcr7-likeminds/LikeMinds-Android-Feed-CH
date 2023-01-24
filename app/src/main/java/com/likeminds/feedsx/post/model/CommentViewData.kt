@@ -15,7 +15,7 @@ class CommentViewData private constructor(
     var user: UserViewData,
     var createdAt: Long,
     var updatedAt: Long,
-    var menuItems: List<MenuItemViewData>
+    var menuItems: List<OverflowMenuItemViewData>
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_COMMENT
@@ -29,7 +29,7 @@ class CommentViewData private constructor(
         private var user: UserViewData = UserViewData.Builder().build()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
-        private var menuItems: List<MenuItemViewData> = listOf()
+        private var menuItems: List<OverflowMenuItemViewData> = listOf()
 
         fun userId(userId: String) = apply { this.userId = userId }
         fun text(text: String) = apply { this.text = text }
@@ -39,7 +39,7 @@ class CommentViewData private constructor(
         fun user(user: UserViewData) = apply { this.user = user }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
-        fun menuItems(menuItems: List<MenuItemViewData>) = apply { this.menuItems = menuItems }
+        fun menuItems(menuItems: List<OverflowMenuItemViewData>) = apply { this.menuItems = menuItems }
 
         fun build() = CommentViewData(
             userId,

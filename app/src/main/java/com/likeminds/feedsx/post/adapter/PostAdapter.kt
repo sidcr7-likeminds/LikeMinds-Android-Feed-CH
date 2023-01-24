@@ -49,5 +49,6 @@ class PostAdapter constructor(
         fun pinPost() {}
         fun savePost() {}
         fun likePost() {}
+        fun onPostMenuItemClicked(postId: String, title: String)
     }
 }

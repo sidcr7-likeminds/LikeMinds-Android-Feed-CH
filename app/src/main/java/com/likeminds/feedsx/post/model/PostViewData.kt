@@ -19,7 +19,7 @@ class PostViewData private constructor(
     var userId: String,
     var likesCount: Int,
     var commentsCount: Int,
-    var menuItems: List<MenuItemViewData>,
+    var menuItems: List<OverflowMenuItemViewData>,
     var comments: List<CommentViewData>,
     var createdAt: Long,
     var updatedAt: Long,
@@ -62,7 +62,7 @@ class PostViewData private constructor(
         private var userId: String = ""
         private var likesCount: Int = 0
         private var commentsCount: Int = 0
-        private var menuItems: List<MenuItemViewData> = listOf()
+        private var menuItems: List<OverflowMenuItemViewData> = listOf()
         private var comments: List<CommentViewData> = listOf()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
@@ -85,7 +85,7 @@ class PostViewData private constructor(
         fun userId(userId: String) = apply { this.userId = userId }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
         fun commentsCount(commentsCount: Int) = apply { this.commentsCount = commentsCount }
-        fun menuItems(menuItems: List<MenuItemViewData>) = apply { this.menuItems = menuItems }
+        fun menuItems(menuItems: List<OverflowMenuItemViewData>) = apply { this.menuItems = menuItems }
         fun comments(comments: List<CommentViewData>) = apply { this.comments = comments }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }

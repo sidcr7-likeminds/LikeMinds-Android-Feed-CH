@@ -7,19 +7,26 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
+import com.likeminds.feedsx.post.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.post.adapter.PostAdapter
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.post.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.model.PostViewData
+import com.likeminds.feedsx.post.view.OverflowMenuPopup
 import com.likeminds.feedsx.utils.SeeMoreUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity(), PostAdapterListener {
+class MainActivity :
+    AppCompatActivity(),
+    PostAdapterListener {
 
     private var colorsList: List<String> =
         listOf("#ff0000", "#397c73", "#848659", "#ffcb00", "#bebb57")
@@ -92,6 +99,21 @@ class MainActivity : AppCompatActivity(), PostAdapterListener {
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
+                .id("1")
+                .text(text)
+                .shortText(SeeMoreUtil.getShortContent(text, 10))
+                .build()
+        )
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("2")
+                .text(text)
+                .shortText(SeeMoreUtil.getShortContent(text, 10))
+                .build()
+        )
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("3")
                 .text(text)
                 .shortText(SeeMoreUtil.getShortContent(text, 10))
                 .build()
@@ -121,6 +143,10 @@ class MainActivity : AppCompatActivity(), PostAdapterListener {
                 mPostAdapter.update(position, newViewData)
             }
         }
+    }
+
+    override fun onPostMenuItemClicked(postId: String, title: String) {
+        Log.d("TAG", postId + title);
     }
 
 }
