@@ -1,10 +1,9 @@
-package com.likeminds.feedsx
+package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -13,9 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
-import com.likeminds.feedsx.post.adapter.PostAdapter
-import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.post.model.*
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.ViewUtils
 import dagger.hilt.android.AndroidEntryPoint
 

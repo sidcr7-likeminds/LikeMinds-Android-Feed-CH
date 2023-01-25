@@ -1,6 +1,6 @@
-package com.likeminds.feedsx.overflowmenu.adapter
+package com.likeminds.feedsx.overflowmenu.view.adapter
 
-import com.likeminds.feedsx.overflowmenu.adapter.databinder.OverflowMenuItemBinder
+import com.likeminds.feedsx.overflowmenu.view.adapter.databinder.OverflowMenuItemBinder
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder

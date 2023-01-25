@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.post.model
+package com.likeminds.feedsx.posttypes.model
 
 import android.os.Parcelable
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData

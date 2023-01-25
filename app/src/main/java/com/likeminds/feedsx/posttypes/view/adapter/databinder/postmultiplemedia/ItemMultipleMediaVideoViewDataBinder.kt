@@ -1,9 +1,8 @@
-package com.likeminds.feedsx.post.adapter.databinder.postmultiplemedia
+package com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia
 
 import android.media.MediaPlayer
 import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.utils.ViewUtils.hide

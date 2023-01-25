@@ -1,9 +1,9 @@
-package com.likeminds.feedsx.overflowmenu.adapter.databinder
+package com.likeminds.feedsx.overflowmenu.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemOverflowMenuBinding
-import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapterListener
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType

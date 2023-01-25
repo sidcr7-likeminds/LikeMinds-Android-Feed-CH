@@ -8,8 +8,8 @@ import android.view.View
 import android.widget.PopupWindow
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.likeminds.feedsx.databinding.PopupOverflowMenuBinding
-import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapter
-import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapterListener
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapter
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.isValidIndex

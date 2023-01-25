@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.post.adapter.databinder.postmultiplemedia
+package com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

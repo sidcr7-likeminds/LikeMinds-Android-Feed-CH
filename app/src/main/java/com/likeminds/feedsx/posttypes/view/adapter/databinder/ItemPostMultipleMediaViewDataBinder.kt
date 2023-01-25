@@ -1,34 +1,44 @@
-package com.likeminds.feedsx.post.adapter.databinder
+package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
-import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapterListener
+import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.post.model.PostViewData
-import com.likeminds.feedsx.post.util.PostTypeUtil
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
+import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
 
-class ItemPostDocumentsViewDataBinder constructor(
+class ItemPostMultipleMediaViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<ItemPostDocumentsBinding, PostViewData>(),
+) : ViewDataBinder<ItemPostMultipleMediaBinding, PostViewData>(),
     OverflowMenuAdapterListener {
 
     private lateinit var overflowMenu: OverflowMenuPopup
 
     override val viewType: Int
-        get() = ITEM_POST_DOCUMENTS
+        get() = ITEM_POST_MULTIPLE_MEDIA
 
-    override fun createBinder(parent: ViewGroup): ItemPostDocumentsBinding {
+    override fun createBinder(parent: ViewGroup): ItemPostMultipleMediaBinding {
         overflowMenu = OverflowMenuPopup.create(parent.context, this)
-        return ItemPostDocumentsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ItemPostMultipleMediaBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
     }
 
-    override fun bindData(binding: ItemPostDocumentsBinding, data: PostViewData, position: Int) {
+    override fun bindData(
+        binding: ItemPostMultipleMediaBinding,
+        data: PostViewData,
+        position: Int
+    ) {
         overflowMenu.setItems(data.menuItems)
+
+        PostTypeUtil.initViewPager(binding, data)
 
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
@@ -46,13 +56,6 @@ class ItemPostDocumentsViewDataBinder constructor(
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data
-        )
-
-        PostTypeUtil.initDocumentsRecyclerView(
-            binding,
-            data,
-            listener,
-            position
         )
     }
 
