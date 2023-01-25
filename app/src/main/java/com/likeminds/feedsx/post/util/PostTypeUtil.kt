@@ -102,7 +102,7 @@ object PostTypeUtil {
             mDocumentsAdapter.replace(postData.attachments)
         } else {
             binding.tvShowMore.show()
-            binding.tvShowMore.text = "+${documents.size - SHOW_MORE_COUNT} more"
+            "+${documents.size - SHOW_MORE_COUNT} more".also { binding.tvShowMore.text = it }
             mDocumentsAdapter.replace(documents.take(SHOW_MORE_COUNT))
         }
 

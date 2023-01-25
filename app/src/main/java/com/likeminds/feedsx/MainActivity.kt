@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -14,9 +15,7 @@ import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
 import com.likeminds.feedsx.post.adapter.PostAdapter
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.post.model.AttachmentViewData
-import com.likeminds.feedsx.post.model.DOCUMENT
-import com.likeminds.feedsx.post.model.PostViewData
+import com.likeminds.feedsx.post.model.*
 import com.likeminds.feedsx.utils.ViewUtils
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -97,18 +96,21 @@ class MainActivity :
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("1")
+                .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
                 .text(text)
                 .build()
         )
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("2")
+                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
                 .text(text)
                 .build()
         )
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("3")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
                 .text(text)
                 .build()
         )
@@ -129,6 +131,28 @@ class MainActivity :
                     )
                 )
                 .id("4")
+                .user(UserViewData.Builder().name("Mahir").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .attachments(
+                    listOf(
+                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(VIDEO).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(VIDEO).fileUrl("").fileSize("")
+                            .build()
+                    )
+                )
+                .id("5")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
                 .text(text)
                 .build()
         )
@@ -160,7 +184,7 @@ class MainActivity :
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
-        Log.d("TAG", postId + title);
+        Toast.makeText(this, "Post id :${postId}, Title :${title}", Toast.LENGTH_SHORT)
     }
 
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
