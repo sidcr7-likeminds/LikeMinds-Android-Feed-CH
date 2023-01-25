@@ -2,10 +2,10 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph_create_post.xml"
-    app:startDestination="@id/fragment_create_post">
+    app:startDestination="@id/fragment_feed">
 
     <fragment
-        android:id="@+id/fragment_create_post"
+        android:id="@+id/fragment_feed"
         android:name="com.likeminds.feedsx.feed.view.FeedFragment"
         android:label="FeedFragment" />
 </navigation>

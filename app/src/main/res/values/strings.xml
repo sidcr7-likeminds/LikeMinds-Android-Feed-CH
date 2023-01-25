@@ -35,4 +35,6 @@
     <string name="search_hint_text">Search…</string>
     <string name="all_posts">All Posts</string>
     <string name="following">Following</string>
+    <string name="scalix">SCALIX</string>
+    <string name="new_post">New Post</string>
 </resources>

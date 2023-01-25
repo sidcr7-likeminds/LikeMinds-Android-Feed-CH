@@ -12,18 +12,12 @@ import androidx.viewbinding.ViewBinding
 import com.likeminds.feedsx.branding.model.BrandingData
 import javax.inject.Inject
 
-abstract class BaseFragment<B : ViewBinding, VM : ViewModel> : Fragment() {
+abstract class BaseFragment<B : ViewBinding> : Fragment() {
 
     private var _binding: B? = null
     protected val binding get() = _binding!!
     private var hasInitializedRootView = false
     private var requestCode: Int = -1
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    protected lateinit var viewModel: VM
-
-    protected abstract fun getViewModelClass(): Class<VM>?
 
     protected abstract fun getViewBinding(): B
 
@@ -88,7 +82,6 @@ abstract class BaseFragment<B : ViewBinding, VM : ViewModel> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        init()
         receiveExtras()
         handleResultListener()
     }
@@ -123,17 +116,6 @@ abstract class BaseFragment<B : ViewBinding, VM : ViewModel> : Fragment() {
             _binding = null
         }
         super.onDestroyView()
-    }
-
-    private fun init() {
-        if (getViewModelClass() == null) {
-            return
-        }
-        viewModel = if (useSharedViewModel) {
-            ViewModelProvider(requireActivity(), viewModelFactory)[getViewModelClass()!!]
-        } else {
-            ViewModelProvider(this, viewModelFactory)[getViewModelClass()!!]
-        }
     }
 
     private fun callBranding() {

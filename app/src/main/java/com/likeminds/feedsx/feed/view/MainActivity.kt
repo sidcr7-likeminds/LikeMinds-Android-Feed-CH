@@ -30,6 +30,7 @@ class MainActivity : BaseAppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
         navController.setGraph(R.navigation.nav_graph_main_activity, intent.extras)
+
     }
 
     override fun onSupportNavigateUp(): Boolean {

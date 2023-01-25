@@ -49,7 +49,7 @@
                     android:ellipsize="end"
                     android:maxEms="15"
                     android:maxLines="1"
-                    android:text="Community"
+                    android:text="@string/scalix"
                     android:textColor="@{isBrandingBasic ? @color/black : @color/white}"
                     android:textSize="22sp"
                     app:fontType="medium"
@@ -59,58 +59,74 @@
 
                 <ImageView
                     android:id="@+id/iv_search"
-                    tools:ignore="ContentDescription"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="16dp"
                     android:src="@drawable/ic_material_icons_white_search"
                     android:tint="@{isBrandingBasic ? @color/black : @color/white}"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/member_image"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/member_image"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@color/black" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:elevation="0dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar"
-            app:tabIndicator="@drawable/tab_indicator"
-            app:tabIndicatorColor="@color/majorelle_blue"
-            app:tabIndicatorFullWidth="false"
-            app:tabIndicatorHeight="4dp"
-            app:tabTextColor="@color/majorelle_blue">
+        <View
+            android:id="@+id/v_top_background"
+            android:layout_width="0dp"
+            android:layout_height="75dp"
+            android:background="@color/white"
+            android:visibility="gone"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:letterSpacing="0"
-                android:lineSpacingExtra="0sp"
-                android:text="@string/all_posts" />
-
-            <com.google.android.material.tabs.TabItem
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:letterSpacing="0"
-                android:lineSpacingExtra="0sp"
-                android:text="@string/following" />
-
-        </com.google.android.material.tabs.TabLayout>
-
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/view_pager"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:clipToPadding="false"
+            android:descendantFocusability="blocksDescendants"
+            android:overScrollMode="never"
+            android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tab_layout" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsExtendedFAB
+            android:id="@+id/new_post_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            android:gravity="center"
+            android:paddingEnd="20dp"
+            android:paddingStart="20dp"
+            android:text="@string/new_post"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            app:font_Style="medium"
+            app:icon="@drawable/ic_new_post_plus"
+            app:iconGravity="start"
+            app:iconSize="30dp"
+            app:iconTint="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:fontFamily="@font/roboto_medium" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

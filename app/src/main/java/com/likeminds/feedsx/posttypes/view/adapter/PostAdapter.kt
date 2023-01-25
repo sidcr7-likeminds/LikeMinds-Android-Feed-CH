@@ -47,9 +47,9 @@ class PostAdapter constructor(
         //TODO: add compulsory methods
 
         fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
-        fun pinPost() {}
-        fun savePost() {}
-        fun likePost() {}
+        fun pinPost()
+        fun savePost()
+        fun likePost()
         fun onPostMenuItemClicked(postId: String, title: String)
         fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
     }
