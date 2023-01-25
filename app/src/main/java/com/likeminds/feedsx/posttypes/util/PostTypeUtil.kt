@@ -13,13 +13,13 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.posttypes.model.IMAGE
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.VIDEO
+import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
+import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ViewUtils
@@ -311,5 +311,4 @@ object PostTypeUtil {
     fun onMemberTagClicked() {
         // TODO: Change Implementation
     }
-
 }

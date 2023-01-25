@@ -1,20 +1,20 @@
-package com.likeminds.feedsx.home.views
+package com.likeminds.feedsx.feed.view
 
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.tabs.TabLayoutMediator
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.FragmentHomeBinding
-import com.likeminds.feedsx.home.adapter.HomePagerAdapter
+import com.likeminds.feedsx.databinding.FragmentFeedBinding
+import com.likeminds.feedsx.feed.view.adapter.FeedPagerAdapter
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : BaseFragment<FragmentHomeBinding>() {
+class FeedFragment : BaseFragment<FragmentFeedBinding>() {
 
-    lateinit var pagerAdapter: HomePagerAdapter
+    lateinit var pagerAdapter: FeedPagerAdapter
 
-    override fun getViewBinding(): FragmentHomeBinding {
-        return FragmentHomeBinding.inflate(layoutInflater)
+    override fun getViewBinding(): FragmentFeedBinding {
+        return FragmentFeedBinding.inflate(layoutInflater)
     }
 
     override fun setUpViews() {
@@ -23,6 +23,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun initUI() {
+        //TODO: Set as per branding
+        binding.isBrandingBasic = true
+
         binding.viewPager.apply {
             (getChildAt(0) as? RecyclerView)?.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
             adapter = pagerAdapter

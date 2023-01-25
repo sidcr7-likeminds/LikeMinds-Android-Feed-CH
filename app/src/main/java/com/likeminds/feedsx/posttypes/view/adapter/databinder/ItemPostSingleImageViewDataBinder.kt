@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostSingleImageBinding
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_IMAGE
@@ -26,6 +26,7 @@ class ItemPostSingleImageViewDataBinder constructor(
 
     override fun createBinder(parent: ViewGroup): ItemPostSingleImageBinding {
         overflowMenu = OverflowMenuPopup.create(parent.context, this)
+
         return ItemPostSingleImageBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
