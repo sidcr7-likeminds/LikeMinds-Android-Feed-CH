@@ -11,17 +11,15 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
-import com.likeminds.feedsx.databinding.ItemDocumentBinding
-import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
-import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
-import com.likeminds.feedsx.databinding.LayoutAuthorFrameBinding
-import com.likeminds.feedsx.databinding.LayoutPostActionsBinding
+import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.post.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.post.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.post.model.AttachmentViewData
+import com.likeminds.feedsx.post.model.IMAGE
 import com.likeminds.feedsx.post.model.PostViewData
+import com.likeminds.feedsx.post.model.VIDEO
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ViewUtils
@@ -30,6 +28,8 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.MemberTaggingDecoder
+import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
+import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
 
 object PostTypeUtil {
 
@@ -85,11 +85,11 @@ object PostTypeUtil {
 
     fun initDocumentsRecyclerView(
         binding: ItemPostDocumentsBinding,
-        mDocumentsAdapter: DocumentsPostAdapter,
         postData: PostViewData,
         postAdapterListener: PostAdapterListener,
         position: Int
     ) {
+        val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
         binding.rvDocuments.apply {
             adapter = mDocumentsAdapter
             layoutManager = LinearLayoutManager(binding.root.context)
@@ -180,11 +180,25 @@ object PostTypeUtil {
                 )
     }
 
-    fun initViewPager(binding: ItemPostMultipleMediaBinding) {
+    fun initViewPager(binding: ItemPostMultipleMediaBinding, data: PostViewData) {
+        val attachments = data.attachments.map {
+            when (it.fileType) {
+                IMAGE -> {
+                    it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
+                }
+                VIDEO -> {
+                    it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
+                }
+                else -> {
+                    it
+                }
+            }
+        }
         binding.viewpagerMultipleMedia.isSaveEnabled = false
         val multipleMediaPostAdapter = MultipleMediaPostAdapter()
         binding.viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
         binding.dotsIndicator.setViewPager2(binding.viewpagerMultipleMedia)
+        multipleMediaPostAdapter.replace(attachments)
     }
 
     fun initTextContent(

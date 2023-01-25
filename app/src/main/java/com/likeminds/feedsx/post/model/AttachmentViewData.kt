@@ -11,13 +11,17 @@ class AttachmentViewData private constructor(
     @AttachmentType var fileType: Int,
     var fileUrl: String,
     var fileFormat: String?,
-    var fileSize: String
+    var fileSize: String,
+    var dynamicViewType: Int?
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
-    //TODO for multiple media
+        //TODO for multiple media
         get() = when {
-            (fileType == DOCUMENT) -> {
+            dynamicViewType != null -> {
+                dynamicViewType!!
+            }
+            fileType == DOCUMENT -> {
                 ITEM_POST_DOCUMENTS_ITEM
             }
             else -> {
@@ -31,17 +35,22 @@ class AttachmentViewData private constructor(
         private var fileUrl: String = ""
         private var fileFormat: String? = null
         private var fileSize: String = ""
+        private var dynamicViewType: Int? = null
 
         fun fileType(@AttachmentType fileType: Int) = apply { this.fileType = fileType }
         fun fileUrl(fileUrl: String) = apply { this.fileUrl = fileUrl }
         fun fileFormat(fileFormat: String?) = apply { this.fileFormat = fileFormat }
         fun fileSize(fileSize: String) = apply { this.fileSize = fileSize }
 
+        fun dynamicViewType(dynamicViewType: Int?) =
+            apply { this.dynamicViewType = dynamicViewType }
+
         fun build() = AttachmentViewData(
             fileType,
             fileUrl,
             fileFormat,
-            fileSize
+            fileSize,
+            dynamicViewType
         )
     }
 
@@ -50,6 +59,7 @@ class AttachmentViewData private constructor(
             .fileUrl(fileUrl)
             .fileFormat(fileFormat)
             .fileSize(fileSize)
+            .dynamicViewType(dynamicViewType)
     }
 
 }

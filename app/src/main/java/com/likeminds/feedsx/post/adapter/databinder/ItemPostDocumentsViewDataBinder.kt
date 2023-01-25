@@ -4,12 +4,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
 import com.likeminds.feedsx.overflowmenu.adapter.OverflowMenuAdapterListener
-import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
+import com.likeminds.feedsx.post.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.post.model.PostViewData
 import com.likeminds.feedsx.post.util.PostTypeUtil
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.post.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
 
@@ -19,7 +18,6 @@ class ItemPostDocumentsViewDataBinder constructor(
     OverflowMenuAdapterListener {
 
     private lateinit var overflowMenu: OverflowMenuPopup
-    private val mDocumentsAdapter: DocumentsPostAdapter = DocumentsPostAdapter(listener)
 
     override val viewType: Int
         get() = ITEM_POST_DOCUMENTS
@@ -52,7 +50,6 @@ class ItemPostDocumentsViewDataBinder constructor(
 
         PostTypeUtil.initDocumentsRecyclerView(
             binding,
-            mDocumentsAdapter,
             data,
             listener,
             position
