@@ -49,11 +49,10 @@ class ItemPostLinkViewDataBinder constructor(
             listener
         )
 
-        //TODO: Testing data
-        binding.tvLinkDescription.text =
-            "The new feature has already been implemented in the United States and Other Eu…"
-        binding.tvLinkTitle.text = "Twitter will soon let you schedule your tweets"
-        binding.tvLinkUrl.text = "www.youtube.com"
+        PostTypeUtil.initLinkView(
+            binding,
+            data.attachments.first().attachmentMeta.ogTags
+        )
     }
 
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {

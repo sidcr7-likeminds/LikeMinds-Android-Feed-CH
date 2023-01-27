@@ -17,7 +17,6 @@ class PostViewData private constructor(
     var communityId: Int,
     var isPinned: Boolean,
     var isSaved: Boolean,
-    var isEdited: Boolean,
     var isLiked: Boolean,
     var userId: String,
     var likesCount: Int,
@@ -29,25 +28,26 @@ class PostViewData private constructor(
     var user: UserViewData
 ) : Parcelable, BaseViewType {
 
-    //TODO: isEdited/isLiked not added in ED yet.
     //TODO: add post id while adding menu item
 
     //TODO: Change see more limit count
 
     override val viewType: Int
         get() = when {
-            //TODO: For Link?
-            (attachments.size == 1 && attachments.first().fileType == IMAGE) -> {
+            (attachments.size == 1 && attachments.first().attachmentType == IMAGE) -> {
                 ITEM_POST_SINGLE_IMAGE
             }
-            (attachments.size == 1 && attachments.first().fileType == VIDEO) -> {
+            (attachments.size == 1 && attachments.first().attachmentType == VIDEO) -> {
                 ITEM_POST_SINGLE_VIDEO
             }
-            (attachments.isNotEmpty() && attachments.first().fileType == DOCUMENT) -> {
+            (attachments.isNotEmpty() && attachments.first().attachmentType == DOCUMENT) -> {
                 ITEM_POST_DOCUMENTS
             }
-            (attachments.size > 1 && (attachments.first().fileType == IMAGE || attachments.first().fileType == VIDEO)) -> {
+            (attachments.size > 1 && (attachments.first().attachmentType == IMAGE || attachments.first().attachmentType == VIDEO)) -> {
                 ITEM_POST_MULTIPLE_MEDIA
+            }
+            (attachments.isNotEmpty() && attachments.first().attachmentType == LINK) -> {
+                ITEM_POST_LINK
             }
             else -> {
                 ITEM_POST_TEXT_ONLY
@@ -94,7 +94,6 @@ class PostViewData private constructor(
         fun communityId(communityId: Int) = apply { this.communityId = communityId }
         fun isPinned(isPinned: Boolean) = apply { this.isPinned = isPinned }
         fun isSaved(isSaved: Boolean) = apply { this.isSaved = isSaved }
-        fun isEdited(isEdited: Boolean) = apply { this.isEdited = isEdited }
         fun isLiked(isLiked: Boolean) = apply { this.isLiked = isLiked }
         fun userId(userId: String) = apply { this.userId = userId }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
@@ -118,7 +117,6 @@ class PostViewData private constructor(
             isPinned,
             isSaved,
             isEdited,
-            isLiked,
             userId,
             likesCount,
             commentsCount,
@@ -140,7 +138,6 @@ class PostViewData private constructor(
             .communityId(communityId)
             .isPinned(isPinned)
             .isSaved(isSaved)
-            .isEdited(isEdited)
             .isLiked(isLiked)
             .userId(userId)
             .likesCount(likesCount)
