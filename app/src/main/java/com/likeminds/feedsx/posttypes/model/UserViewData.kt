@@ -18,6 +18,8 @@ class UserViewData private constructor(
     override val viewType: Int
         get() = ITEM_USER
 
+    //TODO: customTitle not added in ED yet.
+
     class Builder {
         private var id: Int = 0
         private var name: String = ""

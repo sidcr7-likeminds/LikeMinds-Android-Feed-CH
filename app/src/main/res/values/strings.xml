@@ -42,6 +42,4 @@
     <string name="following">Following</string>
     <string name="scalix">SCALIX</string>
     <string name="new_post">New Post</string>
-    <string name="placeholder_pages">%d Pages</string>
-    <string name="link">Link</string>
 </resources>

@@ -81,49 +81,47 @@ class FeedFragment :
                 .text(text)
                 .build()
         )
+        text = "Hello!"
         mPostAdapter.add(
             PostViewData.Builder()
-                .id("4")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
                 .attachments(
                     listOf(
-                        AttachmentViewData.Builder()
-                            .attachmentType(LINK)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .ogTags(
-                                        LinkOGTags.Builder()
-                                            .title("Youtube video")
-                                            .image("https://i.ytimg.com/vi/EbyAoYaUcVo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDiI5bXtT71sC4IAnHiDAh52LxbFA")
-                                            .url("https://www.youtube.com/watch?v=sAuQjwEl-Bo")
-                                            .description("This is a youtube video")
-                                            .build()
-                                    )
-                                    .build()
-                            )
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
                             .build()
                     )
                 )
+                .id("4")
+                .user(UserViewData.Builder().name("Mahir").customTitle("Admin").build())
+                .text(text)
                 .build()
         )
         mPostAdapter.add(
             PostViewData.Builder()
-                .id("5")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
                 .attachments(
                     listOf(
-                        AttachmentViewData.Builder()
-                            .attachmentType(IMAGE)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKEHgSbU751Z6Gn5FsbVMw7x_VFyKGwwHEEUiC9HtnKw&s")
-                                    .build()
-                            )
+                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(VIDEO).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
+                            .build(),
+                        AttachmentViewData.Builder().fileType(VIDEO).fileUrl("").fileSize("")
                             .build()
                     )
                 )
+                .id("5")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
                 .build()
         )
     }

@@ -56,11 +56,9 @@ class ItemPostSingleImageViewDataBinder constructor(
             listener
         )
 
-        val imageUrl = data.attachments.first().attachmentMeta.url
-
         ImageBindingUtil.loadImage(
             binding.ivPost,
-            imageUrl,
+            data.attachments.first().fileUrl,
             placeholder = R.drawable.image_placeholder
         )
     }

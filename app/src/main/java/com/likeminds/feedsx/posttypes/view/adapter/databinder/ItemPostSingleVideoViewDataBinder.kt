@@ -57,7 +57,7 @@ class ItemPostSingleVideoViewDataBinder constructor(
         )
 
         val video: Uri =
-            Uri.parse(data.attachments.first().attachmentMeta.url)
+            Uri.parse(data.attachments.first().fileUrl)
 
         binding.videoPost.setVideoURI(video)
         binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->

@@ -8,8 +8,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class AttachmentViewData private constructor(
-    @AttachmentType var attachmentType: Int,
-    var attachmentMeta: AttachmentMetaViewData,
+    @AttachmentType var fileType: Int,
+    var fileUrl: String,
+    var fileFormat: String?,
+    var fileSize: String,
     var dynamicViewType: Int?
 ) : Parcelable, BaseViewType {
 
@@ -19,7 +21,7 @@ class AttachmentViewData private constructor(
             dynamicViewType != null -> {
                 dynamicViewType!!
             }
-            attachmentType == DOCUMENT -> {
+            fileType == DOCUMENT -> {
                 ITEM_POST_DOCUMENTS_ITEM
             }
             else -> {
@@ -29,31 +31,34 @@ class AttachmentViewData private constructor(
 
     class Builder {
         @AttachmentType
-        private var attachmentType: Int = 0
-        private var attachmentMeta: AttachmentMetaViewData =
-            AttachmentMetaViewData.Builder().build()
+        private var fileType: Int = 0
+        private var fileUrl: String = ""
+        private var fileFormat: String? = null
+        private var fileSize: String = ""
         private var dynamicViewType: Int? = null
 
-        fun attachmentType(@AttachmentType attachmentType: Int) =
-            apply { this.attachmentType = attachmentType }
-
-        fun attachmentMeta(attachmentMeta: AttachmentMetaViewData) =
-            apply { this.attachmentMeta = attachmentMeta }
-
+        fun fileType(@AttachmentType fileType: Int) = apply { this.fileType = fileType }
+        fun fileUrl(fileUrl: String) = apply { this.fileUrl = fileUrl }
+        fun fileFormat(fileFormat: String?) = apply { this.fileFormat = fileFormat }
+        fun fileSize(fileSize: String) = apply { this.fileSize = fileSize }
 
         fun dynamicViewType(dynamicViewType: Int?) =
             apply { this.dynamicViewType = dynamicViewType }
 
         fun build() = AttachmentViewData(
-            attachmentType,
-            attachmentMeta,
+            fileType,
+            fileUrl,
+            fileFormat,
+            fileSize,
             dynamicViewType
         )
     }
 
     fun toBuilder(): Builder {
-        return Builder().attachmentType(attachmentType)
-            .attachmentMeta(attachmentMeta)
+        return Builder().fileType(fileType)
+            .fileUrl(fileUrl)
+            .fileFormat(fileFormat)
+            .fileSize(fileSize)
             .dynamicViewType(dynamicViewType)
     }
 
