@@ -1,12 +1,13 @@
 package com.likeminds.feedsx.feed.view
 
 import android.os.Bundle
-import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
 import com.likeminds.feedsx.feed.view.LikesActivity.Companion.LIKES_SCREEN_EXTRAS
 import com.likeminds.feedsx.feed.view.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.feed.view.model.LikesViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
@@ -40,10 +41,27 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
             show()
         }
 
-        Log.d("TAG", extras.postId + " " + extras.likesCount)
-
         //TODO: Testing data
+        mLikesScreenAdapter.add(
+            LikesViewData.Builder()
+                .id("1")
+                .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
+                .build()
+        )
 
+        mLikesScreenAdapter.add(
+            LikesViewData.Builder()
+                .id("2")
+                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
+                .build()
+        )
+
+        mLikesScreenAdapter.add(
+            LikesViewData.Builder()
+                .id("3")
+                .user(UserViewData.Builder().name("Siddharth").build())
+                .build()
+        )
     }
 
     override fun setArguments(args: Bundle?) {

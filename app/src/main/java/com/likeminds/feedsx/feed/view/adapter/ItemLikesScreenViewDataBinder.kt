@@ -9,6 +9,7 @@ import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_LIKES_SCREEN
 
 class ItemLikesScreenViewDataBinder : ViewDataBinder<ItemLikesScreenBinding, LikesViewData>() {
+
     override val viewType: Int
         get() = ITEM_LIKES_SCREEN
 
