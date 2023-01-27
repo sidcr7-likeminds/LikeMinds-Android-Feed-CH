@@ -149,7 +149,8 @@ object PostTypeUtil {
 
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
-        data: PostViewData
+        data: PostViewData,
+        listener: PostAdapterListener
     ) {
         //TODO: share post
 
@@ -169,6 +170,8 @@ object PostTypeUtil {
                     data.likesCount,
                     data.likesCount
                 )
+
+        binding.likesCount.setOnClickListener { listener.showLikesScreen(data) }
 
         binding.commentsCount.text =
             if (data.commentsCount == 0) context.getString(R.string.add_comment)

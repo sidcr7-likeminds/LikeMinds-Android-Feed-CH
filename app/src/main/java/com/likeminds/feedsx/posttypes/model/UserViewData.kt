@@ -11,7 +11,7 @@ class UserViewData private constructor(
     var name: String,
     var imageUrl: String,
     var userUniqueId: String,
-    var customTitle: String,
+    var customTitle: String?,
     var isGuest: Boolean,
     var isDeleted: Boolean,
 ) : Parcelable, BaseViewType {
@@ -25,7 +25,7 @@ class UserViewData private constructor(
         private var name: String = ""
         private var imageUrl: String = ""
         private var userUniqueId: String = ""
-        private var customTitle: String = ""
+        private var customTitle: String? = null
         private var isGuest: Boolean = false
         private var isDeleted: Boolean = false
 
@@ -33,7 +33,7 @@ class UserViewData private constructor(
         fun name(name: String) = apply { this.name = name }
         fun imageUrl(imageUrl: String) = apply { this.imageUrl = imageUrl }
         fun userUniqueId(userUniqueId: String) = apply { this.userUniqueId = userUniqueId }
-        fun customTitle(customTitle: String) = apply { this.customTitle = customTitle }
+        fun customTitle(customTitle: String?) = apply { this.customTitle = customTitle }
         fun isGuest(isGuest: Boolean) = apply { this.isGuest = isGuest }
         fun isDeleted(isDeleted: Boolean) = apply { this.isDeleted = isDeleted }
 

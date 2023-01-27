@@ -16,6 +16,7 @@ const val ITEM_OVERFLOW_MENU_ITEM = 10
 const val ITEM_USER = 11
 const val ITEM_COMMENT = 12
 const val ITEM_POST_DOCUMENTS_ITEM = 13
+const val ITEM_LIKES_SCREEN = 14
 
 
 @IntDef(
@@ -32,7 +33,8 @@ const val ITEM_POST_DOCUMENTS_ITEM = 13
     ITEM_OVERFLOW_MENU_ITEM,
     ITEM_USER,
     ITEM_COMMENT,
-    ITEM_POST_DOCUMENTS_ITEM
+    ITEM_POST_DOCUMENTS_ITEM,
+    ITEM_LIKES_SCREEN
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class ViewType

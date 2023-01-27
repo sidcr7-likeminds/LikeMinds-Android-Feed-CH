@@ -16,6 +16,10 @@
         <item quantity="one">1 Like</item>
         <item quantity="other">%d Likes</item>
     </plurals>
+    <plurals name="likes_small">
+        <item quantity="one">1 like</item>
+        <item quantity="other">%d likes</item>
+    </plurals>
     <plurals name="comments">
         <item quantity="one">1 Comment</item>
         <item quantity="other">%d Comments</item>

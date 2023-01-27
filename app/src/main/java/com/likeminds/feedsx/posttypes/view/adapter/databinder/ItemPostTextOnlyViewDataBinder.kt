@@ -50,7 +50,8 @@ class ItemPostTextOnlyViewDataBinder constructor(
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            data
+            data,
+            listener
         )
     }
 

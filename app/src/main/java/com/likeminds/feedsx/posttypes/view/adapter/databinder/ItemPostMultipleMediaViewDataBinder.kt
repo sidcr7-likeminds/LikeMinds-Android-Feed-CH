@@ -56,7 +56,8 @@ class ItemPostMultipleMediaViewDataBinder constructor(
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            data
+            data,
+            listener
         )
     }
 

@@ -45,7 +45,8 @@ class ItemPostSingleVideoViewDataBinder constructor(
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            data
+            data,
+            listener
         )
 
         PostTypeUtil.initTextContent(

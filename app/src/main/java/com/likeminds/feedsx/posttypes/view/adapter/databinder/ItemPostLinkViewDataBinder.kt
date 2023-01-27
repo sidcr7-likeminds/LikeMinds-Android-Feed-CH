@@ -45,7 +45,8 @@ class ItemPostLinkViewDataBinder constructor(
 
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            data
+            data,
+            listener
         )
 
         //TODO: Testing data
