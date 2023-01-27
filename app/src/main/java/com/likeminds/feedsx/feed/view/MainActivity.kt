@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.ViewUtils
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -117,16 +117,20 @@ class MainActivity :
             PostViewData.Builder()
                 .attachments(
                     listOf(
-                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(DOCUMENT).fileUrl("").fileSize("")
-                            .build()
+                        AttachmentViewData.Builder()
+                            .attachmentType(LINK)
+                            .attachmentMeta(
+                                AttachmentMetaViewData.Builder()
+                                    .ogTags(
+                                        LinkOGTags.Builder()
+                                            .title("Youtube video")
+                                            .image("https://i.ytimg.com/vi/EbyAoYaUcVo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDiI5bXtT71sC4IAnHiDAh52LxbFA")
+                                            .url("https://www.youtube.com/watch?v=sAuQjwEl-Bo")
+                                            .description("This is a youtube video")
+                                            .build()
+                                    )
+                                    .build()
+                            ).build()
                     )
                 )
                 .id("4")
@@ -138,15 +142,13 @@ class MainActivity :
             PostViewData.Builder()
                 .attachments(
                     listOf(
-                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(VIDEO).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(IMAGE).fileUrl("").fileSize("")
-                            .build(),
-                        AttachmentViewData.Builder().fileType(VIDEO).fileUrl("").fileSize("")
+                        AttachmentViewData.Builder()
+                            .attachmentType(IMAGE)
+                            .attachmentMeta(
+                                AttachmentMetaViewData.Builder()
+                                    .url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKEHgSbU751Z6Gn5FsbVMw7x_VFyKGwwHEEUiC9HtnKw&s")
+                                    .build()
+                            )
                             .build()
                     )
                 )

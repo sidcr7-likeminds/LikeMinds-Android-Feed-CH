@@ -19,4 +19,6 @@
         <item quantity="one">1 Comment</item>
         <item quantity="other">%d Comments</item>
     </plurals>
+    <string name="placeholder_pages">%d Pages</string>
+    <string name="link">Link</string>
 </resources>

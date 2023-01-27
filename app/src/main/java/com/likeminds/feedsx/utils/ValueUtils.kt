@@ -1,5 +1,7 @@
 package com.likeminds.feedsx.utils
 
+import android.net.Uri
+
 class ValueUtils {
 
 }
@@ -23,4 +25,11 @@ fun Int.isValidIndex(items: List<*>? = null): Boolean {
     } else {
         this > -1
     }
+}
+
+fun String.isValidYoutubeLink(): Boolean {
+    val uri = Uri.parse(this)
+    return uri.host.equals("youtube") ||
+            uri.host.equals("youtu.be") ||
+            uri.host.equals("www.youtube.com")
 }
