@@ -5,8 +5,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/white">
+        android:layout_height="match_parent">
 
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
@@ -17,8 +16,7 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@color/white">
+                android:layout_height="match_parent">
 
                 <include
                     android:id="@+id/author_frame"
@@ -132,7 +130,6 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:elevation="4dp"
                 android:src="@drawable/ic_attach_files"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -141,7 +138,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
-                android:elevation="4dp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="@string/attach_files"
                 android:textColor="@color/raisin_black"
@@ -204,6 +200,7 @@
             android:layout_marginHorizontal="16dp"
             android:paddingVertical="10dp"
             android:gravity="center_vertical"
+            android:elevation="4dp"
             app:layout_constraintBottom_toTopOf="@id/video_image_separator">
 
             <ImageView
@@ -215,7 +212,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
-                android:elevation="4dp"
                 android:fontFamily="@font/roboto_regular"
                 android:text="@string/add_photo"
                 android:textColor="@color/raisin_black"

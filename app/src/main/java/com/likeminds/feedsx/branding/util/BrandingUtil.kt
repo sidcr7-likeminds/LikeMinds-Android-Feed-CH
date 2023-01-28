@@ -45,9 +45,9 @@ object BrandingUtil {
         val color = when (textType) {
             "title" -> {
                 if (BrandingData.isBrandingBasic) {
-                    Color.WHITE
-                } else {
                     Color.BLACK
+                } else {
+                    Color.WHITE
                 }
             }
             "special" -> {

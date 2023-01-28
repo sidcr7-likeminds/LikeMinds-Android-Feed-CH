@@ -48,9 +48,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
 
     private fun initAddAttachmentsView() {
         binding.layoutAttachFiles.setOnClickListener {
-            //TODO: add name
             val extra = MediaPickerExtras.Builder()
-                .creatorName("Sid")
                 .mediaTypes(listOf(PDF))
                 .build()
             val intent = MediaPickerActivity.getIntent(requireContext(), extra)
@@ -58,9 +56,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         }
 
         binding.layoutAddImage.setOnClickListener {
-            //TODO: add name
             val extras = MediaPickerExtras.Builder()
-                .creatorName("Sid")
                 .mediaTypes(listOf(IMAGE, VIDEO))
                 .build()
 
@@ -69,9 +65,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         }
 
         binding.layoutAddVideo.setOnClickListener {
-            //TODO: add name
             val extras = MediaPickerExtras.Builder()
-                .creatorName("Sid")
                 .mediaTypes(listOf(IMAGE, VIDEO))
                 .build()
 

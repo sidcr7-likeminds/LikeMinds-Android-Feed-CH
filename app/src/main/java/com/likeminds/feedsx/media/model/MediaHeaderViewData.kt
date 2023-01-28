@@ -16,6 +16,8 @@ class MediaHeaderViewData private constructor(
         private var title: String = ""
 
         fun title(title: String) = apply { this.title = title }
+
+        fun build() = MediaHeaderViewData(title)
     }
 
     fun toBuilder(): Builder {

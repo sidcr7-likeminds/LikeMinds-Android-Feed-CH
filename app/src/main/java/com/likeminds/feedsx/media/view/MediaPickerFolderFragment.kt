@@ -55,18 +55,29 @@ class MediaPickerFolderFragment :
         return FragmentMediaPickerFolderBinding.inflate(layoutInflater)
     }
 
+    override fun receiveExtras() {
+        super.receiveExtras()
+        mediaPickerExtras =
+            MediaPickerFolderFragmentArgs.fromBundle(requireArguments()).mediaPickerExtras
+        getExternalAppList()
+    }
+
     override fun setUpViews() {
         super.setUpViews()
         setHasOptionsMenu(true)
         initializeUI()
         initializeListeners()
+        viewModel.fetchAllFolders(requireContext(), mediaPickerExtras.mediaTypes)
+            .observe(viewLifecycleOwner) {
+                mediaPickerAdapter.replace(it)
+            }
     }
 
     private fun initializeUI() {
         binding.toolbar.title = ""
 
         (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
-        initializeTitle()
+        binding.tvToolbarTitle.text = getString(R.string.all_media)
 
         mediaPickerAdapter = MediaPickerAdapter(this)
         binding.rvFolder.apply {
@@ -79,17 +90,6 @@ class MediaPickerFolderFragment :
         binding.ivBack.setOnClickListener {
             requireActivity().onBackPressed()
         }
-    }
-
-    private fun initializeTitle() {
-        binding.tvToolbarTitle.text =
-            if (MediaType.isBothImageAndVideo(mediaPickerExtras.mediaTypes)
-                && mediaPickerExtras.creatorName?.isNotEmpty() == true
-            ) {
-                String.format("Send to %s", mediaPickerExtras.creatorName)
-            } else {
-                getString(R.string.gallery)
-            }
     }
 
     @SuppressLint("RestrictedApi")
@@ -135,13 +135,6 @@ class MediaPickerFolderFragment :
         } else {
             false
         }
-    }
-
-    override fun receiveExtras() {
-        super.receiveExtras()
-        mediaPickerExtras =
-            MediaPickerFolderFragmentArgs.fromBundle(requireArguments()).mediaPickerExtras
-        getExternalAppList()
     }
 
     private fun getExternalAppList() {

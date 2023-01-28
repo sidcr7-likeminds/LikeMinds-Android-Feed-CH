@@ -8,7 +8,7 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -18,7 +18,8 @@
             app:contentInsetStart="0dp"
             app:contentInsetStartWithNavigation="0dp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/OverFlowMenu">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -38,6 +39,8 @@
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
                     app:tint="@color/black" />
 
+                <!-- TODO: Set as per branding-->
+
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="0dp"
@@ -51,14 +54,14 @@
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     android:textStyle="normal"
-                    app:textType="title"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/iv_back"
                     app:layout_constraintTop_toTopOf="parent"
+                    app:textType="title"
                     tools:text="All Media" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.appcompat.widget.Toolbar>
+        </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
 
         <com.likeminds.feedsx.utils.recyclerview.AnimatedRecyclerView
             android:id="@+id/rv_folder"
@@ -81,7 +84,6 @@
             app:spanCount="2"
             tools:itemCount="10"
             tools:listitem="@layout/item_media_picker_folder" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,13 +4,13 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal class MediaPickerItemExtras private constructor(
+class MediaPickerItemExtras private constructor(
     var bucketId: String,
     var folderTitle: String,
     var mediaTypes: List<String>,
     var allowMultipleSelect: Boolean,
 ) : Parcelable {
-    internal class Builder {
+    class Builder {
         private var bucketId: String = ""
         private var folderTitle: String = ""
         private var mediaTypes: List<String> = emptyList()

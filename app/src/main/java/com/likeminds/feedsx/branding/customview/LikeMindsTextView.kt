@@ -9,7 +9,7 @@ import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.util.BrandingUtil
 
-internal class LikeMindsTextView : AppCompatTextView {
+internal class   LikeMindsTextView : AppCompatTextView {
 
     private val isHeader = false
 
