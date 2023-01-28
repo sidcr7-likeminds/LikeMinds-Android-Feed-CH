@@ -86,6 +86,7 @@ class MediaPickerActivity : BaseAppCompatActivity() {
     }
 
     private fun startMediaPickerFragment() {
+        Log.d("TAG", "startMediaPickerFragment: ")
         checkIfDocumentPickerInitiated()
 
         val navHostFragment =
@@ -99,6 +100,7 @@ class MediaPickerActivity : BaseAppCompatActivity() {
                 navGraph.setStartDestination(R.id.media_picker_folder_fragment)
             }
             MediaType.isPDF(mediaPickerExtras.mediaTypes) -> {
+                Log.d("TAG", "media_picker_document_fragment: ")
                 navGraph.setStartDestination(R.id.media_picker_document_fragment)
             }
             else -> {

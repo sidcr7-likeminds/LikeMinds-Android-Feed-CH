@@ -5,7 +5,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
-import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_DOCUMENT
@@ -25,7 +24,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val data =
                     result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
-//                checkMediaPickedResult(data)
+                checkMediaPickedResult(data)
             }
         }
 
@@ -34,7 +33,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
             if (result.resultCode == Activity.RESULT_OK) {
                 val data =
                     result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
-//                checkMediaPickedResult(data)
+                checkMediaPickedResult(data)
             }
         }
 
@@ -81,31 +80,31 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         }
     }
 
-//    private fun checkMediaPickedResult(result: MediaPickerResult?) {
-//        if (result != null) {
-//            when (result.mediaPickerResultType) {
-//                MEDIA_RESULT_BROWSE -> {
-//                    if (MediaType.isPDF(result.mediaTypes)) {
-//                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
-//                            allowMultipleSelect = result.allowMultipleSelect
-//                        )
-//                        startActivityForResult(intent, BROWSE_DOCUMENT)
-//                    } else {
-//                        val intent = AndroidUtils.getExternalPickerIntent(
-//                            result.mediaTypes,
-//                            result.allowMultipleSelect,
-//                            result.browseClassName
-//                        )
-//                        if (intent != null)
-//                            startActivityForResult(intent, BROWSE_MEDIA)
-//                    }
-//                }
-//                MEDIA_RESULT_PICKED -> {
+    private fun checkMediaPickedResult(result: MediaPickerResult?) {
+        if (result != null) {
+            when (result.mediaPickerResultType) {
+                MEDIA_RESULT_BROWSE -> {
+                    if (MediaType.isPDF(result.mediaTypes)) {
+                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
+                            allowMultipleSelect = result.allowMultipleSelect
+                        )
+                        startActivityForResult(intent, BROWSE_DOCUMENT)
+                    } else {
+                        val intent = AndroidUtils.getExternalPickerIntent(
+                            result.mediaTypes,
+                            result.allowMultipleSelect,
+                            result.browseClassName
+                        )
+                        if (intent != null)
+                            startActivityForResult(intent, BROWSE_MEDIA)
+                    }
+                }
+                MEDIA_RESULT_PICKED -> {
 //                    onMediaPicked(result)
-//                }
-//            }
-//        }
-//    }
+                }
+            }
+        }
+    }
 
 //    private fun onMediaPicked(result: MediaPickerResult) {
 //        val data =
