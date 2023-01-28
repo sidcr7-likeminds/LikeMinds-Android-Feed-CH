@@ -33,6 +33,9 @@ dependencies {
     implementation deps.rxJava.main
     implementation deps.rxJava.android
 
+    //Stream
+    implementation deps.stream.main
+
     //testing
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit

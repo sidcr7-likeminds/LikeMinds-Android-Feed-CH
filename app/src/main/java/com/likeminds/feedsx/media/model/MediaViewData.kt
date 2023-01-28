@@ -17,12 +17,12 @@ class MediaViewData private constructor(
     var bucketId: String?,
     var dateTimeStampHeader: String,
     var mediaName: String?,
-    var _viewType: Int?,
+    var dynamicViewType: Int?,
     var filteredKeywords: List<String>?,
-    var pdfPageCount: Int?,
+    var pdfPageCount: Int?
 ) : Parcelable, BaseViewType {
     override val viewType: Int
-        get() = _viewType ?: ITEM_MEDIA_PICKER_SINGLE
+        get() = dynamicViewType ?: ITEM_MEDIA_PICKER_SINGLE
 
     class Builder {
         private var uri: Uri = Uri.parse("")
@@ -34,7 +34,7 @@ class MediaViewData private constructor(
         private var bucketId: String? = null
         private var dateTimeStampHeader: String = ""
         private var mediaName: String? = null
-        private var _viewType: Int? = null
+        private var dynamicViewType: Int? = null
         private var filteredKeywords: List<String>? = null
         private var pdfPageCount: Int? = null
 
@@ -49,7 +49,7 @@ class MediaViewData private constructor(
             apply { this.dateTimeStampHeader = dateTimeStampHeader }
 
         fun mediaName(mediaName: String?) = apply { this.mediaName = mediaName }
-        fun _viewType(_viewType: Int?) = apply { this._viewType = _viewType }
+        fun dynamicViewType(dynamicViewType: Int?) = apply { this.dynamicViewType = dynamicViewType }
         fun filteredKeywords(filteredKeywords: List<String>?) =
             apply { this.filteredKeywords = filteredKeywords }
 
@@ -65,7 +65,7 @@ class MediaViewData private constructor(
             bucketId,
             dateTimeStampHeader,
             mediaName,
-            _viewType,
+            dynamicViewType,
             filteredKeywords,
             pdfPageCount
         )
@@ -81,7 +81,7 @@ class MediaViewData private constructor(
             .bucketId(bucketId)
             .dateTimeStampHeader(dateTimeStampHeader)
             .mediaName(mediaName)
-            ._viewType(_viewType)
+            .dynamicViewType(dynamicViewType)
             .filteredKeywords(filteredKeywords)
             .pdfPageCount(pdfPageCount)
     }

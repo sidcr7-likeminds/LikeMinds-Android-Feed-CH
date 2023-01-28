@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class MediaFolderViewData private constructor(
-    var thumbnailUri: Uri,
+    var thumbnailUri: Uri?,
     var title: String,
     var itemCount: Int,
     var bucketId: String,
@@ -18,13 +18,13 @@ class MediaFolderViewData private constructor(
         get() = ITEM_MEDIA_PICKER_FOLDER
 
     class Builder {
-        private var thumbnailUri: Uri = Uri.parse("")
+        private var thumbnailUri: Uri? = null
         private var title: String = ""
         private var itemCount: Int = 0
         private var bucketId: String = ""
         private var folderType: MediaFolderType = MediaFolderType.NORMAL
 
-        fun thumbnailUri(thumbnailUri: Uri) = apply { this.thumbnailUri = thumbnailUri }
+        fun thumbnailUri(thumbnailUri: Uri?) = apply { this.thumbnailUri = thumbnailUri }
         fun title(title: String) = apply { this.title = title }
         fun itemCount(itemCount: Int) = apply { this.itemCount = itemCount }
         fun bucketId(bucketId: String) = apply { this.bucketId = bucketId }

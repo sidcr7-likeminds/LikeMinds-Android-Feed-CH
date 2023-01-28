@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.model.Fonts
 import com.likeminds.feedsx.databinding.ActivityMainBinding
+import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
@@ -81,6 +82,10 @@ class MainActivity :
 
         binding.btn.setOnClickListener {
             recreateSmoothly()
+        }
+
+        binding.nextButton.setOnClickListener {
+            CreatePostActivity.start(this)
         }
     }
 

@@ -29,6 +29,7 @@ versions.dotsindicator = '4.2'
 versions.hilt = "2.44"
 versions.rxJava = '2.2.5'
 versions.rxAndroid = '2.1.1'
+versions.stream = '1.2.1'
 ext.versions = versions
 
 
@@ -87,6 +88,10 @@ deps.rxJava = rxJava
 def exo_player = [:]
 exo_player.main = "com.google.android.exoplayer:exoplayer:$versions.exo_player"
 deps.exo_player = exo_player
+
+def stream = [:]
+stream.main = "com.annimon:stream:$versions.stream"
+deps.stream = stream
 
 def testing = [:]
 testing.junit = "junit:junit:$versions.junit"

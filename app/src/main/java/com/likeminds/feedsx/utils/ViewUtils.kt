@@ -5,6 +5,10 @@ import android.content.res.Resources
 import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.navigation.fragment.NavHostFragment
 
 //view related utils class
 object ViewUtils {
@@ -32,5 +36,15 @@ object ViewUtils {
 
     fun View.show() {
         visibility = View.VISIBLE
+    }
+
+    fun showShortToast(context: Context?, text: String?) {
+        if (context == null || text.isNullOrEmpty()) return
+        Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+    }
+
+    fun FragmentManager.currentFragment(navHostId: Int): Fragment? {
+        val navHostFragment = this.findFragmentById(navHostId) as? NavHostFragment
+        return navHostFragment?.childFragmentManager?.fragments?.firstOrNull()
     }
 }

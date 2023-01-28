@@ -5,6 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class MediaPickerResult private constructor(
+    var isResultOk: Boolean,
     @MediaPickerResultType
     var mediaPickerResultType: Int,
     var mediaTypes: List<String>,
@@ -14,6 +15,8 @@ class MediaPickerResult private constructor(
 ) : Parcelable {
 
     class Builder {
+        private var isResultOk: Boolean = false
+
         @MediaPickerResultType
         private var mediaPickerResultType: Int = 0
         private var mediaTypes: List<String> = listOf()
@@ -21,6 +24,7 @@ class MediaPickerResult private constructor(
         private var browseClassName: Pair<String, String>? = null
         private var allowMultipleSelect: Boolean = false
 
+        fun isResultOk(isResultOk: Boolean) = apply { this.isResultOk = isResultOk }
         fun mediaPickerResultType(@MediaPickerResultType mediaPickerResultType: Int) =
             apply { this.mediaPickerResultType = mediaPickerResultType }
 
@@ -35,6 +39,7 @@ class MediaPickerResult private constructor(
             apply { this.allowMultipleSelect = allowMultipleSelect }
 
         fun build() = MediaPickerResult(
+            isResultOk,
             mediaPickerResultType,
             mediaTypes,
             medias,
@@ -44,7 +49,8 @@ class MediaPickerResult private constructor(
     }
 
     fun toBuilder(): Builder {
-        return Builder().mediaPickerResultType(mediaPickerResultType)
+        return Builder().isResultOk(isResultOk)
+            .mediaPickerResultType(mediaPickerResultType)
             .mediaTypes(mediaTypes)
             .medias(medias)
             .browseClassName(browseClassName)

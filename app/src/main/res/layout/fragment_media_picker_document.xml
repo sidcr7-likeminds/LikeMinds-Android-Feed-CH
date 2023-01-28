@@ -12,7 +12,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
+            android:background="@color/white"
             android:elevation="4dp"
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:contentInsetEnd="0dp"
@@ -38,9 +38,9 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
-                    app:tint="@color/white" />
-
-                <TextView
+                    app:tint="@color/black" />
+                <!-- TODO ... Apply branding -->
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                     android:includeFontPadding="false"
                     android:singleLine="true"
                     android:text="@string/documents"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textSize="20sp"
                     app:layout_constraintBottom_toTopOf="@+id/tv_selected_count"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -59,14 +59,14 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_chainStyle="packed" />
 
-                <TextView
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_selected_count"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:alpha="0.8"
                     android:fontFamily="sans-serif"
                     android:includeFontPadding="false"
-                    android:textColor="@color/white"
+                    android:textColor="@color/grey"
                     android:textSize="14sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -106,7 +106,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            app:backgroundTint="@color/teal"
+            app:backgroundTint="@color/majorelle_blue"
             android:visibility="gone"
             app:fabCustomSize="48dp"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -5,13 +5,18 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.model.MEDIA_RESULT_BROWSE
 import com.likeminds.feedsx.media.model.MediaPickerExtras
 import com.likeminds.feedsx.media.model.MediaPickerResult
 import com.likeminds.feedsx.media.model.MediaType
+import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
+import com.likeminds.feedsx.utils.permissions.Permission
+import com.likeminds.feedsx.utils.permissions.PermissionDeniedCallback
+import com.likeminds.feedsx.utils.permissions.PermissionManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -51,6 +56,33 @@ class MediaPickerActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media_picker)
+        val extras = intent.extras?.getParcelable<MediaPickerExtras>(ARG_MEDIA_PICKER_EXTRAS)
+        if (extras == null) {
+            throw IllegalArgumentException("Arguments are missing")
+        } else {
+            mediaPickerExtras = extras
+        }
+
+        checkStoragePermission()
+    }
+
+    private fun checkStoragePermission() {
+        PermissionManager.performTaskWithPermission(
+            this,
+            { startMediaPickerFragment() },
+            Permission.getStoragePermissionData(),
+            showInitialPopup = true,
+            showDeniedPopup = true,
+            permissionDeniedCallback = object : PermissionDeniedCallback {
+                override fun onDeny() {
+                    onBackPressed()
+                }
+
+                override fun onCancel() {
+                    onBackPressed()
+                }
+            }
+        )
     }
 
     private fun startMediaPickerFragment() {
@@ -100,6 +132,31 @@ class MediaPickerActivity : BaseAppCompatActivity() {
             }
             setResult(Activity.RESULT_OK, intent)
             finish()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == PermissionManager.REQUEST_CODE_SETTINGS_PERMISSION) {
+            checkStoragePermission()
+        }
+    }
+
+    override fun onBackPressed() {
+        when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
+            is MediaPickerFolderFragment -> {
+                super.onBackPressed()
+            }
+            is MediaPickerItemFragment -> {
+                Log.d("TAG", "Called")
+//                fragment.onBackPressedFromFragment()
+            }
+            is MediaPickerDocumentFragment -> {
+                if (fragment.onBackPressedFromFragment()) super.onBackPressed()
+            }
+            else -> {
+                super.onBackPressed()
+            }
         }
     }
 }

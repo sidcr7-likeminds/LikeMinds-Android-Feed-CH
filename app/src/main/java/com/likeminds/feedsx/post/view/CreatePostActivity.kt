@@ -1,5 +1,7 @@
 package com.likeminds.feedsx.post.view
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -16,6 +18,19 @@ class CreatePostActivity : BaseAppCompatActivity() {
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
+
+    companion object {
+
+        @JvmStatic
+        fun start(context: Context) {
+            context.startActivity(Intent(context, CreatePostActivity::class.java))
+        }
+
+        @JvmStatic
+        fun getIntent(context: Context): Intent {
+            return Intent(context, CreatePostActivity::class.java)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

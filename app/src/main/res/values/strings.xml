@@ -24,6 +24,7 @@
     <string name="sort">Sort</string>
     <string name="browse_other_docs">Browse other docs…</string>
     <string name="search_hint_text">Search…</string>
+    <string name="large_file_select_error_message">Files below 100 KB and above 100 MB are not allowed</string>
 
     <string name="see_more"> See More</string>
     <plurals name="likes">
@@ -36,4 +37,12 @@
     </plurals>
     <string name="placeholder_pages">%d Pages</string>
     <string name="link">Link</string>
+    <string name="gallery">Gallery</string>
+    <string name="tap_to_select">Tap to select</string>
+    <string name="sort_by_name">Sort by name</string>
+    <string name="sort_by_date">Sort by date</string>
+    <string name="photo_saved_to_gallery">Photo saved to gallery</string>
+    <string name="video_saved_to_gallery">Video saved to gallery</string>
+    <string name="saved_to_gallery">Saved to gallery</string>
+    <string name="download_in_progress">Download in progress</string>
 </resources>
