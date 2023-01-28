@@ -25,4 +25,15 @@
     <string name="browse_other_docs">Browse other docs…</string>
     <string name="search_hint_text">Search…</string>
 
+    <string name="see_more"> See More</string>
+    <plurals name="likes">
+        <item quantity="one">1 Like</item>
+        <item quantity="other">%d Likes</item>
+    </plurals>
+    <plurals name="comments">
+        <item quantity="one">1 Comment</item>
+        <item quantity="other">%d Comments</item>
+    </plurals>
+    <string name="placeholder_pages">%d Pages</string>
+    <string name="link">Link</string>
 </resources>

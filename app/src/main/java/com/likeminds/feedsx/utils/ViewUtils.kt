@@ -25,4 +25,12 @@ object ViewUtils {
             view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
+
+    fun View.hide() {
+        visibility = View.GONE
+    }
+
+    fun View.show() {
+        visibility = View.VISIBLE
+    }
 }
