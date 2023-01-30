@@ -2,9 +2,9 @@ package com.likeminds.feedsx.feed.view
 
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -46,8 +46,31 @@ class FeedFragment :
         binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = mPostAdapter
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val isExtended = binding.newPostButton.isExtended
+
+                    // Scroll down
+                    if (dy > 20 && isExtended) {
+                        binding.newPostButton.shrink()
+                    }
+
+                    // Scroll up
+                    if (dy < -20 && isExtended == false) {
+                        binding.newPostButton.extend()
+                    }
+
+                    // At the top
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        binding.newPostButton.extend()
+                    }
+                }
+            })
             show()
         }
+
 
         //TODO: Testing data
         var text =
@@ -77,13 +100,82 @@ class FeedFragment :
                 .text(text)
                 .build()
         )
+        text =
+            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("4")
+                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        text =
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("5")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        text =
+            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("6")
+                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        text =
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("7")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        text =
+            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("8")
+                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        text =
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("9")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        text =
+            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("10")
+                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        text =
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+        mPostAdapter.add(
+            PostViewData.Builder()
+                .id("11")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
     }
 
     private fun initToolbar() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
-
-        //if user is guest user hide, profile icon from toolbar
-        binding.memberImage.isVisible = !isGuestUser
 
         //click listener -> open profile screen
         binding.memberImage.setOnClickListener {
