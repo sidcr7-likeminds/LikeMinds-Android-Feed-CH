@@ -19,6 +19,24 @@
         <item quantity="one">1 Comment</item>
         <item quantity="other">%d Comments</item>
     </plurals>
+    <string name="create_a_post">Create a post</string>
+    <string name="done">Done</string>
+    <string name="post">Post</string>
+    <string name="write_something_here">Write something here...</string>
+    <string name="attach_files">Attach Files</string>
+    <string name="add_video">Add Video</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="playing_this_video">Playing this video…</string>
+    <string name="add_more">Add More</string>
+    <string name="documents">Documents</string>
+    <string name="action_search">Search</string>
+    <string name="sort">Sort</string>
+    <string name="browse_other_docs">Browse other docs…</string>
+    <string name="search_hint_text">Search…</string>
+    <string name="all_posts">All Posts</string>
+    <string name="following">Following</string>
+    <string name="scalix">SCALIX</string>
+    <string name="new_post">New Post</string>
     <string name="placeholder_pages">%d Pages</string>
     <string name="link">Link</string>
 </resources>

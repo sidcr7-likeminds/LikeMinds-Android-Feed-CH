@@ -5,12 +5,12 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO

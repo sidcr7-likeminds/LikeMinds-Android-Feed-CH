@@ -373,5 +373,4 @@ object PostTypeUtil {
     fun onMemberTagClicked() {
         // TODO: Change Implementation
     }
-
 }
