@@ -2,9 +2,9 @@ package com.likeminds.feedsx.posttypes.view.adapter
 
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
+import com.likeminds.feedsx.utils.ValueUtils.getItemInList
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.getItemInList
 import com.likeminds.feedsx.utils.model.BaseViewType
 
 class PostAdapter constructor(
@@ -47,9 +47,11 @@ class PostAdapter constructor(
         //TODO: add compulsory methods
 
         fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
-        fun pinPost()
-        fun savePost()
-        fun likePost()
+        fun pinPost() {}
+        fun savePost() {}
+        fun likePost() {}
+        fun sharePost() {}
+        fun comment() {}
         fun onPostMenuItemClicked(postId: String, title: String)
         fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
         fun showLikesScreen(postData: PostViewData)

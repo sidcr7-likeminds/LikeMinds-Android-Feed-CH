@@ -24,6 +24,8 @@ class ItemDocumentViewDataBinder constructor(
         data: AttachmentViewData,
         position: Int
     ) {
+
+        // sets the document data on the doc view
         PostTypeUtil.initDocument(
             binding,
             data

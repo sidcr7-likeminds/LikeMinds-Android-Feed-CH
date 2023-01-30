@@ -26,6 +26,7 @@ class ItemMultipleMediaVideoViewDataBinder :
         position: Int
     ) {
         //TODO: Testing data
+        //TODO: Migrate to exo player
         val video: Uri =
             Uri.parse("https://media.geeksforgeeks.org/wp-content/uploads/20201217192146/Screenrecorder-2020-12-17-19-17-36-828.mp4?_=1")
 
