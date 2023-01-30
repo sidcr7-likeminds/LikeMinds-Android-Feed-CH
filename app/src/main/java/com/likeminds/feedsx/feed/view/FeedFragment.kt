@@ -6,9 +6,9 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
+import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.ViewUtils
@@ -58,7 +58,7 @@ class FeedFragment :
                     }
 
                     // Scroll up
-                    if (dy < -20 && isExtended == false) {
+                    if (dy < -20 && !isExtended) {
                         binding.newPostButton.extend()
                     }
 
@@ -74,7 +74,7 @@ class FeedFragment :
 
         //TODO: Testing data
         var text =
-            "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
+            "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("1")
@@ -100,10 +100,26 @@ class FeedFragment :
                 .text(text)
                 .build()
         )
-        text =
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
         mPostAdapter.add(
             PostViewData.Builder()
+                .attachments(
+                    listOf(
+                        AttachmentViewData.Builder()
+                            .attachmentType(LINK)
+                            .attachmentMeta(
+                                AttachmentMetaViewData.Builder()
+                                    .ogTags(
+                                        LinkOGTags.Builder()
+                                            .title("Youtube video")
+                                            .image("https://i.ytimg.com/vi/EbyAoYaUcVo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDiI5bXtT71sC4IAnHiDAh52LxbFA")
+                                            .url("https://www.youtube.com/watch?v=sAuQjwEl-Bo")
+                                            .description("This is a youtube video")
+                                            .build()
+                                    )
+                                    .build()
+                            ).build()
+                    )
+                )
                 .id("4")
                 .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
                 .text(text)
@@ -113,6 +129,18 @@ class FeedFragment :
             "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
         mPostAdapter.add(
             PostViewData.Builder()
+                .attachments(
+                    listOf(
+                        AttachmentViewData.Builder()
+                            .attachmentType(IMAGE)
+                            .attachmentMeta(
+                                AttachmentMetaViewData.Builder()
+                                    .url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKEHgSbU751Z6Gn5FsbVMw7x_VFyKGwwHEEUiC9HtnKw&s")
+                                    .build()
+                            )
+                            .build()
+                    )
+                )
                 .id("5")
                 .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
                 .text(text)
@@ -226,6 +254,15 @@ class FeedFragment :
         mPostAdapter.update(
             position, postData.toBuilder().isExpanded(true).build()
         )
+    }
+
+    // opens likes screen when likes count is tapped.
+    override fun showLikesScreen(postData: PostViewData) {
+        val extras = LikesScreenExtras.Builder()
+            .postId(postData.id)
+            .likesCount(postData.likesCount)
+            .build()
+        LikesActivity.start(requireContext(), extras)
     }
 
     /**

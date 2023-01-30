@@ -54,5 +54,6 @@ class PostAdapter constructor(
         fun comment() {}
         fun onPostMenuItemClicked(postId: String, title: String)
         fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
+        fun showLikesScreen(postData: PostViewData)
     }
 }

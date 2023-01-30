@@ -167,6 +167,8 @@ object PostTypeUtil {
                     data.likesCount
                 )
 
+        binding.likesCount.setOnClickListener { listener.showLikesScreen(data) }
+
         binding.commentsCount.text =
             if (data.commentsCount == 0) context.getString(R.string.add_comment)
             else
