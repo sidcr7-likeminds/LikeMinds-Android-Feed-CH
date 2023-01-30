@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.media.util
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
@@ -118,5 +119,22 @@ object MediaUtils {
             )
         }
         return mediaUris
+    }
+
+    fun getExternalIntentPickerUris(data: Intent?): ArrayList<Uri> {
+        val uris = arrayListOf<Uri>()
+        if (data != null) {
+            val mediaUriCount = data.clipData?.itemCount ?: 0
+            if (mediaUriCount > 0) {
+                for (i in 0 until mediaUriCount) {
+                    val mediaUri = data.clipData?.getItemAt(i)?.uri
+                    if (mediaUri != null) uris.add(mediaUri)
+                }
+            } else {
+                val mediaUri = data.data
+                if (mediaUri != null) uris.add(mediaUri)
+            }
+        }
+        return uris
     }
 }

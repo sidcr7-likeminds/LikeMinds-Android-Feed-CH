@@ -1,10 +1,12 @@
 package com.likeminds.feedsx.post.view
 
 import android.app.Activity
+import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_DOCUMENT
@@ -50,6 +52,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         binding.layoutAttachFiles.setOnClickListener {
             val extra = MediaPickerExtras.Builder()
                 .mediaTypes(listOf(PDF))
+                .allowMultipleSelect(true)
                 .build()
             val intent = MediaPickerActivity.getIntent(requireContext(), extra)
             documentLauncher.launch(intent)
@@ -58,6 +61,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         binding.layoutAddImage.setOnClickListener {
             val extras = MediaPickerExtras.Builder()
                 .mediaTypes(listOf(IMAGE, VIDEO))
+                .allowMultipleSelect(true)
                 .build()
 
             val intent = MediaPickerActivity.getIntent(requireContext(), extras)
@@ -67,6 +71,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         binding.layoutAddVideo.setOnClickListener {
             val extras = MediaPickerExtras.Builder()
                 .mediaTypes(listOf(IMAGE, VIDEO))
+                .allowMultipleSelect(true)
                 .build()
 
             val intent = MediaPickerActivity.getIntent(requireContext(), extras)
@@ -96,6 +101,48 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
                 MEDIA_RESULT_PICKED -> {
 //                    onMediaPicked(result)
                 }
+            }
+        }
+    }
+
+    private fun onMediaPickedFromGallery(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            if (mediaUris.isNotEmpty()) {
+//                showPickImagesListScreen(*mediaUris.toTypedArray(), saveInCache = true)
+            }
+        }
+    }
+
+    private fun onPdfPicked(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            if (mediaUris.isNotEmpty()) {
+//                showPickDocumentsListScreen(*mediaUris.toTypedArray(), saveInCache = true)
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) {
+            return
+        }
+        when (requestCode) {
+            BROWSE_MEDIA -> {
+                onMediaPickedFromGallery(data)
+            }
+//            PICK_CAMERA -> {
+//                onImagePickedFromCamera()
+//            }
+            BROWSE_DOCUMENT -> {
+                onPdfPicked(data)
             }
         }
     }
