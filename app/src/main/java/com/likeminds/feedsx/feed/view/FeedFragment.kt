@@ -8,8 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.ViewUtils
@@ -24,10 +23,6 @@ class FeedFragment :
 
     private val viewModel: FeedViewModel by viewModels()
     lateinit var mPostAdapter: PostAdapter
-
-    companion object {
-
-    }
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -63,7 +58,7 @@ class FeedFragment :
                     }
 
                     // Scroll up
-                    if (dy < -20 && isExtended == false) {
+                    if (dy < -20 && !isExtended) {
                         binding.newPostButton.extend()
                     }
 
@@ -78,7 +73,7 @@ class FeedFragment :
 
 
         //TODO: Testing data
-        val text =
+        var text =
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()

@@ -7,7 +7,7 @@ import com.likeminds.feedsx.utils.model.ITEM_LIKES_SCREEN
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class LikesViewData private constructor(
+class LikeViewData private constructor(
     var id: String,
     var userId: String,
     var createdAt: Long,
@@ -31,7 +31,7 @@ class LikesViewData private constructor(
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
         fun user(user: UserViewData) = apply { this.user = user }
 
-        fun build() = LikesViewData(
+        fun build() = LikeViewData(
             id,
             userId,
             createdAt,

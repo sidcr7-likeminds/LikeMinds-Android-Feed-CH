@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.feed.view.adapter
 
-import com.likeminds.feedsx.feed.view.model.LikesViewData
+import com.likeminds.feedsx.feed.view.adapter.viewdatabinder.ItemLikesScreenViewDataBinder
+import com.likeminds.feedsx.feed.view.model.LikeViewData
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
@@ -11,8 +12,8 @@ class LikesScreenAdapter : BaseRecyclerAdapter<BaseViewType>() {
         initViewDataBinders()
     }
 
-    override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, LikesViewData>> {
-        val viewDataBinders = ArrayList<ViewDataBinder<*, LikesViewData>>(1)
+    override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, LikeViewData>> {
+        val viewDataBinders = ArrayList<ViewDataBinder<*, LikeViewData>>(1)
 
         val likesScreenBinding = ItemLikesScreenViewDataBinder()
         viewDataBinders.add(likesScreenBinding)
