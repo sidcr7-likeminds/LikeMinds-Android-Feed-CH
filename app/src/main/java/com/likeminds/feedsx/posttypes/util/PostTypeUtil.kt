@@ -13,12 +13,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.*
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -32,14 +37,15 @@ object PostTypeUtil {
     private const val TAG = "PostTypeUtil"
     private const val SHOW_MORE_COUNT = 2
 
+    // initializes author data frame on the post
     fun initAuthorFrame(
         binding: LayoutAuthorFrameBinding,
         data: PostViewData,
         overflowMenu: OverflowMenuPopup
     ) {
         //TODO: Change pin filled drawable
-        if (data.isPinned) binding.ivPin.setImageResource(R.drawable.ic_pin_filled)
-        else binding.ivPin.setImageResource(R.drawable.ic_pin_unfilled)
+        if (data.isPinned) binding.ivPin.show()
+        else binding.ivPin.hide()
 
         binding.ivPostMenu.setOnClickListener {
             showOverflowMenu(binding.ivPostMenu, overflowMenu)
@@ -72,6 +78,7 @@ object PostTypeUtil {
         )
     }
 
+    // initializes the recyclerview with attached documents
     fun initDocumentsRecyclerView(
         binding: ItemPostDocumentsBinding,
         postData: PostViewData,
@@ -100,6 +107,7 @@ object PostTypeUtil {
         }
     }
 
+    // initializes document item of the document recyclerview
     fun initDocument(
         binding: ItemDocumentBinding,
         document: AttachmentViewData,
@@ -134,11 +142,13 @@ object PostTypeUtil {
         }
     }
 
+
+    // initializes various actions on the post
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
-        data: PostViewData
+        data: PostViewData,
+        listener: PostAdapterListener
     ) {
-        //TODO: share post
 
         val context = binding.root.context
 
@@ -165,8 +175,25 @@ object PostTypeUtil {
                     data.commentsCount,
                     data.commentsCount
                 )
+
+        binding.ivLike.setOnClickListener {
+            listener.likePost()
+        }
+
+        binding.ivBookmark.setOnClickListener {
+            listener.savePost()
+        }
+
+        binding.ivShare.setOnClickListener {
+            listener.sharePost()
+        }
+
+        binding.ivComment.setOnClickListener {
+            listener.comment()
+        }
     }
 
+    // initializes view pager for multiple media post
     fun initViewPager(binding: ItemPostMultipleMediaBinding, data: PostViewData) {
         val attachments = data.attachments.map {
             when (it.attachmentType) {
@@ -188,6 +215,7 @@ object PostTypeUtil {
         multipleMediaPostAdapter.replace(attachments)
     }
 
+    // handles the text content of each post
     fun initTextContent(
         tvPostContent: TextView,
         data: PostViewData,
@@ -212,6 +240,7 @@ object PostTypeUtil {
                 textForLinkify
             }
 
+        // TODO: Confirm
         MemberTaggingDecoder.decode(
             tvPostContent,
             trimmedText,
@@ -295,6 +324,7 @@ object PostTypeUtil {
         )
     }
 
+    // handles link view in the post
     fun initLinkView(
         binding: ItemPostLinkBinding,
         data: LinkOGTags
@@ -331,6 +361,15 @@ object PostTypeUtil {
         binding.tvLinkUrl.text = data.url
     }
 
+    // sets the items in overflow menu
+    fun setOverflowMenuItems(
+        overflowMenu: OverflowMenuPopup,
+        menuItems: List<OverflowMenuItemViewData>
+    ) {
+        overflowMenu.setItems(menuItems)
+    }
+
+    // performs action when member tag is clicked
     fun onMemberTagClicked() {
         // TODO: Change Implementation
     }

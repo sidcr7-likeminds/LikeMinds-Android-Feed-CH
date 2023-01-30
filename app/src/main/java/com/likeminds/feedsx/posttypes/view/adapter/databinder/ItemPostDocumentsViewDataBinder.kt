@@ -28,14 +28,21 @@ class ItemPostDocumentsViewDataBinder constructor(
     }
 
     override fun bindData(binding: ItemPostDocumentsBinding, data: PostViewData, position: Int) {
-        overflowMenu.setItems(data.menuItems)
 
+        // sets items to overflow menu
+        PostTypeUtil.setOverflowMenuItems(
+            overflowMenu,
+            data.menuItems
+        )
+
+        // sets data to the creator frame
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data,
             overflowMenu
         )
 
+        // sets the text content of the post
         PostTypeUtil.initTextContent(
             binding.tvPostContent,
             data,
@@ -43,11 +50,14 @@ class ItemPostDocumentsViewDataBinder constructor(
             listener
         )
 
+        // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            data
+            data,
+            listener
         )
 
+        // initializes the recycler view for documents attached
         PostTypeUtil.initDocumentsRecyclerView(
             binding,
             data,
@@ -56,6 +66,7 @@ class ItemPostDocumentsViewDataBinder constructor(
         )
     }
 
+    // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
         listener.onPostMenuItemClicked(menu.dataId, menu.title)
     }
