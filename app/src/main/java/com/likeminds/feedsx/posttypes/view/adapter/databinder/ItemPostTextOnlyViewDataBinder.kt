@@ -33,14 +33,21 @@ class ItemPostTextOnlyViewDataBinder constructor(
             OverflowMenuItemViewData.Builder().title("Edit").dataId(data.id).build(),
             OverflowMenuItemViewData.Builder().dataId(data.id).title("Delete").build()
         )
-        overflowMenu.setItems(list)
 
+        // sets items to overflow menu
+        PostTypeUtil.setOverflowMenuItems(
+            overflowMenu,
+            list
+        )
+
+        // sets data to the creator frame
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data,
             overflowMenu
         )
 
+        // sets the text content of the post
         PostTypeUtil.initTextContent(
             binding.tvPostContent,
             data,
@@ -48,12 +55,15 @@ class ItemPostTextOnlyViewDataBinder constructor(
             listener
         )
 
+        // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            data
+            data,
+            listener
         )
     }
 
+    // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
         listener.onPostMenuItemClicked(menu.dataId, menu.title)
     }

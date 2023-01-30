@@ -28,14 +28,21 @@ class ItemPostLinkViewDataBinder constructor(
     }
 
     override fun bindData(binding: ItemPostLinkBinding, data: PostViewData, position: Int) {
-        overflowMenu.setItems(data.menuItems)
 
+        // sets items to overflow menu
+        PostTypeUtil.setOverflowMenuItems(
+            overflowMenu,
+            data.menuItems
+        )
+
+        // sets data to the creator frame
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data,
             overflowMenu
         )
 
+        // sets the text content of the post
         PostTypeUtil.initTextContent(
             binding.tvPostContent,
             data,
@@ -43,18 +50,21 @@ class ItemPostLinkViewDataBinder constructor(
             listener
         )
 
+        // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
-            data
+            data,
+            listener
         )
 
-        //TODO: Testing data
-        binding.tvLinkDescription.text =
-            "The new feature has already been implemented in the United States and Other Eu…"
-        binding.tvLinkTitle.text = "Twitter will soon let you schedule your tweets"
-        binding.tvLinkUrl.text = "www.youtube.com"
+        // handles the link view
+        PostTypeUtil.initLinkView(
+            binding,
+            data.attachments.first().attachmentMeta.ogTags
+        )
     }
 
+    // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
         listener.onPostMenuItemClicked(menu.dataId, menu.title)
     }

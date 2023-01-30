@@ -8,24 +8,25 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.*
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.IMAGE
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.VIDEO
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
@@ -36,14 +37,15 @@ object PostTypeUtil {
     private const val TAG = "PostTypeUtil"
     private const val SHOW_MORE_COUNT = 2
 
+    // initializes author data frame on the post
     fun initAuthorFrame(
         binding: LayoutAuthorFrameBinding,
         data: PostViewData,
         overflowMenu: OverflowMenuPopup
     ) {
         //TODO: Change pin filled drawable
-        if (data.isPinned) binding.ivPin.setImageResource(R.drawable.ic_pin_filled)
-        else binding.ivPin.setImageResource(R.drawable.ic_pin_unfilled)
+        if (data.isPinned) binding.ivPin.show()
+        else binding.ivPin.hide()
 
         binding.ivPostMenu.setOnClickListener {
             showOverflowMenu(binding.ivPostMenu, overflowMenu)
@@ -61,16 +63,9 @@ object PostTypeUtil {
             showRoundImage = true
         )
 
-        // edited post
-        if (data.isEdited) {
-            binding.viewDotEdited.show()
-            binding.tvEdited.show()
-            binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.updatedAt)
-        } else {
-            binding.viewDotEdited.hide()
-            binding.tvEdited.hide()
-            binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
-        }
+        binding.viewDotEdited.hide()
+        binding.tvEdited.hide()
+        binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
     }
 
     //to show the options on the post
@@ -83,6 +78,7 @@ object PostTypeUtil {
         )
     }
 
+    // initializes the recyclerview with attached documents
     fun initDocumentsRecyclerView(
         binding: ItemPostDocumentsBinding,
         postData: PostViewData,
@@ -111,6 +107,7 @@ object PostTypeUtil {
         }
     }
 
+    // initializes document item of the document recyclerview
     fun initDocument(
         binding: ItemDocumentBinding,
         document: AttachmentViewData,
@@ -120,38 +117,38 @@ object PostTypeUtil {
         binding.tvMeta2.hide()
         binding.viewMetaDot2.hide()
         binding.tvMeta3.hide()
-        //TODO: set document meta once meta data is added 
 
-//        if (attachment.meta != null) {
-//            val noOfPage = attachment.meta()?.numberOfPage ?: 0
-//            val size = attachment.meta()?.size ?: 0
-//            val mediaType = attachment.type()
-//            if (noOfPage > 0) {
-//                binding.tvMeta1.show()
-//                binding.tvMeta1.text = binding.root.context.getString(
-//                    R.string.placeholder_pages, noOfPage
-//                )
-//            }
-//            if (size > 0) {
-//                binding.tvMeta2.show()
-//                binding.tvMeta2.text = MediaUtils.getFileSizeText(size)
-//                if (binding.tvMeta1.isVisible) {
-//                    binding.viewMetaDot1.show()
-//                }
-//            }
-//            if (!mediaType.isNullOrEmpty() && (binding.tvMeta1.isVisible || binding.tvMeta2.isVisible)) {
-//                binding.tvMeta3.show()
-//                binding.tvMeta3.text = mediaType
-//                binding.viewMetaDot2.show()
-//            }
-//        }
+        val attachmentMeta = document.attachmentMeta
+
+        val noOfPage = attachmentMeta.pageCount ?: 0
+        val mediaType = attachmentMeta.format
+        if (noOfPage > 0) {
+            binding.tvMeta1.show()
+            binding.tvMeta1.text = binding.root.context.getString(
+                R.string.placeholder_pages, noOfPage
+            )
+        }
+        if (!attachmentMeta.size.isNullOrEmpty()) {
+            binding.tvMeta2.show()
+            binding.tvMeta2.text = attachmentMeta.size
+            if (binding.tvMeta1.isVisible) {
+                binding.viewMetaDot1.show()
+            }
+        }
+        if (!mediaType.isNullOrEmpty() && (binding.tvMeta1.isVisible || binding.tvMeta2.isVisible)) {
+            binding.tvMeta3.show()
+            binding.tvMeta3.text = mediaType
+            binding.viewMetaDot2.show()
+        }
     }
 
+
+    // initializes various actions on the post
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
-        data: PostViewData
+        data: PostViewData,
+        listener: PostAdapterListener
     ) {
-        //TODO: share post
 
         val context = binding.root.context
 
@@ -178,11 +175,28 @@ object PostTypeUtil {
                     data.commentsCount,
                     data.commentsCount
                 )
+
+        binding.ivLike.setOnClickListener {
+            listener.likePost()
+        }
+
+        binding.ivBookmark.setOnClickListener {
+            listener.savePost()
+        }
+
+        binding.ivShare.setOnClickListener {
+            listener.sharePost()
+        }
+
+        binding.ivComment.setOnClickListener {
+            listener.comment()
+        }
     }
 
+    // initializes view pager for multiple media post
     fun initViewPager(binding: ItemPostMultipleMediaBinding, data: PostViewData) {
         val attachments = data.attachments.map {
-            when (it.fileType) {
+            when (it.attachmentType) {
                 IMAGE -> {
                     it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
                 }
@@ -201,6 +215,7 @@ object PostTypeUtil {
         multipleMediaPostAdapter.replace(attachments)
     }
 
+    // handles the text content of each post
     fun initTextContent(
         tvPostContent: TextView,
         data: PostViewData,
@@ -225,6 +240,7 @@ object PostTypeUtil {
                 textForLinkify
             }
 
+        // TODO: Confirm
         MemberTaggingDecoder.decode(
             tvPostContent,
             trimmedText,
@@ -308,6 +324,52 @@ object PostTypeUtil {
         )
     }
 
+    // handles link view in the post
+    fun initLinkView(
+        binding: ItemPostLinkBinding,
+        data: LinkOGTags
+    ) {
+        val isYoutubeLink = data.url?.isValidYoutubeLink() == true
+        binding.tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+            data.title
+        } else {
+            binding.root.context.getString(R.string.link)
+        }
+        binding.tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
+        binding.tvLinkDescription.text = data.description
+
+        if (isYoutubeLink) {
+            binding.ivLink.hide()
+            binding.ivPlay.isVisible = !data.image.isNullOrEmpty()
+            binding.ivYoutubeLink.isVisible = !data.image.isNullOrEmpty()
+            binding.ivYoutubeLogo.isVisible = !data.image.isNullOrEmpty()
+        } else {
+            binding.ivPlay.hide()
+            binding.ivYoutubeLink.hide()
+            binding.ivYoutubeLogo.hide()
+            binding.ivLink.isVisible = !data.image.isNullOrEmpty()
+        }
+
+        ImageBindingUtil.loadImage(
+            if (isYoutubeLink) binding.ivYoutubeLink else binding.ivLink,
+            data.image,
+            placeholder = R.drawable.ic_link_primary_40dp,
+            cornerRadius = 8,
+            isBlur = isYoutubeLink
+        )
+
+        binding.tvLinkUrl.text = data.url
+    }
+
+    // sets the items in overflow menu
+    fun setOverflowMenuItems(
+        overflowMenu: OverflowMenuPopup,
+        menuItems: List<OverflowMenuItemViewData>
+    ) {
+        overflowMenu.setItems(menuItems)
+    }
+
+    // performs action when member tag is clicked
     fun onMemberTagClicked() {
         // TODO: Change Implementation
     }
