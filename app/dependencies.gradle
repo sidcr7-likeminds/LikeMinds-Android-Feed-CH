@@ -9,6 +9,8 @@ dependencies {
     implementation deps.ui.constraint_layout
     implementation deps.ui.recycler_view
     implementation deps.ui.circleimageview
+    implementation deps.ui.dot_indicator
+    implementation deps.ui.photo_view
 
     //hilt
     implementation deps.hilt.main
@@ -22,6 +24,10 @@ dependencies {
     //navigation
     implementation deps.navigation.main
     implementation deps.navigation.ui
+
+    //glide
+    implementation deps.glide.core
+    kapt deps.glide.compiler
 
     //testing
     testImplementation deps.testing.junit
