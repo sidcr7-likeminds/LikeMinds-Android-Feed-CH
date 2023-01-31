@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.view
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
@@ -60,7 +61,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
 
         binding.layoutAddImage.setOnClickListener {
             val extras = MediaPickerExtras.Builder()
-                .mediaTypes(listOf(IMAGE, VIDEO))
+                .mediaTypes(listOf(IMAGE))
                 .allowMultipleSelect(true)
                 .build()
 
@@ -70,7 +71,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
 
         binding.layoutAddVideo.setOnClickListener {
             val extras = MediaPickerExtras.Builder()
-                .mediaTypes(listOf(IMAGE, VIDEO))
+                .mediaTypes(listOf(IMAGE))
                 .allowMultipleSelect(true)
                 .build()
 
@@ -99,7 +100,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
                     }
                 }
                 MEDIA_RESULT_PICKED -> {
-//                    onMediaPicked(result)
+                    onMediaPicked(result)
                 }
             }
         }
@@ -147,20 +148,39 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         }
     }
 
-//    private fun onMediaPicked(result: MediaPickerResult) {
-//        val data =
-//            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
-//        if (data.isNotEmpty()) {
-//            when {
-//                MediaType.isPDF(result.mediaTypes) -> {
-//                    showPickDocumentsListScreen(*data.toTypedArray())
-//                }
-//                else -> {
-//                    showPickImagesListScreen(*data.toTypedArray())
-//                }
-//            }
-//        }
-//    }
+    private fun onMediaPicked(result: MediaPickerResult) {
+        val data =
+            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        Log.d("TAG", "onMediaPicked: $data")
+        if (data.isNotEmpty()) {
+            when {
+                MediaType.isPDF(result.mediaTypes) -> {
+//                    showPickDocuments(*data.toTypedArray())
+                }
+                data.size == 1 && MediaType.isImage(result.mediaTypes.first()) -> {
+//                    showPickImage(*data.toTypedArray())
+                }
+                data.size == 1 && MediaType.isVideo(result.mediaTypes.first()) -> {
+//                    showPickImage(*data.toTypedArray())
+                }
+                else -> {
+//                    showPickImages(*data.toTypedArray())
+                }
+            }
+        }
+    }
+
+    private fun showPickDocuments() {
+
+    }
+
+    private fun showPickImages() {
+
+    }
+
+    private fun showPickVideos() {
+
+    }
 
 //    private fun showPickImagesListScreen(
 //        vararg mediaUris: SingleUriData,

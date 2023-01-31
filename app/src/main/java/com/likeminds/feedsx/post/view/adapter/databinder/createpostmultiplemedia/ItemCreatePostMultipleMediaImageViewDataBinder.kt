@@ -35,5 +35,9 @@ class ItemCreatePostMultipleMediaImageViewDataBinder :
             "https://picsum.photos/id/237/200/300",
             placeholder = R.drawable.image_placeholder
         )
+
+        binding.ivCross.setOnClickListener {
+
+        }
     }
 }

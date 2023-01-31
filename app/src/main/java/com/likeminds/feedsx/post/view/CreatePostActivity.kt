@@ -53,7 +53,7 @@ class CreatePostActivity : BaseAppCompatActivity() {
             onBackPressed()
         }
 
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.label) {
                 CreatePostFragment::class.simpleName -> {
                     binding.toolbar.setTitle(R.string.create_a_post)

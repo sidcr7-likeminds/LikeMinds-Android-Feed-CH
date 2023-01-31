@@ -1,5 +1,6 @@
-package com.likeminds.feedsx.post.view.adapter.databinder
+package com.likeminds.feedsx.post.view.adapter
 
+import com.likeminds.feedsx.post.view.adapter.databinder.ItemCreatePostDocumentViewDataBinder
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType

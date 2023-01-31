@@ -3,7 +3,6 @@ package com.likeminds.feedsx.media
 import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.pdf.PdfRenderer
 import android.media.MediaMetadataRetriever
 import android.net.Uri
@@ -20,7 +19,6 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.utils.DateUtil
 import com.likeminds.feedsx.utils.ValueUtils.Companion.getOrDefault
 import com.likeminds.feedsx.utils.downloader.DownloadUtil
-import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.file.isLargeFile
 import com.likeminds.feedsx.utils.getMediaType
 import com.likeminds.feedsx.utils.getMimeType
@@ -536,27 +534,6 @@ class MediaRepository @Inject constructor() {
             }
         }
         return null
-    }
-
-    fun createThumbnailForAudio(
-        context: Context,
-        mediaUris: MutableList<SingleUriData>?,
-    ): MutableList<SingleUriData>? {
-        val mediaMetadataRetriever = MediaMetadataRetriever()
-        val bfo = BitmapFactory.Options()
-        return mediaUris?.map {
-            mediaMetadataRetriever.setDataSource(context, it.uri)
-            val rawArt = mediaMetadataRetriever.embeddedPicture
-            val art = if (rawArt != null) {
-                val bitmap = BitmapFactory.decodeByteArray(rawArt, 0, rawArt.size, bfo)
-                FileUtil.getUriFromBitmapWithRandomName(context, bitmap)
-            } else {
-                null
-            }
-            it.toBuilder()
-                .thumbnailUri(art)
-                .build()
-        } as? MutableList<SingleUriData>
     }
 
     fun convertUriToByteArray(context: Context, uri: Uri): ByteArray {

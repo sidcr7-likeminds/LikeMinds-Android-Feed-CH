@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.post.view.adapter.databinder
+package com.likeminds.feedsx.post.view.adapter
 
 import com.likeminds.feedsx.post.view.adapter.databinder.createpostmultiplemedia.ItemCreatePostMultipleMediaImageViewDataBinder
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia.ItemCreatePostMultipleMediaVideoViewDataBinder

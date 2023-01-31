@@ -11,8 +11,8 @@ import com.likeminds.feedsx.databinding.PopupOverflowMenuBinding
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapter
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
-import com.likeminds.feedsx.utils.ValueUtils.isValidIndex
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.isValidIndex
 
 class OverflowMenuPopup(
     private val context: Context,
