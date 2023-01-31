@@ -30,6 +30,8 @@ class ItemMultipleMediaImageViewDataBinder :
     ) {
 
         //TODO: Testing data
+
+        // loads post image inside the post's image view
         ImageBindingUtil.loadImage(
             binding.ivPost,
             "https://picsum.photos/id/237/200/300",

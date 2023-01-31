@@ -26,6 +26,9 @@
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
         <activity
+            android:name=".feed.view.LikesActivity"
+            android:exported="true" />
+        <activity
             android:name=".feed.view.MainActivity"
             android:exported="true">
             <intent-filter>

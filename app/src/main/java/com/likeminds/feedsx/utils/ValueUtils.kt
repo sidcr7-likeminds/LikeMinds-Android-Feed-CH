@@ -8,7 +8,6 @@ import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.VIDEO
 
 class ValueUtils {
-
     companion object {
 
         @JvmStatic
@@ -29,14 +28,6 @@ fun <T> List<T>.getItemInList(position: Int): T? {
         return null
     }
     return this[position]
-}
-
-fun Int.isValidIndex(items: List<*>? = null): Boolean {
-    return if (items != null) {
-        this > -1 && this < items.size
-    } else {
-        this > -1
-    }
 }
 
 /**
@@ -93,6 +84,14 @@ fun Uri.getMimeType(context: Context): String? {
         type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.lowercase())
     }
     return type
+}
+
+fun Int.isValidIndex(items: List<*>? = null): Boolean {
+    return if (items != null) {
+        this > -1 && this < items.size
+    } else {
+        this > -1
+    }
 }
 
 fun String.isValidYoutubeLink(): Boolean {

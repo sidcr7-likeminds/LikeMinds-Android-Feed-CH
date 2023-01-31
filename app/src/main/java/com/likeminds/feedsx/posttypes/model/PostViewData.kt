@@ -29,7 +29,8 @@ class PostViewData private constructor(
 ) : Parcelable, BaseViewType {
 
     //TODO: add post id while adding menu item
-    //TODO: limit for short text
+
+    //TODO: Change see more limit count
 
     override val viewType: Int
         get() = when {
@@ -75,7 +76,11 @@ class PostViewData private constructor(
         private var user: UserViewData = UserViewData.Builder().build()
 
         fun id(id: String) = apply { this.id = id }
-        fun text(text: String) = apply { this.text = text }
+        fun text(text: String) = apply {
+            this.text = text
+            this.shortText = SeeMoreUtil.getShortContent(text, 100)
+        }
+
         fun shortText(shortText: String?) = apply { this.shortText = shortText }
         fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) =
             apply { this.alreadySeenFullContent = alreadySeenFullContent }
@@ -126,7 +131,7 @@ class PostViewData private constructor(
     fun toBuilder(): Builder {
         return Builder().id(id)
             .text(text)
-            .shortText(SeeMoreUtil.getShortContent(text, 10))
+            .shortText(shortText)
             .alreadySeenFullContent(alreadySeenFullContent)
             .isExpanded(isExpanded)
             .attachments(attachments)

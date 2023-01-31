@@ -5,12 +5,12 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
@@ -35,19 +35,21 @@ class ItemPostSingleVideoViewDataBinder constructor(
     }
 
     override fun bindData(binding: ItemPostSingleVideoBinding, data: PostViewData, position: Int) {
-        overflowMenu.setItems(data.menuItems)
 
+        // sets items to overflow menu
+        PostTypeUtil.setOverflowMenuItems(
+            overflowMenu,
+            data.menuItems
+        )
+
+        // sets data to the creator frame
         PostTypeUtil.initAuthorFrame(
             binding.authorFrame,
             data,
             overflowMenu
         )
 
-        PostTypeUtil.initActionsLayout(
-            binding.postActionsLayout,
-            data
-        )
-
+        // sets the text content of the post
         PostTypeUtil.initTextContent(
             binding.tvPostContent,
             data,
@@ -55,6 +57,14 @@ class ItemPostSingleVideoViewDataBinder constructor(
             listener
         )
 
+        // handles various actions for the post
+        PostTypeUtil.initActionsLayout(
+            binding.postActionsLayout,
+            data,
+            listener
+        )
+
+        //TODO: Migrate to exo player
         val video: Uri =
             Uri.parse(data.attachments.first().attachmentMeta.url)
 
@@ -66,6 +76,7 @@ class ItemPostSingleVideoViewDataBinder constructor(
         })
     }
 
+    // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
         listener.onPostMenuItemClicked(menu.dataId, menu.title)
     }
