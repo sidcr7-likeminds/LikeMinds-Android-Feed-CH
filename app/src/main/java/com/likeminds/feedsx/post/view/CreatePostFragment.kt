@@ -2,12 +2,15 @@ package com.likeminds.feedsx.post.view
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
+import android.graphics.Color
+import android.text.Editable
+import android.text.TextWatcher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -35,6 +38,7 @@ class CreatePostFragment :
     private val viewModel: CreatePostViewModel by viewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
+
     private var multiMediaAdapter: MultipleMediaCreatePostAdapter? = null
     private var documentsAdapter: DocumentsCreatePostAdapter? = null
 
@@ -63,6 +67,7 @@ class CreatePostFragment :
     override fun setUpViews() {
         super.setUpViews()
         initAddAttachmentsView()
+        initPostContentTextListener()
     }
 
     private fun initiateMediaPicker(list: List<String>) {
@@ -120,15 +125,15 @@ class CreatePostFragment :
         }
     }
 
-    //TODO: Handle this.
     private fun onMediaPickedFromGallery(data: Intent?) {
         val uris = MediaUtils.getExternalIntentPickerUris(data)
         viewModel.fetchUriDetails(requireContext(), uris) {
             val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
                 requireContext(), it
             )
+            selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
-//                showPickImagesListScreen(*mediaUris.toTypedArray(), saveInCache = true)
+                showPostMedia()
             }
         }
     }
@@ -141,7 +146,7 @@ class CreatePostFragment :
             )
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
-                showPickDocuments(mediaUris)
+                showPickDocuments()
             }
         }
     }
@@ -165,35 +170,152 @@ class CreatePostFragment :
         val data =
             MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
         selectedMediaUris.addAll(data)
-        if (data.isNotEmpty()) {
-            when {
-                MediaType.isPDF(result.mediaTypes) -> {
-                    showPickDocuments(data)
-                }
-                selectedMediaUris.size == 1 && MediaType.isImage(result.mediaTypes.first()) -> {
-                    showPickImage(data)
-                }
-                selectedMediaUris.size == 1 && MediaType.isVideo(result.mediaTypes.first()) -> {
-                    showPickVideo(data)
-                }
-                else -> {
-                    showMultiMediaAttachments(data)
-                }
+        showPostMedia()
+    }
+
+    private fun showPostMedia() {
+        when {
+            selectedMediaUris.size >= 1 && MediaType.isPDF(selectedMediaUris.first().fileType) -> {
+                showPickDocuments()
+            }
+            selectedMediaUris.size == 1 && MediaType.isImage(selectedMediaUris.first().fileType) -> {
+                showPickImage()
+            }
+            selectedMediaUris.size == 1 && MediaType.isVideo(selectedMediaUris.first().fileType) -> {
+                showPickVideo()
+            }
+            selectedMediaUris.size >= 1 -> {
+                showMultiMediaAttachments()
+            }
+            else -> {
+                handlePostButton(!binding.etPostContent.text.isNullOrEmpty())
+                handleAddAttachmentLayouts(true)
             }
         }
     }
 
-    private fun handlePostButton() {
-        //TODO: handle post clickable or not
+    private fun initPostContentTextListener() {
+        binding.etPostContent.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {
+                if (s.isNotEmpty()) handlePostButton(true)
+                else {
+                    if (selectedMediaUris.isEmpty()) handlePostButton(false)
+                    else handlePostButton(true)
+                }
+            }
+
+            override fun beforeTextChanged(
+                s: CharSequence, start: Int,
+                count: Int, after: Int
+            ) {
+            }
+
+            override fun onTextChanged(
+                s: CharSequence, start: Int,
+                before: Int, count: Int
+            ) {
+            }
+        })
     }
 
+    private fun handlePostButton(clickable: Boolean) {
+        val createPostActivity = requireActivity() as CreatePostActivity
+        if (clickable) {
+            createPostActivity.binding.tvPostDone.isClickable = true
+            createPostActivity.binding.tvPostDone.setTextColor(BrandingData.getButtonsColor())
+        } else {
+            createPostActivity.binding.tvPostDone.isClickable = false
+            createPostActivity.binding.tvPostDone.setTextColor(Color.parseColor("#666666"))
+        }
+    }
 
     private fun handleAddAttachmentLayouts(show: Boolean) {
         binding.groupAddAttachments.isVisible = show
     }
 
-    private fun showPickDocuments(data: ArrayList<SingleUriData>) {
+    private fun showPickVideo() {
         handleAddAttachmentLayouts(false)
+        handlePostButton(true)
+        binding.apply {
+            singleVideoAttachment.root.show()
+            singleImageAttachment.root.hide()
+            linkPreview.root.hide()
+            documentsAttachment.root.hide()
+            multipleMediaAttachment.root.hide()
+            singleVideoAttachment.btnAddMore.setOnClickListener {
+                initiateMediaPicker(listOf(IMAGE, VIDEO))
+            }
+            singleVideoAttachment.layoutSingleVideoPost.ivCross.setOnClickListener {
+                selectedMediaUris.clear()
+                singleVideoAttachment.root.hide()
+                handleAddAttachmentLayouts(true)
+                handlePostButton(!etPostContent.text.isNullOrEmpty())
+            }
+
+            //TODO: Use exo player
+            singleVideoAttachment.layoutSingleVideoPost.vvSingleVideoPost.setVideoURI(
+                selectedMediaUris.first().uri
+            )
+        }
+    }
+
+    private fun showPickImage() {
+        handleAddAttachmentLayouts(false)
+        handlePostButton(true)
+        binding.apply {
+            singleImageAttachment.root.show()
+            singleVideoAttachment.root.hide()
+            linkPreview.root.hide()
+            documentsAttachment.root.hide()
+            multipleMediaAttachment.root.hide()
+            singleImageAttachment.btnAddMore.setOnClickListener {
+                initiateMediaPicker(listOf(IMAGE, VIDEO))
+            }
+            singleImageAttachment.layoutSingleImagePost.ivCross.setOnClickListener {
+                selectedMediaUris.clear()
+                singleImageAttachment.root.hide()
+                handleAddAttachmentLayouts(true)
+                handlePostButton(!etPostContent.text.isNullOrEmpty())
+            }
+
+            ImageBindingUtil.loadImage(
+                singleImageAttachment.layoutSingleImagePost.ivSingleImagePost,
+                selectedMediaUris.first().uri,
+                placeholder = R.drawable.image_placeholder
+            )
+        }
+    }
+
+    private fun showMultiMediaAttachments() {
+        handleAddAttachmentLayouts(false)
+        handlePostButton(true)
+        binding.apply {
+            singleImageAttachment.root.hide()
+            singleVideoAttachment.root.hide()
+            linkPreview.root.hide()
+            documentsAttachment.root.hide()
+            multipleMediaAttachment.root.show()
+            multipleMediaAttachment.btnAddMore.setOnClickListener {
+                initiateMediaPicker(listOf(IMAGE, VIDEO))
+            }
+
+            val attachments = selectedMediaUris.map {
+                convertSingleDataUri(it)
+            }
+
+            if (multiMediaAdapter == null) {
+                multipleMediaAttachment.viewpagerMultipleMedia.isSaveEnabled = false
+                multiMediaAdapter = MultipleMediaCreatePostAdapter(this@CreatePostFragment)
+                multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
+                multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+            }
+            multiMediaAdapter!!.replace(attachments)
+        }
+    }
+
+    private fun showPickDocuments() {
+        handleAddAttachmentLayouts(false)
+        handlePostButton(true)
         binding.apply {
             singleVideoAttachment.root.hide()
             singleImageAttachment.root.hide()
@@ -219,80 +341,8 @@ class CreatePostFragment :
         }
     }
 
-    private fun showPickVideo(data: ArrayList<SingleUriData>) {
-        handleAddAttachmentLayouts(false)
-        binding.apply {
-            singleVideoAttachment.root.show()
-            singleImageAttachment.root.hide()
-            linkPreview.root.hide()
-            documentsAttachment.root.hide()
-            multipleMediaAttachment.root.hide()
-            singleVideoAttachment.btnAddMore.setOnClickListener {
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
-            singleVideoAttachment.layoutSingleVideoPost.ivCross.setOnClickListener {
-                selectedMediaUris.clear()
-                singleVideoAttachment.root.hide()
-                handleAddAttachmentLayouts(true)
-            }
-
-            //TODO: Use exo player
-            singleVideoAttachment.layoutSingleVideoPost.vvSingleVideoPost.setVideoURI(data.first().uri)
-        }
-    }
-
-    private fun showPickImage(data: ArrayList<SingleUriData>) {
-        handleAddAttachmentLayouts(false)
-        binding.apply {
-            singleImageAttachment.root.show()
-            singleVideoAttachment.root.hide()
-            linkPreview.root.hide()
-            documentsAttachment.root.hide()
-            multipleMediaAttachment.root.hide()
-            singleImageAttachment.btnAddMore.setOnClickListener {
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
-            singleImageAttachment.layoutSingleImagePost.ivCross.setOnClickListener {
-                selectedMediaUris.clear()
-                singleImageAttachment.root.hide()
-                handleAddAttachmentLayouts(true)
-            }
-
-            ImageBindingUtil.loadImage(
-                singleImageAttachment.layoutSingleImagePost.ivSingleImagePost,
-                data.first().uri,
-                placeholder = R.drawable.image_placeholder
-            )
-        }
-    }
-
-    private fun showMultiMediaAttachments(data: ArrayList<SingleUriData>) {
-        handleAddAttachmentLayouts(false)
-        binding.apply {
-            singleImageAttachment.root.hide()
-            singleVideoAttachment.root.hide()
-            linkPreview.root.hide()
-            documentsAttachment.root.hide()
-            multipleMediaAttachment.root.show()
-            multipleMediaAttachment.btnAddMore.setOnClickListener {
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
-
-            val attachments = selectedMediaUris.map {
-                convertSingleDataUri(it)
-            }
-
-            if (multiMediaAdapter == null) {
-                multipleMediaAttachment.viewpagerMultipleMedia.isSaveEnabled = false
-                multiMediaAdapter = MultipleMediaCreatePostAdapter(this@CreatePostFragment)
-                multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
-                multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
-            }
-            multiMediaAdapter!!.replace(attachments)
-        }
-    }
-
     override fun onMediaRemoved(position: Int, mediaType: String) {
-        Log.d("TAG", "onMediaRemoved: " + position)
+        selectedMediaUris.removeAt(position)
+        showPostMedia()
     }
 }

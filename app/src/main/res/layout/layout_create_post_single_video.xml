@@ -27,7 +27,6 @@
             android:textColor="@color/majorelle_blue"
             android:drawableLeft="@drawable/ic_plus"
             android:textSize="14sp"
-            android:visibility="gone"
             app:font_type="medium"
             android:paddingHorizontal="24dp"
             android:background="@drawable/background_round_8dp"

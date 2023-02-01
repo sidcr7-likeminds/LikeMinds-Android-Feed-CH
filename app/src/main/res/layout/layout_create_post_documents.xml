@@ -36,7 +36,6 @@
             android:paddingHorizontal="24dp"
             android:background="@drawable/background_round_8dp"
             tools:fontFamily="@font/roboto_medium"
-            tools:visibility="visible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/rv_documents"

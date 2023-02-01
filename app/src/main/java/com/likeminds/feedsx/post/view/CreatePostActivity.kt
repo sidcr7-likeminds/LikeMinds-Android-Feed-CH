@@ -13,7 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class CreatePostActivity : BaseAppCompatActivity() {
 
-    private lateinit var binding: ActivityCreatePostBinding
+    lateinit var binding: ActivityCreatePostBinding
 
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
