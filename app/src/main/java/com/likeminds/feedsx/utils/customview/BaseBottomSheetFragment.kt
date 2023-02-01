@@ -9,15 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
-import javax.inject.Inject
 
 abstract class BaseBottomSheetFragment<B : ViewBinding> :
     BottomSheetDialogFragment() {

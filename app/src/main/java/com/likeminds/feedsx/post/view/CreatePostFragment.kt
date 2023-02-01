@@ -3,10 +3,10 @@ package com.likeminds.feedsx.post.view
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.text.Editable
-import android.text.TextWatcher
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
@@ -18,16 +18,20 @@ import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_DOCUMENT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_MEDIA
+import com.likeminds.feedsx.post.model.ShareExternalData
 import com.likeminds.feedsx.post.util.CreatePostListener
 import com.likeminds.feedsx.post.view.adapter.DocumentsCreatePostAdapter
 import com.likeminds.feedsx.post.view.adapter.MultipleMediaCreatePostAdapter
 import com.likeminds.feedsx.post.viewmodel.CreatePostViewModel
+import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
+import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.isValidYoutubeLink
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -188,34 +192,27 @@ class CreatePostFragment :
                 showMultiMediaAttachments()
             }
             else -> {
-                handlePostButton(!binding.etPostContent.text.isNullOrEmpty())
+                val text = binding.etPostContent.text?.trim()
+                if (selectedMediaUris.size == 0 && text != null) {
+                    showLinkPreview(text.toString())
+                }
+                handlePostButton(!text.isNullOrEmpty())
                 handleAddAttachmentLayouts(true)
             }
         }
     }
 
     private fun initPostContentTextListener() {
-        binding.etPostContent.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(s: Editable) {
-                if (s.isNotEmpty()) handlePostButton(true)
-                else {
-                    if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                    else handlePostButton(true)
-                }
+        binding.etPostContent.doAfterTextChanged {
+            val text = it?.toString()?.trim()
+            if (text.isNullOrEmpty()) {
+                if (selectedMediaUris.isEmpty()) handlePostButton(false)
+                else handlePostButton(true)
+            } else {
+                showPostMedia()
+                handlePostButton(true)
             }
-
-            override fun beforeTextChanged(
-                s: CharSequence, start: Int,
-                count: Int, after: Int
-            ) {
-            }
-
-            override fun onTextChanged(
-                s: CharSequence, start: Int,
-                before: Int, count: Int
-            ) {
-            }
-        })
+        }
     }
 
     private fun handlePostButton(clickable: Boolean) {
@@ -231,6 +228,84 @@ class CreatePostFragment :
 
     private fun handleAddAttachmentLayouts(show: Boolean) {
         binding.groupAddAttachments.isVisible = show
+    }
+
+    private fun showLinkPreview(text: String?) {
+        if (text.isNullOrEmpty()) {
+            binding.linkPreview.root.hide()
+            return
+        }
+
+        val link = text.getUrlIfExist()
+        var sharedData = ShareExternalData.Builder()
+
+        if (!link.isNullOrEmpty()) {
+            //Contains link
+            sharedData = sharedData.sharedLink(link)
+
+            //TODO: handle internal links
+//            if (Route.isInternalLink(link)) {
+//                sharedData = sharedData.isInternalLink(true)
+//                viewModel.fetchPreview(link)
+//                setInitialDataInInternalLinkView(link)
+//            } else {
+//                ProgressHelper.showProgress(binding.inputBox.viewLink.progressBar)
+//                viewModel.decodeUrl(link)
+//            }
+            //TODO: testing data
+
+            val linkData = LinkOGTags.Builder()
+                .title("Youtube video")
+                .image("https://i.ytimg.com/vi/EbyAoYaUcVo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDiI5bXtT71sC4IAnHiDAh52LxbFA")
+                .url("https://www.youtube.com/watch?v=sAuQjwEl-Bo")
+                .description("This is a youtube video")
+                .build()
+
+            initLinkView(
+                linkData
+            )
+        } else {
+            binding.linkPreview.root.hide()
+        }
+    }
+
+    private fun initLinkView(data: LinkOGTags) {
+        binding.linkPreview.apply {
+            this.root.show()
+            val isYoutubeLink = data.url?.isValidYoutubeLink() == true
+            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+                data.title
+            } else {
+                binding.root.context.getString(R.string.link)
+            }
+            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
+            tvLinkDescription.text = data.description
+
+            if (isYoutubeLink) {
+                ivLink.hide()
+                ivPlay.isVisible = !data.image.isNullOrEmpty()
+                ivYoutubeLink.isVisible = !data.image.isNullOrEmpty()
+                ivYoutubeLogo.isVisible = !data.image.isNullOrEmpty()
+            } else {
+                ivPlay.hide()
+                ivYoutubeLink.hide()
+                ivYoutubeLogo.hide()
+                ivLink.isVisible = !data.image.isNullOrEmpty()
+            }
+
+            ImageBindingUtil.loadImage(
+                if (isYoutubeLink) ivYoutubeLink else ivLink,
+                data.image,
+                placeholder = R.drawable.ic_link_primary_40dp,
+                cornerRadius = 8,
+                isBlur = isYoutubeLink
+            )
+
+            tvLinkUrl.text = data.url
+            ivCross.setOnClickListener {
+                this.root.hide()
+            }
+        }
     }
 
     private fun showPickVideo() {
@@ -249,7 +324,8 @@ class CreatePostFragment :
                 selectedMediaUris.clear()
                 singleVideoAttachment.root.hide()
                 handleAddAttachmentLayouts(true)
-                handlePostButton(!etPostContent.text.isNullOrEmpty())
+                val text = etPostContent.text?.trim()
+                handlePostButton(!text.isNullOrEmpty())
             }
 
             //TODO: Use exo player
@@ -275,7 +351,8 @@ class CreatePostFragment :
                 selectedMediaUris.clear()
                 singleImageAttachment.root.hide()
                 handleAddAttachmentLayouts(true)
-                handlePostButton(!etPostContent.text.isNullOrEmpty())
+                val text = etPostContent.text?.trim()
+                handlePostButton(!text.isNullOrEmpty())
             }
 
             ImageBindingUtil.loadImage(
@@ -343,6 +420,8 @@ class CreatePostFragment :
 
     override fun onMediaRemoved(position: Int, mediaType: String) {
         selectedMediaUris.removeAt(position)
+        if (mediaType == PDF) documentsAdapter?.removeIndex(position)
+        else multiMediaAdapter?.removeIndex(position)
         showPostMedia()
     }
 }

@@ -10,12 +10,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.utils.ViewUtils
-import javax.inject.Inject
 
 abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
 
