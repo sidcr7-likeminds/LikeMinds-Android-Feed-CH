@@ -5,13 +5,13 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemCreatePostSingleVideoBinding
+import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 
 class ItemCreatePostMultipleMediaVideoViewDataBinder :
-    ViewDataBinder<ItemCreatePostSingleVideoBinding, BaseViewType>() {
+    ViewDataBinder<ItemCreatePostSingleVideoBinding, AttachmentViewData>() {
     override val viewType: Int
         get() = ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 
@@ -22,12 +22,11 @@ class ItemCreatePostMultipleMediaVideoViewDataBinder :
 
     override fun bindData(
         binding: ItemCreatePostSingleVideoBinding,
-        data: BaseViewType,
+        data: AttachmentViewData,
         position: Int
     ) {
-        //TODO: Testing data
         val video: Uri =
-            Uri.parse("https://media.geeksforgeeks.org/wp-content/uploads/20201217192146/Screenrecorder-2020-12-17-19-17-36-828.mp4?_=1")
+            data.attachmentMeta.uri!!
 
         binding.vvSingleVideoPost.setVideoURI(video)
         binding.vvSingleVideoPost.setOnPreparedListener(MediaPlayer.OnPreparedListener { mp ->

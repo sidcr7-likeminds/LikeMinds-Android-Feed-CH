@@ -89,6 +89,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginTop="16dp"
+                    android:layout_marginHorizontal="16dp"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -115,7 +116,7 @@
             android:id="@+id/group_add_attachments"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="layout_add_image, layout_add_video, layout_attach_files"/>
+            app:constraint_referenced_ids="layout_add_image, layout_add_video, layout_attach_files, video_file_separator, video_image_separator"/>
 
         <LinearLayout
             android:id="@+id/layout_attach_files"

@@ -21,6 +21,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:background="@drawable/background_round_8dp"
             android:drawableLeft="@drawable/ic_plus"
             android:paddingHorizontal="24dp"
@@ -28,11 +29,11 @@
             android:textAllCaps="false"
             android:textColor="@color/majorelle_blue"
             android:textSize="14sp"
-            android:visibility="gone"
             app:font_type="medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layout_single_image_post"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:fontFamily="@font/roboto_medium"
             tools:visibility="visible" />
 

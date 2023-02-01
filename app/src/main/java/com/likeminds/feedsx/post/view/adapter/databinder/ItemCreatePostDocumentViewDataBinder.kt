@@ -47,6 +47,8 @@ class ItemCreatePostDocumentViewDataBinder :
 
         val attachmentMeta = document.attachmentMeta
 
+        binding.tvDocumentName.text = attachmentMeta.name ?: "Document"
+
         val noOfPage = attachmentMeta.pageCount ?: 0
         val mediaType = attachmentMeta.format
         if (noOfPage > 0) {

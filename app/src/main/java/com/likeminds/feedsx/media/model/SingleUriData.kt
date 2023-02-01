@@ -11,7 +11,7 @@ class SingleUriData private constructor(
     var width: Int?,
     var height: Int?,
     var thumbnailUri: Uri?,
-    var size: Long?,
+    var size: Long,
     var mediaName: String?,
     var pdfPageCount: Int?,
     var duration: Int?,
@@ -23,7 +23,7 @@ class SingleUriData private constructor(
         private var width: Int? = null
         private var height: Int? = null
         private var thumbnailUri: Uri? = null
-        private var size: Long? = null
+        private var size: Long = 0
         private var mediaName: String? = null
         private var pdfPageCount: Int? = null
         private var duration: Int? = null
@@ -33,7 +33,7 @@ class SingleUriData private constructor(
         fun width(width: Int?) = apply { this.width = width }
         fun height(height: Int?) = apply { this.height = height }
         fun thumbnailUri(thumbnailUri: Uri?) = apply { this.thumbnailUri = thumbnailUri }
-        fun size(size: Long?) = apply { this.size = size }
+        fun size(size: Long) = apply { this.size = size }
         fun mediaName(mediaName: String?) = apply { this.mediaName = mediaName }
         fun pdfPageCount(pdfPageCount: Int?) = apply { this.pdfPageCount = pdfPageCount }
         fun duration(duration: Int?) = apply { this.duration = duration }
