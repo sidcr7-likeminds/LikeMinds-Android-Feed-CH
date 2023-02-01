@@ -5,14 +5,17 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemCreatePostDocumentBinding
+import com.likeminds.feedsx.media.model.PDF
+import com.likeminds.feedsx.post.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 
-class ItemCreatePostDocumentViewDataBinder :
-    ViewDataBinder<ItemCreatePostDocumentBinding, AttachmentViewData>() {
+class ItemCreatePostDocumentViewDataBinder constructor(
+    private val listener: CreatePostListener
+) : ViewDataBinder<ItemCreatePostDocumentBinding, AttachmentViewData>() {
     override val viewType: Int
         get() = ITEM_CREATE_POST_DOCUMENTS_ITEM
 
@@ -31,13 +34,14 @@ class ItemCreatePostDocumentViewDataBinder :
     ) {
 
         // sets the document data on the doc view
-        initDocument(binding, data)
+        initDocument(binding, data, position)
     }
 
     // initializes document item of the document recyclerview
     private fun initDocument(
         binding: ItemCreatePostDocumentBinding,
         document: AttachmentViewData,
+        position: Int
     ) {
         binding.tvMeta1.hide()
         binding.viewMetaDot1.hide()
@@ -69,8 +73,9 @@ class ItemCreatePostDocumentViewDataBinder :
             binding.tvMeta3.text = mediaType
             binding.viewMetaDot2.show()
         }
+
         binding.ivCross.setOnClickListener {
-            //TODO:
+            listener.onMediaRemoved(position, PDF)
         }
     }
 }

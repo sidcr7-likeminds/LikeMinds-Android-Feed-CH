@@ -1,17 +1,20 @@
-package com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia
+package com.likeminds.feedsx.post.view.adapter.databinder.createpostmultiplemedia
 
 import android.media.MediaPlayer
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemCreatePostSingleVideoBinding
+import com.likeminds.feedsx.media.model.VIDEO
+import com.likeminds.feedsx.post.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 
-class ItemCreatePostMultipleMediaVideoViewDataBinder :
-    ViewDataBinder<ItemCreatePostSingleVideoBinding, AttachmentViewData>() {
+class ItemCreatePostMultipleMediaVideoViewDataBinder constructor(
+    private val listener: CreatePostListener
+) : ViewDataBinder<ItemCreatePostSingleVideoBinding, AttachmentViewData>() {
     override val viewType: Int
         get() = ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 
@@ -34,8 +37,9 @@ class ItemCreatePostMultipleMediaVideoViewDataBinder :
             binding.iconVideoPlay.hide()
             binding.vvSingleVideoPost.start()
         })
+
         binding.ivCross.setOnClickListener {
-            //TODO:
+            listener.onMediaRemoved(position, VIDEO)
         }
     }
 }

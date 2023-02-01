@@ -15,6 +15,7 @@ import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_DOCUMENT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_MEDIA
+import com.likeminds.feedsx.post.util.CreatePostListener
 import com.likeminds.feedsx.post.view.adapter.DocumentsCreatePostAdapter
 import com.likeminds.feedsx.post.view.adapter.MultipleMediaCreatePostAdapter
 import com.likeminds.feedsx.post.viewmodel.CreatePostViewModel
@@ -27,7 +28,9 @@ import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
+class CreatePostFragment :
+    BaseFragment<FragmentCreatePostBinding>(),
+    CreatePostListener {
 
     private val viewModel: CreatePostViewModel by viewModels()
 
@@ -161,7 +164,6 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
     private fun onMediaPicked(result: MediaPickerResult) {
         val data =
             MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
-        Log.d("TAG", "onMediaPicked: $data")
         selectedMediaUris.addAll(data)
         if (data.isNotEmpty()) {
             when {
@@ -191,7 +193,6 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
     }
 
     private fun showPickDocuments(data: ArrayList<SingleUriData>) {
-        Log.d("TAG", "showPickDocuments: " + data + selectedMediaUris.size)
         handleAddAttachmentLayouts(false)
         binding.apply {
             singleVideoAttachment.root.hide()
@@ -208,7 +209,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
             }
 
             if (documentsAdapter == null) {
-                documentsAdapter = DocumentsCreatePostAdapter()
+                documentsAdapter = DocumentsCreatePostAdapter(this@CreatePostFragment)
                 documentsAttachment.rvDocuments.apply {
                     adapter = documentsAdapter
                     layoutManager = LinearLayoutManager(context)
@@ -283,7 +284,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
 
             if (multiMediaAdapter == null) {
                 multipleMediaAttachment.viewpagerMultipleMedia.isSaveEnabled = false
-                multiMediaAdapter = MultipleMediaCreatePostAdapter()
+                multiMediaAdapter = MultipleMediaCreatePostAdapter(this@CreatePostFragment)
                 multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
                 multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
             }
@@ -291,4 +292,7 @@ class CreatePostFragment : BaseFragment<FragmentCreatePostBinding>() {
         }
     }
 
+    override fun onMediaRemoved(position: Int, mediaType: String) {
+        Log.d("TAG", "onMediaRemoved: " + position)
+    }
 }
