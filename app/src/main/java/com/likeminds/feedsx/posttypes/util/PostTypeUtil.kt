@@ -191,7 +191,7 @@ object PostTypeUtil {
         }
 
         binding.ivComment.setOnClickListener {
-            listener.comment()
+            listener.comment(data)
         }
     }
 

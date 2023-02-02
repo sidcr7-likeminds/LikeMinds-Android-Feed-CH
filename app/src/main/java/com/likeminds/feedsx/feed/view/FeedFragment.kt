@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.post.detail.model.PostDetailExtras
+import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
@@ -22,7 +24,7 @@ class FeedFragment :
     PostAdapterListener {
 
     private val viewModel: FeedViewModel by viewModels()
-    lateinit var mPostAdapter: PostAdapter
+    private lateinit var mPostAdapter: PostAdapter
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -258,11 +260,18 @@ class FeedFragment :
 
     // opens likes screen when likes count is tapped.
     override fun showLikesScreen(postData: PostViewData) {
-        val extras = LikesScreenExtras.Builder()
+        val likesScreenExtras = LikesScreenExtras.Builder()
             .postId(postData.id)
             .likesCount(postData.likesCount)
             .build()
-        LikesActivity.start(requireContext(), extras)
+        LikesActivity.start(requireContext(), likesScreenExtras)
+    }
+
+    override fun comment(postData: PostViewData) {
+        val postDetailExtras = PostDetailExtras.Builder()
+            .commentsCount(postData.commentsCount)
+            .build()
+        PostDetailActivity.start(requireContext(), postDetailExtras)
     }
 
     /**
