@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.view
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -46,6 +45,7 @@ class CreatePostFragment :
     private var multiMediaAdapter: MultipleMediaCreatePostAdapter? = null
     private var documentsAdapter: DocumentsCreatePostAdapter? = null
 
+    // launcher to handle gallery (IMAGE/VIDEO) intent
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -55,6 +55,7 @@ class CreatePostFragment :
             }
         }
 
+    // launcher to handle document (PDF) intent
     private val documentLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
@@ -74,6 +75,7 @@ class CreatePostFragment :
         initPostContentTextListener()
     }
 
+    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
     private fun initiateMediaPicker(list: List<String>) {
         val extras = MediaPickerExtras.Builder()
             .mediaTypes(list)
@@ -84,6 +86,7 @@ class CreatePostFragment :
         galleryLauncher.launch(intent)
     }
 
+    // initializes click listeners on add attachment layouts
     private fun initAddAttachmentsView() {
         binding.layoutAttachFiles.setOnClickListener {
             val extra = MediaPickerExtras.Builder()
@@ -103,6 +106,7 @@ class CreatePostFragment :
         }
     }
 
+    // process the result obtained from media picker
     private fun checkMediaPickedResult(result: MediaPickerResult?) {
         if (result != null) {
             when (result.mediaPickerResultType) {
@@ -150,7 +154,7 @@ class CreatePostFragment :
             )
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
-                showPickDocuments()
+                showAttachedDocuments()
             }
         }
     }
@@ -170,6 +174,7 @@ class CreatePostFragment :
         }
     }
 
+    // converts the picked media to SingleUriData and adds to the selected media
     private fun onMediaPicked(result: MediaPickerResult) {
         val data =
             MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
@@ -177,16 +182,17 @@ class CreatePostFragment :
         showPostMedia()
     }
 
+    // handles the logic to show the type of post
     private fun showPostMedia() {
         when {
             selectedMediaUris.size >= 1 && MediaType.isPDF(selectedMediaUris.first().fileType) -> {
-                showPickDocuments()
+                showAttachedDocuments()
             }
             selectedMediaUris.size == 1 && MediaType.isImage(selectedMediaUris.first().fileType) -> {
-                showPickImage()
+                showAttachedImage()
             }
             selectedMediaUris.size == 1 && MediaType.isVideo(selectedMediaUris.first().fileType) -> {
-                showPickVideo()
+                showAttachedVideo()
             }
             selectedMediaUris.size >= 1 -> {
                 showMultiMediaAttachments()
@@ -202,6 +208,7 @@ class CreatePostFragment :
         }
     }
 
+    // adds text watcher on post content edit text
     private fun initPostContentTextListener() {
         binding.etPostContent.doAfterTextChanged {
             val text = it?.toString()?.trim()
@@ -215,6 +222,7 @@ class CreatePostFragment :
         }
     }
 
+    // handles click action on Post button
     private fun handlePostButton(clickable: Boolean) {
         val createPostActivity = requireActivity() as CreatePostActivity
         if (clickable) {
@@ -226,10 +234,12 @@ class CreatePostFragment :
         }
     }
 
+    // handles visibility of add attachment layouts
     private fun handleAddAttachmentLayouts(show: Boolean) {
         binding.groupAddAttachments.isVisible = show
     }
 
+    // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
         if (text.isNullOrEmpty()) {
             binding.linkPreview.root.hide()
@@ -269,6 +279,7 @@ class CreatePostFragment :
         }
     }
 
+    // renders data in the link view
     private fun initLinkView(data: LinkOGTags) {
         binding.linkPreview.apply {
             this.root.show()
@@ -308,7 +319,8 @@ class CreatePostFragment :
         }
     }
 
-    private fun showPickVideo() {
+    // shows attached video in single video post type
+    private fun showAttachedVideo() {
         handleAddAttachmentLayouts(false)
         handlePostButton(true)
         binding.apply {
@@ -335,7 +347,8 @@ class CreatePostFragment :
         }
     }
 
-    private fun showPickImage() {
+    // shows attached image in single image post type
+    private fun showAttachedImage() {
         handleAddAttachmentLayouts(false)
         handlePostButton(true)
         binding.apply {
@@ -363,6 +376,7 @@ class CreatePostFragment :
         }
     }
 
+    // shows view pager with multiple media
     private fun showMultiMediaAttachments() {
         handleAddAttachmentLayouts(false)
         handlePostButton(true)
@@ -390,7 +404,8 @@ class CreatePostFragment :
         }
     }
 
-    private fun showPickDocuments() {
+    // shows document recycler view with attached files
+    private fun showAttachedDocuments() {
         handleAddAttachmentLayouts(false)
         handlePostButton(true)
         binding.apply {
@@ -418,6 +433,7 @@ class CreatePostFragment :
         }
     }
 
+    // triggered when a document/media from view pager is removed
     override fun onMediaRemoved(position: Int, mediaType: String) {
         selectedMediaUris.removeAt(position)
         if (mediaType == PDF) documentsAdapter?.removeIndex(position)
