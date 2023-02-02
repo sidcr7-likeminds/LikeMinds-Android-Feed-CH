@@ -116,7 +116,7 @@ class PostViewData private constructor(
             communityId,
             isPinned,
             isSaved,
-            isEdited,
+            isLiked,
             userId,
             likesCount,
             commentsCount,

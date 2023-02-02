@@ -1,13 +1,14 @@
-package com.likeminds.feedsx.posttypes.view.adapter
+package com.likeminds.feedsx.post.detail.view.adapter
 
-import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentViewDataBinder
+import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentsCountViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
-import com.likeminds.feedsx.utils.ValueUtils.getItemInList
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 
-class PostAdapter constructor(
+class PostDetailAdapter constructor(
     val listener: PostAdapterListener
 ) : BaseRecyclerAdapter<BaseViewType>() {
 
@@ -16,9 +17,15 @@ class PostAdapter constructor(
     }
 
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
-        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(6)
+        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(8)
 
-        val itemPostTextOnlyBinder= ItemPostTextOnlyViewDataBinder(listener)
+        val itemPostDetailCommentsCountViewDataBinder = ItemPostDetailCommentsCountViewDataBinder()
+        viewDataBinders.add(itemPostDetailCommentsCountViewDataBinder)
+
+        val itemPostDetailCommentViewDataBinder = ItemPostDetailCommentViewDataBinder()
+        viewDataBinders.add(itemPostDetailCommentViewDataBinder)
+
+        val itemPostTextOnlyBinder = ItemPostTextOnlyViewDataBinder(listener)
         viewDataBinders.add(itemPostTextOnlyBinder)
 
         val itemPostSingleImageViewDataBinder = ItemPostSingleImageViewDataBinder(listener)
@@ -37,24 +44,5 @@ class PostAdapter constructor(
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
 
         return viewDataBinders
-    }
-
-    operator fun get(position: Int): BaseViewType? {
-        return items().getItemInList(position)
-    }
-
-    interface PostAdapterListener {
-        //TODO: add compulsory methods
-
-        fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
-        fun pinPost() {}
-        fun savePost() {}
-        fun likePost() {}
-        fun sharePost() {}
-        fun comment(postData: PostViewData)
-        fun onPostMenuItemClicked(postId: String, title: String)
-        fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
-        fun showLikesScreen(postData: PostViewData)
-        fun postDetails(postData: PostViewData)
     }
 }

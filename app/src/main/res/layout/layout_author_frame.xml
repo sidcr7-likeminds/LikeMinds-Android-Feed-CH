@@ -29,7 +29,7 @@
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:textColor="@color/grey"
+            android:textColor="@color/raisin_black"
             android:textSize="16sp"
             tools:fontFamily="@font/roboto_medium"
             app:fontType="medium"

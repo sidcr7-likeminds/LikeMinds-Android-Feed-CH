@@ -152,8 +152,8 @@ object PostTypeUtil {
 
         val context = binding.root.context
 
-        if (data.isLiked) binding.ivLike.setImageResource(R.drawable.ic_liked_filled)
-        else binding.ivLike.setImageResource(R.drawable.ic_liked_unfilled)
+        if (data.isLiked) binding.ivLike.setImageResource(R.drawable.ic_like_filled)
+        else binding.ivLike.setImageResource(R.drawable.ic_like_unfilled)
 
         if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
         else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
@@ -191,6 +191,10 @@ object PostTypeUtil {
         }
 
         binding.ivComment.setOnClickListener {
+            listener.comment(data)
+        }
+
+        binding.commentsCount.setOnClickListener {
             listener.comment(data)
         }
     }

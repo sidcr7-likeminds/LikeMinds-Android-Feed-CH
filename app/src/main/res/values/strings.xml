@@ -50,4 +50,5 @@
     <string name="placeholder_pages">%d Pages</string>
     <string name="link">Link</string>
     <string name="request_not_processed">Couldn\'t process your request</string>
+    <string name="write_a_comment">Write a comment</string>
 </resources>

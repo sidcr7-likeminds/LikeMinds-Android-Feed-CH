@@ -89,6 +89,9 @@ class FeedFragment :
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("2")
+                .likesCount(10)
+                .commentsCount(4)
+                .isLiked(true)
                 .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
                 .text(text)
                 .build()
@@ -258,7 +261,7 @@ class FeedFragment :
         )
     }
 
-    // opens likes screen when likes count is tapped.
+    // opens likes screen when likes count is clicked.
     override fun showLikesScreen(postData: PostViewData) {
         val likesScreenExtras = LikesScreenExtras.Builder()
             .postId(postData.id)
@@ -267,8 +270,22 @@ class FeedFragment :
         LikesActivity.start(requireContext(), likesScreenExtras)
     }
 
+    //opens post detail screen when add comment/comments count is clicked
     override fun comment(postData: PostViewData) {
         val postDetailExtras = PostDetailExtras.Builder()
+            .postId(postData.id)
+            .isEditTextFocused(true)
+            .commentsCount(postData.commentsCount)
+            .build()
+        PostDetailActivity.start(requireContext(), postDetailExtras)
+    }
+
+    //opens post detail screen when post content is clicked
+    //TODO: confirm and trigger
+    override fun postDetails(postData: PostViewData) {
+        val postDetailExtras = PostDetailExtras.Builder()
+            .postId(postData.id)
+            .isEditTextFocused(false)
             .commentsCount(postData.commentsCount)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
