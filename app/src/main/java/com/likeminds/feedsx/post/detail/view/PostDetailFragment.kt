@@ -1,15 +1,18 @@
 package com.likeminds.feedsx.post.detail.view
 
+import android.util.Log
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.feed.view.LikesActivity
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
-import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
+import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
+import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.ViewUtils
@@ -19,7 +22,8 @@ import com.likeminds.feedsx.utils.customview.BaseFragment
 class PostDetailFragment :
     BaseFragment<FragmentPostDetailBinding>(),
     PostAdapterListener,
-    PostDetailAdapterListener {
+    PostDetailAdapterListener,
+    PostDetailReplyAdapterListener {
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -36,7 +40,7 @@ class PostDetailFragment :
     }
 
     private fun initRecyclerView() {
-        mPostDetailAdapter = PostDetailAdapter(this, this)
+        mPostDetailAdapter = PostDetailAdapter(this, this, this)
         binding.rvPostDetails.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = mPostDetailAdapter
@@ -69,7 +73,7 @@ class PostDetailFragment :
 
     // TODO: testing data
     private fun addTestingData() {
-        var text =
+        val text =
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostDetailAdapter.add(
             PostViewData.Builder()
@@ -114,9 +118,20 @@ class PostDetailFragment :
         )
 
         mPostDetailAdapter.add(
+            CommentsCountViewData.Builder()
+                .commentsCount(3)
+                .build()
+        )
+
+        mPostDetailAdapter.add(
             CommentViewData.Builder()
-                .isLiked(true)
+                .isLiked(false)
                 .id("1")
+                .user(
+                    UserViewData.Builder()
+                        .name("Siddharth Dubey")
+                        .build()
+                )
                 .text("This is a test comment 1")
                 .build()
         )
@@ -125,6 +140,12 @@ class PostDetailFragment :
             CommentViewData.Builder()
                 .isLiked(true)
                 .id("2")
+                .user(
+                    UserViewData.Builder()
+                        .name("Ishaan Jain")
+                        .build()
+                )
+                .likesCount(10)
                 .text("This is a test comment 2")
                 .build()
         )
@@ -132,7 +153,42 @@ class PostDetailFragment :
             CommentViewData.Builder()
                 .isLiked(false)
                 .id("3")
-                .text("This is a test comment 2")
+                .user(
+                    UserViewData.Builder()
+                        .name("Natesh Rehlan")
+                        .build()
+                )
+                .likesCount(10)
+                .repliesCount(5)
+                .text("This is a test comment 3")
+                .build()
+        )
+        mPostDetailAdapter.add(
+            CommentViewData.Builder()
+                .isLiked(false)
+                .id("4")
+                .user(
+                    UserViewData.Builder()
+                        .name("Natesh Rehlan")
+                        .build()
+                )
+                .likesCount(10)
+                .repliesCount(5)
+                .text("This is a test comment 4")
+                .build()
+        )
+        mPostDetailAdapter.add(
+            CommentViewData.Builder()
+                .isLiked(false)
+                .id("5")
+                .user(
+                    UserViewData.Builder()
+                        .name("Natesh Rehlan")
+                        .build()
+                )
+                .likesCount(10)
+                .repliesCount(5)
+                .text("This is a test comment 5")
                 .build()
         )
     }
@@ -161,7 +217,7 @@ class PostDetailFragment :
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
-        TODO("Not yet implemented")
+        //TODO: menu item handle
     }
 
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
@@ -198,5 +254,67 @@ class PostDetailFragment :
             .likesCount(postData.likesCount)
             .build()
         LikesActivity.start(requireContext(), likesScreenExtras)
+    }
+
+    override fun likeComment(commentId: String) {
+        // TODO: likes the comment with comment id
+    }
+
+    override fun fetchReplies(commentId: String, commentPosition: Int) {
+        // TODO: fetch replies of the clicked comment and edit this dummy data
+
+        Log.d("TAG", "fetch: " + (mPostDetailAdapter[commentPosition] is CommentViewData))
+        if (mPostDetailAdapter[commentPosition] is CommentViewData) {
+            val comment = mPostDetailAdapter[commentPosition] as CommentViewData
+            comment.replies.addAll(
+                mutableListOf(
+                    CommentViewData.Builder()
+                        .isLiked(false)
+                        .id("6")
+                        .user(
+                            UserViewData.Builder()
+                                .name("Natesh Rehlan")
+                                .build()
+                        )
+                        .level(1)
+                        .text("This is a test reply 1")
+                        .build(),
+                    CommentViewData.Builder()
+                        .isLiked(false)
+                        .id("7")
+                        .user(
+                            UserViewData.Builder()
+                                .name("Natesh Rehlan")
+                                .build()
+                        )
+                        .likesCount(10)
+                        .repliesCount(5)
+                        .level(1)
+                        .text("This is a test reply 2")
+                        .build(),
+                    CommentViewData.Builder()
+                        .isLiked(true)
+                        .id("8")
+                        .user(
+                            UserViewData.Builder()
+                                .name("Natesh Rehlan")
+                                .build()
+                        )
+                        .likesCount(10)
+                        .level(1)
+                        .text("This is a test reply 3")
+                        .build()
+                )
+            )
+            mPostDetailAdapter.update(commentPosition, comment)
+        }
+    }
+
+    override fun replyOnComment(commentId: String) {
+        // TODO: fetch replies of the clicked comment
+    }
+
+    override fun onCommentMenuItemClicked(commentId: String, title: String) {
+        //TODO: comment menu item
     }
 }

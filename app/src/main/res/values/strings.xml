@@ -55,4 +55,7 @@
     <string name="link">Link</string>
     <string name="request_not_processed">Couldn\'t process your request</string>
     <string name="write_a_comment">Write a comment</string>
+    <string name="view_more_replies">View more replies</string>
+    <string name="of"> of </string>
+    <string name="reply">Reply</string>
 </resources>

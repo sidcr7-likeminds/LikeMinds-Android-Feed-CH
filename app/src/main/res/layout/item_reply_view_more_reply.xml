@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:paddingHorizontal="16dp">
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_view_more_replies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="3dp"
+            android:text="@string/view_more_replies"
+            android:textColor="@color/dark_grayish_blue"
+            android:textSize="14sp"
+            app:fontType="medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:fontFamily="@font/roboto_medium" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_showed_replies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="3dp"
+            android:text="@string/view_more_replies"
+            android:textColor="@color/dark_grayish_blue"
+            android:textSize="12sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toStartOf="@id/tv_of"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:fontFamily="@font/roboto_medium"
+            tools:text="10" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_of"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="3dp"
+            android:text="@string/of"
+            android:textColor="@color/dark_grayish_blue"
+            android:textSize="12sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toStartOf="@+id/tv_total_replies"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:fontFamily="@font/roboto_medium" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_total_replies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingVertical="3dp"
+            android:text="@string/view_more_replies"
+            android:textColor="@color/dark_grayish_blue"
+            android:textSize="12sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:fontFamily="@font/roboto_medium"
+            tools:text="15"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

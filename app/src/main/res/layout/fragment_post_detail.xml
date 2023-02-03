@@ -6,9 +6,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clickable="true"
-        android:focusableInTouchMode="true"
-        android:focusable="true">
+        android:layout_marginTop="8dp"
+        android:background="@color/cloudy_blue">
 
         <View
             android:id="@+id/v_top_background"
@@ -23,46 +22,45 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_post_details"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintBottom_toTopOf="@id/comments_et_separator"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <View
-            android:id="@+id/comments_et_separator"
-            android:layout_width="match_parent"
-            android:layout_height="12dp"
-            android:background="@color/cloudy_blue"
-            app:layout_constraintTop_toBottomOf="@id/rv_post_details"/>
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:clipToPadding="false"
+            android:descendantFocusability="blocksDescendants"
+            android:overScrollMode="never"
+            app:layout_constrainedHeight="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/et_comment"/>
 
         <com.likeminds.feedsx.branding.customview.edittext.LikeMindsEditText
             android:id="@+id/et_comment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:background="@null"
+            android:background="@color/white"
             android:ellipsize="end"
-            app:font_style="regular"
-            android:paddingHorizontal="16dp"
+            android:hint="@string/write_a_comment"
             android:inputType="textMultiLine"
             android:minHeight="48dp"
-            android:hint="@string/write_a_comment"
+            android:paddingHorizontal="16dp"
             android:textColor="@color/dark_grey"
             android:textColorHint="@color/maastricht_blue_40"
-            app:layout_constraintStart_toStartOf="parent"
+            android:elevation="4dp"
+            app:font_style="regular"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_comment_send"
-            app:layout_constraintTop_toBottomOf="@id/comments_et_separator"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/iv_comment_send"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/et_comment"
+            android:background="@color/white"
+            android:clickable="false"
+            android:elevation="4dp"
             app:layout_constraintBottom_toBottomOf="@id/et_comment"
             app:layout_constraintEnd_toEndOf="parent"
-            android:clickable="false"
+            app:layout_constraintTop_toTopOf="@id/et_comment"
             app:srcCompat="@drawable/ic_comment_send_disable"
-            tools:ignore="ContentDescription"/>
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

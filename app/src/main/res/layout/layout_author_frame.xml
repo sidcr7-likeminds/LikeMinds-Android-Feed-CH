@@ -113,7 +113,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_post_menu"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_pin_unfilled" />
+            app:srcCompat="@drawable/ic_pin_unfilled"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/iv_post_menu"
@@ -123,7 +124,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_overflow_menu" />
+            app:srcCompat="@drawable/ic_overflow_menu"
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

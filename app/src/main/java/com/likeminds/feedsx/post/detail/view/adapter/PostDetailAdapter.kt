@@ -11,7 +11,8 @@ import com.likeminds.feedsx.utils.model.BaseViewType
 
 class PostDetailAdapter constructor(
     val postAdapterListener: PostAdapterListener,
-    val postDetailAdapterListener: PostDetailAdapterListener
+    val postDetailAdapterListener: PostDetailAdapterListener,
+    val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
 ) : BaseRecyclerAdapter<BaseViewType>() {
 
     init {
@@ -24,7 +25,8 @@ class PostDetailAdapter constructor(
         val itemPostDetailCommentsCountViewDataBinder = ItemPostDetailCommentsCountViewDataBinder()
         viewDataBinders.add(itemPostDetailCommentsCountViewDataBinder)
 
-        val itemPostDetailCommentViewDataBinder = ItemPostDetailCommentViewDataBinder(postDetailAdapterListener)
+        val itemPostDetailCommentViewDataBinder =
+            ItemPostDetailCommentViewDataBinder(postDetailAdapterListener, postDetailReplyAdapterListener)
         viewDataBinders.add(itemPostDetailCommentViewDataBinder)
 
         val itemPostTextOnlyBinder = ItemPostTextOnlyViewDataBinder(postAdapterListener)
@@ -56,8 +58,9 @@ class PostDetailAdapter constructor(
     }
 
     interface PostDetailAdapterListener {
-        fun likeComment(commentId: String) {}
-        fun showReplies() {}
-        fun replyOnComment() {}
+        fun likeComment(commentId: String)
+        fun fetchReplies(commentId: String, commentPosition: Int)
+        fun replyOnComment(commentId: String)
+        fun onCommentMenuItemClicked(commentId: String, title: String)
     }
 }

@@ -13,8 +13,8 @@
             android:id="@+id/tv_commenter_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="1dp"
             android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="1dp"
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
@@ -31,17 +31,30 @@
             android:id="@+id/tv_comment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
             android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="5dp"
             android:lineSpacingExtra="1sp"
             android:textColor="@color/raisin_black"
             android:textSize="14sp"
             app:fontType="regular"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@id/iv_comment_menu"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_commenter_name"
             tools:fontFamily="@font/roboto_regular"
             tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
+
+        <ImageView
+            android:id="@+id/iv_comment_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@id/tv_comment_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_overflow_menu"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/iv_like"
@@ -89,6 +102,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:paddingVertical="3dp"
+            android:text="@string/reply"
             android:textColor="@color/maastricht_blue_40"
             android:textSize="12sp"
             android:textStyle="normal"
@@ -103,7 +117,7 @@
             android:id="@+id/group_replies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="view_dot, tv_reply_count"/>
+            app:constraint_referenced_ids="view_dot, tv_reply_count" />
 
         <View
             android:id="@+id/view_dot"
@@ -145,42 +159,41 @@
             android:textColor="@color/maastricht_blue_40"
             android:textSize="12sp"
             android:textStyle="normal"
+            android:visibility="visible"
             app:fontType="regular"
             app:layout_constraintBottom_toBottomOf="@id/tv_reply"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_reply"
             tools:fontFamily="@font/roboto_regular"
-            tools:text="20m"
-            tools:visibility="visible" />
+            tools:text="20m" />
 
         <View
             android:id="@+id/comment_separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="20dp"
-            android:backgroundTint="@color/maastricht_blue_40"
-            app:layout_constraintTop_toBottomOf="@id/tv_comment_time"/>
+            android:background="@color/blue_separator"
+            app:layout_constraintTop_toBottomOf="@id/tv_comment_time" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_replies"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="14dp"
-            app:layout_constraintTop_toBottomOf="@id/iv_like"
-            app:layout_constraintStart_toEndOf="@id/iv_like"
-            app:layout_constraintEnd_toEndOf="parent"
             android:isScrollContainer="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_like"
+            app:layout_constraintTop_toBottomOf="@id/iv_like"
             tools:itemCount="3"
-            tools:listitem="@layout/item_post_detail_reply"/>
+            tools:listitem="@layout/item_post_detail_reply" />
 
         <View
             android:id="@+id/reply_comment_separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="32dp"
-            android:backgroundTint="@color/maastricht_blue_40"
+            android:background="@color/blue_separator"
             android:visibility="gone"
-            app:layout_constraintTop_toBottomOf="@id/rv_replies"/>
+            app:layout_constraintTop_toBottomOf="@id/rv_replies" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

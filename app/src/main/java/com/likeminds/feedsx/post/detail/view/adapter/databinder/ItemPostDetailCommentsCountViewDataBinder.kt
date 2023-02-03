@@ -4,12 +4,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailCommentsCountBinding
-import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENTS_COUNT
 
 class ItemPostDetailCommentsCountViewDataBinder :
-    ViewDataBinder<ItemPostDetailCommentsCountBinding, PostViewData>() {
+    ViewDataBinder<ItemPostDetailCommentsCountBinding, CommentsCountViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_DETAIL_COMMENTS_COUNT
@@ -24,7 +24,7 @@ class ItemPostDetailCommentsCountViewDataBinder :
 
     override fun bindData(
         binding: ItemPostDetailCommentsCountBinding,
-        data: PostViewData,
+        data: CommentsCountViewData,
         position: Int
     ) {
 

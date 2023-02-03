@@ -69,11 +69,11 @@ object PostTypeUtil {
     }
 
     //to show the options on the post
-    private fun showOverflowMenu(ivPostMenu: ImageView, overflowMenu: OverflowMenuPopup) {
+    fun showOverflowMenu(ivMenu: ImageView, overflowMenu: OverflowMenuPopup) {
         overflowMenu.showAsDropDown(
-            ivPostMenu,
+            ivMenu,
             -ViewUtils.dpToPx(16),
-            -ivPostMenu.height / 2,
+            -ivMenu.height / 2,
             Gravity.START
         )
     }

@@ -216,11 +216,11 @@ class FeedFragment :
 
         //click listener -> open profile screen
         binding.memberImage.setOnClickListener {
-            TODO("Not yet implemented")
+            //TODO: On member Image click
         }
 
         binding.ivSearch.setOnClickListener {
-            TODO("Not yet implemented")
+            //TODO: perform search
         }
     }
 
@@ -235,15 +235,15 @@ class FeedFragment :
     }
 
     override fun pinPost() {
-        TODO("Not yet implemented")
+        //TODO: pin post
     }
 
     override fun savePost() {
-        TODO("Not yet implemented")
+        //TODO: save post
     }
 
     override fun likePost() {
-        TODO("Not yet implemented")
+        //TODO: like post
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
