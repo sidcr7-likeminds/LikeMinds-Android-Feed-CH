@@ -3,7 +3,8 @@ package com.likeminds.feedsx.posttypes.model
 import android.os.Parcelable
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.model.BaseViewType
-import com.likeminds.feedsx.utils.model.ITEM_COMMENT
+import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
+import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_REPLY
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -20,10 +21,14 @@ class CommentViewData private constructor(
     var createdAt: Long,
     var updatedAt: Long,
     var menuItems: List<OverflowMenuItemViewData>,
-    var replies: List<CommentViewData>
+    var replies: MutableList<CommentViewData>,
+    var parentId: String?
 ) : Parcelable, BaseViewType {
     override val viewType: Int
-        get() = ITEM_COMMENT
+        get() = when (level) {
+            0 -> ITEM_POST_DETAIL_COMMENT
+            else -> ITEM_POST_DETAIL_REPLY
+        }
 
     class Builder {
         private var id: String = ""
@@ -38,7 +43,8 @@ class CommentViewData private constructor(
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
         private var menuItems: List<OverflowMenuItemViewData> = listOf()
-        private var replies: List<CommentViewData> = listOf()
+        private var replies: MutableList<CommentViewData> = mutableListOf()
+        private var parentId: String? = null
 
         fun id(id: String) = apply { this.id = id }
         fun postId(postId: String) = apply { this.postId = postId }
@@ -54,7 +60,9 @@ class CommentViewData private constructor(
         fun menuItems(menuItems: List<OverflowMenuItemViewData>) =
             apply { this.menuItems = menuItems }
 
-        fun replies(replies: List<CommentViewData>) =
+        fun parentId(parentId: String?) = apply { this.parentId = parentId }
+
+        fun replies(replies: MutableList<CommentViewData>) =
             apply { this.replies = replies }
 
         fun build() = CommentViewData(
@@ -70,7 +78,8 @@ class CommentViewData private constructor(
             createdAt,
             updatedAt,
             menuItems,
-            replies
+            replies,
+            parentId
         )
     }
 
@@ -88,6 +97,7 @@ class CommentViewData private constructor(
             .updatedAt(updatedAt)
             .menuItems(menuItems)
             .replies(replies)
+            .parentId(parentId)
     }
 
 }

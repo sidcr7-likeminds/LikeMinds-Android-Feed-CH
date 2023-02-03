@@ -2,15 +2,17 @@ package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailCommentsCountBinding
+import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.BaseViewType
+import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENTS_COUNT
 
 class ItemPostDetailCommentsCountViewDataBinder :
-    ViewDataBinder<ItemPostDetailCommentsCountBinding, BaseViewType>() {
+    ViewDataBinder<ItemPostDetailCommentsCountBinding, PostViewData>() {
 
     override val viewType: Int
-        get() = TODO("Not yet implemented")
+        get() = ITEM_POST_DETAIL_COMMENTS_COUNT
 
     override fun createBinder(parent: ViewGroup): ItemPostDetailCommentsCountBinding {
         return ItemPostDetailCommentsCountBinding.inflate(
@@ -22,9 +24,15 @@ class ItemPostDetailCommentsCountViewDataBinder :
 
     override fun bindData(
         binding: ItemPostDetailCommentsCountBinding,
-        data: BaseViewType,
+        data: PostViewData,
         position: Int
     ) {
-        TODO("Not yet implemented")
+
+        val context = binding.root.context
+        binding.tvCommentsCount.text = context.resources.getQuantityString(
+            R.plurals.comments,
+            data.commentsCount,
+            data.commentsCount
+        )
     }
 }

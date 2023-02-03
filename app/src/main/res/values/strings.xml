@@ -29,6 +29,10 @@
         <item quantity="one">1 comment</item>
         <item quantity="other">%d comments</item>
     </plurals>
+    <plurals name="replies">
+        <item quantity="one">1 Reply</item>
+        <item quantity="other">%d Replies</item>
+    </plurals>
     <string name="create_a_post">Create a post</string>
     <string name="done">Done</string>
     <string name="post">Post</string>

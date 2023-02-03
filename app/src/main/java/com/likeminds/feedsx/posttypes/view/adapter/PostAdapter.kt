@@ -18,7 +18,7 @@ class PostAdapter constructor(
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(6)
 
-        val itemPostTextOnlyBinder= ItemPostTextOnlyViewDataBinder(listener)
+        val itemPostTextOnlyBinder = ItemPostTextOnlyViewDataBinder(listener)
         viewDataBinders.add(itemPostTextOnlyBinder)
 
         val itemPostSingleImageViewDataBinder = ItemPostSingleImageViewDataBinder(listener)
@@ -55,6 +55,6 @@ class PostAdapter constructor(
         fun onPostMenuItemClicked(postId: String, title: String)
         fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
         fun showLikesScreen(postData: PostViewData)
-        fun postDetails(postData: PostViewData)
+        fun postDetails(postData: PostViewData) {}
     }
 }

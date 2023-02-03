@@ -74,7 +74,11 @@ class FeedFragment :
         }
 
 
-        //TODO: Testing data
+        //TODO: Remove Testing data
+        addTestingData()
+    }
+
+    private fun addTestingData() {
         var text =
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
@@ -226,9 +230,7 @@ class FeedFragment :
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .build()
-            if (newViewData != null) {
-                mPostAdapter.update(position, newViewData)
-            }
+            mPostAdapter.update(position, newViewData)
         }
     }
 

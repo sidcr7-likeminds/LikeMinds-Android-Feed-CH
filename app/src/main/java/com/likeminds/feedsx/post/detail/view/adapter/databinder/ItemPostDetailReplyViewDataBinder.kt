@@ -3,23 +3,21 @@ package com.likeminds.feedsx.post.detail.view.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
+import com.likeminds.feedsx.databinding.ItemPostDetailReplyBinding
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.ViewUtils.hide
-import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
+import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_REPLY
 
-class ItemPostDetailCommentViewDataBinder constructor(
+class ItemPostDetailReplyViewDataBinder constructor(
     val listener: PostDetailAdapterListener
-) : ViewDataBinder<ItemPostDetailCommentBinding, CommentViewData>() {
-
+) : ViewDataBinder<ItemPostDetailReplyBinding, CommentViewData>() {
     override val viewType: Int
-        get() = ITEM_POST_DETAIL_COMMENT
+        get() = ITEM_POST_DETAIL_REPLY
 
-    override fun createBinder(parent: ViewGroup): ItemPostDetailCommentBinding {
-        return ItemPostDetailCommentBinding.inflate(
+    override fun createBinder(parent: ViewGroup): ItemPostDetailReplyBinding {
+        return ItemPostDetailReplyBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -27,19 +25,19 @@ class ItemPostDetailCommentViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemPostDetailCommentBinding,
+        binding: ItemPostDetailReplyBinding,
         data: CommentViewData,
         position: Int
     ) {
 
-        initCommentsView(
+        initReplyView(
             binding,
             data
         )
     }
 
-    private fun initCommentsView(
-        binding: ItemPostDetailCommentBinding,
+    private fun initReplyView(
+        binding: ItemPostDetailReplyBinding,
         data: CommentViewData
     ) {
 
@@ -57,24 +55,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
                         data.likesCount,
                         data.likesCount
                     )
-            }
-
-            if (data.repliesCount == 0) groupReplies.hide()
-            else {
-                groupReplies.show()
-                tvReplyCount.text = context.resources.getQuantityString(
-                    R.plurals.replies,
-                    data.repliesCount,
-                    data.repliesCount
-                )
-            }
-
-            tvReply.setOnClickListener {
-                listener.replyOnComment()
-            }
-
-            tvReplyCount.setOnClickListener {
-                listener.showReplies()
             }
 
             ivLike.setOnClickListener {
