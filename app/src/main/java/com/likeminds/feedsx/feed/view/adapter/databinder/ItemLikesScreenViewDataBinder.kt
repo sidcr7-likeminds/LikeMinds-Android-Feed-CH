@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.feed.view.adapter.viewdatabinder
+package com.likeminds.feedsx.feed.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

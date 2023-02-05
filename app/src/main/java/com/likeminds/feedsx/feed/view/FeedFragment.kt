@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.feed.view
 
-import android.widget.Toast
+import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +13,10 @@ import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
+import com.likeminds.feedsx.report.model.ReportExtras
+import com.likeminds.feedsx.report.view.ReportActivity
+import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -24,6 +29,16 @@ class FeedFragment :
 
     private val viewModel: FeedViewModel by viewModels()
     lateinit var mPostAdapter: PostAdapter
+
+    private val reportPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                ReportSuccessDialog("Message").show(
+                    childFragmentManager,
+                    ReportSuccessDialog.TAG
+                )
+            }
+        }
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -249,7 +264,20 @@ class FeedFragment :
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
         //TODO: Perform action on post's menu item selection
-        Toast.makeText(context, "Post id :${postId}, Title :${title}", Toast.LENGTH_SHORT)
+        // Testing data
+        if (title.equals("Report")) {
+            //create extras for [ReportActivity]
+            val reportExtras = ReportExtras.Builder()
+                .dataId(postId)
+                .type(REPORT_TYPE_POST)
+                .build()
+
+            //get Intent for [ReportActivity]
+            val intent = ReportActivity.getIntent(requireContext(), reportExtras)
+
+            //start [ReportActivity] and check for result
+            reportPostLauncher.launch(intent)
+        }
     }
 
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
