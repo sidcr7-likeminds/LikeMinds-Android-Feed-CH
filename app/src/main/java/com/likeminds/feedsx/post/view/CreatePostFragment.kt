@@ -17,20 +17,19 @@ import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_DOCUMENT
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_MEDIA
-import com.likeminds.feedsx.post.model.ShareExternalData
 import com.likeminds.feedsx.post.util.CreatePostListener
-import com.likeminds.feedsx.post.view.adapter.DocumentsCreatePostAdapter
-import com.likeminds.feedsx.post.view.adapter.MultipleMediaCreatePostAdapter
+import com.likeminds.feedsx.post.view.adapter.CreatePostDocumentsAdapter
+import com.likeminds.feedsx.post.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.utils.AndroidUtils
+import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.isValidYoutubeLink
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -42,28 +41,8 @@ class CreatePostFragment :
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
 
-    private var multiMediaAdapter: MultipleMediaCreatePostAdapter? = null
-    private var documentsAdapter: DocumentsCreatePostAdapter? = null
-
-    // launcher to handle gallery (IMAGE/VIDEO) intent
-    private val galleryLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data =
-                    result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
-                checkMediaPickedResult(data)
-            }
-        }
-
-    // launcher to handle document (PDF) intent
-    private val documentLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data =
-                    result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
-                checkMediaPickedResult(data)
-            }
-        }
+    private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
+    private var documentsAdapter: CreatePostDocumentsAdapter? = null
 
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
@@ -247,11 +226,8 @@ class CreatePostFragment :
         }
 
         val link = text.getUrlIfExist()
-        var sharedData = ShareExternalData.Builder()
 
         if (!link.isNullOrEmpty()) {
-            //Contains link
-            sharedData = sharedData.sharedLink(link)
 
             //TODO: handle internal links
 //            if (Route.isInternalLink(link)) {
@@ -396,7 +372,7 @@ class CreatePostFragment :
 
             if (multiMediaAdapter == null) {
                 multipleMediaAttachment.viewpagerMultipleMedia.isSaveEnabled = false
-                multiMediaAdapter = MultipleMediaCreatePostAdapter(this@CreatePostFragment)
+                multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
                 multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
                 multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
             }
@@ -423,7 +399,7 @@ class CreatePostFragment :
             }
 
             if (documentsAdapter == null) {
-                documentsAdapter = DocumentsCreatePostAdapter(this@CreatePostFragment)
+                documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
                 documentsAttachment.rvDocuments.apply {
                     adapter = documentsAdapter
                     layoutManager = LinearLayoutManager(context)
@@ -440,4 +416,24 @@ class CreatePostFragment :
         else multiMediaAdapter?.removeIndex(position)
         showPostMedia()
     }
+
+    // launcher to handle gallery (IMAGE/VIDEO) intent
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data =
+                    result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
+                checkMediaPickedResult(data)
+            }
+        }
+
+    // launcher to handle document (PDF) intent
+    private val documentLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data =
+                    result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
+                checkMediaPickedResult(data)
+            }
+        }
 }

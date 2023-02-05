@@ -12,8 +12,10 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 
 object ViewDataConverter {
 
+
+    // Converts the SingleDataUri (contains the data of local file) to AttachmentViewData
     fun convertSingleDataUri(singleUriData: SingleUriData): AttachmentViewData {
-        var attachmentType: Int? = null
+        val attachmentType: Int?
         val viewType = when (singleUriData.fileType) {
             IMAGE -> {
                 attachmentType = com.likeminds.feedsx.posttypes.model.IMAGE

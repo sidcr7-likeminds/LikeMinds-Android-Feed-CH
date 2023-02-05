@@ -6,7 +6,7 @@ import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 
-class DocumentsCreatePostAdapter constructor(
+class CreatePostDocumentsAdapter constructor(
     private val listener: CreatePostListener
 ) : BaseRecyclerAdapter<BaseViewType>() {
 

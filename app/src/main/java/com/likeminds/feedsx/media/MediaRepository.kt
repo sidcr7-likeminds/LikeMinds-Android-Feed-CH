@@ -24,8 +24,6 @@ import com.likeminds.feedsx.utils.getMediaType
 import com.likeminds.feedsx.utils.getMimeType
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
 import com.likeminds.likemindschat.utils.*
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.util.*
 import javax.inject.Inject
 
@@ -112,11 +110,7 @@ class MediaRepository @Inject constructor() {
             mediaFolders.addAll(
                 Stream.of(data.first.values).map { folder ->
                     val folderType =
-                        if (folder.getFolderTitle() == DownloadUtil.DOWNLOAD_DIRECTORY) {
-                            MediaFolderType.LIKEMINDS
-                        } else {
-                            MediaFolderType.NORMAL
-                        }
+                        MediaFolderType.NORMAL
                     MediaFolderViewData.Builder()
                         .thumbnailUri(folder.thumbnail)
                         .title(folder.getFolderTitle())
@@ -181,7 +175,7 @@ class MediaRepository @Inject constructor() {
 
         val cameraBucketId = imageFolders?.cameraBucketId ?: videoFolders?.cameraBucketId
         val allMediaThumbnail =
-            if (imageFolders?.thumbnailTimestamp ?: 0 > videoFolders?.thumbnailTimestamp ?: 0) {
+            if ((imageFolders?.thumbnailTimestamp ?: 0) > (videoFolders?.thumbnailTimestamp ?: 0)) {
                 imageFolders?.thumbnail
             } else {
                 videoFolders?.thumbnail
@@ -534,24 +528,6 @@ class MediaRepository @Inject constructor() {
             }
         }
         return null
-    }
-
-    fun convertUriToByteArray(context: Context, uri: Uri): ByteArray {
-        val iStream = context.contentResolver.openInputStream(uri)
-        return getBytes(iStream)
-    }
-
-    private fun getBytes(iStream: InputStream?): ByteArray {
-        val byteBuffer = ByteArrayOutputStream()
-        val bufferSize = 1024
-        val buffer = ByteArray(bufferSize)
-
-        var len: Int
-        while (iStream?.read(buffer).also { len = it ?: 0 } != -1) {
-            byteBuffer.write(buffer, 0, len)
-        }
-
-        return byteBuffer.toByteArray()
     }
 
     private val isNotPending: String
