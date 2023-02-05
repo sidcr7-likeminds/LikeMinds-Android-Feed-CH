@@ -15,16 +15,18 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
-            app:srcCompat="@drawable/ic_liked_filled"
+            app:srcCompat="@drawable/ic_like_filled"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription"/>
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/likes_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:paddingVertical="4dp"
             tools:fontFamily="@font/roboto_regular"
             android:textColor="@color/grey"
             android:textSize="14sp"
@@ -45,13 +47,15 @@
             android:paddingHorizontal="2dp"
             app:layout_constraintStart_toEndOf="@id/likes_count"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription"/>
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/comments_count"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
+            android:paddingVertical="4dp"
             tools:fontFamily="@font/roboto_regular"
             android:textColor="@color/grey"
             android:textSize="14sp"
