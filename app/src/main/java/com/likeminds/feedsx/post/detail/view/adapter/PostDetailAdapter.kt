@@ -4,9 +4,9 @@ import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCo
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentsCountViewDataBinder
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
-import com.likeminds.feedsx.utils.ValueUtils.getItemInList
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
+import com.likeminds.feedsx.utils.getItemInList
 import com.likeminds.feedsx.utils.model.BaseViewType
 
 class PostDetailAdapter constructor(

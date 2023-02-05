@@ -8,7 +8,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemMediaPickerFolderBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MediaFolderType
 import com.likeminds.feedsx.media.model.MediaFolderViewData
 import com.likeminds.feedsx.utils.customview.ViewDataBinder

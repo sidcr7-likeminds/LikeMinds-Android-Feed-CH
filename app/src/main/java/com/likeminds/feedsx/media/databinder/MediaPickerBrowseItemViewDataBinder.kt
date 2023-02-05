@@ -3,7 +3,7 @@ package com.likeminds.feedsx.media.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemMediaPickerBrowseBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MediaBrowserViewData
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_BROWSE

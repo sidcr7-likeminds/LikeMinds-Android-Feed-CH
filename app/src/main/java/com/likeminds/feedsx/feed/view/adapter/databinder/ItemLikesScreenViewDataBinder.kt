@@ -3,7 +3,7 @@ package com.likeminds.feedsx.feed.view.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemLikesScreenBinding
-import com.likeminds.feedsx.feed.view.model.LikeViewData
+import com.likeminds.feedsx.feed.model.LikeViewData
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder

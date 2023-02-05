@@ -13,8 +13,8 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentMediaPickerFolderBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapter
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.media.viewmodel.MediaViewModel

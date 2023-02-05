@@ -35,8 +35,4 @@
         <attr name="gridLayoutManagerColumns" format="integer" />
     </declare-styleable>
 
-    <declare-styleable name="LikeMindsEditText">
-        <attr name="font_style" format="string" />
-    </declare-styleable>
-
 </resources>

@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.media.adapter
+package com.likeminds.feedsx.media.view.adapter
 
 import com.likeminds.feedsx.media.databinder.*
 import com.likeminds.feedsx.media.model.MediaFolderViewData

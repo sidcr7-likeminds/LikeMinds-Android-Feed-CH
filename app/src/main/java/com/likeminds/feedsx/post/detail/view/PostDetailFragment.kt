@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.feed.view.LikesActivity
-import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
@@ -262,8 +262,6 @@ class PostDetailFragment :
 
     override fun fetchReplies(commentId: String, commentPosition: Int) {
         // TODO: fetch replies of the clicked comment and edit this dummy data
-
-        Log.d("TAG", "fetch: " + (mPostDetailAdapter[commentPosition] is CommentViewData))
         if (mPostDetailAdapter[commentPosition] is CommentViewData) {
             val comment = mPostDetailAdapter[commentPosition] as CommentViewData
             comment.replies.addAll(

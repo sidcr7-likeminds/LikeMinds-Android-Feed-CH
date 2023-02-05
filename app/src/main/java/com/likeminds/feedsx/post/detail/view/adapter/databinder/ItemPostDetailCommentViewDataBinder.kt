@@ -107,8 +107,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 adapter = mRepliesAdapter
             }
 
-            Log.d("TAG", "onBind: " + data.replies.isNotEmpty())
-
             if (data.replies.isNotEmpty()) {
                 rvReplies.show()
                 mRepliesAdapter.replace(data.replies.toList())

@@ -2,16 +2,22 @@ package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
-import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.deletecontent.model.DELETE_CONTENT_TYPE_POST
+import com.likeminds.feedsx.deletecontent.model.DeleteContentExtras
+import com.likeminds.feedsx.deletecontent.view.DeleteContentDialogFragment
+import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
-import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
+import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
@@ -27,10 +33,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FeedFragment :
     BaseFragment<FragmentFeedBinding>(),
-    PostAdapterListener {
+    PostAdapterListener,
+    DeleteContentDialogFragment.DeleteContentDialogListener {
 
     private val viewModel: FeedViewModel by viewModels()
     private lateinit var mPostAdapter: PostAdapter
+    private lateinit var alertDialog: AlertDialog
 
     private val reportPostLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -95,7 +103,6 @@ class FeedFragment :
             })
             show()
         }
-
 
         //TODO: Remove Testing data
         addTestingData()
@@ -247,6 +254,54 @@ class FeedFragment :
         }
     }
 
+    private fun deletePost(postId: String) {
+        //TODO: set isAdmin
+        val isAdmin = true
+        if (isAdmin) {
+            val deleteContentExtras = DeleteContentExtras.Builder()
+                .contentId(postId)
+                .contentType(DELETE_CONTENT_TYPE_POST)
+                .build()
+            DeleteContentDialogFragment.showDialog(
+                childFragmentManager,
+                deleteContentExtras
+            )
+        } else {
+            showDeletePostDialog()
+        }
+    }
+
+    private fun showDeletePostDialog() {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setMessage(getString(R.string.delete_post_message))
+            .setTitle(getString(R.string.delete_post_question))
+            .setCancelable(true)
+            .setPositiveButton("DELETE") { _, _ ->
+
+            }.setNegativeButton("CANCEL") { _, _ ->
+                alertDialog.dismiss()
+            }
+        //Creating dialog box
+        alertDialog = builder.create()
+        alertDialog.show()
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black_40))
+    }
+
+    private fun reportPost(postId: String) {
+        //create extras for [ReportActivity]
+        val reportExtras = ReportExtras.Builder()
+            .dataId(postId)
+            .type(REPORT_TYPE_POST)
+            .build()
+
+        //get Intent for [ReportActivity]
+        val intent = ReportActivity.getIntent(requireContext(), reportExtras)
+
+        //start [ReportActivity] and check for result
+        reportPostLauncher.launch(intent)
+    }
+
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostAdapter[position]
         if (item is PostViewData) {
@@ -272,18 +327,13 @@ class FeedFragment :
     override fun onPostMenuItemClicked(postId: String, title: String) {
         //TODO: Perform action on post's menu item selection
         // Testing data
-        if (title.equals("Report")) {
-            //create extras for [ReportActivity]
-            val reportExtras = ReportExtras.Builder()
-                .dataId(postId)
-                .type(REPORT_TYPE_POST)
-                .build()
-
-            //get Intent for [ReportActivity]
-            val intent = ReportActivity.getIntent(requireContext(), reportExtras)
-
-            //start [ReportActivity] and check for result
-            reportPostLauncher.launch(intent)
+        when (title) {
+            "Report" -> {
+                reportPost(postId)
+            }
+            "Delete" -> {
+                deletePost(postId)
+            }
         }
     }
 
@@ -343,5 +393,13 @@ class FeedFragment :
             position,
             px
         )
+    }
+
+    override fun deleteContent(
+        deleteContentExtras: DeleteContentExtras,
+        reportTagId: String,
+        reason: String
+    ) {
+        // TODO: call api
     }
 }

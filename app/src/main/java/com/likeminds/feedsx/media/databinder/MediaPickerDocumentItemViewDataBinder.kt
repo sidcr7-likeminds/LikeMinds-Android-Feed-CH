@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemMediaPickerDocumentBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.util.MediaPickerDataBinderUtils.Companion.getFilteredText
 import com.likeminds.feedsx.media.util.MediaUtils

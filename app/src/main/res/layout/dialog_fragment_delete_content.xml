@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="reasonData"
+            type="com.likeminds.feedsx.deletecontent.model.ReasonChooseViewData" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.cardview.widget.CardView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraint_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="24dp"
+                android:paddingBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    android:id="@+id/tv_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lineSpacingExtra="8sp"
+                    android:textColor="@color/black_87"
+                    android:textSize="16sp"
+                    android:textStyle="normal"
+                    app:fontType="medium"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="@string/delete_post_question" />
+
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    android:id="@+id/tv_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:lineSpacingExtra="7sp"
+                    android:textColor="@color/grey"
+                    android:textSize="15sp"
+                    android:textStyle="normal"
+                    app:fontType="regular"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_title"
+                    tools:text="@string/delete_post_message" />
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_reason"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginVertical="16dp"
+                    android:elevation="4dp"
+                    app:cardCornerRadius="8dp"
+                    app:contentPadding="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_description">
+
+                    <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                        android:id="@+id/tv_reason"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center_vertical"
+                        android:hint="@string/reason_for_deleting"
+                        android:includeFontPadding="false"
+                        android:lineSpacingExtra="4sp"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black_20"
+                        android:textSize="14sp"
+                        android:textStyle="normal"
+                        app:drawableEndCompat="@drawable/ic_arrow_drop_down"
+                        app:fontType="regular" />
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/cv_other_reason"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
+                    android:layout_marginTop="16dp"
+                    android:elevation="4dp"
+                    android:visibility="gone"
+                    app:cardCornerRadius="8dp"
+                    app:contentPaddingBottom="16dp"
+                    app:contentPaddingLeft="12dp"
+                    app:contentPaddingRight="12dp"
+                    app:contentPaddingTop="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/cv_reason">
+
+                    <com.likeminds.feedsx.branding.customview.edittext.LikeMindsEditText
+                        android:id="@+id/et_other_reason"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@android:color/transparent"
+                        android:hint="@string/type_your_reason"
+                        android:includeFontPadding="false"
+                        android:lineSpacingExtra="4sp"
+                        android:singleLine="true"
+                        android:textColor="@color/black"
+                        android:textColorHint="@color/black_20"
+                        android:textSize="14sp"
+                        app:font_style="regular" />
+                </androidx.cardview.widget.CardView>
+
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    android:id="@+id/tv_cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:layout_marginEnd="32dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:letterSpacing="0.04"
+                    android:paddingVertical="12dp"
+                    android:text="@string/cancel"
+                    android:textAllCaps="true"
+                    app:layout_constraintVertical_weight="1"
+                    android:textColor="@color/black_40"
+                    android:textSize="13sp"
+                    android:textStyle="normal"
+                    app:fontType="medium"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cv_other_reason"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_confirm" />
+
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    android:id="@+id/tv_confirm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="42dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:enabled="false"
+                    android:letterSpacing="0.04"
+                    android:paddingVertical="12dp"
+                    android:text="@string/confirm"
+                    android:textAllCaps="true"
+                    android:textColor="@color/black_20"
+                    android:textSize="13sp"
+                    android:textStyle="normal"
+                    app:fontType="medium"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cv_other_reason"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

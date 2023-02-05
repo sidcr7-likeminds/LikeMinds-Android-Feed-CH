@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.feed.view.model
+package com.likeminds.feedsx.feed.model
 
 import android.os.Parcelable
 import com.likeminds.feedsx.posttypes.model.UserViewData

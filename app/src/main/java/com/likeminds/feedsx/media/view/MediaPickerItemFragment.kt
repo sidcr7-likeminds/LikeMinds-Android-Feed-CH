@@ -12,8 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentMediaPickerItemBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapter
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MEDIA_RESULT_PICKED
 import com.likeminds.feedsx.media.model.MediaPickerItemExtras
 import com.likeminds.feedsx.media.model.MediaPickerResult
