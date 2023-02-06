@@ -36,7 +36,7 @@
     <string name="create_a_post">Create a post</string>
     <string name="done">Done</string>
     <string name="post">Post</string>
-    <string name="write_something_here">Write something here...</string>
+    <string name="write_something_here">Write something here…</string>
     <string name="attach_files">Attach Files</string>
     <string name="add_video">Add Video</string>
     <string name="add_photo">Add Photo</string>
@@ -56,6 +56,6 @@
     <string name="request_not_processed">Couldn\'t process your request</string>
     <string name="write_a_comment">Write a comment</string>
     <string name="view_more_replies">View more replies</string>
-    <string name="of"> of </string>
+    <string name="placeholder_replies">%d of %d</string>
     <string name="reply">Reply</string>
 </resources>

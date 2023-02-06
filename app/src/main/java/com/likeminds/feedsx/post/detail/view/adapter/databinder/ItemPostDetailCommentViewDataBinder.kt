@@ -9,6 +9,8 @@ import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
+import com.likeminds.feedsx.post.detail.model.ViewMoreReplyViewData
+import com.likeminds.feedsx.post.detail.view.PostDetailFragment
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
@@ -54,6 +56,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
         )
     }
 
+    // sets the data to comments item and handles the replies click and rv
     private fun initCommentsView(
         binding: ItemPostDetailCommentBinding,
         data: CommentViewData,
@@ -114,6 +117,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 mRepliesAdapter.replace(data.replies.toList())
                 commentSeparator.hide()
                 replyCommentSeparator.show()
+                handleViewMore(data, position)
             } else {
                 rvReplies.hide()
                 commentSeparator.show()
@@ -138,6 +142,20 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     overflowMenu
                 )
             }
+        }
+    }
+
+    // adds ViewMoreReply view when required
+    private fun handleViewMore(data: CommentViewData, position: Int) {
+        if (data.repliesCount > PostDetailFragment.REPLIES_THRESHOLD && data.replies.size < data.repliesCount) {
+            mRepliesAdapter.add(
+                ViewMoreReplyViewData.Builder()
+                    .totalCommentsCount(data.repliesCount)
+                    .currentCount(data.replies.size)
+                    .parentCommentId(data.id)
+                    .parentCommentPosition(position)
+                    .build()
+            )
         }
     }
 

@@ -13,7 +13,7 @@
             android:id="@+id/tv_view_more_replies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingVertical="3dp"
+            android:paddingVertical="4dp"
             android:text="@string/view_more_replies"
             android:textColor="@color/dark_grayish_blue"
             android:textSize="14sp"
@@ -24,48 +24,18 @@
             tools:fontFamily="@font/roboto_medium" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
-            android:id="@+id/tv_showed_replies"
+            android:id="@+id/tv_replies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingVertical="3dp"
-            android:text="@string/view_more_replies"
-            android:textColor="@color/dark_grayish_blue"
-            android:textSize="12sp"
-            app:fontType="regular"
-            app:layout_constraintEnd_toStartOf="@id/tv_of"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:fontFamily="@font/roboto_medium"
-            tools:text="10" />
-
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
-            android:id="@+id/tv_of"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingVertical="3dp"
-            android:text="@string/of"
-            android:textColor="@color/dark_grayish_blue"
-            android:textSize="12sp"
-            app:fontType="regular"
-            app:layout_constraintEnd_toStartOf="@+id/tv_total_replies"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:fontFamily="@font/roboto_medium" />
-
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
-            android:id="@+id/tv_total_replies"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingVertical="3dp"
-            android:text="@string/view_more_replies"
+            android:text="@string/placeholder_replies"
             android:textColor="@color/dark_grayish_blue"
             android:textSize="12sp"
             app:fontType="regular"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:fontFamily="@font/roboto_medium"
-            tools:text="15"/>
+            tools:fontFamily="@font/roboto_medium" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

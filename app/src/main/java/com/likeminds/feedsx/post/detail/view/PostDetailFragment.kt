@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.post.detail.view
 
-import android.util.Log
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
@@ -29,6 +28,10 @@ class PostDetailFragment :
 
     private lateinit var mPostDetailAdapter: PostDetailAdapter
 
+    companion object {
+        const val REPLIES_THRESHOLD = 3
+    }
+
     override fun getViewBinding(): FragmentPostDetailBinding {
         return FragmentPostDetailBinding.inflate(layoutInflater)
     }
@@ -39,6 +42,7 @@ class PostDetailFragment :
         initCommentEditText()
     }
 
+    // initializes the post detail screen recycler view
     private fun initRecyclerView() {
         mPostDetailAdapter = PostDetailAdapter(this, this, this)
         binding.rvPostDetails.apply {
@@ -49,9 +53,8 @@ class PostDetailFragment :
         addTestingData()
     }
 
-    // TODO: handle hiding keyboard properly
+    // initializes comment edittext with TextWatcher and focuses the keyboard
     private fun initCommentEditText() {
-
         binding.etComment.apply {
             if (postDetailExtras.isEditTextFocused) focusAndShowKeyboard()
 
@@ -159,7 +162,6 @@ class PostDetailFragment :
                         .build()
                 )
                 .likesCount(10)
-                .repliesCount(5)
                 .text("This is a test comment 3")
                 .build()
         )
@@ -173,7 +175,6 @@ class PostDetailFragment :
                         .build()
                 )
                 .likesCount(10)
-                .repliesCount(5)
                 .text("This is a test comment 4")
                 .build()
         )
@@ -186,8 +187,8 @@ class PostDetailFragment :
                         .name("Natesh Rehlan")
                         .build()
                 )
-                .likesCount(10)
-                .repliesCount(5)
+                .likesCount(100)
+                .repliesCount(10)
                 .text("This is a test comment 5")
                 .build()
         )
@@ -202,6 +203,7 @@ class PostDetailFragment :
         postDetailExtras = arguments?.getParcelable(POST_DETAIL_EXTRAS)!!
     }
 
+    // updates post view data when see more/see less is clicked
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostDetailAdapter[position]
         if (item is PostViewData) {
@@ -212,14 +214,17 @@ class PostDetailFragment :
         }
     }
 
+    // callback when add comment is clicked on post
     override fun comment(postData: PostViewData) {
         binding.etComment.focusAndShowKeyboard()
     }
 
+    // callback for post menu item click
     override fun onPostMenuItemClicked(postId: String, title: String) {
         //TODO: menu item handle
     }
 
+    // callback when +x more text is clicked to see more documents
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostDetailAdapter.items().size - 1) {
             binding.rvPostDetails.post {
@@ -228,7 +233,8 @@ class PostDetailFragment :
         }
 
         mPostDetailAdapter.update(
-            position, postData.toBuilder().isExpanded(true).build()
+            position,
+            postData.toBuilder().isExpanded(true).build()
         )
     }
 
@@ -248,6 +254,7 @@ class PostDetailFragment :
         )
     }
 
+    // callback when likes count is clicked - opens likes screen
     override fun showLikesScreen(postData: PostViewData) {
         val likesScreenExtras = LikesScreenExtras.Builder()
             .postId(postData.id)
@@ -256,14 +263,14 @@ class PostDetailFragment :
         LikesActivity.start(requireContext(), likesScreenExtras)
     }
 
+    // callback when post is liked
     override fun likeComment(commentId: String) {
         // TODO: likes the comment with comment id
     }
 
+    // callback when replies count is clicked - fetches replies for the comment
     override fun fetchReplies(commentId: String, commentPosition: Int) {
         // TODO: fetch replies of the clicked comment and edit this dummy data
-
-        Log.d("TAG", "fetch: " + (mPostDetailAdapter[commentPosition] is CommentViewData))
         if (mPostDetailAdapter[commentPosition] is CommentViewData) {
             val comment = mPostDetailAdapter[commentPosition] as CommentViewData
             comment.replies.addAll(
@@ -310,11 +317,74 @@ class PostDetailFragment :
         }
     }
 
+    // callback when
     override fun replyOnComment(commentId: String) {
         // TODO: fetch replies of the clicked comment
     }
 
+    // callback for comment's menu is item
     override fun onCommentMenuItemClicked(commentId: String, title: String) {
         //TODO: comment menu item
+    }
+
+    // callback when view more replies is clicked
+    override fun viewMoreReplies(
+        parentCommentId: String,
+        parentCommentPosition: Int,
+        currentVisibleReplies: Int
+    ) {
+        // TODO: fetch comment replies. Testing data. Fetch min of REPLIES_THRESHOLD or remaining replies
+
+        if (mPostDetailAdapter[parentCommentPosition] is CommentViewData) {
+            val comment = mPostDetailAdapter[parentCommentPosition] as CommentViewData
+            if (comment.replies.size < comment.repliesCount) {
+                comment.replies.addAll(
+                    mutableListOf(
+                        CommentViewData.Builder()
+                            .isLiked(false)
+                            .id("6")
+                            .user(
+                                UserViewData.Builder()
+                                    .name("Natesh Rehlan")
+                                    .build()
+                            )
+                            .level(1)
+                            .text("This is a test reply 1")
+                            .build(),
+                        CommentViewData.Builder()
+                            .isLiked(false)
+                            .id("7")
+                            .user(
+                                UserViewData.Builder()
+                                    .name("Natesh Rehlan")
+                                    .build()
+                            )
+                            .likesCount(10)
+                            .repliesCount(5)
+                            .level(1)
+                            .text("This is a test reply 2")
+                            .build(),
+                        CommentViewData.Builder()
+                            .isLiked(true)
+                            .id("8")
+                            .user(
+                                UserViewData.Builder()
+                                    .name("Natesh Rehlan")
+                                    .build()
+                            )
+                            .likesCount(10)
+                            .level(1)
+                            .text("This is a test reply 3")
+                            .build()
+                    )
+                )
+            }
+            mPostDetailAdapter.update(parentCommentPosition, comment)
+        }
+    }
+
+    // callback when the item of reply menu is clicked
+    override fun onReplyMenuItemClicked(replyId: String, title: String) {
+        //TODO: handle menu item click for replies.
     }
 }
