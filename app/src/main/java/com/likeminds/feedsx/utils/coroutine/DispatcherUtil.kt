@@ -21,3 +21,12 @@ internal fun CoroutineScope.launchDefault(block: suspend (CoroutineScope) -> Uni
     this.launch(Dispatchers.Default) {
         block(this)
     }
+
+/**
+ * Use this dispatcher to run a coroutine on the main Android thread. This should be used only for interacting with the UI and performing quick work.
+ * Examples include calling suspend functions, running Android UI framework operations, and updating LiveData objects.
+ */
+internal fun CoroutineScope.launchMain(block: suspend (CoroutineScope) -> Unit) =
+    this.launch(Dispatchers.Main) {
+        block(this)
+    }

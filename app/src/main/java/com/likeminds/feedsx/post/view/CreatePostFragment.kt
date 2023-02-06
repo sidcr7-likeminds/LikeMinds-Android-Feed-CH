@@ -15,15 +15,12 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
-import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_DOCUMENT
-import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.BROWSE_MEDIA
 import com.likeminds.feedsx.post.util.CreatePostListener
 import com.likeminds.feedsx.post.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.utils.AndroidUtils
-import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -94,7 +91,7 @@ class CreatePostFragment :
                         val intent = AndroidUtils.getExternalDocumentPickerIntent(
                             allowMultipleSelect = result.allowMultipleSelect
                         )
-                        startActivityForResult(intent, BROWSE_DOCUMENT)
+                        documentBrowseLauncher.launch(intent)
                     } else {
                         val intent = AndroidUtils.getExternalPickerIntent(
                             result.mediaTypes,
@@ -102,7 +99,7 @@ class CreatePostFragment :
                             result.browseClassName
                         )
                         if (intent != null)
-                            startActivityForResult(intent, BROWSE_MEDIA)
+                            mediaBrowseLauncher.launch(intent)
                     }
                 }
                 MEDIA_RESULT_PICKED -> {
@@ -134,21 +131,6 @@ class CreatePostFragment :
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
                 showAttachedDocuments()
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode != Activity.RESULT_OK) {
-            return
-        }
-        when (requestCode) {
-            BROWSE_MEDIA -> {
-                onMediaPickedFromGallery(data)
-            }
-            BROWSE_DOCUMENT -> {
-                onPdfPicked(data)
             }
         }
     }
@@ -259,7 +241,6 @@ class CreatePostFragment :
     private fun initLinkView(data: LinkOGTags) {
         binding.linkPreview.apply {
             this.root.show()
-            val isYoutubeLink = data.url?.isValidYoutubeLink() == true
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
                 data.title
             } else {
@@ -268,24 +249,13 @@ class CreatePostFragment :
             tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
             tvLinkDescription.text = data.description
 
-            if (isYoutubeLink) {
-                ivLink.hide()
-                ivPlay.isVisible = !data.image.isNullOrEmpty()
-                ivYoutubeLink.isVisible = !data.image.isNullOrEmpty()
-                ivYoutubeLogo.isVisible = !data.image.isNullOrEmpty()
-            } else {
-                ivPlay.hide()
-                ivYoutubeLink.hide()
-                ivYoutubeLogo.hide()
-                ivLink.isVisible = !data.image.isNullOrEmpty()
-            }
+            ivLink.isVisible = !data.image.isNullOrEmpty()
 
             ImageBindingUtil.loadImage(
-                if (isYoutubeLink) ivYoutubeLink else ivLink,
+                ivLink,
                 data.image,
                 placeholder = R.drawable.ic_link_primary_40dp,
-                cornerRadius = 8,
-                isBlur = isYoutubeLink
+                cornerRadius = 8
             )
 
             tvLinkUrl.text = data.url
@@ -427,12 +397,28 @@ class CreatePostFragment :
             }
         }
 
+    private val mediaBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onMediaPickedFromGallery(result.data)
+            }
+        }
+
+    private val documentBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onPdfPicked(result.data)
+            }
+        }
+
     // launcher to handle document (PDF) intent
     private val documentLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data =
-                    result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
+                    result.data?.extras?.getParcelable<MediaPickerResult>(
+                        ARG_MEDIA_PICKER_RESULT
+                    )
                 checkMediaPickedResult(data)
             }
         }

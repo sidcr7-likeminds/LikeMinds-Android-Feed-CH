@@ -330,20 +330,6 @@ object FileUtil {
         }
         return true
     }
-
-    /**
-     * Can be called to clear the temporary files that are created when fetching the uri
-     * Delete the files in the "Temp" folder at the root of the project.
-     */
-    fun deleteTempFiles(context: Context) {
-        context.getExternalFilesDir("Temp")?.let { folder ->
-            folder.listFiles()?.let { files ->
-                files.forEach {
-                    it.deleteRecursively()
-                }
-            }
-        }
-    }
 }
 
 private const val LARGE_FILE_SIZE = 100 //in MegaBytes

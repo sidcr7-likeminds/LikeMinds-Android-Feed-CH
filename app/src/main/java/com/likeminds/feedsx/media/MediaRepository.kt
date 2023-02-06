@@ -17,11 +17,10 @@ import com.annimon.stream.Stream
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.utils.DateUtil
-import com.likeminds.feedsx.utils.ValueUtils.Companion.getOrDefault
-import com.likeminds.feedsx.utils.downloader.DownloadUtil
+import com.likeminds.feedsx.utils.ValueUtils.getMediaType
+import com.likeminds.feedsx.utils.ValueUtils.getMimeType
+import com.likeminds.feedsx.utils.ValueUtils.getOrDefault
 import com.likeminds.feedsx.utils.file.isLargeFile
-import com.likeminds.feedsx.utils.getMediaType
-import com.likeminds.feedsx.utils.getMimeType
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
 import com.likeminds.likemindschat.utils.*
 import java.util.*
@@ -118,7 +117,7 @@ class MediaRepository @Inject constructor() {
                         .bucketId(folder.bucketId)
                         .folderType(folderType).build()
                 }.toList().sortedWith(
-                    compareBy({ it.title != DownloadUtil.DOWNLOAD_DIRECTORY }, { it.title })
+                    compareBy { it.title }
                 )
             )
 

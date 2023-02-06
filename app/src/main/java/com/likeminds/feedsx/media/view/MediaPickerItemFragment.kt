@@ -75,7 +75,6 @@ class MediaPickerItemFragment :
         }
         initializeUI()
         initializeListeners()
-        checkStoragePermission()
 
         viewModel.fetchMediaInBucket(
             requireContext(),
