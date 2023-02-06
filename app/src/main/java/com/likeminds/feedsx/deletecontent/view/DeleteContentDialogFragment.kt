@@ -4,11 +4,9 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.InsetDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
@@ -24,8 +22,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
     ReasonChooseDialog.ReasonChooseDialogListener {
 
     companion object {
-        // TODO: Change collabcard
-        private const val TAG = "DeleteChatRoomDialogFragment"
+        private const val TAG = "DeleteContentDialogFragment"
         private const val ARG_DELETE_CONTENT_EXTRAS = "ARG_DELETE_CONTENT_EXTRAS"
 
         @JvmStatic
@@ -62,6 +59,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
         initializeListeners()
     }
 
+    // initializes window and sets data as per content type [COMMENT/POST]
     private fun initView() {
         val background = ColorDrawable(Color.TRANSPARENT)
         val inset = InsetDrawable(background, ViewUtils.dpToPx(32), 0, ViewUtils.dpToPx(32), 0)
@@ -80,6 +78,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
         }
     }
 
+    // sets click listeners to select reason and submit request
     private fun initializeListeners() {
         binding.cvReason.setOnClickListener {
             ReasonChooseDialog.newInstance(childFragmentManager)
@@ -114,6 +113,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
         }
     }
 
+    // handles confirm button (enabled/disabled)
     private fun handleConfirmButton(isEnabled: Boolean) {
         binding.tvConfirm.isEnabled = isEnabled
         if (isEnabled) {
@@ -128,6 +128,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
         }
     }
 
+    // callback when a reason is selected from bottom sheet
     override fun onReasonSelected(viewData: ReasonChooseViewData) {
         binding.reasonData = viewData
         binding.tvReason.text = viewData.value

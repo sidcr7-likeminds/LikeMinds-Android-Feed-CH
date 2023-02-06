@@ -34,6 +34,7 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
         initializeUI()
     }
 
+    // initialized listener and adds data to the list
     private fun initializeUI() {
         try {
             reasonChooseDialogListener = parentFragment as ReasonChooseDialogListener?
@@ -62,6 +63,7 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
         reasonChooseAdapter.replace(list as List<BaseViewType>?)
     }
 
+    // callback when one of the item from reason list is selected
     override fun onOptionSelected(viewData: ReasonChooseViewData) {
         reasonChooseDialogListener?.onReasonSelected(viewData)
         dismiss()

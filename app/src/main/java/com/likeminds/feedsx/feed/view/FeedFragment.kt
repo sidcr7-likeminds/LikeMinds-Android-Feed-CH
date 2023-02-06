@@ -254,6 +254,7 @@ class FeedFragment :
         }
     }
 
+    // processes delete post request
     private fun deletePost(postId: String) {
         //TODO: set isAdmin
         val isAdmin = true
@@ -271,6 +272,7 @@ class FeedFragment :
         }
     }
 
+    // shows delete post dialog when user deletes their own post
     private fun showDeletePostDialog() {
         val builder = AlertDialog.Builder(requireContext())
         builder.setMessage(getString(R.string.delete_post_message))
@@ -288,6 +290,7 @@ class FeedFragment :
             ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black_40))
     }
 
+    // Processes report action on post
     private fun reportPost(postId: String) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
