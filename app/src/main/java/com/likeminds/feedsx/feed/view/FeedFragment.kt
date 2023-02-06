@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
@@ -22,7 +24,9 @@ class FeedFragment :
     PostAdapterListener {
 
     private val viewModel: FeedViewModel by viewModels()
-    lateinit var mPostAdapter: PostAdapter
+
+    private lateinit var mPostAdapter: PostAdapter
+    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -39,6 +43,7 @@ class FeedFragment :
         binding.isBrandingBasic = true
 
         initRecyclerView()
+        initSwipeRefreshLayout()
     }
 
     private fun initRecyclerView() {
@@ -200,6 +205,24 @@ class FeedFragment :
                 .text(text)
                 .build()
         )
+    }
+
+    // initializes swipe refresh layout and sets refresh listener
+    private fun initSwipeRefreshLayout() {
+        mSwipeRefreshLayout = binding.swipeRefreshLayout
+        mSwipeRefreshLayout.setColorSchemeColors(
+            BrandingData.getButtonsColor(),
+        )
+
+        mSwipeRefreshLayout.setOnRefreshListener {
+            mSwipeRefreshLayout.isRefreshing = true
+            fetchRefreshedData()
+        }
+    }
+
+    //TODO: Call api and refresh the feed data
+    private fun fetchRefreshedData() {
+        mSwipeRefreshLayout.isRefreshing = false
     }
 
     private fun initToolbar() {
