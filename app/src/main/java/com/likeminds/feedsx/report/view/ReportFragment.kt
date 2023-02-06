@@ -66,8 +66,8 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         initListeners()
     }
 
+    //setup recycler view
     private fun initRecyclerView() {
-        //setup recycler view
         mAdapter = ReportAdapter(this)
         val flexboxLayoutManager = FlexboxLayoutManager(requireContext())
         flexboxLayoutManager.flexDirection = FlexDirection.ROW
@@ -111,8 +111,8 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         )
     }
 
+    //set headers and sub header as per report type
     private fun initViewAsType() {
-        //set headers and sub header as per report type
         when (extras.type) {
             REPORT_TYPE_POST -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "post")

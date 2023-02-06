@@ -80,6 +80,7 @@ class ReportTagItemViewDataBinder constructor(
         binding.reportTagViewData = data
     }
 
+    // sets click listener to handle selected report tag
     private fun setListeners(binding: ItemReportTagsBinding) {
         binding.tvReportTag.setOnClickListener {
             val reportTagViewData = binding.reportTagViewData ?: return@setOnClickListener

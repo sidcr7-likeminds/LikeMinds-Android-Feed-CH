@@ -29,17 +29,6 @@ class FeedFragment :
 
     private val viewModel: FeedViewModel by viewModels()
     lateinit var mPostAdapter: PostAdapter
-
-    private val reportPostLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                ReportSuccessDialog("Message").show(
-                    childFragmentManager,
-                    ReportSuccessDialog.TAG
-                )
-            }
-        }
-
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
     }
@@ -316,4 +305,15 @@ class FeedFragment :
             px
         )
     }
+
+    // launcher to start [Report Activity] and show success dialog for result
+    private val reportPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                ReportSuccessDialog("Message").show(
+                    childFragmentManager,
+                    ReportSuccessDialog.TAG
+                )
+            }
+        }
 }

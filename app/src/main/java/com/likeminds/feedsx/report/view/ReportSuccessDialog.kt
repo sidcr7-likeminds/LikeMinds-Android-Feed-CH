@@ -27,8 +27,8 @@ class ReportSuccessDialog constructor(
         initView()
     }
 
+    //set header and sub header as per [type] received in constructor
     private fun initView() {
-        //set header and sub header as per [type] received in constructor
         binding.tvReportedHeader.text = getString(R.string.s_is_reported_for_review, type)
         binding.tvReportSubHeader.text = getString(
             R.string.our_team_will_look_into_your_feedback_and_will_take_appropriate_action_on_this_s,
