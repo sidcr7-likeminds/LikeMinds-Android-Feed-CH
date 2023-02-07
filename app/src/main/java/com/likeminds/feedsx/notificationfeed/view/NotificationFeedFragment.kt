@@ -30,6 +30,7 @@ class NotificationFeedFragment :
         initRecyclerView()
     }
 
+    // initializes notification recycler view
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
         mNotificationFeedAdapter = NotificationFeedAdapter(this)
@@ -72,6 +73,7 @@ class NotificationFeedFragment :
                             .build()
                     )
                 )
+                .cta("route://post_detail?post_id=1&comment_id=2")
                 .createdAt(1675721450000)
                 .activityMessage(text)
                 .build()
@@ -96,6 +98,7 @@ class NotificationFeedFragment :
                     )
                 )
                 .createdAt(1675717850000)
+                .cta("route://create_post")
                 .activityMessage(text)
                 .build()
         )

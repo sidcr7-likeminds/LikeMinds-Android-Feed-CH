@@ -1,9 +1,8 @@
 package com.likeminds.feedsx.notificationfeed.view.adapter.databinder
 
-import android.view.Gravity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemNotificationFeedBinding
@@ -14,9 +13,9 @@ import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.Route
 import com.likeminds.feedsx.utils.TimeUtil.getRelativeTime
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 
@@ -51,13 +50,20 @@ class ItemNotificationFeedViewDataBinder constructor(
             data.menuItems
         )
 
-        initNotificationView(
+        // handles route on notification click
+        handleRoute(
             binding,
             data
         )
 
+        // sets data to the notification item
+        initNotificationView(
+            binding,
+            data
+        )
     }
 
+    // initializes notification item
     private fun initNotificationView(
         binding: ItemNotificationFeedBinding,
         data: NotificationFeedViewData
@@ -69,7 +75,6 @@ class ItemNotificationFeedViewDataBinder constructor(
 
         val user = data.user
         binding.apply {
-
             if (data.isRead) {
                 root.setBackgroundColor(
                     ContextCompat.getColor(
@@ -87,7 +92,10 @@ class ItemNotificationFeedViewDataBinder constructor(
             }
 
             ivNotificationMenu.setOnClickListener {
-                showOverflowMenu(ivNotificationMenu, overflowMenu)
+                PostTypeUtil.showOverflowMenu(
+                    ivNotificationMenu,
+                    overflowMenu
+                )
             }
 
             MemberImageUtil.setImage(
@@ -105,6 +113,7 @@ class ItemNotificationFeedViewDataBinder constructor(
         }
     }
 
+    // handles text content of notification
     private fun initNotificationTextContent(
         binding: ItemNotificationFeedBinding,
         data: NotificationFeedViewData
@@ -117,14 +126,20 @@ class ItemNotificationFeedViewDataBinder constructor(
         }
     }
 
-    //to show the options on the notification item
-    private fun showOverflowMenu(ivNotificationMenu: ImageView, overflowMenu: OverflowMenuPopup) {
-        overflowMenu.showAsDropDown(
-            ivNotificationMenu,
-            -ViewUtils.dpToPx(16),
-            -ivNotificationMenu.height / 2,
-            Gravity.START
-        )
+    private fun handleRoute(
+        binding: ItemNotificationFeedBinding,
+        data: NotificationFeedViewData
+    ) {
+        binding.root.apply {
+            setOnClickListener {
+                val routeIntent = Route.getRouteIntent(
+                    context,
+                    data.cta,
+                )
+                if (routeIntent != null)
+                    context.startActivity(routeIntent)
+            }
+        }
     }
 
     // handles the menu item click on the post

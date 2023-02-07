@@ -40,12 +40,6 @@ object ViewUtils {
         visibility = View.VISIBLE
     }
 
-    fun hideKeyboard(view: View) {
-        val imm =
-            view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
-    }
-
     fun showShortToast(context: Context?, text: String?) {
         if (context == null || text.isNullOrEmpty()) return
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
