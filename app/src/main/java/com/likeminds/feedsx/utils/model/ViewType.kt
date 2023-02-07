@@ -17,7 +17,7 @@ const val ITEM_USER = 11
 const val ITEM_COMMENT = 12
 const val ITEM_POST_DOCUMENTS_ITEM = 13
 const val ITEM_LIKES_SCREEN = 14
-
+const val ITEM_NOTIFICATION_FEED = 15
 
 @IntDef(
     ITEM_NONE,
@@ -34,7 +34,8 @@ const val ITEM_LIKES_SCREEN = 14
     ITEM_USER,
     ITEM_COMMENT,
     ITEM_POST_DOCUMENTS_ITEM,
-    ITEM_LIKES_SCREEN
+    ITEM_LIKES_SCREEN,
+    ITEM_NOTIFICATION_FEED
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class ViewType

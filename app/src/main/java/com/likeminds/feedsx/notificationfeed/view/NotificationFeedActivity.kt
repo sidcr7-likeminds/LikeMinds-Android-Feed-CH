@@ -7,7 +7,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ActivityNotificationFeedBinding
-import com.likeminds.feedsx.feed.view.LikesFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -51,8 +50,8 @@ class NotificationFeedActivity : BaseAppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.label) {
-                LikesFragment::class.simpleName -> {
-                    binding.toolbar.setTitle(R.string.likes)
+                NotificationFeedFragment::class.simpleName -> {
+                    binding.toolbar.setTitle(R.string.notifications)
                 }
             }
         }

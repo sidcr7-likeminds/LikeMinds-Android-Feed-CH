@@ -1,12 +1,16 @@
 package com.likeminds.feedsx.notificationfeed.model
 
 import android.os.Parcelable
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.model.BaseViewType
+import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class NotificationFeedViewData private constructor(
     var id: String,
+    val isRead: Boolean,
     var actionBy: String,
     var actionOn: List<String>,
     var communityId: Int,
@@ -16,15 +20,20 @@ class NotificationFeedViewData private constructor(
     var action: String,
     var cta: String,
     var activityMessage: String,
+    var user: UserViewData,
+    var menuItems: List<OverflowMenuItemViewData>,
     var createdAt: Long,
     var updatedAt: Long
 ) : Parcelable, BaseViewType {
 
+    //TODO: isRead, menuItems not there in ED
+
     override val viewType: Int
-        get() = TODO("Not yet implemented")
+        get() = ITEM_NOTIFICATION_FEED
 
     class Builder {
         private var id: String = ""
+        private var isRead: Boolean = false
         private var actionBy: String = ""
         private var actionOn: List<String> = listOf()
         private var communityId: Int = 0
@@ -35,10 +44,13 @@ class NotificationFeedViewData private constructor(
         private var action: String = ""
         private var cta: String = ""
         private var activityMessage: String = ""
+        private var user: UserViewData = UserViewData.Builder().build()
+        private var menuItems: List<OverflowMenuItemViewData> = listOf()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
 
         fun id(id: String) = apply { this.id = id }
+        fun isRead(isRead: Boolean) = apply { this.isRead = isRead }
         fun actionBy(actionBy: String) = apply { this.actionBy = actionBy }
         fun actionOn(actionOn: List<String>) = apply { this.actionOn = actionOn }
         fun communityId(communityId: Int) = apply { this.communityId = communityId }
@@ -51,11 +63,16 @@ class NotificationFeedViewData private constructor(
         fun activityMessage(activityMessage: String) =
             apply { this.activityMessage = activityMessage }
 
+        fun user(user: UserViewData) = apply { this.user = user }
+        fun menuItems(menuItems: List<OverflowMenuItemViewData>) =
+            apply { this.menuItems = menuItems }
+
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
-        
+
         fun build() = NotificationFeedViewData(
             id,
+            isRead,
             actionBy,
             actionOn,
             communityId,
@@ -64,12 +81,27 @@ class NotificationFeedViewData private constructor(
             action,
             cta,
             activityMessage,
+            user,
+            menuItems,
             createdAt,
             updatedAt
         )
     }
 
     fun toBuilder(): Builder {
-        return Builder()
+        return Builder().id(id)
+            .isRead(isRead)
+            .actionBy(actionBy)
+            .actionOn(actionOn)
+            .communityId(communityId)
+            .entityType(entityType)
+            .entityId(entityId)
+            .action(action)
+            .cta(cta)
+            .activityMessage(activityMessage)
+            .user(user)
+            .menuItems(menuItems)
+            .createdAt(createdAt)
+            .updatedAt(updatedAt)
     }
 }

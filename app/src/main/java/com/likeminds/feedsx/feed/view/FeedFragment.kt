@@ -8,9 +8,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -42,35 +44,18 @@ class FeedFragment :
     }
 
     private fun initRecyclerView() {
+        val linearLayoutManager = LinearLayoutManager(context)
         mPostAdapter = PostAdapter(this)
         binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = linearLayoutManager
             adapter = mPostAdapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val isExtended = binding.newPostButton.isExtended
-
-                    // Scroll down
-                    if (dy > 20 && isExtended) {
-                        binding.newPostButton.shrink()
-                    }
-
-                    // Scroll up
-                    if (dy < -20 && !isExtended) {
-                        binding.newPostButton.extend()
-                    }
-
-                    // At the top
-                    if (!recyclerView.canScrollVertically(-1)) {
-                        binding.newPostButton.extend()
-                    }
-                }
-            })
             show()
         }
 
+        attachPagination(
+            binding.recyclerView,
+            linearLayoutManager
+        )
 
         //TODO: Testing data
         var text =
@@ -202,6 +187,36 @@ class FeedFragment :
         )
     }
 
+    //attach scroll listener for pagination
+    private fun attachPagination(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+        recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
+            override fun onLoadMore(currentPage: Int) {
+                // TODO: add logic
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val isExtended = binding.newPostButton.isExtended
+
+                // Scroll down
+                if (dy > 20 && isExtended) {
+                    binding.newPostButton.shrink()
+                }
+
+                // Scroll up
+                if (dy < -20 && !isExtended) {
+                    binding.newPostButton.extend()
+                }
+
+                // At the top
+                if (!recyclerView.canScrollVertically(-1)) {
+                    binding.newPostButton.extend()
+                }
+            }
+        })
+    }
+
     private fun initToolbar() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
@@ -210,9 +225,16 @@ class FeedFragment :
             TODO("Not yet implemented")
         }
 
+        binding.ivNotification.setOnClickListener {
+            NotificationFeedActivity.start(requireContext())
+        }
+
         binding.ivSearch.setOnClickListener {
             TODO("Not yet implemented")
         }
+
+        //TODO: testing data. add this while observing data
+        binding.tvNotificationCount.text = "10"
     }
 
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
