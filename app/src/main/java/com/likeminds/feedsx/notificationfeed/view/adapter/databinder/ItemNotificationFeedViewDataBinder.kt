@@ -14,9 +14,10 @@ import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.TimeUtil.getRelativeTime
+import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 
 class ItemNotificationFeedViewDataBinder constructor(
@@ -54,12 +55,18 @@ class ItemNotificationFeedViewDataBinder constructor(
             binding,
             data
         )
+
     }
 
     private fun initNotificationView(
         binding: ItemNotificationFeedBinding,
         data: NotificationFeedViewData
     ) {
+        initNotificationTextContent(
+            binding,
+            data
+        )
+
         val user = data.user
         binding.apply {
 
@@ -91,21 +98,31 @@ class ItemNotificationFeedViewDataBinder constructor(
                 showRoundImage = true
             )
 
-            tvNotificationContent.text = data.activityMessage
-
             //TODO: logic to get post type.
             ivPostType.setImageResource(R.drawable.ic_doc_attachment)
 
-//            tvNotificationDate.text =
+            tvNotificationDate.text = getRelativeTime(data.createdAt)
         }
     }
 
-    //to show the options on the post
-    private fun showOverflowMenu(ivPostMenu: ImageView, overflowMenu: OverflowMenuPopup) {
+    private fun initNotificationTextContent(
+        binding: ItemNotificationFeedBinding,
+        data: NotificationFeedViewData
+    ) {
+        binding.apply {
+            val textForLinkify = data.activityMessage.getValidTextForLinkify()
+
+            // TODO: handle the member name in the text.
+            tvNotificationContent.text = textForLinkify
+        }
+    }
+
+    //to show the options on the notification item
+    private fun showOverflowMenu(ivNotificationMenu: ImageView, overflowMenu: OverflowMenuPopup) {
         overflowMenu.showAsDropDown(
-            ivPostMenu,
+            ivNotificationMenu,
             -ViewUtils.dpToPx(16),
-            -ivPostMenu.height / 2,
+            -ivNotificationMenu.height / 2,
             Gravity.START
         )
     }
