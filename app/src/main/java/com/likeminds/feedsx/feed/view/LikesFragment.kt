@@ -13,7 +13,6 @@ import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.log
 
 @AndroidEntryPoint
 class LikesFragment : BaseFragment<FragmentLikesBinding>() {
@@ -22,9 +21,9 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         private const val TAG = "Likes Screen"
     }
 
-    lateinit var mLikesScreenAdapter: LikesScreenAdapter
+    private lateinit var mLikesScreenAdapter: LikesScreenAdapter
 
-    private lateinit var extras: LikesScreenExtras
+    private lateinit var likesScreenExtras: LikesScreenExtras
 
     override fun getViewBinding(): FragmentLikesBinding {
         return FragmentLikesBinding.inflate(layoutInflater)
@@ -87,6 +86,6 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        extras = arguments?.getParcelable(LIKES_SCREEN_EXTRAS)!!
+        likesScreenExtras = arguments?.getParcelable(LIKES_SCREEN_EXTRAS)!!
     }
 }

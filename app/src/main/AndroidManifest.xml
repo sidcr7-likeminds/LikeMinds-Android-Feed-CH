@@ -32,6 +32,10 @@
         <activity
             android:name=".notificationfeed.view.NotificationFeedActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".post.detail.view.PostDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".feed.view.MainActivity"
             android:exported="true">
