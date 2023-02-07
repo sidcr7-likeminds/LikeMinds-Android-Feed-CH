@@ -6,7 +6,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.util.BrandingUtil
 
-internal class LikeMindsTextView : AppCompatTextView {
+internal class   LikeMindsTextView : AppCompatTextView {
 
     constructor(context: Context) : super(context) {
         initiate(null)
@@ -27,8 +27,11 @@ internal class LikeMindsTextView : AppCompatTextView {
     private fun initiate(attrs: AttributeSet?) {
         // fonts
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsTextView)
-        val fontStyle = array.getString(R.styleable.LikeMindsTextView_fontType)
-        this.typeface = BrandingUtil.getTypeFace(context, fontStyle)
+        this.typeface = BrandingUtil.getTypeFace(context, array.getString(R.styleable.LikeMindsTextView_fontType))
+
+        //text color
+        this.setTextColor(BrandingUtil.getTextColor(this.currentTextColor, array.getString(R.styleable.LikeMindsTextView_textType)))
+
         array.recycle()
     }
 }

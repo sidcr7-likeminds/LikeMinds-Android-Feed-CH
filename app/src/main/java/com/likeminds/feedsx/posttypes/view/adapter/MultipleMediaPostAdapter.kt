@@ -15,11 +15,11 @@ class MultipleMediaPostAdapter : BaseRecyclerAdapter<BaseViewType>() {
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(2)
 
-        val multipleMediaImageBinding = ItemMultipleMediaImageViewDataBinder()
-        viewDataBinders.add(multipleMediaImageBinding)
+        val multipleMediaImageBinder = ItemMultipleMediaImageViewDataBinder()
+        viewDataBinders.add(multipleMediaImageBinder)
 
-        val multipleMediaVideoBinding = ItemMultipleMediaVideoViewDataBinder()
-        viewDataBinders.add(multipleMediaVideoBinding)
+        val multipleMediaVideoBinder = ItemMultipleMediaVideoViewDataBinder()
+        viewDataBinders.add(multipleMediaVideoBinder)
 
         return viewDataBinders
     }
