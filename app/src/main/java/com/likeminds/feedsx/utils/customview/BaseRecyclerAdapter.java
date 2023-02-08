@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.likeminds.feedsx.branding.model.BrandingData;
 import com.likeminds.feedsx.feed.util.FeedDiffUtilCallback;
+import com.likeminds.feedsx.post.detail.util.PostDetailDiffUtilCallback;
 import com.likeminds.feedsx.utils.model.BaseViewType;
 import com.likeminds.feedsx.utils.model.ViewType;
 
@@ -135,7 +136,16 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         dataList.addAll(items);
         diffResult.dispatchUpdatesTo(this);
     }
-//
+
+    // TODO: call this while observing post detail data
+    public void setItemsViaDiffUtilForPostDetail(List<T> items) {
+        PostDetailDiffUtilCallback postDetailDiffUtilCallback = new PostDetailDiffUtilCallback(dataList, items);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(postDetailDiffUtilCallback);
+        dataList.clear();
+        dataList.addAll(items);
+        diffResult.dispatchUpdatesTo(this);
+    }
+
 //    public void setItemsViaDiffUtilForChatroomDetail(List<T> items) {
 //        ChatroomDetailDiffUtilCallback diffUtilCallback = new ChatroomDetailDiffUtilCallback(dataList, items);
 //        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffUtilCallback);

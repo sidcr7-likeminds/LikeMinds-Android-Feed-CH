@@ -13,7 +13,10 @@ class FeedDiffUtilCallback(
 
     override fun getNewListSize() = newList.size
 
-    override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+    override fun areItemsTheSame(
+        oldItemPosition: Int,
+        newItemPosition: Int
+    ): Boolean {
         val oldItem = oldList[oldItemPosition]
         val newItem = newList[newItemPosition]
 
@@ -23,7 +26,10 @@ class FeedDiffUtilCallback(
         return false
     }
 
-    override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+    override fun areContentsTheSame(
+        oldItemPosition: Int,
+        newItemPosition: Int
+    ): Boolean {
         val oldItem = oldList[oldItemPosition]
         val newItem = newList[newItemPosition]
         if (oldItem is PostViewData && newItem is PostViewData) {

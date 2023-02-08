@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.detail.view
 
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.feed.view.LikesActivity
@@ -51,6 +52,8 @@ class PostDetailFragment :
         binding.rvPostDetails.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = mPostDetailAdapter
+            if (itemAnimator is SimpleItemAnimator)
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             show()
         }
         addTestingData()
