@@ -29,10 +29,6 @@ dependencies {
     implementation deps.glide.core
     kapt deps.glide.compiler
 
-    //rx
-    implementation deps.rxJava.main
-    implementation deps.rxJava.android
-
     //Stream
     implementation deps.stream.main
 

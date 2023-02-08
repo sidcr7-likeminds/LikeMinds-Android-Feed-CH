@@ -27,8 +27,6 @@ versions.cropper = '4.2.1'
 versions.drawable_toolbox = '1.0.7'
 versions.dotsindicator = '4.2'
 versions.hilt = "2.44"
-versions.rxJava = '2.2.5'
-versions.rxAndroid = '2.1.1'
 versions.stream = '1.2.1'
 ext.versions = versions
 
@@ -79,11 +77,6 @@ navigation.main = "androidx.navigation:navigation-fragment-ktx:$versions.navigat
 navigation.ui = "androidx.navigation:navigation-ui-ktx:$versions.navigation"
 navigation.safe_args = "androidx.navigation:navigation-safe-args-gradle-plugin:$versions.navigation"
 deps.navigation = navigation
-
-def rxJava = [:]
-rxJava.main = "io.reactivex.rxjava2:rxjava:$versions.rxJava"
-rxJava.android = "io.reactivex.rxjava2:rxandroid:$versions.rxAndroid"
-deps.rxJava = rxJava
 
 def exo_player = [:]
 exo_player.main = "com.google.android.exoplayer:exoplayer:$versions.exo_player"

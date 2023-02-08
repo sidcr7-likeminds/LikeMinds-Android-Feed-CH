@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.media.databinder
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
