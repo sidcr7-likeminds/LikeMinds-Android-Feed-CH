@@ -237,7 +237,7 @@ object PostTypeUtil {
 
         val trimmedText =
             if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-                data?.shortText
+                data.shortText
             } else {
                 textForLinkify
             }
@@ -274,7 +274,7 @@ object PostTypeUtil {
             }
         }
         val seeMoreSpannableStringBuilder = SpannableStringBuilder()
-        if (!alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
+        if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
             seeMoreSpannableStringBuilder.append("...")
             seeMoreSpannableStringBuilder.append(seeMore)
             seeMoreSpannableStringBuilder.setSpan(
@@ -304,7 +304,7 @@ object PostTypeUtil {
             }
         }
         val seeLessSpannableStringBuilder = SpannableStringBuilder()
-        if (alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
+        if (alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
             seeLessSpannableStringBuilder.append(seeLess)
             seeLessSpannableStringBuilder.setSpan(
                 seeLessClickableSpan,

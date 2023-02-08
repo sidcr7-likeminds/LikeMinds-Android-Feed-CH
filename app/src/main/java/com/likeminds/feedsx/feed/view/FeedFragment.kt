@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SimpleItemAnimator
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
@@ -15,6 +16,7 @@ import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class FeedFragment :
@@ -68,6 +70,8 @@ class FeedFragment :
                     }
                 }
             })
+            if (itemAnimator is SimpleItemAnimator)
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             show()
         }
 
@@ -241,7 +245,7 @@ class FeedFragment :
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
         //TODO: Perform action on post's menu item selection
-        Toast.makeText(context, "Post id :${postId}, Title :${title}", Toast.LENGTH_SHORT)
+        Toast.makeText(context, "Post id :${postId}, Title :${title}", Toast.LENGTH_SHORT).show()
     }
 
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {

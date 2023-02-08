@@ -30,8 +30,8 @@ class ItemPostTextOnlyViewDataBinder constructor(
     override fun bindData(binding: ItemPostTextOnlyBinding, data: PostViewData, position: Int) {
         //TODO: Testing data
         val list = listOf(
-            OverflowMenuItemViewData.Builder().title("Edit").dataId(data.id).build(),
-            OverflowMenuItemViewData.Builder().dataId(data.id).title("Delete").build()
+            OverflowMenuItemViewData.Builder().title("Edit").entityId(data.id).build(),
+            OverflowMenuItemViewData.Builder().entityId(data.id).title("Delete").build()
         )
 
         // sets items to overflow menu
@@ -65,7 +65,7 @@ class ItemPostTextOnlyViewDataBinder constructor(
 
     // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        listener.onPostMenuItemClicked(menu.dataId, menu.title)
+        listener.onPostMenuItemClicked(menu.entityId, menu.title)
     }
 
 }

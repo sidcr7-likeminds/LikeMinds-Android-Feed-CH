@@ -27,7 +27,11 @@ class ItemPostDocumentsViewDataBinder constructor(
         return ItemPostDocumentsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
-    override fun bindData(binding: ItemPostDocumentsBinding, data: PostViewData, position: Int) {
+    override fun bindData(
+        binding: ItemPostDocumentsBinding,
+        data: PostViewData,
+        position: Int
+    ) {
 
         // sets items to overflow menu
         PostTypeUtil.setOverflowMenuItems(
@@ -68,7 +72,7 @@ class ItemPostDocumentsViewDataBinder constructor(
 
     // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        listener.onPostMenuItemClicked(menu.dataId, menu.title)
+        listener.onPostMenuItemClicked(menu.entityId, menu.title)
     }
 
 }
