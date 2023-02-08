@@ -66,7 +66,6 @@ class PostViewData private constructor(
         private var communityId: Int = 0
         private var isPinned: Boolean = false
         private var isSaved: Boolean = false
-        private var isEdited: Boolean = false
         private var isLiked: Boolean = false
         private var userId: String = ""
         private var likesCount: Int = 0
@@ -82,7 +81,7 @@ class PostViewData private constructor(
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply {
             this.text = text
-            this.shortText = SeeMoreUtil.getShortContent(text, 100)
+            this.shortText = SeeMoreUtil.getShortContent(text, 10)
         }
 
         fun shortText(shortText: String?) = apply { this.shortText = shortText }
@@ -122,7 +121,7 @@ class PostViewData private constructor(
             communityId,
             isPinned,
             isSaved,
-            isEdited,
+            isLiked,
             userId,
             likesCount,
             commentsCount,
