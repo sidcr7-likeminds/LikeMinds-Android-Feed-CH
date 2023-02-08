@@ -47,7 +47,6 @@ class PostAdapter constructor(
         //TODO: add compulsory methods
 
         fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
-        fun pinPost() {}
         fun savePost() {}
         fun likePost() {}
         fun sharePost() {}

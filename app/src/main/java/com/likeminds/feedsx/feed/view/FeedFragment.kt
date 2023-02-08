@@ -231,14 +231,12 @@ class FeedFragment :
         }
     }
 
-    override fun pinPost() {
-        TODO("Not yet implemented")
-    }
-
+    // TODO: add fromPostSaved key while adding post data to adapter
     override fun savePost() {
         TODO("Not yet implemented")
     }
 
+    // TODO: add fromPostLiked key while adding post data to adapter
     override fun likePost() {
         TODO("Not yet implemented")
     }

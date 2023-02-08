@@ -38,6 +38,15 @@ class ItemPostMultipleMediaViewDataBinder constructor(
         position: Int
     ) {
 
+        // handles various actions for the post
+        PostTypeUtil.initActionsLayout(
+            binding.postActionsLayout,
+            data,
+            listener
+        )
+
+        if (data.fromPostLiked || data.fromPostSaved) return
+
         // sets items to overflow menu
         PostTypeUtil.setOverflowMenuItems(
             overflowMenu,
@@ -62,12 +71,6 @@ class ItemPostMultipleMediaViewDataBinder constructor(
             listener
         )
 
-        // handles various actions for the post
-        PostTypeUtil.initActionsLayout(
-            binding.postActionsLayout,
-            data,
-            listener
-        )
     }
 
     // handles the menu item click on the post

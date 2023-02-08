@@ -34,7 +34,20 @@ class ItemPostSingleVideoViewDataBinder constructor(
         )
     }
 
-    override fun bindData(binding: ItemPostSingleVideoBinding, data: PostViewData, position: Int) {
+    override fun bindData(
+        binding: ItemPostSingleVideoBinding,
+        data: PostViewData,
+        position: Int
+    ) {
+
+        // handles various actions for the post
+        PostTypeUtil.initActionsLayout(
+            binding.postActionsLayout,
+            data,
+            listener
+        )
+
+        if (data.fromPostLiked || data.fromPostSaved) return
 
         // sets items to overflow menu
         PostTypeUtil.setOverflowMenuItems(
@@ -54,13 +67,6 @@ class ItemPostSingleVideoViewDataBinder constructor(
             binding.tvPostContent,
             data,
             itemPosition = position,
-            listener
-        )
-
-        // handles various actions for the post
-        PostTypeUtil.initActionsLayout(
-            binding.postActionsLayout,
-            data,
             listener
         )
 
