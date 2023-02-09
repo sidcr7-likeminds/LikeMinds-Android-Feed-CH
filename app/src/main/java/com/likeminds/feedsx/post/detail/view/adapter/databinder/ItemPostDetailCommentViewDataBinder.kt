@@ -110,7 +110,11 @@ class ItemPostDetailCommentViewDataBinder constructor(
             }
 
             tvReply.setOnClickListener {
-                postDetailAdapterListener.replyOnComment(data.id)
+                postDetailAdapterListener.replyOnComment(
+                    data.id,
+                    position,
+                    data.user
+                )
             }
 
             ivLike.setOnClickListener {

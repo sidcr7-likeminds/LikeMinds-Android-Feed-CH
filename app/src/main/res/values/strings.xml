@@ -59,4 +59,5 @@
     <string name="view_more_replies">View more replies</string>
     <string name="placeholder_replies">%d of %d</string>
     <string name="reply">Reply</string>
+    <string name="replying_to_s">Replying to %s</string>
 </resources>

@@ -17,6 +17,7 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
@@ -98,13 +99,21 @@ class PostDetailFragment :
     }
 
     private fun initListeners() {
-        binding.ivCommentSend.setOnClickListener {
-            if (parentCommentIdToReply != null) {
-                // input text is reply to a comment
-                // TODO: create a reply to comment
-            } else {
-                // input text is a comment
-                // TODO: create a new comment
+        binding.apply {
+            ivCommentSend.setOnClickListener {
+                if (parentCommentIdToReply != null) {
+                    // input text is reply to a comment
+                    // TODO: create a reply to comment
+                } else {
+                    // input text is a comment
+                    // TODO: create a new comment
+                }
+            }
+
+            ivRemoveReplyingTo.setOnClickListener {
+                parentCommentIdToReply = null
+                tvReplyingTo.hide()
+                ivRemoveReplyingTo.hide()
             }
         }
     }
@@ -355,10 +364,29 @@ class PostDetailFragment :
         }
     }
 
-    // callback when
-    override fun replyOnComment(commentId: String) {
+    // callback when replying on a comment
+    override fun replyOnComment(
+        commentId: String,
+        commentPosition: Int,
+        parentCommenter: UserViewData
+    ) {
         // TODO: fetch replies of the clicked comment
         parentCommentIdToReply = commentId
+        binding.apply {
+            tvReplyingTo.show()
+            ivRemoveReplyingTo.show()
+
+            tvReplyingTo.text = String.format(
+                getString(R.string.replying_to_s),
+                parentCommenter.name
+            )
+
+            etComment.focusAndShowKeyboard()
+
+            rvPostDetails.smoothScrollToPosition(
+                commentPosition
+            )
+        }
     }
 
     // callback for comment's menu is item
