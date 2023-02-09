@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.likeminds.feedsx.branding.model.BrandingData;
 import com.likeminds.feedsx.feed.util.FeedDiffUtilCallback;
+import com.likeminds.feedsx.notificationfeed.util.NotificationFeedDiffUtilCallback;
 import com.likeminds.feedsx.post.detail.util.PostDetailDiffUtilCallback;
 import com.likeminds.feedsx.utils.model.BaseViewType;
 import com.likeminds.feedsx.utils.model.ViewType;
@@ -141,6 +142,15 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
     public void setItemsViaDiffUtilForPostDetail(List<T> items) {
         PostDetailDiffUtilCallback postDetailDiffUtilCallback = new PostDetailDiffUtilCallback(dataList, items);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(postDetailDiffUtilCallback);
+        dataList.clear();
+        dataList.addAll(items);
+        diffResult.dispatchUpdatesTo(this);
+    }
+
+    // TODO: call this while observing notifications
+    public void setItemsViaDiffUtilForNotification(List<T> items) {
+        NotificationFeedDiffUtilCallback notificationFeedDiffUtilCallback = new NotificationFeedDiffUtilCallback(dataList, items);
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(notificationFeedDiffUtilCallback);
         dataList.clear();
         dataList.addAll(items);
         diffResult.dispatchUpdatesTo(this);

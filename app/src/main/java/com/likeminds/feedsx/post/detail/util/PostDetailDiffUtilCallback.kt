@@ -1,11 +1,12 @@
 package com.likeminds.feedsx.post.detail.util
 
 import androidx.recyclerview.widget.DiffUtil
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.util.PostDiffUtilHelper.overflowMenuItemViewDataList
+import com.likeminds.feedsx.posttypes.util.PostDiffUtilHelper.postViewData
+import com.likeminds.feedsx.posttypes.util.PostDiffUtilHelper.userViewData
 import com.likeminds.feedsx.utils.model.BaseViewType
 
 class PostDetailDiffUtilCallback(
@@ -51,7 +52,10 @@ class PostDetailDiffUtilCallback(
                 )
             }
             oldItem is PostViewData && newItem is PostViewData -> {
-                // TODO: Confirm
+                postViewData(
+                    oldItem,
+                    newItem
+                )
                 return true
             }
             oldItem is CommentViewData && newItem is CommentViewData -> {
@@ -102,39 +106,5 @@ class PostDetailDiffUtilCallback(
         newItem: CommentsCountViewData
     ): Boolean {
         return oldItem.commentsCount == newItem.commentsCount
-    }
-
-    //TODO: move to util?
-    private fun userViewData(
-        oldItem: UserViewData,
-        newItem: UserViewData
-    ): Boolean {
-        return oldItem.id == newItem.id
-                && oldItem.name == newItem.name
-                && oldItem.imageUrl == newItem.imageUrl
-                && oldItem.userUniqueId == newItem.userUniqueId
-                && oldItem.customTitle == newItem.customTitle
-                && oldItem.isGuest == newItem.isGuest
-                && oldItem.isDeleted == newItem.isDeleted
-    }
-
-    private fun overflowMenuItemViewDataList(
-        oldItem: List<OverflowMenuItemViewData>,
-        newItem: List<OverflowMenuItemViewData>
-    ): Boolean {
-        if (oldItem.isEmpty() && newItem.isEmpty()) return true
-        if (oldItem.size != newItem.size) return false
-        for (i in oldItem.indices) {
-            if (!overflowMenuItemViewData(oldItem[i], newItem[i])) return false
-        }
-        return true
-    }
-
-    private fun overflowMenuItemViewData(
-        oldItem: OverflowMenuItemViewData,
-        newItem: OverflowMenuItemViewData
-    ): Boolean {
-        return oldItem.title == newItem.title
-                && oldItem.entityId == newItem.entityId
     }
 }
