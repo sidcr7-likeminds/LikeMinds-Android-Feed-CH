@@ -226,8 +226,9 @@ object PostTypeUtil {
         tvPostContent: TextView,
         data: PostViewData,
         itemPosition: Int,
-        adapterListener: PostAdapterListener? = null,
+        adapterListener: PostAdapterListener
     ) {
+        val context = tvPostContent.context
         val textForLinkify = data.text.getValidTextForLinkify()
 
         var alreadySeenFullContent = data.alreadySeenFullContent == true
@@ -241,7 +242,7 @@ object PostTypeUtil {
 
         val trimmedText =
             if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-                data?.shortText
+                data.shortText
             } else {
                 textForLinkify
             }
@@ -260,7 +261,7 @@ object PostTypeUtil {
         }
 
         val seeMoreColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
-        val seeMore = SpannableStringBuilder(" See More")
+        val seeMore = SpannableStringBuilder(context.getString(R.string.see_more))
         seeMore.setSpan(
             ForegroundColorSpan(seeMoreColor),
             0,
@@ -270,7 +271,7 @@ object PostTypeUtil {
         val seeMoreClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 alreadySeenFullContent = true
-                adapterListener?.updateSeenFullContent(itemPosition, true)
+                adapterListener.updateSeenFullContent(itemPosition, true)
             }
 
             override fun updateDrawState(ds: TextPaint) {
@@ -278,7 +279,7 @@ object PostTypeUtil {
             }
         }
         val seeMoreSpannableStringBuilder = SpannableStringBuilder()
-        if (!alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
+        if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
             seeMoreSpannableStringBuilder.append("...")
             seeMoreSpannableStringBuilder.append(seeMore)
             seeMoreSpannableStringBuilder.setSpan(
@@ -290,7 +291,7 @@ object PostTypeUtil {
         }
 
         val seeLessColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
-        val seeLess = SpannableStringBuilder(" See Less")
+        val seeLess = SpannableStringBuilder(context.getString(R.string.see_less))
         seeLess.setSpan(
             ForegroundColorSpan(seeLessColor),
             0,
@@ -300,7 +301,7 @@ object PostTypeUtil {
         val seeLessClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 alreadySeenFullContent = false
-                adapterListener?.updateSeenFullContent(itemPosition, false)
+                adapterListener.updateSeenFullContent(itemPosition, false)
             }
 
             override fun updateDrawState(ds: TextPaint) {
@@ -308,7 +309,7 @@ object PostTypeUtil {
             }
         }
         val seeLessSpannableStringBuilder = SpannableStringBuilder()
-        if (alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
+        if (alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
             seeLessSpannableStringBuilder.append(seeLess)
             seeLessSpannableStringBuilder.setSpan(
                 seeLessClickableSpan,
@@ -318,16 +319,52 @@ object PostTypeUtil {
             )
         }
 
+        val postTextClickableSpan = object : ClickableSpan() {
+            override fun onClick(p0: View) {
+                adapterListener.postDetail(data)
+            }
+
+            override fun updateDrawState(ds: TextPaint) {
+                ds.isUnderlineText = false
+            }
+        }
+
+        val postTextSpannableStringBuilder = SpannableStringBuilder()
+        postTextSpannableStringBuilder.append(trimmedText)
+        postTextSpannableStringBuilder.setSpan(
+            postTextClickableSpan,
+            0,
+            trimmedText?.length ?: 0,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
         tvPostContent.movementMethod = CustomLinkMovementMethod {
             //TODO: Handle links etc.
             true
         }
 
         tvPostContent.text = TextUtils.concat(
-            tvPostContent.text,
+            postTextSpannableStringBuilder,
             seeMoreSpannableStringBuilder,
             seeLessSpannableStringBuilder
         )
+    }
+
+    fun initPostSingleImage(
+        ivPost: ImageView,
+        data: PostViewData,
+        adapterListener: PostAdapterListener
+    ) {
+
+        ImageBindingUtil.loadImage(
+            ivPost,
+            data.attachments.first().attachmentMeta.url,
+            placeholder = R.drawable.image_placeholder
+        )
+
+        ivPost.setOnClickListener {
+            adapterListener.postDetail(data)
+        }
     }
 
     // handles link view in the post

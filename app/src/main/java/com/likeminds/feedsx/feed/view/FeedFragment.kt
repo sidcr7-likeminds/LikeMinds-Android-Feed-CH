@@ -283,8 +283,7 @@ class FeedFragment :
     }
 
     //opens post detail screen when post content is clicked
-    //TODO: confirm and trigger
-    override fun postDetails(postData: PostViewData) {
+    override fun postDetail(postData: PostViewData) {
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
