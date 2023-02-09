@@ -1,10 +1,10 @@
-package com.likeminds.feedsx.deletecontent.view.adapter.databinder
+package com.likeminds.feedsx.deleteentity.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemReasonChooseBinding
-import com.likeminds.feedsx.deletecontent.model.ReasonChooseViewData
-import com.likeminds.feedsx.deletecontent.view.adapter.ReasonChooseAdapter.ReasonChooseAdapterListener
+import com.likeminds.feedsx.deleteentity.model.ReasonChooseViewData
+import com.likeminds.feedsx.deleteentity.view.adapter.ReasonChooseAdapter.ReasonChooseAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_REASON_CHOOSE
 

@@ -7,7 +7,7 @@
 
         <variable
             name="reasonData"
-            type="com.likeminds.feedsx.deletecontent.model.ReasonChooseViewData" />
+            type="com.likeminds.feedsx.deleteentity.model.ReasonChooseViewData" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

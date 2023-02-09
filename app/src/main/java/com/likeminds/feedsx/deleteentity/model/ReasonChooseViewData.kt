@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.deletecontent.model
+package com.likeminds.feedsx.deleteentity.model
 
 import android.os.Parcelable
 import com.likeminds.feedsx.utils.model.BaseViewType

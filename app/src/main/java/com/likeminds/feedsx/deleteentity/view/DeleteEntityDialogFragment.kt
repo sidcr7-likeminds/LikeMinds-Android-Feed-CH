@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.deletecontent.view
+package com.likeminds.feedsx.deleteentity.view
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,14 +11,14 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
-import com.likeminds.feedsx.databinding.DialogFragmentDeleteContentBinding
-import com.likeminds.feedsx.deletecontent.model.DELETE_CONTENT_TYPE_POST
-import com.likeminds.feedsx.deletecontent.model.DeleteContentExtras
-import com.likeminds.feedsx.deletecontent.model.ReasonChooseViewData
+import com.likeminds.feedsx.databinding.DialogFragmentDeleteEntityBinding
+import com.likeminds.feedsx.deleteentity.model.DELETE_ENTITY_TYPE_POST
+import com.likeminds.feedsx.deleteentity.model.DeleteEntityExtras
+import com.likeminds.feedsx.deleteentity.model.ReasonChooseViewData
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 
-class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteContentBinding>(),
+class DeleteEntityDialogFragment : BaseDialogFragment<DialogFragmentDeleteEntityBinding>(),
     ReasonChooseDialog.ReasonChooseDialogListener {
 
     companion object {
@@ -28,11 +28,11 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
         @JvmStatic
         fun showDialog(
             supportFragmentManager: FragmentManager,
-            deleteContentExtras: DeleteContentExtras
+            deleteEntityExtras: DeleteEntityExtras
         ) {
-            DeleteContentDialogFragment().apply {
+            DeleteEntityDialogFragment().apply {
                 arguments = Bundle().apply {
-                    putParcelable(ARG_DELETE_CONTENT_EXTRAS, deleteContentExtras)
+                    putParcelable(ARG_DELETE_CONTENT_EXTRAS, deleteEntityExtras)
                 }
             }.show(supportFragmentManager, TAG)
         }
@@ -40,16 +40,16 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
 
     private var deleteChatRoomDialogListener: DeleteContentDialogListener? = null
 
-    private var deleteContentExtras: DeleteContentExtras? = null
+    private var deleteEntityExtras: DeleteEntityExtras? = null
 
-    override fun getViewBinding(): DialogFragmentDeleteContentBinding {
-        return DialogFragmentDeleteContentBinding.inflate(layoutInflater)
+    override fun getViewBinding(): DialogFragmentDeleteEntityBinding {
+        return DialogFragmentDeleteEntityBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {
         super.receiveExtras()
         arguments?.let {
-            deleteContentExtras = it.getParcelable(ARG_DELETE_CONTENT_EXTRAS)
+            deleteEntityExtras = it.getParcelable(ARG_DELETE_CONTENT_EXTRAS)
         }
     }
 
@@ -69,7 +69,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
             WindowManager.LayoutParams.WRAP_CONTENT
         )
 
-        if (deleteContentExtras?.contentType == DELETE_CONTENT_TYPE_POST) {
+        if (deleteEntityExtras?.entityType == DELETE_ENTITY_TYPE_POST) {
             binding.tvTitle.text = getString(R.string.delete_post_question)
             binding.tvDescription.text = getString(R.string.delete_post_message)
         } else {
@@ -85,7 +85,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
         }
 
         binding.tvConfirm.setOnClickListener {
-            if (deleteContentExtras == null) {
+            if (deleteEntityExtras == null) {
                 return@setOnClickListener
             }
             val data = binding.reasonData ?: return@setOnClickListener
@@ -97,7 +97,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
             }
 
             deleteChatRoomDialogListener?.deleteContent(
-                deleteContentExtras!!,
+                deleteEntityExtras!!,
                 data.tagId,
                 reason
             )
@@ -145,7 +145,7 @@ class DeleteContentDialogFragment : BaseDialogFragment<DialogFragmentDeleteConte
 
     interface DeleteContentDialogListener {
         fun deleteContent(
-            deleteContentExtras: DeleteContentExtras,
+            deleteEntityExtras: DeleteEntityExtras,
             reportTagId: String,
             reason: String
         )

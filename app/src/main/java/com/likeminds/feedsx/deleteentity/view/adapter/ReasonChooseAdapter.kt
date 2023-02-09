@@ -1,7 +1,7 @@
-package com.likeminds.feedsx.deletecontent.view.adapter
+package com.likeminds.feedsx.deleteentity.view.adapter
 
-import com.likeminds.feedsx.deletecontent.model.ReasonChooseViewData
-import com.likeminds.feedsx.deletecontent.view.adapter.databinder.ReasonChooseViewDataBinder
+import com.likeminds.feedsx.deleteentity.model.ReasonChooseViewData
+import com.likeminds.feedsx.deleteentity.view.adapter.databinder.ReasonChooseViewDataBinder
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
