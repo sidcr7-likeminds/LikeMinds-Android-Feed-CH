@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.detail.view
 
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.feed.view.LikesActivity
@@ -14,6 +15,7 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetai
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -47,13 +49,31 @@ class PostDetailFragment :
 
     // initializes the post detail screen recycler view
     private fun initRecyclerView() {
+        val linearLayoutManager = LinearLayoutManager(context)
         mPostDetailAdapter = PostDetailAdapter(this, this, this)
         binding.rvPostDetails.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = linearLayoutManager
             adapter = mPostDetailAdapter
             show()
         }
+
+        attachPagination(
+            binding.rvPostDetails,
+            linearLayoutManager
+        )
         addTestingData()
+    }
+
+    // attach scroll listener for pagination for comments
+    private fun attachPagination(
+        recyclerView: RecyclerView,
+        layoutManager: LinearLayoutManager
+    ) {
+        recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
+            override fun onLoadMore(currentPage: Int) {
+                // TODO: add logic
+            }
+        })
     }
 
     // initializes comment edittext with TextWatcher and focuses the keyboard
