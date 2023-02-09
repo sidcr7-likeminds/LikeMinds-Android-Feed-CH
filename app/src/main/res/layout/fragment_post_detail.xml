@@ -31,7 +31,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/et_comment"/>
 
-        <com.likeminds.feedsx.branding.customview.edittext.LikeMindsEditText
+        <com.likeminds.feedsx.branding.customview.LikeMindsEditText
             android:id="@+id/et_comment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -213,6 +213,7 @@ class PostDetailFragment :
     }
 
     override fun receiveExtras() {
+        // TODO: handle when opened from route
         super.receiveExtras()
         if (arguments == null || arguments?.containsKey(POST_DETAIL_EXTRAS) == false) {
             requireActivity().supportFragmentManager.popBackStack()

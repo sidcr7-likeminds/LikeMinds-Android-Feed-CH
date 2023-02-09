@@ -6,11 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import com.likeminds.feedsx.branding.model.BrandingData
-import javax.inject.Inject
 
 abstract class BaseFragment<B : ViewBinding> : Fragment() {
 

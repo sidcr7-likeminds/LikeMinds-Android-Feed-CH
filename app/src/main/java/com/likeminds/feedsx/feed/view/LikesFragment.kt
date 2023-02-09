@@ -35,7 +35,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     }
 
     private fun initRecyclerView() {
-        val linearLayoutManager = LinearLayoutManager(context);
+        val linearLayoutManager = LinearLayoutManager(context)
         mLikesScreenAdapter = LikesScreenAdapter()
         binding.rvLikes.apply {
             layoutManager = linearLayoutManager
