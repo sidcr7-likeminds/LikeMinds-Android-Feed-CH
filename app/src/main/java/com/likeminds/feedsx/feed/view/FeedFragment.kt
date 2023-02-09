@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
-import com.likeminds.feedsx.deletecontent.model.DELETE_CONTENT_TYPE_POST
-import com.likeminds.feedsx.deletecontent.model.DeleteContentExtras
-import com.likeminds.feedsx.deletecontent.view.DeleteContentDialogFragment
+import com.likeminds.feedsx.deleteentity.model.DELETE_ENTITY_TYPE_POST
+import com.likeminds.feedsx.deleteentity.model.DeleteEntityExtras
+import com.likeminds.feedsx.deleteentity.view.DeleteEntityDialogFragment
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
@@ -34,7 +34,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class FeedFragment :
     BaseFragment<FragmentFeedBinding>(),
     PostAdapterListener,
-    DeleteContentDialogFragment.DeleteContentDialogListener {
+    DeleteEntityDialogFragment.DeleteContentDialogListener {
 
     private val viewModel: FeedViewModel by viewModels()
     private lateinit var mPostAdapter: PostAdapter
@@ -259,13 +259,13 @@ class FeedFragment :
         //TODO: set isAdmin
         val isAdmin = true
         if (isAdmin) {
-            val deleteContentExtras = DeleteContentExtras.Builder()
-                .contentId(postId)
-                .contentType(DELETE_CONTENT_TYPE_POST)
+            val deleteEntityExtras = DeleteEntityExtras.Builder()
+                .entityId(postId)
+                .entityType(DELETE_ENTITY_TYPE_POST)
                 .build()
-            DeleteContentDialogFragment.showDialog(
+            DeleteEntityDialogFragment.showDialog(
                 childFragmentManager,
-                deleteContentExtras
+                deleteEntityExtras
             )
         } else {
             showDeletePostDialog()
@@ -399,7 +399,7 @@ class FeedFragment :
     }
 
     override fun deleteContent(
-        deleteContentExtras: DeleteContentExtras,
+        deleteEntityExtras: DeleteEntityExtras,
         reportTagId: String,
         reason: String
     ) {
