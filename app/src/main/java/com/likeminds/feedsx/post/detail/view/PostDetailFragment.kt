@@ -349,6 +349,9 @@ class PostDetailFragment :
                 )
             )
             mPostDetailAdapter.update(commentPosition, comment)
+            binding.rvPostDetails.smoothScrollToPosition(
+                mPostDetailAdapter.itemCount
+            )
         }
     }
 

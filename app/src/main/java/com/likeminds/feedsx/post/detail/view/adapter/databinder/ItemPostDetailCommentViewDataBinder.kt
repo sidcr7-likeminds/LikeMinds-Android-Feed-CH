@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -110,20 +109,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 adapter = mRepliesAdapter
             }
 
-            Log.d("TAG", "onBind: " + data.replies.isNotEmpty())
-
-            if (data.replies.isNotEmpty()) {
-                rvReplies.show()
-                mRepliesAdapter.replace(data.replies.toList())
-                commentSeparator.hide()
-                replyCommentSeparator.show()
-                handleViewMore(data, position)
-            } else {
-                rvReplies.hide()
-                commentSeparator.show()
-                replyCommentSeparator.hide()
-            }
-
             tvReply.setOnClickListener {
                 postDetailAdapterListener.replyOnComment(data.id)
             }
@@ -141,6 +126,20 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     ivCommentMenu,
                     overflowMenu
                 )
+            }
+
+            if (data.replies.isNotEmpty()) {
+                rvReplies.show()
+                mRepliesAdapter.replace(data.replies.toList())
+                commentSeparator.hide()
+                replyCommentSeparator.show()
+                tvReplyCount.isClickable = false
+                handleViewMore(data, position)
+            } else {
+                rvReplies.hide()
+                commentSeparator.show()
+                replyCommentSeparator.hide()
+                tvReplyCount.isClickable = true
             }
         }
     }
