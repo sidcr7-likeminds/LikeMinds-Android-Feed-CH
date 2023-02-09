@@ -40,13 +40,14 @@
             android:hint="@string/write_a_comment"
             android:inputType="textMultiLine"
             android:minHeight="48dp"
-            android:paddingHorizontal="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="64dp"
             android:textColor="@color/dark_grey"
             android:textColorHint="@color/maastricht_blue_40"
             android:elevation="4dp"
             app:font_style="regular"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/iv_comment_send"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView

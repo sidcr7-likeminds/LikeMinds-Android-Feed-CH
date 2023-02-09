@@ -77,7 +77,7 @@ class PostViewData private constructor(
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply {
             this.text = text
-            this.shortText = SeeMoreUtil.getShortContent(text, 10)
+//            this.shortText = SeeMoreUtil.getShortContent(text, 10)
         }
 
         fun shortText(shortText: String?) = apply { this.shortText = shortText }

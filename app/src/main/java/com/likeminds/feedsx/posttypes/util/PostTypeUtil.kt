@@ -20,6 +20,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.SeeMoreUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
@@ -240,26 +241,6 @@ object PostTypeUtil {
             tvPostContent.show()
         }
 
-        val trimmedText =
-            if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-                data.shortText
-            } else {
-                textForLinkify
-            }
-
-        // TODO: Confirm
-        MemberTaggingDecoder.decode(
-            tvPostContent,
-            trimmedText,
-            enableClick = true,
-            BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
-                tvPostContent.context,
-                R.color.pure_blue
-            )
-        ) { tag ->
-            onMemberTagClicked()
-        }
-
         val seeMoreColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
         val seeMore = SpannableStringBuilder(context.getString(R.string.see_more))
         seeMore.setSpan(
@@ -277,17 +258,6 @@ object PostTypeUtil {
             override fun updateDrawState(ds: TextPaint) {
                 ds.isUnderlineText = false
             }
-        }
-        val seeMoreSpannableStringBuilder = SpannableStringBuilder()
-        if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-            seeMoreSpannableStringBuilder.append("...")
-            seeMoreSpannableStringBuilder.append(seeMore)
-            seeMoreSpannableStringBuilder.setSpan(
-                seeMoreClickableSpan,
-                3,
-                seeMore.length + 3,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
         }
 
         val seeLessColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
@@ -308,16 +278,6 @@ object PostTypeUtil {
                 ds.isUnderlineText = false
             }
         }
-        val seeLessSpannableStringBuilder = SpannableStringBuilder()
-        if (alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-            seeLessSpannableStringBuilder.append(seeLess)
-            seeLessSpannableStringBuilder.setSpan(
-                seeLessClickableSpan,
-                0,
-                seeLess.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
 
         val postTextClickableSpan = object : ClickableSpan() {
             override fun onClick(p0: View) {
@@ -329,25 +289,77 @@ object PostTypeUtil {
             }
         }
 
-        val postTextSpannableStringBuilder = SpannableStringBuilder()
-        postTextSpannableStringBuilder.append(trimmedText)
-        postTextSpannableStringBuilder.setSpan(
-            postTextClickableSpan,
-            0,
-            trimmedText?.length ?: 0,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
+        tvPostContent.post {
+            val shortText: String? = SeeMoreUtil.getShortContent(
+                data.text,
+                tvPostContent,
+                3,
+                500
+            )
 
-        tvPostContent.movementMethod = CustomLinkMovementMethod {
-            //TODO: Handle links etc.
-            true
+            val trimmedText =
+                if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                    shortText
+                } else {
+                    textForLinkify
+                }
+
+            // TODO: Confirm
+            MemberTaggingDecoder.decode(
+                tvPostContent,
+                trimmedText,
+                enableClick = true,
+                BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
+                    tvPostContent.context,
+                    R.color.pure_blue
+                )
+            ) { tag ->
+                onMemberTagClicked()
+            }
+
+            val seeMoreSpannableStringBuilder = SpannableStringBuilder()
+            if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                seeMoreSpannableStringBuilder.append("...")
+                seeMoreSpannableStringBuilder.append(seeMore)
+                seeMoreSpannableStringBuilder.setSpan(
+                    seeMoreClickableSpan,
+                    3,
+                    seeMore.length + 3,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+
+            val seeLessSpannableStringBuilder = SpannableStringBuilder()
+            if (alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                seeLessSpannableStringBuilder.append(seeLess)
+                seeLessSpannableStringBuilder.setSpan(
+                    seeLessClickableSpan,
+                    0,
+                    seeLess.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+
+            val postTextSpannableStringBuilder = SpannableStringBuilder()
+            postTextSpannableStringBuilder.append(trimmedText)
+            postTextSpannableStringBuilder.setSpan(
+                postTextClickableSpan,
+                0,
+                trimmedText.length ?: 0,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+
+            tvPostContent.movementMethod = CustomLinkMovementMethod {
+                //TODO: Handle links etc.
+                true
+            }
+
+            tvPostContent.text = TextUtils.concat(
+                postTextSpannableStringBuilder,
+                seeMoreSpannableStringBuilder,
+                seeLessSpannableStringBuilder
+            )
         }
-
-        tvPostContent.text = TextUtils.concat(
-            postTextSpannableStringBuilder,
-            seeMoreSpannableStringBuilder,
-            seeLessSpannableStringBuilder
-        )
     }
 
     fun initPostSingleImage(
