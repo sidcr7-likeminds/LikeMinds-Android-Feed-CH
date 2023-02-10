@@ -2,6 +2,8 @@ package com.likeminds.feedsx.notificationfeed.view
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter
@@ -19,6 +21,7 @@ class NotificationFeedFragment :
     NotificationFeedAdapterListener {
 
     private lateinit var mNotificationFeedAdapter: NotificationFeedAdapter
+    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     override fun getViewBinding(): FragmentNotificationFeedBinding {
         return FragmentNotificationFeedBinding.inflate(layoutInflater)
@@ -28,6 +31,7 @@ class NotificationFeedFragment :
         super.setUpViews()
 
         initRecyclerView()
+        initSwipeRefreshLayout()
     }
 
     // initializes notification recycler view
@@ -177,6 +181,52 @@ class NotificationFeedFragment :
                 // TODO: add logic
             }
         })
+    }
+
+    // initializes swipe refresh layout and sets refresh listener
+    private fun initSwipeRefreshLayout() {
+        mSwipeRefreshLayout = binding.swipeRefreshLayout
+        mSwipeRefreshLayout.setColorSchemeColors(
+            BrandingData.getButtonsColor(),
+        )
+
+        mSwipeRefreshLayout.setOnRefreshListener {
+            mSwipeRefreshLayout.isRefreshing = true
+            fetchRefreshedData()
+        }
+    }
+
+    //TODO: Call api and refresh the notification data
+    private fun fetchRefreshedData() {
+        val user = UserViewData.Builder()
+            .name("Sid")
+            .customTitle("Admin")
+            .build()
+
+        var text = "Nishkarsh Kaushik commented on your post with photo."
+        mNotificationFeedAdapter.add(
+            0,
+            NotificationFeedViewData.Builder()
+                .id("1")
+                .user(user)
+                .menuItems(
+                    listOf(
+                        OverflowMenuItemViewData.Builder()
+                            .dataId("1")
+                            .title("Delete")
+                            .build(),
+                        OverflowMenuItemViewData.Builder()
+                            .dataId("2")
+                            .title("Mute")
+                            .build()
+                    )
+                )
+                .cta("route://post_detail?post_id=1&comment_id=2")
+                .createdAt(1675721450000)
+                .activityMessage(text)
+                .build()
+        )
+        mSwipeRefreshLayout.isRefreshing = false
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
