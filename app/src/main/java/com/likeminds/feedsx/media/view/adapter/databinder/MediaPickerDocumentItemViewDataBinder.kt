@@ -1,22 +1,20 @@
-package com.likeminds.feedsx.media.databinder
+package com.likeminds.feedsx.media.view.adapter.databinder
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemMediaPickerDocumentBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.util.MediaPickerDataBinderUtils.Companion.getFilteredText
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.utils.DateUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
-import javax.inject.Inject
 
-class MediaPickerDocumentItemViewDataBinder @Inject constructor(
+class MediaPickerDocumentItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
 ) : ViewDataBinder<ItemMediaPickerDocumentBinding, MediaViewData>() {
 
