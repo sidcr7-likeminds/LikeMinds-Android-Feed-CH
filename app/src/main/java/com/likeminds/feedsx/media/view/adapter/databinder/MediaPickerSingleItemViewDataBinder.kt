@@ -17,7 +17,7 @@ import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_SINGLE
 
-class MediaPickerSingleItemViewDataBinderM constructor(
+class MediaPickerSingleItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
 ) : ViewDataBinder<ItemMediaPickerSingleBinding, MediaViewData>() {
 
