@@ -9,27 +9,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
-import javax.inject.Inject
 
-abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
+abstract class BaseBottomSheetFragment<B : ViewBinding> :
     BottomSheetDialogFragment() {
 
     private var _binding: B? = null
     protected val binding get() = _binding!!
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelProvider.Factory
-    protected lateinit var viewModel: VM
-
-    protected abstract fun getViewModelClass(): Class<VM>?
 
     protected abstract fun getViewBinding(): B
 
@@ -58,7 +49,6 @@ abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetStyle)
-        init()
         receiveExtras()
     }
 
@@ -111,17 +101,6 @@ abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
                 BrandingData.currentAdvanced!!.second,
                 BrandingData.currentAdvanced!!.third
             )
-        }
-    }
-
-    private fun init() {
-        if (getViewModelClass() == null) {
-            return
-        }
-        viewModel = if (useSharedViewModel) {
-            ViewModelProvider(requireActivity(), viewModelFactory).get(getViewModelClass()!!)
-        } else {
-            ViewModelProvider(this, viewModelFactory).get(getViewModelClass()!!)
         }
     }
 

@@ -1,5 +1,7 @@
 package com.likeminds.feedsx.utils
 
+import android.text.format.DateUtils
+
 object TimeUtil {
 
     private const val DAY_IN_MILLIS = 24 * 60 * 60 * 1000
@@ -26,4 +28,15 @@ object TimeUtil {
         }
     }
 
+    /**
+     * @param timestamp epoch time in milliseconds
+     * @return time in " time ago" format
+     * */
+    fun getRelativeTime(timestamp: Long): String {
+        return DateUtils.getRelativeTimeSpanString(
+            timestamp,
+            System.currentTimeMillis(),
+            DateUtils.MINUTE_IN_MILLIS
+        ).toString()
+    }
 }

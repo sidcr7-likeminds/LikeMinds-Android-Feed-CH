@@ -119,12 +119,16 @@ object PostTypeUtil {
         binding.tvMeta3.hide()
 
         val attachmentMeta = document.attachmentMeta
+        val context = binding.root.context
+
+        binding.tvDocumentName.text =
+            attachmentMeta.name ?: context.getString(R.string.documents)
 
         val noOfPage = attachmentMeta.pageCount ?: 0
         val mediaType = attachmentMeta.format
         if (noOfPage > 0) {
             binding.tvMeta1.show()
-            binding.tvMeta1.text = binding.root.context.getString(
+            binding.tvMeta1.text = context.getString(
                 R.string.placeholder_pages, noOfPage
             )
         }
@@ -241,7 +245,7 @@ object PostTypeUtil {
 
         val trimmedText =
             if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-                data?.shortText
+                data.shortText
             } else {
                 textForLinkify
             }
@@ -278,7 +282,7 @@ object PostTypeUtil {
             }
         }
         val seeMoreSpannableStringBuilder = SpannableStringBuilder()
-        if (!alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
+        if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
             seeMoreSpannableStringBuilder.append("...")
             seeMoreSpannableStringBuilder.append(seeMore)
             seeMoreSpannableStringBuilder.setSpan(
@@ -308,7 +312,7 @@ object PostTypeUtil {
             }
         }
         val seeLessSpannableStringBuilder = SpannableStringBuilder()
-        if (alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
+        if (alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
             seeLessSpannableStringBuilder.append(seeLess)
             seeLessSpannableStringBuilder.setSpan(
                 seeLessClickableSpan,

@@ -31,6 +31,8 @@ class PostDetailFragment :
     private lateinit var mPostDetailAdapter: PostDetailAdapter
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
+    private var parentCommentIdToReply: String? = null
+
     companion object {
         const val REPLIES_THRESHOLD = 3
     }
@@ -44,6 +46,7 @@ class PostDetailFragment :
         initRecyclerView()
         initCommentEditText()
         initSwipeRefreshLayout()
+        initListeners()
     }
 
     // initializes the post detail screen recycler view
@@ -118,6 +121,18 @@ class PostDetailFragment :
                     ivCommentSend.isClickable = true
                     ivCommentSend.setImageResource(R.drawable.ic_comment_send_enable)
                 }
+            }
+        }
+    }
+
+    private fun initListeners() {
+        binding.ivCommentSend.setOnClickListener {
+            if (parentCommentIdToReply != null) {
+                // input text is reply to a comment
+                // TODO: create a reply to comment
+            } else {
+                // input text is a comment
+                // TODO: create a new comment
             }
         }
     }
@@ -243,6 +258,7 @@ class PostDetailFragment :
     }
 
     override fun receiveExtras() {
+        // TODO: handle when opened from route
         super.receiveExtras()
         if (arguments == null || arguments?.containsKey(POST_DETAIL_EXTRAS) == false) {
             requireActivity().supportFragmentManager.popBackStack()
@@ -368,6 +384,7 @@ class PostDetailFragment :
     // callback when
     override fun replyOnComment(commentId: String) {
         // TODO: fetch replies of the clicked comment
+        parentCommentIdToReply = commentId
     }
 
     // callback for comment's menu is item

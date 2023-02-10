@@ -65,9 +65,39 @@
                     android:src="@drawable/ic_material_icons_white_search"
                     android:tint="@{isBrandingBasic ? @color/black : @color/white}"
                     app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/iv_notification"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
+
+                <ImageView
+                    android:id="@+id/iv_notification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_notification_bell"
+                    android:tint="@{isBrandingBasic ? @color/black : @color/white}"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/member_image"
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
+
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    android:id="@+id/tv_notification_count"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:translationX="2dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/notification_badge"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:fontType="medium"
+                    app:layout_constraintEnd_toEndOf="@id/iv_notification"
+                    app:layout_constraintTop_toTopOf="@id/iv_notification"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_notification"
+                    tools:text="99" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/member_image"
