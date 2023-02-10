@@ -17,8 +17,8 @@ class DocumentsPostAdapter constructor(
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(1)
 
-        val documentsBinding = ItemDocumentViewDataBinder(listener)
-        viewDataBinders.add(documentsBinding)
+        val documentsBinder = ItemDocumentViewDataBinder(listener)
+        viewDataBinders.add(documentsBinder)
 
         return viewDataBinders
     }

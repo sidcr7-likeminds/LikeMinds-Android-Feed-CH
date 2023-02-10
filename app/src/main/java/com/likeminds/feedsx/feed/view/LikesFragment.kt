@@ -88,6 +88,5 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
             return
         }
         extras = arguments?.getParcelable(LIKES_SCREEN_EXTRAS)!!
-        Log.d("TAG", " " + extras.likesCount)
     }
 }

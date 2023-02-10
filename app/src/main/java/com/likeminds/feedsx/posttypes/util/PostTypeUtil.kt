@@ -119,12 +119,16 @@ object PostTypeUtil {
         binding.tvMeta3.hide()
 
         val attachmentMeta = document.attachmentMeta
+        val context = binding.root.context
+
+        binding.tvDocumentName.text =
+            attachmentMeta.name ?: context.getString(R.string.documents)
 
         val noOfPage = attachmentMeta.pageCount ?: 0
         val mediaType = attachmentMeta.format
         if (noOfPage > 0) {
             binding.tvMeta1.show()
-            binding.tvMeta1.text = binding.root.context.getString(
+            binding.tvMeta1.text = context.getString(
                 R.string.placeholder_pages, noOfPage
             )
         }

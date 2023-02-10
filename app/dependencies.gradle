@@ -29,6 +29,9 @@ dependencies {
     implementation deps.glide.core
     kapt deps.glide.compiler
 
+    //Stream
+    implementation deps.stream.main
+
     //testing
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit

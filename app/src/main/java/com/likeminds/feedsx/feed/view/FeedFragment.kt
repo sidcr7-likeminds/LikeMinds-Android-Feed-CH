@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
@@ -39,6 +40,13 @@ class FeedFragment :
         binding.isBrandingBasic = true
 
         initRecyclerView()
+        initNewPostClick()
+    }
+
+    private fun initNewPostClick() {
+        binding.newPostButton.setOnClickListener {
+            CreatePostActivity.start(requireContext())
+        }
     }
 
     private fun initRecyclerView() {
