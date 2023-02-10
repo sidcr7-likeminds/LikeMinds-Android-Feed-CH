@@ -196,11 +196,11 @@ object PostTypeUtil {
         }
 
         binding.ivComment.setOnClickListener {
-            listener.comment(data)
+            listener.comment(data.id)
         }
 
         binding.commentsCount.setOnClickListener {
-            listener.comment(data)
+            listener.comment(data.id)
         }
     }
 
@@ -259,8 +259,8 @@ object PostTypeUtil {
                 adapterListener.updateSeenFullContent(itemPosition, true)
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                ds.isUnderlineText = false
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
             }
         }
 
@@ -278,21 +278,22 @@ object PostTypeUtil {
                 adapterListener.updateSeenFullContent(itemPosition, false)
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                ds.isUnderlineText = false
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
             }
         }
 
         val postTextClickableSpan = object : ClickableSpan() {
-            override fun onClick(p0: View) {
+            override fun onClick(view: View) {
                 adapterListener.postDetail(data)
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                ds.isUnderlineText = false
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
             }
         }
 
+        // post is used here to get lines count in the text view
         tvPostContent.post {
             val shortText: String? = SeeMoreUtil.getShortContent(
                 data.text,

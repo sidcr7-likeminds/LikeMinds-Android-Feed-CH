@@ -46,6 +46,9 @@ class PostDetailFragment :
         initRecyclerView()
         initCommentEditText()
         initListeners()
+
+        //TODO: testing data
+        updateCommentsCount(10)
     }
 
     // initializes the post detail screen recycler view
@@ -63,6 +66,17 @@ class PostDetailFragment :
             linearLayoutManager
         )
         addTestingData()
+    }
+
+    // TODO: call after fetching post
+    // updates the comments count on toolbar
+    private fun updateCommentsCount(commentsCount: Int) {
+        (requireActivity() as PostDetailActivity).binding.tvToolbarSubTitle.text =
+            this.resources.getQuantityString(
+                R.plurals.comments_small,
+                commentsCount,
+                commentsCount
+            )
     }
 
     // attach scroll listener for pagination for comments
@@ -259,7 +273,7 @@ class PostDetailFragment :
     }
 
     // callback when add comment is clicked on post
-    override fun comment(postData: PostViewData) {
+    override fun comment(postId: String) {
         binding.etComment.focusAndShowKeyboard()
     }
 

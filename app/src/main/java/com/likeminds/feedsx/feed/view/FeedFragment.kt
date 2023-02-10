@@ -281,11 +281,10 @@ class FeedFragment :
     }
 
     //opens post detail screen when add comment/comments count is clicked
-    override fun comment(postData: PostViewData) {
+    override fun comment(postId: String) {
         val postDetailExtras = PostDetailExtras.Builder()
-            .postId(postData.id)
+            .postId(postId)
             .isEditTextFocused(true)
-            .commentsCount(postData.commentsCount)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
     }
@@ -295,7 +294,6 @@ class FeedFragment :
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
-            .commentsCount(postData.commentsCount)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
     }
