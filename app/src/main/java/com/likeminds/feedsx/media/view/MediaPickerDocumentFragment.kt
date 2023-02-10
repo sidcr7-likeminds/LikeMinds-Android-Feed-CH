@@ -16,8 +16,8 @@ import androidx.lifecycle.lifecycleScope
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentMediaPickerDocumentBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapter
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.viewmodel.MediaViewModel
 import com.likeminds.feedsx.search.util.CustomSearchBar

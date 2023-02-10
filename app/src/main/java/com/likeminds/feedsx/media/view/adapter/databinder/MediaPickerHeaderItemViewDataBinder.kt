@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.media.databinder
+package com.likeminds.feedsx.media.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,9 +6,8 @@ import com.likeminds.feedsx.databinding.ItemMediaPickerHeaderBinding
 import com.likeminds.feedsx.media.model.MediaHeaderViewData
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_HEADER
-import javax.inject.Inject
 
-class MediaPickerHeaderItemViewDataBinder @Inject constructor() :
+class MediaPickerHeaderItemViewDataBinder :
     ViewDataBinder<ItemMediaPickerHeaderBinding, MediaHeaderViewData>() {
 
     override val viewType: Int
