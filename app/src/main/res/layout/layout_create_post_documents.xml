@@ -18,7 +18,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:itemCount="3"
-            tools:listitem="@layout/item_document"
+            tools:listitem="@layout/item_create_post_document"
             tools:visibility="visible" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsButton
