@@ -77,6 +77,7 @@ object ViewUtils {
         }
     }
 
+    // shows short length snackbar
     fun showShortSnack(view: View, text: String?, anchorView: View? = null) {
         if (text.isNullOrEmpty()) return
         val snackBar = LikeMindsSnackbar.make(view, text)
