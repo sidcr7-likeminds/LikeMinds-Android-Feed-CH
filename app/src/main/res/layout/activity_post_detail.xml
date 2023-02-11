@@ -15,8 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/white"
-        tools:context=".feed.view.LikesActivity">
+        android:background="@color/white">
 
         <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
             android:id="@+id/toolbar"
@@ -57,7 +56,7 @@
                     android:ellipsize="end"
                     android:includeFontPadding="false"
                     android:maxLines="1"
-                    android:text="@string/likes"
+                    android:text="@string/post"
                     android:textColor="@color/black"
                     android:textSize="20sp"
                     app:fontType="medium"
@@ -81,7 +80,7 @@
                     app:layout_constraintStart_toStartOf="@+id/tv_toolbar_title"
                     app:layout_constraintTop_toBottomOf="@id/tv_toolbar_title"
                     app:layout_constraintVertical_chainStyle="packed"
-                    tools:text="14 likes" />
+                    tools:text="14 comments" />
                 <!--                    app:textType="subtitle" />-->
 
             </androidx.constraintlayout.widget.ConstraintLayout>

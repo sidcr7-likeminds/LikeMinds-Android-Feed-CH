@@ -28,7 +28,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.likeminds.feedsx.branding.customview.edittext.LikeMindsEditText
+                <com.likeminds.feedsx.branding.customview.LikeMindsEditText
                     android:id="@+id/et_post_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

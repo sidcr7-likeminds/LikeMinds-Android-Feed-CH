@@ -28,7 +28,10 @@
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".feed.view.LikesActivity"
-            android:exported="true" />
+            android:exported="false" />
+        <activity
+            android:name=".post.detail.view.PostDetailActivity"
+            android:exported="false" />
         <activity
             android:name=".feed.view.MainActivity"
             android:exported="true">

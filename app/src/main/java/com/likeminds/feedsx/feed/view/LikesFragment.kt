@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.feed.view
 
-import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
@@ -13,7 +12,6 @@ import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.log
 
 @AndroidEntryPoint
 class LikesFragment : BaseFragment<FragmentLikesBinding>() {
@@ -22,9 +20,9 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         private const val TAG = "Likes Screen"
     }
 
-    lateinit var mLikesScreenAdapter: LikesScreenAdapter
+    private lateinit var mLikesScreenAdapter: LikesScreenAdapter
 
-    private lateinit var extras: LikesScreenExtras
+    private lateinit var likesScreenExtras: LikesScreenExtras
 
     override fun getViewBinding(): FragmentLikesBinding {
         return FragmentLikesBinding.inflate(layoutInflater)
@@ -36,7 +34,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     }
 
     private fun initRecyclerView() {
-        val linearLayoutManager = LinearLayoutManager(context);
+        val linearLayoutManager = LinearLayoutManager(context)
         mLikesScreenAdapter = LikesScreenAdapter()
         binding.rvLikes.apply {
             layoutManager = linearLayoutManager
@@ -73,7 +71,10 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     }
 
     //attach scroll listener for pagination
-    private fun attachPagination(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+    private fun attachPagination(
+        recyclerView: RecyclerView,
+        layoutManager: LinearLayoutManager
+    ) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 // TODO: add logic
@@ -87,6 +88,6 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        extras = arguments?.getParcelable(LIKES_SCREEN_EXTRAS)!!
+        likesScreenExtras = arguments?.getParcelable(LIKES_SCREEN_EXTRAS)!!
     }
 }
