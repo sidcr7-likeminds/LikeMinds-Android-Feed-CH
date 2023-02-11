@@ -124,29 +124,4 @@ object AndroidUtils {
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
         return intent
     }
-
-    fun moveAttachmentToCache(
-        context: Context,
-        vararg data: SingleUriData
-    ): List<SingleUriData> {
-        return data.mapNotNull { singleUriData ->
-            val uri = when (singleUriData.fileType) {
-                IMAGE -> {
-                    FileUtil.getSharedImageUri(context, singleUriData.uri)
-                }
-                VIDEO -> {
-                    FileUtil.getSharedVideoUri(context, singleUriData.uri)
-                }
-                PDF -> {
-                    FileUtil.getSharedPdfUri(context, singleUriData.uri)
-                }
-                else -> null
-            }
-            if (uri != null) {
-                singleUriData.toBuilder().uri(uri).build()
-            } else {
-                null
-            }
-        }
-    }
 }

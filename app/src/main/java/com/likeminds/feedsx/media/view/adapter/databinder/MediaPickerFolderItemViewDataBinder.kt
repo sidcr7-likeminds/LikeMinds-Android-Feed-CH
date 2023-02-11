@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.media.databinder
+package com.likeminds.feedsx.media.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,14 +8,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemMediaPickerFolderBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MediaFolderType
 import com.likeminds.feedsx.media.model.MediaFolderViewData
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_FOLDER
-import javax.inject.Inject
 
-class MediaPickerFolderItemViewDataBinder @Inject constructor(
+class MediaPickerFolderItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
 ) : ViewDataBinder<ItemMediaPickerFolderBinding, MediaFolderViewData>() {
 
@@ -51,7 +50,6 @@ class MediaPickerFolderItemViewDataBinder @Inject constructor(
     private fun getFolderIcon(folderType: MediaFolderType): Int {
         return when (folderType) {
             MediaFolderType.CAMERA -> R.drawable.ic_camera_white
-            MediaFolderType.LIKEMINDS -> R.drawable.ic_likeminds_logo
             else -> R.drawable.ic_folder
         }
     }

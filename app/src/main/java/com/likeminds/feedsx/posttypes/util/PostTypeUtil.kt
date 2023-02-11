@@ -19,7 +19,11 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -115,14 +119,16 @@ object PostTypeUtil {
         binding.tvMeta3.hide()
 
         val attachmentMeta = document.attachmentMeta
+        val context = binding.root.context
 
-        binding.tvDocumentName.text = attachmentMeta.name ?: "Document"
+        binding.tvDocumentName.text =
+            attachmentMeta.name ?: context.getString(R.string.documents)
 
         val noOfPage = attachmentMeta.pageCount ?: 0
         val mediaType = attachmentMeta.format
         if (noOfPage > 0) {
             binding.tvMeta1.show()
-            binding.tvMeta1.text = binding.root.context.getString(
+            binding.tvMeta1.text = context.getString(
                 R.string.placeholder_pages, noOfPage
             )
         }
