@@ -1,7 +1,5 @@
 package com.likeminds.feedsx.media.view.adapter
 
-import com.likeminds.feedsx.media.adapter.databinder.*
-import com.likeminds.feedsx.media.databinder.*
 import com.likeminds.feedsx.media.model.MediaFolderViewData
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.view.adapter.databinder.*

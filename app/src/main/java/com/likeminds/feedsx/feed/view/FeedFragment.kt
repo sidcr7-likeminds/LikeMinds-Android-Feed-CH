@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.post.detail.model.PostDetailExtras
+import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
@@ -29,6 +31,7 @@ class FeedFragment :
 
     private val viewModel: FeedViewModel by viewModels()
     lateinit var mPostAdapter: PostAdapter
+
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
     }
@@ -84,7 +87,11 @@ class FeedFragment :
         }
 
 
-        //TODO: Testing data
+        //TODO: Remove Testing data
+        addTestingData()
+    }
+
+    private fun addTestingData() {
         var text =
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
@@ -99,6 +106,9 @@ class FeedFragment :
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("2")
+                .likesCount(10)
+                .commentsCount(4)
+                .isLiked(true)
                 .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
                 .text(text)
                 .build()
@@ -219,11 +229,11 @@ class FeedFragment :
 
         //click listener -> open profile screen
         binding.memberImage.setOnClickListener {
-            TODO("Not yet implemented")
+            //TODO: On member Image click
         }
 
         binding.ivSearch.setOnClickListener {
-            TODO("Not yet implemented")
+            //TODO: perform search
         }
     }
 
@@ -233,22 +243,20 @@ class FeedFragment :
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .build()
-            if (newViewData != null) {
-                mPostAdapter.update(position, newViewData)
-            }
+            mPostAdapter.update(position, newViewData)
         }
     }
 
     override fun pinPost() {
-        TODO("Not yet implemented")
+        //TODO: pin post
     }
 
     override fun savePost() {
-        TODO("Not yet implemented")
+        //TODO: save post
     }
 
     override fun likePost() {
-        TODO("Not yet implemented")
+        //TODO: like post
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
@@ -281,13 +289,31 @@ class FeedFragment :
         )
     }
 
-    // opens likes screen when likes count is tapped.
+    // opens likes screen when likes count is clicked.
     override fun showLikesScreen(postData: PostViewData) {
-        val extras = LikesScreenExtras.Builder()
+        val likesScreenExtras = LikesScreenExtras.Builder()
             .postId(postData.id)
             .likesCount(postData.likesCount)
             .build()
-        LikesActivity.start(requireContext(), extras)
+        LikesActivity.start(requireContext(), likesScreenExtras)
+    }
+
+    //opens post detail screen when add comment/comments count is clicked
+    override fun comment(postId: String) {
+        val postDetailExtras = PostDetailExtras.Builder()
+            .postId(postId)
+            .isEditTextFocused(true)
+            .build()
+        PostDetailActivity.start(requireContext(), postDetailExtras)
+    }
+
+    //opens post detail screen when post content is clicked
+    override fun postDetail(postData: PostViewData) {
+        val postDetailExtras = PostDetailExtras.Builder()
+            .postId(postData.id)
+            .isEditTextFocused(false)
+            .build()
+        PostDetailActivity.start(requireContext(), postDetailExtras)
     }
 
     /**

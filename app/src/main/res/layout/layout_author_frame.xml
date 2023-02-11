@@ -28,7 +28,7 @@
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:maxLines="1"
-            android:textColor="@color/grey"
+            android:textColor="@color/raisin_black"
             android:textSize="16sp"
             tools:fontFamily="@font/roboto_medium"
             app:fontType="medium"
@@ -112,7 +112,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_post_menu"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_pin_unfilled" />
+            app:srcCompat="@drawable/ic_pin_unfilled"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/iv_post_menu"
@@ -122,7 +123,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_overflow_menu" />
+            app:srcCompat="@drawable/ic_overflow_menu"
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

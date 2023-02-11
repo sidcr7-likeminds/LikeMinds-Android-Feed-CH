@@ -7,27 +7,13 @@
     <string name="settings">Settings</string>
     <string name="like">Like</string>
     <string name="likes">Likes</string>
+    <string name="comments">Comments</string>
     <string name="add_comment">Add Comment</string>
     <string name="edited">Edited</string>
     <string name="admin">Admin</string>
     <string name="pdf">PDF</string>
-    <string name="create_a_post">Create a post</string>
-    <string name="done">Done</string>
-    <string name="post">Post</string>
-    <string name="write_something_here">Write something here...</string>
-    <string name="attach_files">Attach Files</string>
-    <string name="add_video">Add Video</string>
-    <string name="add_photo">Add Photo</string>
-    <string name="playing_this_video">Playing this video…</string>
-    <string name="add_more">Add More</string>
-    <string name="documents">Documents</string>
-    <string name="action_search">Search</string>
-    <string name="sort">Sort</string>
-    <string name="browse_other_docs">Browse other docs…</string>
-    <string name="search_hint_text">Search…</string>
-    <string name="large_file_select_error_message">Files below 100 KB and above 100 MB are not allowed</string>
-
     <string name="see_more"> See More</string>
+    <string name="see_less"> See Less</string>
     <plurals name="likes">
         <item quantity="one">1 Like</item>
         <item quantity="other">%d Likes</item>
@@ -40,6 +26,29 @@
         <item quantity="one">1 Comment</item>
         <item quantity="other">%d Comments</item>
     </plurals>
+    <plurals name="comments_small">
+        <item quantity="one">1 comment</item>
+        <item quantity="other">%d comments</item>
+    </plurals>
+    <plurals name="replies">
+        <item quantity="one">1 Reply</item>
+        <item quantity="other">%d Replies</item>
+    </plurals>
+    <string name="create_a_post">Create a post</string>
+    <string name="done">Done</string>
+    <string name="post">Post</string>
+    <string name="write_something_here">Write something here…</string>
+    <string name="attach_files">Attach Files</string>
+    <string name="add_video">Add Video</string>
+    <string name="add_photo">Add Photo</string>
+    <string name="playing_this_video">Playing this video…</string>
+    <string name="add_more">Add More</string>
+    <string name="documents">Documents</string>
+    <string name="action_search">Search</string>
+    <string name="sort">Sort</string>
+    <string name="browse_other_docs">Browse other docs…</string>
+    <string name="search_hint_text">Search…</string>
+    <string name="large_file_select_error_message">Files below 100 KB and above 100 MB are not allowed</string>
     <string name="all_posts">All Posts</string>
     <string name="following">Following</string>
     <string name="scalix">SCALIX</string>
@@ -65,4 +74,9 @@
     <string name="write_description">Write Description</string>
     <string name="s_is_reported_for_review">%s is reported for review</string>
     <string name="our_team_will_look_into_your_feedback_and_will_take_appropriate_action_on_this_s">Our team will look into your feedback and will take appropriate action on this %s</string>
+    <string name="write_a_comment">Write a comment</string>
+    <string name="view_more_replies">View more replies</string>
+    <string name="placeholder_replies">%d of %d</string>
+    <string name="reply">Reply</string>
+    <string name="replying_to_s">Replying to %s</string>
 </resources>

@@ -2,7 +2,6 @@ package com.likeminds.feedsx.posttypes.model
 
 import android.os.Parcelable
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.utils.SeeMoreUtil
 import com.likeminds.feedsx.utils.model.*
 import kotlinx.parcelize.Parcelize
 
@@ -10,7 +9,6 @@ import kotlinx.parcelize.Parcelize
 class PostViewData private constructor(
     var id: String,
     var text: String,
-    var shortText: String?,
     val alreadySeenFullContent: Boolean?,
     val isExpanded: Boolean,
     var attachments: List<AttachmentViewData>,
@@ -57,14 +55,12 @@ class PostViewData private constructor(
     class Builder {
         private var id: String = ""
         private var text: String = ""
-        private var shortText: String? = null
         private var alreadySeenFullContent: Boolean? = null
         private var isExpanded: Boolean = false
         private var attachments: List<AttachmentViewData> = listOf()
         private var communityId: Int = 0
         private var isPinned: Boolean = false
         private var isSaved: Boolean = false
-        private var isEdited: Boolean = false
         private var isLiked: Boolean = false
         private var userId: String = ""
         private var likesCount: Int = 0
@@ -76,12 +72,8 @@ class PostViewData private constructor(
         private var user: UserViewData = UserViewData.Builder().build()
 
         fun id(id: String) = apply { this.id = id }
-        fun text(text: String) = apply {
-            this.text = text
-            this.shortText = SeeMoreUtil.getShortContent(text, 100)
-        }
+        fun text(text: String) = apply { this.text = text }
 
-        fun shortText(shortText: String?) = apply { this.shortText = shortText }
         fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) =
             apply { this.alreadySeenFullContent = alreadySeenFullContent }
 
@@ -109,14 +101,13 @@ class PostViewData private constructor(
         fun build() = PostViewData(
             id,
             text,
-            shortText,
             alreadySeenFullContent,
             isExpanded,
             attachments,
             communityId,
             isPinned,
             isSaved,
-            isEdited,
+            isLiked,
             userId,
             likesCount,
             commentsCount,
@@ -131,7 +122,6 @@ class PostViewData private constructor(
     fun toBuilder(): Builder {
         return Builder().id(id)
             .text(text)
-            .shortText(shortText)
             .alreadySeenFullContent(alreadySeenFullContent)
             .isExpanded(isExpanded)
             .attachments(attachments)

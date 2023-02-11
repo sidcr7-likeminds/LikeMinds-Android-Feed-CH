@@ -24,7 +24,11 @@ class ItemPostDocumentsViewDataBinder constructor(
 
     override fun createBinder(parent: ViewGroup): ItemPostDocumentsBinding {
         overflowMenu = OverflowMenuPopup.create(parent.context, this)
-        return ItemPostDocumentsBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ItemPostDocumentsBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
     }
 
     override fun bindData(binding: ItemPostDocumentsBinding, data: PostViewData, position: Int) {

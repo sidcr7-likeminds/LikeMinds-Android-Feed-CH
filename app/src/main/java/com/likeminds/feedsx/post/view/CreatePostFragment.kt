@@ -382,7 +382,10 @@ class CreatePostFragment :
     // triggered when a document/media from view pager is removed
     override fun onMediaRemoved(position: Int, mediaType: String) {
         selectedMediaUris.removeAt(position)
-        if (mediaType == PDF) documentsAdapter?.removeIndex(position)
+        if (mediaType == PDF) {
+            documentsAdapter?.removeIndex(position)
+            if(documentsAdapter?.itemCount == 0) binding.documentsAttachment.root.hide()
+        }
         else multiMediaAdapter?.removeIndex(position)
         showPostMedia()
     }
