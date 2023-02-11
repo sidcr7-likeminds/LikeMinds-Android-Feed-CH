@@ -15,6 +15,10 @@ import com.likeminds.feedsx.deleteentity.model.DeleteEntityExtras
 import com.likeminds.feedsx.deleteentity.view.DeleteEntityDialogFragment
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.post.view.CreatePostActivity
@@ -278,9 +282,9 @@ class FeedFragment :
         builder.setMessage(getString(R.string.delete_post_message))
             .setTitle(getString(R.string.delete_post_question))
             .setCancelable(true)
-            .setPositiveButton("DELETE") { _, _ ->
+            .setPositiveButton(getString(R.string.delete_caps)) { _, _ ->
 
-            }.setNegativeButton("CANCEL") { _, _ ->
+            }.setNegativeButton(getString(R.string.cancel_caps)) { _, _ ->
                 alertDialog.dismiss()
             }
         //Creating dialog box
@@ -294,7 +298,7 @@ class FeedFragment :
     private fun reportPost(postId: String) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
-            .dataId(postId)
+            .entityId(postId)
             .type(REPORT_TYPE_POST)
             .build()
 
@@ -328,14 +332,18 @@ class FeedFragment :
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
-        //TODO: Perform action on post's menu item selection
-        // Testing data
         when (title) {
-            "Report" -> {
+            DELETE_POST_MENU_ITEM -> {
+                deletePost(postId)
+            }
+            REPORT_POST_MENU_ITEM -> {
                 reportPost(postId)
             }
-            "Delete" -> {
-                deletePost(postId)
+            PIN_POST_MENU_ITEM -> {
+                // TODO: pin post
+            }
+            UNPIN_POST_MENU_ITEM -> {
+                // TODO: unpin post
             }
         }
     }

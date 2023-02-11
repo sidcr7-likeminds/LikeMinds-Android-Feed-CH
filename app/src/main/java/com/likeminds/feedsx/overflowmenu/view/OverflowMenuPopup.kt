@@ -51,6 +51,10 @@ class OverflowMenuPopup(
         overflowMenuAdapter.replace(items)
     }
 
+    fun size(): Int {
+        return overflowMenuAdapter.itemCount
+    }
+
     fun update(item: OverflowMenuItemViewData) {
         val index = overflowMenuAdapter.items().indexOfFirst {
             (it as OverflowMenuItemViewData).title == item.title

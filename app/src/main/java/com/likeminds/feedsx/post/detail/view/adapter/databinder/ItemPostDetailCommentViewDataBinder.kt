@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -140,6 +139,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
     }
 
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        postDetailAdapterListener.onCommentMenuItemClicked(menu.dataId, menu.title)
+        overflowMenu.dismiss()
+        postDetailAdapterListener.onCommentMenuItemClicked(menu.entityId, menu.title)
     }
 }

@@ -79,8 +79,10 @@
     <string name="reply">Reply</string>
     <string name="type_your_reason">Type your reason</string>
     <string name="cancel">Cancel</string>
+    <string name="cancel_caps">CANCEL</string>
     <string name="confirm">Confirm</string>
     <string name="reason_for_deleting">Reason for deletion</string>
+    <string name="delete_caps">DELETE</string>
     <string name="delete_post_question">Delete post?</string>
     <string name="delete_post_message">Are you sure you want to delete this post? This action cannot be reversed.</string>
     <string name="delete_comment_question">Delete comment?</string>

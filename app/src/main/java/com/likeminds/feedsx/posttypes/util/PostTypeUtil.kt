@@ -3,6 +3,7 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
@@ -64,7 +65,7 @@ object PostTypeUtil {
         binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
     }
 
-    //to show the options on the post
+    //to show the overflow menu
     fun showOverflowMenu(ivMenu: ImageView, overflowMenu: OverflowMenuPopup) {
         overflowMenu.showAsDropDown(
             ivMenu,

@@ -7,28 +7,28 @@ import kotlinx.parcelize.Parcelize
 class ReportExtras private constructor(
     var type: Int,
     var memberId: String?,
-    var dataId: String?,
+    var entityId: String?,
 ) : Parcelable {
 
     class Builder {
         private var type: Int = -1
         private var memberId: String? = null
-        private var dataId: String? = null
+        private var entityId: String? = null
 
         fun type(type: Int) = apply { this.type = type }
         fun memberId(memberId: String?) = apply { this.memberId = memberId }
-        fun dataId(dataId: String?) = apply { this.dataId = dataId }
+        fun entityId(entityId: String?) = apply { this.entityId = entityId }
 
         fun build() = ReportExtras(
             type,
             memberId,
-            dataId
+            entityId
         )
     }
 
     fun toBuilder(): Builder {
         return Builder().memberId(memberId)
             .type(type)
-            .dataId(dataId)
+            .entityId(entityId)
     }
 }
