@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <data>
 
@@ -34,7 +35,8 @@
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/iv_shadow"
@@ -43,7 +45,8 @@
             android:src="@drawable/image_bottom_shadow_light"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ContentDescription" />
 
         <ImageView
             android:id="@+id/imageViewFileTypeIcon"
@@ -52,7 +55,8 @@
             android:layout_margin="4dp"
             android:src="@drawable/ic_video_small"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="ContentDescription" />
 
         <View
             android:id="@+id/view_selection_background"
@@ -74,7 +78,8 @@
             app:layout_constraintEnd_toEndOf="@+id/iv_thumbnail"
             app:layout_constraintStart_toStartOf="@+id/iv_thumbnail"
             app:layout_constraintTop_toTopOf="@+id/iv_thumbnail"
-            app:layout_constraintWidth_percent="0.3" />
+            app:layout_constraintWidth_percent="0.3"
+            tools:ignore="ContentDescription" />
 
         <androidx.constraintlayout.widget.Group
             android:id="@+id/groupSelection"
