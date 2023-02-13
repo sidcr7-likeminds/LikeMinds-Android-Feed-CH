@@ -6,6 +6,8 @@ import android.text.style.ForegroundColorSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -156,6 +158,15 @@ object PostTypeUtil {
 
         if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
         else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+
+        val bounceAnim: Animation = AnimationUtils.loadAnimation(
+            context,
+            R.anim.bounce
+        )
+        bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+
+        binding.ivLike.animation = bounceAnim
+        binding.ivBookmark.animation = bounceAnim
 
         binding.likesCount.text =
             if (data.likesCount == 0) context.getString(R.string.like)
@@ -315,18 +326,73 @@ object PostTypeUtil {
                 seeLess.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-        }
 
-        tvPostContent.movementMethod = CustomLinkMovementMethod {
-            //TODO: Handle links etc.
-            true
-        }
+            val postTextClickableSpan = object : ClickableSpan() {
+                override fun onClick(view: View) {
+                    adapterListener?.postDetails(data)
+                }
 
-        tvPostContent.text = TextUtils.concat(
-            tvPostContent.text,
-            seeMoreSpannableStringBuilder,
-            seeLessSpannableStringBuilder
-        )
+                override fun updateDrawState(textPaint: TextPaint) {
+                    textPaint.isUnderlineText = false
+                }
+            }
+
+            // post is used here to get lines count in the text view
+            tvPostContent.post {
+                val shortText: String? = SeeMoreUtil.getShortContent(
+                    data.text,
+                    tvPostContent,
+                    3,
+                    500
+                )
+
+                val trimmedText =
+                    if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                        shortText
+                    } else {
+                        textForLinkify
+                    }
+
+                // TODO: Confirm
+                MemberTaggingDecoder.decode(
+                    tvPostContent,
+                    trimmedText,
+                    enableClick = true,
+                    BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
+                        tvPostContent.context,
+                        R.color.pure_blue
+                    )
+                ) { tag ->
+                    onMemberTagClicked()
+                }
+
+                tvPostContent.text = TextUtils.concat(
+                    tvPostContent.text,
+                    seeMoreSpannableStringBuilder,
+                    seeLessSpannableStringBuilder
+                )
+
+                tvPostContent.movementMethod = CustomLinkMovementMethod {
+                    //TODO: Handle links etc.
+                    true
+                }
+
+                tvPostContent.setOnClickListener {
+                    adapterListener?.postDetails(data)
+                }
+            }
+
+            tvPostContent.movementMethod = CustomLinkMovementMethod {
+                //TODO: Handle links etc.
+                true
+            }
+
+            tvPostContent.text = TextUtils.concat(
+                tvPostContent.text,
+                seeMoreSpannableStringBuilder,
+                seeLessSpannableStringBuilder
+            )
+        }
     }
 
     // handles link view in the post
@@ -377,5 +443,6 @@ object PostTypeUtil {
     // performs action when member tag is clicked
     fun onMemberTagClicked() {
         // TODO: Change Implementation
+        Log.d("TAG", "onMemberTagClicked: ")
     }
 }

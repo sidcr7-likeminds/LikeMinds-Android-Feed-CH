@@ -12,7 +12,8 @@
     <string name="edited">Edited</string>
     <string name="admin">Admin</string>
     <string name="pdf">PDF</string>
-    <string name="see_more"> See More</string>
+    <string name="see_more">&#160;See More</string>
+    <string name="see_less">&#160;See Less</string>
     <plurals name="likes">
         <item quantity="one">1 Like</item>
         <item quantity="other">%d Likes</item>
