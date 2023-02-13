@@ -19,6 +19,7 @@ versions.lifecycle = '2.4.1'
 versions.glide = '4.12.0'
 versions.fragment_ktx = '1.5.5'
 versions.viewpager2 = '1.0.0'
+versions.flexbox = '3.0.0'
 versions.navigation = '2.4.2'
 versions.exo_player = '2.17.1'
 versions.circleimageview = '3.1.0'
@@ -50,6 +51,7 @@ ui.photo_view = "com.github.chrisbanes:PhotoView:$versions.photoview"
 ui.cropper = "com.github.CanHub:Android-Image-Cropper:$versions.cropper"
 ui.drawable_toolbox = "com.github.duanhong169:drawabletoolbox:$versions.drawable_toolbox"
 ui.dot_indicator = "com.tbuonomo:dotsindicator:$versions.dotsindicator"
+ui.flexbox = "com.google.android.flexbox:flexbox:$versions.flexbox"
 deps.ui = ui
 
 def lifecycle = [:]

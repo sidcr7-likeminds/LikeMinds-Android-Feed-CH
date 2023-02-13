@@ -67,6 +67,13 @@
     <string name="ok">OK</string>
     <string name="all_media">All Media</string>
     <string name="request_not_processed">Couldn\'t process your request</string>
+    <string name="report_abuse">Report Abuse</string>
+    <string name="report_sub_header">You would be able to report this %s after selecting a problem.</string>
+    <string name="please_specify_the_problem_to_continue">Please specify the problem to continue</string>
+    <string name="report">Report</string>
+    <string name="write_description">Write Description</string>
+    <string name="s_is_reported_for_review">%s is reported for review</string>
+    <string name="our_team_will_look_into_your_feedback_and_will_take_appropriate_action_on_this_s">Our team will look into your feedback and will take appropriate action on this %s</string>
     <string name="write_a_comment">Write a comment</string>
     <string name="view_more_replies">View more replies</string>
     <string name="placeholder_replies">%d of %d</string>

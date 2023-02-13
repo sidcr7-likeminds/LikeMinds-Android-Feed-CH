@@ -23,6 +23,9 @@
             android:name=".media.view.MediaPickerActivity"
             android:exported="false" />
         <activity
+            android:name=".report.view.ReportActivity"
+            android:exported="false" />
+        <activity
             android:name=".post.view.CreatePostActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />

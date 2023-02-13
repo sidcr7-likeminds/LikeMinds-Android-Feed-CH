@@ -31,7 +31,8 @@ class ItemPostTextOnlyViewDataBinder constructor(
         //TODO: Testing data
         val list = listOf(
             OverflowMenuItemViewData.Builder().title("Edit").dataId(data.id).build(),
-            OverflowMenuItemViewData.Builder().dataId(data.id).title("Delete").build()
+            OverflowMenuItemViewData.Builder().dataId(data.id).title("Delete").build(),
+            OverflowMenuItemViewData.Builder().title("Report").dataId(data.id).build()
         )
 
         // sets items to overflow menu
