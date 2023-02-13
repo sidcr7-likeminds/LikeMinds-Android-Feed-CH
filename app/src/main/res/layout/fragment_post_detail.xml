@@ -56,8 +56,10 @@
             app:layout_constraintBottom_toBottomOf="@id/tv_replying_to"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_replying_to"
+            android:visibility="gone"
             app:srcCompat="@drawable/ic_multiply"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:visibility="visible" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsEditText
             android:id="@+id/et_comment"

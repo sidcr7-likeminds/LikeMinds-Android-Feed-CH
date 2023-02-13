@@ -8,13 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="44dp"
         android:paddingBottom="12dp"
-        android:background="@color/transparent">
+        android:background="@color/white">
 
         <ImageView
             android:id="@+id/iv_like"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:scaleType="fitCenter"
+            android:layout_marginStart="2dp"
             app:srcCompat="@drawable/ic_like_filled"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

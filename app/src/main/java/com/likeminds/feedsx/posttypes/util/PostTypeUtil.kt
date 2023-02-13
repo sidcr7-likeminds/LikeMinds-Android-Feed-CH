@@ -163,14 +163,13 @@ object PostTypeUtil {
         if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
         else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
 
-        val bounceAnim: Animation = AnimationUtils.loadAnimation(
-            context,
-            R.anim.bounce
-        )
-        bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+        val bounceAnim: Animation =
+            AnimationUtils.loadAnimation(
+                context,
+                R.anim.bounce
+            )
 
-        binding.ivLike.animation = bounceAnim
-        binding.ivBookmark.animation = bounceAnim
+        bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
 
         binding.likesCount.text =
             if (data.likesCount == 0) context.getString(R.string.like)
@@ -193,10 +192,12 @@ object PostTypeUtil {
                 )
 
         binding.ivLike.setOnClickListener {
+            it.startAnimation(bounceAnim)
             listener.likePost()
         }
 
         binding.ivBookmark.setOnClickListener {
+            it.startAnimation(bounceAnim)
             listener.savePost()
         }
 
@@ -369,7 +370,7 @@ object PostTypeUtil {
             }
 
             tvPostContent.text = TextUtils.concat(
-                postTextSpannableStringBuilder,
+                tvPostContent.text,
                 seeMoreSpannableStringBuilder,
                 seeLessSpannableStringBuilder
             )

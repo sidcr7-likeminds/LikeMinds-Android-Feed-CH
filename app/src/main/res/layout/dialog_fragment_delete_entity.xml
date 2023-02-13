@@ -111,7 +111,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cv_reason">
 
-                    <com.likeminds.feedsx.branding.customview.edittext.LikeMindsEditText
+                    <com.likeminds.feedsx.branding.customview.LikeMindsEditText
                         android:id="@+id/et_other_reason"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

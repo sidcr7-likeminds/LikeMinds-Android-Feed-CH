@@ -259,23 +259,6 @@ class PostDetailFragment :
         postDetailExtras = arguments?.getParcelable(POST_DETAIL_EXTRAS)!!
     }
 
-    <<<<<<< HEAD
-    /**
-     * Scroll to a position with offset from the top header
-     * @param position Index of the item to scroll to
-     */
-    private fun scrollToPositionWithOffset(position: Int) {
-        val px = if (binding.vTopBackground.height == 0) {
-            (ViewUtils.dpToPx(75) * 1.5).toInt()
-        } else {
-            (binding.vTopBackground.height * 1.5).toInt()
-        }
-        (binding.rvPostDetails.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
-            position,
-            px
-        )
-    }
-
     // processes delete entity request
     private fun deleteEntity(
         entityId: String,
@@ -344,9 +327,7 @@ class PostDetailFragment :
         reportPostLauncher.launch(intent)
     }
 
-    =======
     // updates post view data when see more/see less is clicked
-    >>>>>>> feature/LM7794_feed_sx
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostDetailAdapter[position]
         if (item is PostViewData) {
@@ -362,15 +343,7 @@ class PostDetailFragment :
         binding.etComment.focusAndShowKeyboard()
     }
 
-    <<<<<<< HEAD
-    =======
-    // callback for post menu item click
-    override fun onPostMenuItemClicked(postId: String, title: String) {
-        //TODO: menu item handle
-    }
-
     // callback when +x more text is clicked to see more documents
-    >>>>>>> feature/LM7794_feed_sx
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostDetailAdapter.items().size - 1) {
             binding.rvPostDetails.post {
@@ -384,8 +357,7 @@ class PostDetailFragment :
         )
     }
 
-    <<<<<<< HEAD
-    =======
+
     /**
      * Scroll to a position with offset from the top header
      * @param position Index of the item to scroll to
@@ -403,7 +375,6 @@ class PostDetailFragment :
     }
 
     // callback when likes count is clicked - opens likes screen
-    >>>>>>> feature/LM7794_feed_sx
     override fun showLikesScreen(postData: PostViewData) {
         val likesScreenExtras = LikesScreenExtras.Builder()
             .postId(postData.id)
@@ -494,7 +465,6 @@ class PostDetailFragment :
         }
     }
 
-    <<<<<<< HEAD
     override fun onPostMenuItemClicked(postId: String, title: String) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
@@ -512,9 +482,7 @@ class PostDetailFragment :
         }
     }
 
-    =======
     // callback for comment's menu is item
-    >>>>>>> feature/LM7794_feed_sx
     override fun onCommentMenuItemClicked(commentId: String, title: String) {
         when (title) {
             DELETE_COMMENT_MENU_ITEM -> {
