@@ -163,13 +163,13 @@ object PostTypeUtil {
         if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
         else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
 
-        val bounceAnim: Animation =
+        // bounce animation for like and save button
+        val bounceAnim: Animation by lazy {
             AnimationUtils.loadAnimation(
                 context,
                 R.anim.bounce
             )
-
-        bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+        }
 
         binding.likesCount.text =
             if (data.likesCount == 0) context.getString(R.string.like)
@@ -192,11 +192,13 @@ object PostTypeUtil {
                 )
 
         binding.ivLike.setOnClickListener {
+            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
             it.startAnimation(bounceAnim)
             listener.likePost()
         }
 
         binding.ivBookmark.setOnClickListener {
+            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
             it.startAnimation(bounceAnim)
             listener.savePost()
         }
@@ -442,6 +444,5 @@ object PostTypeUtil {
     // performs action when member tag is clicked
     fun onMemberTagClicked() {
         // TODO: Change Implementation
-        Log.d("TAG", "onMemberTagClicked: ")
     }
 }

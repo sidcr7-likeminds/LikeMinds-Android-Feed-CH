@@ -45,16 +45,6 @@ class PostDetailFragment :
     private lateinit var mPostDetailAdapter: PostDetailAdapter
     private lateinit var alertDialog: AlertDialog
 
-    private val reportPostLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                ReportSuccessDialog("Message").show(
-                    childFragmentManager,
-                    ReportSuccessDialog.TAG
-                )
-            }
-        }
-
     private var parentCommentIdToReply: String? = null
 
     companion object {
@@ -554,4 +544,14 @@ class PostDetailFragment :
     override fun onReplyMenuItemClicked(replyId: String, title: String) {
         //TODO: handle menu item click for replies.
     }
+
+    private val reportPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                ReportSuccessDialog("Message").show(
+                    childFragmentManager,
+                    ReportSuccessDialog.TAG
+                )
+            }
+        }
 }

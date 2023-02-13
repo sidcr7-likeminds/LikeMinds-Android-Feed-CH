@@ -6,7 +6,7 @@ import com.likeminds.feedsx.utils.model.ITEM_OVERFLOW_MENU_ITEM
 import kotlinx.parcelize.Parcelize
 
 // title -> title of the menu item
-// dataId -> id of the corresponding data (post-id/comment-id, etc)
+// entityId -> id of the corresponding data (post-id/comment-id, etc)
 @Parcelize
 class OverflowMenuItemViewData private constructor(
     @OverflowMenuItemTitle
