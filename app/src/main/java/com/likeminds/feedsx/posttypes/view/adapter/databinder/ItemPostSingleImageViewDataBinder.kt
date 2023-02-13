@@ -64,11 +64,11 @@ class ItemPostSingleImageViewDataBinder constructor(
             listener
         )
 
-        // loads post image inside the post's image view
-        ImageBindingUtil.loadImage(
+        // loads post image and attaches listener
+        PostTypeUtil.initPostSingleImage(
             binding.ivPost,
-            data.attachments.first().attachmentMeta.url,
-            placeholder = R.drawable.image_placeholder
+            data,
+            listener
         )
     }
 

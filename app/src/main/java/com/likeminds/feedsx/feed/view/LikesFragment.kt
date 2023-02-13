@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.feed.view
 
-import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
@@ -35,7 +34,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     }
 
     private fun initRecyclerView() {
-        val linearLayoutManager = LinearLayoutManager(context);
+        val linearLayoutManager = LinearLayoutManager(context)
         mLikesScreenAdapter = LikesScreenAdapter()
         binding.rvLikes.apply {
             layoutManager = linearLayoutManager
@@ -72,7 +71,10 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     }
 
     //attach scroll listener for pagination
-    private fun attachPagination(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+    private fun attachPagination(
+        recyclerView: RecyclerView,
+        layoutManager: LinearLayoutManager
+    ) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 // TODO: add logic

@@ -23,6 +23,8 @@ import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -118,14 +120,16 @@ object PostTypeUtil {
         binding.tvMeta3.hide()
 
         val attachmentMeta = document.attachmentMeta
+        val context = binding.root.context
 
-        binding.tvDocumentName.text = attachmentMeta.name ?: "Document"
+        binding.tvDocumentName.text =
+            attachmentMeta.name ?: context.getString(R.string.documents)
 
         val noOfPage = attachmentMeta.pageCount ?: 0
         val mediaType = attachmentMeta.format
         if (noOfPage > 0) {
             binding.tvMeta1.show()
-            binding.tvMeta1.text = binding.root.context.getString(
+            binding.tvMeta1.text = context.getString(
                 R.string.placeholder_pages, noOfPage
             )
         }
@@ -201,11 +205,11 @@ object PostTypeUtil {
         }
 
         binding.ivComment.setOnClickListener {
-            listener.comment(data)
+            listener.comment(data.id)
         }
 
         binding.commentsCount.setOnClickListener {
-            listener.comment(data)
+            listener.comment(data.id)
         }
     }
 
@@ -236,8 +240,9 @@ object PostTypeUtil {
         tvPostContent: TextView,
         data: PostViewData,
         itemPosition: Int,
-        adapterListener: PostAdapterListener? = null,
+        adapterListener: PostAdapterListener
     ) {
+        val context = tvPostContent.context
         val textForLinkify = data.text.getValidTextForLinkify()
 
         var alreadySeenFullContent = data.alreadySeenFullContent == true
@@ -249,28 +254,8 @@ object PostTypeUtil {
             tvPostContent.show()
         }
 
-        val trimmedText =
-            if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-                data?.shortText
-            } else {
-                textForLinkify
-            }
-
-        // TODO: Confirm
-        MemberTaggingDecoder.decode(
-            tvPostContent,
-            trimmedText,
-            enableClick = true,
-            BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
-                tvPostContent.context,
-                R.color.pure_blue
-            )
-        ) { tag ->
-            onMemberTagClicked()
-        }
-
         val seeMoreColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
-        val seeMore = SpannableStringBuilder(" See More")
+        val seeMore = SpannableStringBuilder(context.getString(R.string.see_more))
         seeMore.setSpan(
             ForegroundColorSpan(seeMoreColor),
             0,
@@ -280,27 +265,16 @@ object PostTypeUtil {
         val seeMoreClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 alreadySeenFullContent = true
-                adapterListener?.updateSeenFullContent(itemPosition, true)
+                adapterListener.updateSeenFullContent(itemPosition, true)
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                ds.isUnderlineText = false
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
             }
-        }
-        val seeMoreSpannableStringBuilder = SpannableStringBuilder()
-        if (!alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
-            seeMoreSpannableStringBuilder.append("...")
-            seeMoreSpannableStringBuilder.append(seeMore)
-            seeMoreSpannableStringBuilder.setSpan(
-                seeMoreClickableSpan,
-                3,
-                seeMore.length + 3,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
         }
 
         val seeLessColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
-        val seeLess = SpannableStringBuilder(" See Less")
+        val seeLess = SpannableStringBuilder(context.getString(R.string.see_less))
         seeLess.setSpan(
             ForegroundColorSpan(seeLessColor),
             0,
@@ -310,77 +284,84 @@ object PostTypeUtil {
         val seeLessClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 alreadySeenFullContent = false
-                adapterListener?.updateSeenFullContent(itemPosition, false)
+                adapterListener.updateSeenFullContent(itemPosition, false)
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                ds.isUnderlineText = false
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
             }
         }
-        val seeLessSpannableStringBuilder = SpannableStringBuilder()
-        if (alreadySeenFullContent && !data?.shortText.isNullOrEmpty()) {
-            seeLessSpannableStringBuilder.append(seeLess)
-            seeLessSpannableStringBuilder.setSpan(
-                seeLessClickableSpan,
-                0,
-                seeLess.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+
+        val postTextClickableSpan = object : ClickableSpan() {
+            override fun onClick(view: View) {
+                adapterListener.postDetail(data)
+            }
+
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
+            }
+        }
+
+        // post is used here to get lines count in the text view
+        tvPostContent.post {
+            val shortText: String? = SeeMoreUtil.getShortContent(
+                data.text,
+                tvPostContent,
+                3,
+                500
             )
 
-            val postTextClickableSpan = object : ClickableSpan() {
-                override fun onClick(view: View) {
-                    adapterListener?.postDetails(data)
+            val trimmedText =
+                if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                    shortText
+                } else {
+                    textForLinkify
                 }
 
-                override fun updateDrawState(textPaint: TextPaint) {
-                    textPaint.isUnderlineText = false
-                }
+            // TODO: Confirm
+            MemberTaggingDecoder.decode(
+                tvPostContent,
+                trimmedText,
+                enableClick = true,
+                BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
+                    tvPostContent.context,
+                    R.color.pure_blue
+                )
+            ) { tag ->
+                onMemberTagClicked()
             }
 
-            // post is used here to get lines count in the text view
-            tvPostContent.post {
-                val shortText: String? = SeeMoreUtil.getShortContent(
-                    data.text,
-                    tvPostContent,
+            val seeMoreSpannableStringBuilder = SpannableStringBuilder()
+            if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                seeMoreSpannableStringBuilder.append("...")
+                seeMoreSpannableStringBuilder.append(seeMore)
+                seeMoreSpannableStringBuilder.setSpan(
+                    seeMoreClickableSpan,
                     3,
-                    500
+                    seeMore.length + 3,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
-
-                val trimmedText =
-                    if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                        shortText
-                    } else {
-                        textForLinkify
-                    }
-
-                // TODO: Confirm
-                MemberTaggingDecoder.decode(
-                    tvPostContent,
-                    trimmedText,
-                    enableClick = true,
-                    BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
-                        tvPostContent.context,
-                        R.color.pure_blue
-                    )
-                ) { tag ->
-                    onMemberTagClicked()
-                }
-
-                tvPostContent.text = TextUtils.concat(
-                    tvPostContent.text,
-                    seeMoreSpannableStringBuilder,
-                    seeLessSpannableStringBuilder
-                )
-
-                tvPostContent.movementMethod = CustomLinkMovementMethod {
-                    //TODO: Handle links etc.
-                    true
-                }
-
-                tvPostContent.setOnClickListener {
-                    adapterListener?.postDetails(data)
-                }
             }
+
+            val seeLessSpannableStringBuilder = SpannableStringBuilder()
+            if (alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                seeLessSpannableStringBuilder.append(seeLess)
+                seeLessSpannableStringBuilder.setSpan(
+                    seeLessClickableSpan,
+                    0,
+                    seeLess.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+
+            val postTextSpannableStringBuilder = SpannableStringBuilder()
+            postTextSpannableStringBuilder.append(trimmedText)
+            postTextSpannableStringBuilder.setSpan(
+                postTextClickableSpan,
+                0,
+                trimmedText.length,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
 
             tvPostContent.movementMethod = CustomLinkMovementMethod {
                 //TODO: Handle links etc.
@@ -388,10 +369,27 @@ object PostTypeUtil {
             }
 
             tvPostContent.text = TextUtils.concat(
-                tvPostContent.text,
+                postTextSpannableStringBuilder,
                 seeMoreSpannableStringBuilder,
                 seeLessSpannableStringBuilder
             )
+        }
+    }
+
+    fun initPostSingleImage(
+        ivPost: ImageView,
+        data: PostViewData,
+        adapterListener: PostAdapterListener
+    ) {
+
+        ImageBindingUtil.loadImage(
+            ivPost,
+            data.attachments.first().attachmentMeta.url,
+            placeholder = R.drawable.image_placeholder
+        )
+
+        ivPost.setOnClickListener {
+            adapterListener.postDetail(data)
         }
     }
 

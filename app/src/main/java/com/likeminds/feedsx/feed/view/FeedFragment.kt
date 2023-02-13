@@ -41,18 +41,9 @@ class FeedFragment :
     DeleteEntityDialogFragment.DeleteContentDialogListener {
 
     private val viewModel: FeedViewModel by viewModels()
-    private lateinit var mPostAdapter: PostAdapter
-    private lateinit var alertDialog: AlertDialog
 
-    private val reportPostLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                ReportSuccessDialog("Message").show(
-                    childFragmentManager,
-                    ReportSuccessDialog.TAG
-                )
-            }
-        }
+    lateinit var mPostAdapter: PostAdapter
+    private lateinit var alertDialog: AlertDialog
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -370,22 +361,19 @@ class FeedFragment :
     }
 
     //opens post detail screen when add comment/comments count is clicked
-    override fun comment(postData: PostViewData) {
+    override fun comment(postId: String) {
         val postDetailExtras = PostDetailExtras.Builder()
-            .postId(postData.id)
+            .postId(postId)
             .isEditTextFocused(true)
-            .commentsCount(postData.commentsCount)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
     }
 
     //opens post detail screen when post content is clicked
-    //TODO: confirm and trigger
-    override fun postDetails(postData: PostViewData) {
+    override fun postDetail(postData: PostViewData) {
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
-            .commentsCount(postData.commentsCount)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
     }
@@ -413,4 +401,15 @@ class FeedFragment :
     ) {
         // TODO: call api
     }
+
+    // launcher to start [Report Activity] and show success dialog for result
+    private val reportPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                ReportSuccessDialog("Message").show(
+                    childFragmentManager,
+                    ReportSuccessDialog.TAG
+                )
+            }
+        }
 }

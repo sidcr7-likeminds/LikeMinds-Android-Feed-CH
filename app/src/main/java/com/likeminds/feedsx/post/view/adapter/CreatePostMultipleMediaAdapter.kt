@@ -7,7 +7,7 @@ import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 
-class MultipleMediaCreatePostAdapter constructor(
+class CreatePostMultipleMediaAdapter constructor(
     private val listener: CreatePostListener
 ) : BaseRecyclerAdapter<BaseViewType>() {
 

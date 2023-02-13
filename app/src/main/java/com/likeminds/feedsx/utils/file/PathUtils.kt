@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.utils.file
 
-import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
@@ -23,8 +22,6 @@ object PathUtils {
      * other file-based ContentProviders.
      *
      */
-    @SuppressLint("NewApi")
-    @Suppress("DEPRECATION")
     internal fun getPath(context: Context, uri: Uri): String {
         val contentResolver = context.contentResolver
         //Document Provider
@@ -42,7 +39,6 @@ object PathUtils {
             }
             // MediaStore (and general)
             uri.isMediaStore -> {
-                val path = getPathFromColumn(contentResolver, uri, COLUMN_DATA)
                 return if (uri.isGooglePhotosUri) {
                     googlePhotosUri(uri) ?: ""
                 } else {
@@ -58,8 +54,6 @@ object PathUtils {
      * Method for external document
      *
      */
-    @SuppressLint("NewApi")
-    @Suppress("DEPRECATION")
     private fun externalStorageDocument(context: Context, uri: Uri): String {
         val docId = DocumentsContract.getDocumentId(uri)
         val split = docId.split(":").toTypedArray()
@@ -102,8 +96,6 @@ object PathUtils {
      * Method for rawDownloadDocument
      *
      */
-    @Suppress("DEPRECATION")
-    @SuppressLint("NewApi")
     private fun rawDownloadsDocument(contentResolver: ContentResolver, uri: Uri): String {
         val fileName = getPathFromColumn(contentResolver, uri, COLUMN_DISPLAY_NAME)
         val subFolderName = getSubFolders(uri.toString())
@@ -123,8 +115,6 @@ object PathUtils {
      * Method for downloadsDocument
      *
      */
-    @SuppressLint("NewApi")
-    @Suppress("DEPRECATION")
     private fun downloadsDocument(contentResolver: ContentResolver, uri: Uri): String {
         val fileName = getPathFromColumn(contentResolver, uri, COLUMN_DISPLAY_NAME)
         val subFolderName = getSubFolders(uri.toString())
@@ -152,7 +142,6 @@ object PathUtils {
      * Method for MediaDocument
      *
      */
-    @SuppressLint("NewApi")
     private fun mediaDocument(contentResolver: ContentResolver, uri: Uri): String {
         val docId = DocumentsContract.getDocumentId(uri)
         val split: Array<String?> = docId.split(":").toTypedArray()

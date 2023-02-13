@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.media.databinder
+package com.likeminds.feedsx.media.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -13,9 +13,8 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.utils.DateUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
-import javax.inject.Inject
 
-class MediaPickerDocumentItemViewDataBinder @Inject constructor(
+class MediaPickerDocumentItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
 ) : ViewDataBinder<ItemMediaPickerDocumentBinding, MediaViewData>() {
 

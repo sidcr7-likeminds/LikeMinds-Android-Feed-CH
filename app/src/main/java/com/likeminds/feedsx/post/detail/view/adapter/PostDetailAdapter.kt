@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.detail.view.adapter
 
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentViewDataBinder
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentsCountViewDataBinder
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
@@ -26,7 +27,10 @@ class PostDetailAdapter constructor(
         viewDataBinders.add(itemPostDetailCommentsCountViewDataBinder)
 
         val itemPostDetailCommentViewDataBinder =
-            ItemPostDetailCommentViewDataBinder(postDetailAdapterListener, postDetailReplyAdapterListener)
+            ItemPostDetailCommentViewDataBinder(
+                postDetailAdapterListener,
+                postDetailReplyAdapterListener
+            )
         viewDataBinders.add(itemPostDetailCommentViewDataBinder)
 
         val itemPostTextOnlyBinder = ItemPostTextOnlyViewDataBinder(postAdapterListener)
@@ -60,7 +64,7 @@ class PostDetailAdapter constructor(
     interface PostDetailAdapterListener {
         fun likeComment(commentId: String)
         fun fetchReplies(commentId: String, commentPosition: Int)
-        fun replyOnComment(commentId: String)
+        fun replyOnComment(commentId: String, commentPosition: Int, parentCommenter: UserViewData)
         fun onCommentMenuItemClicked(commentId: String, title: String)
     }
 }

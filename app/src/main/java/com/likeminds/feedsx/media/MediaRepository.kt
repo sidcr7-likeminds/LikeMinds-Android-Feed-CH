@@ -17,15 +17,12 @@ import com.annimon.stream.Stream
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.utils.DateUtil
-import com.likeminds.feedsx.utils.ValueUtils.Companion.getOrDefault
-import com.likeminds.feedsx.utils.downloader.DownloadUtil
+import com.likeminds.feedsx.utils.ValueUtils.getMediaType
+import com.likeminds.feedsx.utils.ValueUtils.getMimeType
+import com.likeminds.feedsx.utils.ValueUtils.getOrDefault
 import com.likeminds.feedsx.utils.file.isLargeFile
-import com.likeminds.feedsx.utils.getMediaType
-import com.likeminds.feedsx.utils.getMimeType
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
 import com.likeminds.likemindschat.utils.*
-import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.util.*
 import javax.inject.Inject
 
@@ -112,11 +109,7 @@ class MediaRepository @Inject constructor() {
             mediaFolders.addAll(
                 Stream.of(data.first.values).map { folder ->
                     val folderType =
-                        if (folder.getFolderTitle() == DownloadUtil.DOWNLOAD_DIRECTORY) {
-                            MediaFolderType.LIKEMINDS
-                        } else {
-                            MediaFolderType.NORMAL
-                        }
+                        MediaFolderType.NORMAL
                     MediaFolderViewData.Builder()
                         .thumbnailUri(folder.thumbnail)
                         .title(folder.getFolderTitle())
@@ -124,7 +117,7 @@ class MediaRepository @Inject constructor() {
                         .bucketId(folder.bucketId)
                         .folderType(folderType).build()
                 }.toList().sortedWith(
-                    compareBy({ it.title != DownloadUtil.DOWNLOAD_DIRECTORY }, { it.title })
+                    compareBy { it.title }
                 )
             )
 
@@ -181,7 +174,7 @@ class MediaRepository @Inject constructor() {
 
         val cameraBucketId = imageFolders?.cameraBucketId ?: videoFolders?.cameraBucketId
         val allMediaThumbnail =
-            if (imageFolders?.thumbnailTimestamp ?: 0 > videoFolders?.thumbnailTimestamp ?: 0) {
+            if ((imageFolders?.thumbnailTimestamp ?: 0) > (videoFolders?.thumbnailTimestamp ?: 0)) {
                 imageFolders?.thumbnail
             } else {
                 videoFolders?.thumbnail
@@ -374,7 +367,8 @@ class MediaRepository @Inject constructor() {
             MediaStore.Files.FileColumns.MIME_TYPE,
             MediaStore.Files.FileColumns.DATE_MODIFIED,
             MediaStore.Files.FileColumns.SIZE,
-            MediaStore.Files.FileColumns.DISPLAY_NAME
+            MediaStore.Files.FileColumns.DISPLAY_NAME,
+            MediaStore.Files.FileColumns.TITLE
         )
         val selection = MediaStore.Files.FileColumns.MIME_TYPE + "=? AND " + isNotPending
         context.contentResolver.query(contentUri, projection, selection, mimeTypes, sortBy)
@@ -388,8 +382,11 @@ class MediaRepository @Inject constructor() {
                         cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_MODIFIED))
                     val size =
                         cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE))
-                    val mediaName =
+                    var mediaName =
                         cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
+                    if(mediaName == null)
+                        mediaName =
+                            cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE))
                     if (!size.isLargeFile) {
                         media.add(
                             MediaViewData.Builder()
@@ -534,24 +531,6 @@ class MediaRepository @Inject constructor() {
             }
         }
         return null
-    }
-
-    fun convertUriToByteArray(context: Context, uri: Uri): ByteArray {
-        val iStream = context.contentResolver.openInputStream(uri)
-        return getBytes(iStream)
-    }
-
-    private fun getBytes(iStream: InputStream?): ByteArray {
-        val byteBuffer = ByteArrayOutputStream()
-        val bufferSize = 1024
-        val buffer = ByteArray(bufferSize)
-
-        var len: Int
-        while (iStream?.read(buffer).also { len = it ?: 0 } != -1) {
-            byteBuffer.write(buffer, 0, len)
-        }
-
-        return byteBuffer.toByteArray()
     }
 
     private val isNotPending: String

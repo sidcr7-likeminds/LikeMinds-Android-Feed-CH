@@ -1,15 +1,14 @@
-package com.likeminds.feedsx.media.databinder
+package com.likeminds.feedsx.media.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemMediaPickerBrowseBinding
-import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MediaBrowserViewData
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_BROWSE
-import javax.inject.Inject
 
-class MediaPickerBrowseItemViewDataBinder @Inject constructor(
+class MediaPickerBrowseItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
 ) : ViewDataBinder<ItemMediaPickerBrowseBinding, MediaBrowserViewData>() {
 

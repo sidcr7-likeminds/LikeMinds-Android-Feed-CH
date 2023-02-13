@@ -12,11 +12,11 @@ class MemberTaggingClickableSpan(
     val memberTaggingClickableSpanListener: MemberTaggingClickableSpanListener? = null
 ) : ClickableSpan() {
 
-    override fun updateDrawState(ds: TextPaint) {
-        super.updateDrawState(ds)
+    override fun updateDrawState(textPaint: TextPaint) {
+        super.updateDrawState(textPaint)
         try {
-            ds.color = color
-            ds.isUnderlineText = underLineText
+            textPaint.color = color
+            textPaint.isUnderlineText = underLineText
         } catch (e: Exception) {
             e.printStackTrace()
         }
