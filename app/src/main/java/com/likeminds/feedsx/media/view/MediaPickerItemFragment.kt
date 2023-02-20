@@ -21,12 +21,8 @@ import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.viewmodel.MediaViewModel
 import com.likeminds.feedsx.utils.actionmode.ActionModeCallback
 import com.likeminds.feedsx.utils.actionmode.ActionModeListener
-import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_HEADER
-import com.likeminds.feedsx.utils.permissions.Permission
-import com.likeminds.feedsx.utils.permissions.PermissionDeniedCallback
-import com.likeminds.feedsx.utils.permissions.PermissionManager
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

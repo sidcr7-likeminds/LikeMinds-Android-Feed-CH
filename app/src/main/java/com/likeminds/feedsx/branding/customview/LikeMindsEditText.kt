@@ -24,9 +24,8 @@ internal class LikeMindsEditText @JvmOverloads constructor(
             array.getString(R.styleable.LikeMindsTextView_fontType)
         )
 
-        val etType = array.getString(R.styleable.LikeMindsEditText_et_type)
-
         //edittext background color
+        val etType = array.getString(R.styleable.LikeMindsEditText_et_type)
         if (etType.equals("special"))
             this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
 

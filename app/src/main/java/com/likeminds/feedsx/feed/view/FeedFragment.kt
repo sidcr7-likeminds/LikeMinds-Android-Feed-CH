@@ -6,9 +6,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
-import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
+import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
+import com.likeminds.feedsx.delete.view.DeleteDialogFragment
+import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.post.view.CreatePostActivity
@@ -27,9 +36,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FeedFragment :
     BaseFragment<FragmentFeedBinding>(),
-    PostAdapterListener {
+    PostAdapterListener,
+    DeleteDialogFragment.DeleteDialogListener,
+    DeleteAlertDialogFragment.DeleteAlertDialogListener {
 
     private val viewModel: FeedViewModel by viewModels()
+
     lateinit var mPostAdapter: PostAdapter
 
     override fun getViewBinding(): FragmentFeedBinding {
@@ -86,14 +98,13 @@ class FeedFragment :
             show()
         }
 
-
         //TODO: Remove Testing data
         addTestingData()
     }
 
     private fun addTestingData() {
         var text =
-            "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
+            "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("1")
@@ -237,6 +248,43 @@ class FeedFragment :
         }
     }
 
+    // processes delete post request
+    private fun deletePost(postId: String) {
+        //TODO: set isAdmin
+        val isAdmin = false
+        val deleteExtras = DeleteExtras.Builder()
+            .entityId(postId)
+            .entityType(DELETE_TYPE_POST)
+            .build()
+        if (isAdmin) {
+            DeleteDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        } else {
+            // when user deletes their own entity
+            DeleteAlertDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        }
+    }
+
+    // Processes report action on post
+    private fun reportPost(postId: String) {
+        //create extras for [ReportActivity]
+        val reportExtras = ReportExtras.Builder()
+            .entityId(postId)
+            .type(REPORT_TYPE_POST)
+            .build()
+
+        //get Intent for [ReportActivity]
+        val intent = ReportActivity.getIntent(requireContext(), reportExtras)
+
+        //start [ReportActivity] and check for result
+        reportPostLauncher.launch(intent)
+    }
+
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostAdapter[position]
         if (item is PostViewData) {
@@ -260,20 +308,19 @@ class FeedFragment :
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
-        //TODO: Perform action on post's menu item selection
-        // Testing data
-        if (title.equals("Report")) {
-            //create extras for [ReportActivity]
-            val reportExtras = ReportExtras.Builder()
-                .dataId(postId)
-                .type(REPORT_TYPE_POST)
-                .build()
-
-            //get Intent for [ReportActivity]
-            val intent = ReportActivity.getIntent(requireContext(), reportExtras)
-
-            //start [ReportActivity] and check for result
-            reportPostLauncher.launch(intent)
+        when (title) {
+            DELETE_POST_MENU_ITEM -> {
+                deletePost(postId)
+            }
+            REPORT_POST_MENU_ITEM -> {
+                reportPost(postId)
+            }
+            PIN_POST_MENU_ITEM -> {
+                // TODO: pin post
+            }
+            UNPIN_POST_MENU_ITEM -> {
+                // TODO: unpin post
+            }
         }
     }
 
@@ -329,6 +376,24 @@ class FeedFragment :
         (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
             position,
             px
+        )
+    }
+
+    // callback when self post is deleted by user
+    override fun delete(deleteExtras: DeleteExtras) {
+        // TODO: delete post by user
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
+        )
+    }
+
+    // callback when other's post is deleted by CM
+    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
+        // TODO: delete post by admin
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
         )
     }
 

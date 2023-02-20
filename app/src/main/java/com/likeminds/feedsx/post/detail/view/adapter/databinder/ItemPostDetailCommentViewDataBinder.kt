@@ -171,6 +171,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
     }
 
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        postDetailAdapterListener.onCommentMenuItemClicked(menu.dataId, menu.title)
+        overflowMenu.dismiss()
+        postDetailAdapterListener.onCommentMenuItemClicked(menu.entityId, menu.title)
     }
 }

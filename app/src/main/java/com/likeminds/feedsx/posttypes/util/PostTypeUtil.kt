@@ -3,8 +3,11 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -19,12 +22,9 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.SeeMoreUtil
-import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -69,7 +69,7 @@ object PostTypeUtil {
         binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
     }
 
-    //to show the options on the post
+    //to show the overflow menu
     fun showOverflowMenu(ivMenu: ImageView, overflowMenu: OverflowMenuPopup) {
         overflowMenu.showAsDropDown(
             ivMenu,
@@ -163,6 +163,14 @@ object PostTypeUtil {
         if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
         else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
 
+        // bounce animation for like and save button
+        val bounceAnim: Animation by lazy {
+            AnimationUtils.loadAnimation(
+                context,
+                R.anim.bounce
+            )
+        }
+
         binding.likesCount.text =
             if (data.likesCount == 0) context.getString(R.string.like)
             else
@@ -184,10 +192,14 @@ object PostTypeUtil {
                 )
 
         binding.ivLike.setOnClickListener {
+            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+            it.startAnimation(bounceAnim)
             listener.likePost()
         }
 
         binding.ivBookmark.setOnClickListener {
+            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+            it.startAnimation(bounceAnim)
             listener.savePost()
         }
 
@@ -350,7 +362,7 @@ object PostTypeUtil {
             postTextSpannableStringBuilder.setSpan(
                 postTextClickableSpan,
                 0,
-                trimmedText.length ?: 0,
+                trimmedText.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
@@ -360,7 +372,7 @@ object PostTypeUtil {
             }
 
             tvPostContent.text = TextUtils.concat(
-                postTextSpannableStringBuilder,
+                tvPostContent.text,
                 seeMoreSpannableStringBuilder,
                 seeLessSpannableStringBuilder
             )

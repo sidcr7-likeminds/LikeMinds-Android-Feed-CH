@@ -91,6 +91,6 @@ class ItemPostDetailReplyViewDataBinder constructor(
 
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
         //TODO: Can we use postDetailAdapterListener here? As reply is also a comment
-        postDetailReplyAdapterListener.onReplyMenuItemClicked(menu.dataId, menu.title)
+        postDetailReplyAdapterListener.onReplyMenuItemClicked(menu.entityId, menu.title)
     }
 }

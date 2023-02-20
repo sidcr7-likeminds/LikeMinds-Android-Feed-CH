@@ -5,8 +5,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
 import com.likeminds.feedsx.feed.view.LikesActivity.Companion.LIKES_SCREEN_EXTRAS
 import com.likeminds.feedsx.feed.view.adapter.LikesScreenAdapter
-import com.likeminds.feedsx.feed.view.model.LikeViewData
-import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.feed.model.LikeViewData
+import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.show

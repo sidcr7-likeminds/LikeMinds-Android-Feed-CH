@@ -53,11 +53,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/tv_replying_to"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_replying_to"
             app:srcCompat="@drawable/ic_multiply"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            tools:visibility="visible" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsEditText
             android:id="@+id/et_comment"
@@ -68,9 +70,11 @@
             android:ellipsize="end"
             android:hint="@string/write_a_comment"
             android:inputType="textMultiLine"
+            android:maxHeight="100dp"
             android:minHeight="48dp"
             android:paddingStart="16dp"
             android:paddingEnd="64dp"
+            android:scrollbars="vertical"
             android:textColor="@color/dark_grey"
             android:textColorHint="@color/maastricht_blue_40"
             app:font_style="regular"
