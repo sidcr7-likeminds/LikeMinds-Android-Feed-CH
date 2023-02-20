@@ -121,14 +121,6 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         this.dataList = items;
     }
 
-//    public void setItemsViaDiffUtilForHome(List<T> items) {
-//        HomeDiffUtilCallback homeDiffUtilCallback = new HomeDiffUtilCallback(dataList, items);
-//        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(homeDiffUtilCallback);
-//        dataList.clear();
-//        dataList.addAll(items);
-//        diffResult.dispatchUpdatesTo(this);
-//    }
-
     // TODO: call this while observing feed data
     public void setItemsViaDiffUtilForFeed(List<T> items) {
         FeedDiffUtilCallback feedDiffUtilCallback = new FeedDiffUtilCallback(dataList, items);
@@ -155,23 +147,6 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         dataList.addAll(items);
         diffResult.dispatchUpdatesTo(this);
     }
-
-//    public void setItemsViaDiffUtilForChatroomDetail(List<T> items) {
-//        ChatroomDetailDiffUtilCallback diffUtilCallback = new ChatroomDetailDiffUtilCallback(dataList, items);
-//        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(diffUtilCallback);
-//        dataList.clear();
-//        dataList.addAll(items);
-//        diffResult.dispatchUpdatesTo(this);
-//    }
-
-    //todo resolve comments
-//    public void setItemsViaDiffUtilForCommunityFeed(List<T> items) {
-//        CommunityFeedDiffUtilCallback callback = new CommunityFeedDiffUtilCallback(dataList, items);
-//        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(callback);
-//        dataList.clear();
-//        dataList.addAll(items);
-//        diffResult.dispatchUpdatesTo(this);
-//    }
 
     public void notifyAllItems() {
         notifyDataSetChanged();
