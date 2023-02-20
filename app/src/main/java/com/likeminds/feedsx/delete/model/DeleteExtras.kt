@@ -1,11 +1,11 @@
-package com.likeminds.feedsx.deleteentity.model
+package com.likeminds.feedsx.delete.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class DeleteEntityExtras private constructor(
-    @DeleteEntityType
+class DeleteExtras private constructor(
+    @DeleteType
     var entityType: Int,
     var entityId: String
 ) : Parcelable {
@@ -14,10 +14,10 @@ class DeleteEntityExtras private constructor(
         private var entityType: Int = 0
         private var entityId: String = ""
 
-        fun entityType(@DeleteEntityType entityType: Int) = apply { this.entityType = entityType }
+        fun entityType(@DeleteType entityType: Int) = apply { this.entityType = entityType }
         fun entityId(entityId: String) = apply { this.entityId = entityId }
 
-        fun build() = DeleteEntityExtras(entityType, entityId)
+        fun build() = DeleteExtras(entityType, entityId)
     }
 
     fun toBuilder(): Builder {

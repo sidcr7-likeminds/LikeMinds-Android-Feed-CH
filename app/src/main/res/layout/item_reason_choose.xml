@@ -8,7 +8,7 @@
 
         <variable
             name="viewData"
-            type="com.likeminds.feedsx.deleteentity.model.ReasonChooseViewData" />
+            type="com.likeminds.feedsx.delete.model.ReasonChooseViewData" />
 
         <variable
             name="hideBottomLine"

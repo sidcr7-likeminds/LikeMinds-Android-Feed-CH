@@ -2,17 +2,16 @@ package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
-import com.likeminds.feedsx.deleteentity.model.DELETE_ENTITY_TYPE_POST
-import com.likeminds.feedsx.deleteentity.model.DeleteEntityExtras
-import com.likeminds.feedsx.deleteentity.view.DeleteEntityDialogFragment
+import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
+import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
+import com.likeminds.feedsx.delete.view.DeleteDialogFragment
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
@@ -38,12 +37,12 @@ import dagger.hilt.android.AndroidEntryPoint
 class FeedFragment :
     BaseFragment<FragmentFeedBinding>(),
     PostAdapterListener,
-    DeleteEntityDialogFragment.DeleteContentDialogListener {
+    DeleteDialogFragment.DeleteDialogListener,
+    DeleteAlertDialogFragment.DeleteAlertDialogListener {
 
     private val viewModel: FeedViewModel by viewModels()
 
     lateinit var mPostAdapter: PostAdapter
-    private lateinit var alertDialog: AlertDialog
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -252,37 +251,23 @@ class FeedFragment :
     // processes delete post request
     private fun deletePost(postId: String) {
         //TODO: set isAdmin
-        val isAdmin = true
+        val isAdmin = false
+        val deleteExtras = DeleteExtras.Builder()
+            .entityId(postId)
+            .entityType(DELETE_TYPE_POST)
+            .build()
         if (isAdmin) {
-            val deleteEntityExtras = DeleteEntityExtras.Builder()
-                .entityId(postId)
-                .entityType(DELETE_ENTITY_TYPE_POST)
-                .build()
-            DeleteEntityDialogFragment.showDialog(
+            DeleteDialogFragment.showDialog(
                 childFragmentManager,
-                deleteEntityExtras
+                deleteExtras
             )
         } else {
-            showDeletePostDialog()
+            // when user deletes their own entity
+            DeleteAlertDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
         }
-    }
-
-    // shows delete post dialog when user deletes their own post
-    private fun showDeletePostDialog() {
-        val builder = AlertDialog.Builder(requireContext())
-        builder.setMessage(getString(R.string.delete_post_message))
-            .setTitle(getString(R.string.delete_post_question))
-            .setCancelable(true)
-            .setPositiveButton(getString(R.string.delete_caps)) { _, _ ->
-
-            }.setNegativeButton(getString(R.string.cancel_caps)) { _, _ ->
-                alertDialog.dismiss()
-            }
-        //Creating dialog box
-        alertDialog = builder.create()
-        alertDialog.show()
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black_40))
     }
 
     // Processes report action on post
@@ -394,12 +379,20 @@ class FeedFragment :
         )
     }
 
-    override fun deleteContent(
-        deleteEntityExtras: DeleteEntityExtras,
-        reportTagId: String,
-        reason: String
-    ) {
-        // TODO: call api
+    override fun delete(deleteExtras: DeleteExtras) {
+        // TODO: delete post by user
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
+        )
+    }
+
+    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
+        // TODO: delete post by admin
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
+        )
     }
 
     // launcher to start [Report Activity] and show success dialog for result

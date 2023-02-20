@@ -17,6 +17,5 @@ const val REPORT_COMMENT_MENU_ITEM = "Report"
     DELETE_COMMENT_MENU_ITEM,
     REPORT_COMMENT_MENU_ITEM
 )
-
 @Retention(AnnotationRetention.SOURCE)
 annotation class OverflowMenuItemTitle

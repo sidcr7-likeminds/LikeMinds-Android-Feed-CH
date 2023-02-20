@@ -1,12 +1,12 @@
-package com.likeminds.feedsx.deleteentity.view
+package com.likeminds.feedsx.delete.view
 
 import android.graphics.Color
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.databinding.DialogReasonChooseBinding
-import com.likeminds.feedsx.deleteentity.model.ReasonChooseViewData
-import com.likeminds.feedsx.deleteentity.view.adapter.ReasonChooseAdapter
-import com.likeminds.feedsx.deleteentity.view.adapter.ReasonChooseAdapter.ReasonChooseAdapterListener
+import com.likeminds.feedsx.delete.model.ReasonChooseViewData
+import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter
+import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter.ReasonChooseAdapterListener
 import com.likeminds.feedsx.utils.customview.BaseBottomSheetFragment
 import com.likeminds.feedsx.utils.model.BaseViewType
 

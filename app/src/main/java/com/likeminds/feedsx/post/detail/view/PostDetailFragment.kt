@@ -1,16 +1,19 @@
 package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
-import com.likeminds.feedsx.deleteentity.model.DeleteEntityExtras
-import com.likeminds.feedsx.deleteentity.view.DeleteEntityDialogFragment
+import com.likeminds.feedsx.delete.model.DELETE_TYPE_COMMENT
+import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
+import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
+import com.likeminds.feedsx.delete.view.DeleteDialogFragment
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.view.LikesActivity
 import com.likeminds.feedsx.overflowmenu.model.*
@@ -20,7 +23,9 @@ import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_D
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
-import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.CommentViewData
+import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
@@ -32,13 +37,16 @@ import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
+import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
 class PostDetailFragment :
     BaseFragment<FragmentPostDetailBinding>(),
     PostAdapterListener,
     PostDetailAdapterListener,
-    PostDetailReplyAdapterListener {
+    PostDetailReplyAdapterListener,
+    DeleteAlertDialogFragment.DeleteAlertDialogListener,
+    DeleteDialogFragment.DeleteDialogListener {
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -256,46 +264,24 @@ class PostDetailFragment :
         entityType: Int
     ) {
         //TODO: set isAdmin
-        val isAdmin = true
+        val isAdmin = false
+        val deleteExtras = DeleteExtras.Builder()
+            .entityId(entityId)
+            .entityType(entityType)
+            .build()
         if (isAdmin) {
-            val deleteEntityExtras = DeleteEntityExtras.Builder()
-                .entityId(entityId)
-                .entityType(entityType)
-                .build()
-            DeleteEntityDialogFragment.showDialog(
+            // when CM deletes other user's post
+            DeleteDialogFragment.showDialog(
                 childFragmentManager,
-                deleteEntityExtras
+                deleteExtras
             )
         } else {
-            showDeleteEntityDialog(entityType)
+            // when user deletes their own entity
+            DeleteAlertDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
         }
-    }
-
-    // shows delete entity dialog when user deletes their own entity (post/comment)
-    private fun showDeleteEntityDialog(
-        @ReportType
-        entityType: Int
-    ) {
-        val builder = AlertDialog.Builder(requireContext())
-        var message = getString(R.string.delete_post_message)
-        var title = getString(R.string.delete_post_question)
-        if (entityType == REPORT_TYPE_COMMENT) {
-            message = getString(R.string.delete_comment_message)
-            title = getString(R.string.delete_comment_question)
-        }
-        builder.setMessage(message)
-            .setTitle(title)
-            .setCancelable(true)
-            .setPositiveButton(getString(R.string.delete_caps)) { _, _ ->
-
-            }.setNegativeButton(getString(R.string.cancel_caps)) { _, _ ->
-                alertDialog.dismiss()
-            }
-        //Creating dialog box
-        alertDialog = builder.create()
-        alertDialog.show()
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            ?.setTextColor(ContextCompat.getColor(requireContext(), R.color.black_40))
     }
 
     // Processes report action on entity
@@ -554,4 +540,34 @@ class PostDetailFragment :
                 )
             }
         }
+
+    override fun delete(deleteExtras: DeleteExtras) {
+        // TODO: delete post/comment by user
+        Log.d("TAG", "initializeListeners: ${deleteExtras.entityType}")
+        when (deleteExtras.entityType) {
+            DELETE_TYPE_POST -> showShortToast(
+                requireContext(),
+                getString(R.string.post_deleted)
+            )
+            DELETE_TYPE_COMMENT -> showShortToast(
+                requireContext(),
+                getString(R.string.comment_deleted)
+            )
+        }
+    }
+
+    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
+        // TODO: delete post/comment by admin
+        Log.d("TAG", "initializeListeners by admin: ${deleteExtras.entityType}")
+        when (deleteExtras.entityType) {
+            DELETE_TYPE_POST -> showShortToast(
+                requireContext(),
+                getString(R.string.post_deleted)
+            )
+            DELETE_TYPE_COMMENT -> showShortToast(
+                requireContext(),
+                getString(R.string.comment_deleted)
+            )
+        }
+    }
 }
