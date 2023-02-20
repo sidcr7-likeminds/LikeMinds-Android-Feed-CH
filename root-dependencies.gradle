@@ -27,6 +27,7 @@ versions.photoview = '2.3.0'
 versions.cropper = '4.2.1'
 versions.drawable_toolbox = '1.0.7'
 versions.dotsindicator = '4.2'
+versions.swiperefreshlayout = '1.1.0'
 versions.hilt = "2.44"
 versions.stream = '1.2.1'
 ext.versions = versions
@@ -51,6 +52,7 @@ ui.photo_view = "com.github.chrisbanes:PhotoView:$versions.photoview"
 ui.cropper = "com.github.CanHub:Android-Image-Cropper:$versions.cropper"
 ui.drawable_toolbox = "com.github.duanhong169:drawabletoolbox:$versions.drawable_toolbox"
 ui.dot_indicator = "com.tbuonomo:dotsindicator:$versions.dotsindicator"
+ui.swiperefreshlayout = "androidx.swiperefreshlayout:swiperefreshlayout:$versions.swiperefreshlayout"
 ui.flexbox = "com.google.android.flexbox:flexbox:$versions.flexbox"
 deps.ui = ui
 

@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
@@ -14,6 +16,7 @@ import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
@@ -24,6 +27,7 @@ import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
@@ -42,6 +46,7 @@ class FeedFragment :
 
     private val viewModel: FeedViewModel by viewModels()
 
+    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     lateinit var mPostAdapter: PostAdapter
 
     override fun getViewBinding(): FragmentFeedBinding {
@@ -59,6 +64,7 @@ class FeedFragment :
         binding.isBrandingBasic = true
 
         initRecyclerView()
+        initSwipeRefreshLayout()
         initNewPostClick()
     }
 
@@ -69,34 +75,18 @@ class FeedFragment :
     }
 
     private fun initRecyclerView() {
+        val linearLayoutManager = LinearLayoutManager(context)
         mPostAdapter = PostAdapter(this)
         binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = linearLayoutManager
             adapter = mPostAdapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val isExtended = binding.newPostButton.isExtended
-
-                    // Scroll down
-                    if (dy > 20 && isExtended) {
-                        binding.newPostButton.shrink()
-                    }
-
-                    // Scroll up
-                    if (dy < -20 && !isExtended) {
-                        binding.newPostButton.extend()
-                    }
-
-                    // At the top
-                    if (!recyclerView.canScrollVertically(-1)) {
-                        binding.newPostButton.extend()
-                    }
-                }
-            })
             show()
         }
+
+        attachScrollListener(
+            binding.recyclerView,
+            linearLayoutManager
+        )
 
         //TODO: Remove Testing data
         addTestingData()
@@ -235,6 +225,78 @@ class FeedFragment :
         )
     }
 
+    // initializes swipe refresh layout and sets refresh listener
+    private fun initSwipeRefreshLayout() {
+        mSwipeRefreshLayout = binding.swipeRefreshLayout
+        mSwipeRefreshLayout.setColorSchemeColors(
+            BrandingData.getButtonsColor(),
+        )
+
+        mSwipeRefreshLayout.setOnRefreshListener {
+            mSwipeRefreshLayout.isRefreshing = true
+            fetchRefreshedData()
+        }
+    }
+
+    //TODO: Call api and refresh the feed data
+    private fun fetchRefreshedData() {
+        //TODO: testing data
+
+        val text =
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+        mPostAdapter.add(
+            0,
+            PostViewData.Builder()
+                .attachments(
+                    listOf(
+                        AttachmentViewData.Builder()
+                            .attachmentType(IMAGE)
+                            .attachmentMeta(
+                                AttachmentMetaViewData.Builder()
+                                    .url("https://www.shutterstock.com/image-vector/sample-red-square-grunge-stamp-260nw-338250266.jpg")
+                                    .build()
+                            )
+                            .build()
+                    )
+                )
+                .id("5")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        mSwipeRefreshLayout.isRefreshing = false
+    }
+
+    //attach scroll listener for pagination
+    private fun attachScrollListener(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+        recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
+            override fun onLoadMore(currentPage: Int) {
+                // TODO: add logic
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val isExtended = binding.newPostButton.isExtended
+
+                // Scroll down
+                if (dy > 20 && isExtended) {
+                    binding.newPostButton.shrink()
+                }
+
+                // Scroll up
+                if (dy < -20 && !isExtended) {
+                    binding.newPostButton.extend()
+                }
+
+                // At the top
+                if (!recyclerView.canScrollVertically(-1)) {
+                    binding.newPostButton.extend()
+                }
+            }
+        })
+    }
+
     private fun initToolbar() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
@@ -243,9 +305,16 @@ class FeedFragment :
             //TODO: On member Image click
         }
 
+        binding.ivNotification.setOnClickListener {
+            NotificationFeedActivity.start(requireContext())
+        }
+
         binding.ivSearch.setOnClickListener {
             //TODO: perform search
         }
+
+        //TODO: testing data. add this while observing data
+        binding.tvNotificationCount.text = "10"
     }
 
     // processes delete post request

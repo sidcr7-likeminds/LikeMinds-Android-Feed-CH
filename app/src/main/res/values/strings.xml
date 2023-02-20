@@ -67,6 +67,7 @@
     <string name="ok">OK</string>
     <string name="all_media">All Media</string>
     <string name="request_not_processed">Couldn\'t process your request</string>
+    <string name="notifications">Notifications</string>
     <string name="report_abuse">Report Abuse</string>
     <string name="report_sub_header">You would be able to report this %s after selecting a problem.</string>
     <string name="please_specify_the_problem_to_continue">Please specify the problem to continue</string>

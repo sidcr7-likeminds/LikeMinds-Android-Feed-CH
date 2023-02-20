@@ -30,6 +30,7 @@ const val ITEM_POST_DETAIL_REPLY = 24
 const val ITEM_REPLY_VIEW_MORE_REPLY = 25
 const val ITEM_REPORT_TAG = 26
 const val ITEM_REASON_CHOOSE = 27
+const val ITEM_NOTIFICATION_FEED = 28
 
 @IntDef(
     ITEM_NONE,
@@ -59,7 +60,8 @@ const val ITEM_REASON_CHOOSE = 27
     ITEM_POST_DETAIL_REPLY,
     ITEM_REPLY_VIEW_MORE_REPLY,
     ITEM_REPORT_TAG,
-    ITEM_REASON_CHOOSE
+    ITEM_REASON_CHOOSE,
+    ITEM_NOTIFICATION_FEED
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class ViewType

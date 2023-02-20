@@ -3,11 +3,12 @@ package com.likeminds.feedsx.post.detail.view
 import android.app.Activity
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_COMMENT
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
@@ -51,7 +52,7 @@ class PostDetailFragment :
     private lateinit var postDetailExtras: PostDetailExtras
 
     private lateinit var mPostDetailAdapter: PostDetailAdapter
-    private lateinit var alertDialog: AlertDialog
+    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     private var parentCommentIdToReply: String? = null
 
@@ -67,6 +68,7 @@ class PostDetailFragment :
         super.setUpViews()
         initRecyclerView()
         initCommentEditText()
+        initSwipeRefreshLayout()
         initListeners()
 
         //TODO: testing data
@@ -83,11 +85,59 @@ class PostDetailFragment :
             show()
         }
 
-        attachPagination(
+        attachScrollListener(
             binding.rvPostDetails,
             linearLayoutManager
         )
         addTestingData()
+    }
+
+    // initializes swipe refresh layout and sets refresh listener
+    private fun initSwipeRefreshLayout() {
+        mSwipeRefreshLayout = binding.swipeRefreshLayout
+        mSwipeRefreshLayout.setColorSchemeColors(
+            BrandingData.getButtonsColor(),
+        )
+
+        mSwipeRefreshLayout.setOnRefreshListener {
+            mSwipeRefreshLayout.isRefreshing = true
+            fetchRefreshedData()
+        }
+    }
+
+    //TODO: Call api and refresh the post data
+    private fun fetchRefreshedData() {
+        //TODO: testing data
+        mPostDetailAdapter.add(
+            2,
+            CommentViewData.Builder()
+                .isLiked(false)
+                .id("6")
+                .user(
+                    UserViewData.Builder()
+                        .name("Sid")
+                        .build()
+                )
+                .likesCount(140)
+                .text("This is a test comment 6")
+                .build()
+        )
+        mPostDetailAdapter.add(
+            3,
+            CommentViewData.Builder()
+                .isLiked(false)
+                .id("7")
+                .user(
+                    UserViewData.Builder()
+                        .name("Siddharth")
+                        .build()
+                )
+                .likesCount(100)
+                .isLiked(true)
+                .text("This is a test comment 7")
+                .build()
+        )
+        mSwipeRefreshLayout.isRefreshing = false
     }
 
     // TODO: call after fetching post
@@ -102,7 +152,7 @@ class PostDetailFragment :
     }
 
     // attach scroll listener for pagination for comments
-    private fun attachPagination(
+    private fun attachScrollListener(
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager
     ) {
@@ -115,20 +165,16 @@ class PostDetailFragment :
 
     // initializes comment edittext with TextWatcher and focuses the keyboard
     private fun initCommentEditText() {
-        binding.etComment.apply {
-            if (postDetailExtras.isEditTextFocused) focusAndShowKeyboard()
+        binding.apply {
+            if (postDetailExtras.isEditTextFocused) etComment.focusAndShowKeyboard()
 
-            doAfterTextChanged {
+            etComment.doAfterTextChanged {
                 if (it?.trim().isNullOrEmpty()) {
-                    binding.ivCommentSend.apply {
-                        isClickable = false
-                        setImageResource(R.drawable.ic_comment_send_disable)
-                    }
+                    ivCommentSend.isClickable = false
+                    ivCommentSend.setImageResource(R.drawable.ic_comment_send_disable)
                 } else {
-                    binding.ivCommentSend.apply {
-                        isClickable = true
-                        setImageResource(R.drawable.ic_comment_send_enable)
-                    }
+                    ivCommentSend.isClickable = true
+                    ivCommentSend.setImageResource(R.drawable.ic_comment_send_enable)
                 }
             }
         }
@@ -249,6 +295,7 @@ class PostDetailFragment :
     }
 
     override fun receiveExtras() {
+        // TODO: handle when opened from route
         super.receiveExtras()
         if (arguments == null || arguments?.containsKey(POST_DETAIL_EXTRAS) == false) {
             requireActivity().supportFragmentManager.popBackStack()

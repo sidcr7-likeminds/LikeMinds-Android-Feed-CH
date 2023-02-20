@@ -33,6 +33,10 @@
             android:name=".feed.view.LikesActivity"
             android:exported="false" />
         <activity
+            android:name=".notificationfeed.view.NotificationFeedActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".post.detail.view.PostDetailActivity"
             android:exported="false" />
         <activity

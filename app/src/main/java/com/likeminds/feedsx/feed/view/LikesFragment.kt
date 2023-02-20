@@ -3,10 +3,10 @@ package com.likeminds.feedsx.feed.view
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
-import com.likeminds.feedsx.feed.view.LikesActivity.Companion.LIKES_SCREEN_EXTRAS
-import com.likeminds.feedsx.feed.view.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.feed.model.LikeViewData
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
+import com.likeminds.feedsx.feed.view.LikesActivity.Companion.LIKES_SCREEN_EXTRAS
+import com.likeminds.feedsx.feed.view.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -42,7 +42,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
             show()
         }
 
-        attachPagination(
+        attachScrollListener(
             binding.rvLikes,
             linearLayoutManager
         )
@@ -71,7 +71,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     }
 
     //attach scroll listener for pagination
-    private fun attachPagination(
+    private fun attachScrollListener(
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager
     ) {

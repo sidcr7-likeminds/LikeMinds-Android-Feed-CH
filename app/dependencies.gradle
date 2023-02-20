@@ -11,6 +11,7 @@ dependencies {
     implementation deps.ui.circleimageview
     implementation deps.ui.dot_indicator
     implementation deps.ui.photo_view
+    implementation deps.ui.swiperefreshlayout
     implementation deps.ui.flexbox
 
     //hilt
