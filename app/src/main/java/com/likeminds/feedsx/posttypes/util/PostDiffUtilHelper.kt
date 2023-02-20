@@ -10,7 +10,6 @@ object PostDiffUtilHelper {
         newItem: PostViewData
     ): Boolean {
         return oldItem.text == newItem.text
-                && oldItem.shortText == newItem.shortText
                 && oldItem.alreadySeenFullContent == newItem.alreadySeenFullContent
                 && oldItem.isExpanded == newItem.isExpanded
                 && oldItem.isPinned == newItem.isPinned
