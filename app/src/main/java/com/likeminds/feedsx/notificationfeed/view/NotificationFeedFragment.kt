@@ -8,7 +8,6 @@ import com.likeminds.feedsx.databinding.FragmentNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -65,18 +64,18 @@ class NotificationFeedFragment :
             NotificationFeedViewData.Builder()
                 .id("1")
                 .user(user)
-                .menuItems(
-                    listOf(
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("1")
-                            .title("Delete")
-                            .build(),
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("2")
-                            .title("Mute")
-                            .build()
-                    )
-                )
+//                .menuItems(
+//                    listOf(
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("1")
+//                            .title("Delete")
+//                            .build(),
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("2")
+//                            .title("Mute")
+//                            .build()
+//                    )
+//                )
                 .cta("route://post_detail?post_id=1&comment_id=2")
                 .createdAt(1675721450000)
                 .activityMessage(text)
@@ -89,18 +88,18 @@ class NotificationFeedFragment :
             NotificationFeedViewData.Builder()
                 .id("2")
                 .user(user)
-                .menuItems(
-                    listOf(
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("1")
-                            .title("Delete")
-                            .build(),
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("2")
-                            .title("Mute")
-                            .build()
-                    )
-                )
+//                .menuItems(
+//                    listOf(
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("1")
+//                            .title("Delete")
+//                            .build(),
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("2")
+//                            .title("Mute")
+//                            .build()
+//                    )
+//                )
                 .createdAt(1675717850000)
                 .cta("route://create_post")
                 .activityMessage(text)
@@ -112,18 +111,18 @@ class NotificationFeedFragment :
                 .id("3")
                 .user(user)
                 .isRead(true)
-                .menuItems(
-                    listOf(
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("1")
-                            .title("Delete")
-                            .build(),
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("2")
-                            .title("Mute")
-                            .build()
-                    )
-                )
+//                .menuItems(
+//                    listOf(
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("1")
+//                            .title("Delete")
+//                            .build(),
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("2")
+//                            .title("Mute")
+//                            .build()
+//                    )
+//                )
                 .createdAt(1675458650000)
                 .activityMessage(text)
                 .build()
@@ -134,18 +133,18 @@ class NotificationFeedFragment :
                 .id("4")
                 .user(user)
                 .isRead(true)
-                .menuItems(
-                    listOf(
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("1")
-                            .title("Delete")
-                            .build(),
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("2")
-                            .title("Mute")
-                            .build()
-                    )
-                )
+//                .menuItems(
+//                    listOf(
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("1")
+//                            .title("Delete")
+//                            .build(),
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("2")
+//                            .title("Mute")
+//                            .build()
+//                    )
+//                )
                 .createdAt(1670274650000)
                 .activityMessage(text)
                 .build()
@@ -156,18 +155,18 @@ class NotificationFeedFragment :
                 .id("5")
                 .user(user)
                 .isRead(true)
-                .menuItems(
-                    listOf(
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("1")
-                            .title("Delete")
-                            .build(),
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("2")
-                            .title("Mute")
-                            .build()
-                    )
-                )
+//                .menuItems(
+//                    listOf(
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("1")
+//                            .title("Delete")
+//                            .build(),
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("2")
+//                            .title("Mute")
+//                            .build()
+//                    )
+//                )
                 .createdAt(1638738650000)
                 .activityMessage(text)
                 .build()
@@ -209,18 +208,18 @@ class NotificationFeedFragment :
             NotificationFeedViewData.Builder()
                 .id("1")
                 .user(user)
-                .menuItems(
-                    listOf(
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("1")
-                            .title("Delete")
-                            .build(),
-                        OverflowMenuItemViewData.Builder()
-                            .dataId("2")
-                            .title("Mute")
-                            .build()
-                    )
-                )
+//                .menuItems(
+//                    listOf(
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("1")
+//                            .title("Delete")
+//                            .build(),
+//                        OverflowMenuItemViewData.Builder()
+//                            .entityId("2")
+//                            .title("Mute")
+//                            .build()
+//                    )
+//                )
                 .cta("route://post_detail?post_id=1&comment_id=2")
                 .createdAt(1675721450000)
                 .activityMessage(text)
