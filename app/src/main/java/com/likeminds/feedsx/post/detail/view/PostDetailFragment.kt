@@ -541,6 +541,7 @@ class PostDetailFragment :
             }
         }
 
+    // callback when self post is deleted by user
     override fun delete(deleteExtras: DeleteExtras) {
         // TODO: delete post/comment by user
         Log.d("TAG", "initializeListeners: ${deleteExtras.entityType}")
@@ -556,6 +557,7 @@ class PostDetailFragment :
         }
     }
 
+    // callback when other's post is deleted by CM
     override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
         // TODO: delete post/comment by admin
         Log.d("TAG", "initializeListeners by admin: ${deleteExtras.entityType}")

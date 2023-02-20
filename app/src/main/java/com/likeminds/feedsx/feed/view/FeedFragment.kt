@@ -379,6 +379,7 @@ class FeedFragment :
         )
     }
 
+    // callback when self post is deleted by user
     override fun delete(deleteExtras: DeleteExtras) {
         // TODO: delete post by user
         ViewUtils.showShortToast(
@@ -387,6 +388,7 @@ class FeedFragment :
         )
     }
 
+    // callback when other's post is deleted by CM
     override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
         // TODO: delete post by admin
         ViewUtils.showShortToast(

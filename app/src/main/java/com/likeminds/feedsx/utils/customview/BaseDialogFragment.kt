@@ -69,7 +69,6 @@ abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
     ): View {
         _binding = getViewBinding()
         callBranding()
-        setupWindow()
         return binding.root
     }
 
@@ -96,15 +95,5 @@ abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
                 BrandingData.currentAdvanced!!.third
             )
         }
-    }
-
-    private fun setupWindow() {
-        val background = ColorDrawable(Color.TRANSPARENT)
-        val inset = InsetDrawable(background, ViewUtils.dpToPx(32), 0, ViewUtils.dpToPx(32), 0)
-        dialog?.window?.setBackgroundDrawable(inset)
-        dialog?.window?.setLayout(
-            WindowManager.LayoutParams.WRAP_CONTENT,
-            WindowManager.LayoutParams.WRAP_CONTENT
-        )
     }
 }
