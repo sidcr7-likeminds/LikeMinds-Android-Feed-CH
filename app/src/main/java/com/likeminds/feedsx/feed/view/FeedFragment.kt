@@ -1,15 +1,27 @@
 package com.likeminds.feedsx.feed.view
 
-import android.widget.Toast
+import android.app.Activity
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
-import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
+import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
+import com.likeminds.feedsx.delete.view.DeleteDialogFragment
+import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
+import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.post.view.CreatePostActivity
@@ -17,6 +29,10 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
+import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
+import com.likeminds.feedsx.report.model.ReportExtras
+import com.likeminds.feedsx.report.view.ReportActivity
+import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -26,10 +42,14 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class FeedFragment :
     BaseFragment<FragmentFeedBinding>(),
-    PostAdapterListener {
+    PostAdapterListener,
+    DeleteDialogFragment.DeleteDialogListener,
+    DeleteAlertDialogFragment.DeleteAlertDialogListener {
 
     private val viewModel: FeedViewModel by viewModels()
-    private lateinit var mPostAdapter: PostAdapter
+
+    private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+    lateinit var mPostAdapter: PostAdapter
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -46,6 +66,7 @@ class FeedFragment :
         binding.isBrandingBasic = true
 
         initRecyclerView()
+        initSwipeRefreshLayout()
         initNewPostClick()
     }
 
@@ -88,7 +109,7 @@ class FeedFragment :
             show()
         }
 
-        attachPagination(
+        attachScrollListener(
             binding.recyclerView,
             linearLayoutManager
         )
@@ -99,7 +120,7 @@ class FeedFragment :
 
     private fun addTestingData() {
         var text =
-            "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
+            "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
                 .id("1")
@@ -230,8 +251,50 @@ class FeedFragment :
         )
     }
 
+    // initializes swipe refresh layout and sets refresh listener
+    private fun initSwipeRefreshLayout() {
+        mSwipeRefreshLayout = binding.swipeRefreshLayout
+        mSwipeRefreshLayout.setColorSchemeColors(
+            BrandingData.getButtonsColor(),
+        )
+
+        mSwipeRefreshLayout.setOnRefreshListener {
+            mSwipeRefreshLayout.isRefreshing = true
+            fetchRefreshedData()
+        }
+    }
+
+    //TODO: Call api and refresh the feed data
+    private fun fetchRefreshedData() {
+        //TODO: testing data
+
+        val text =
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+        mPostAdapter.add(
+            0,
+            PostViewData.Builder()
+                .attachments(
+                    listOf(
+                        AttachmentViewData.Builder()
+                            .attachmentType(IMAGE)
+                            .attachmentMeta(
+                                AttachmentMetaViewData.Builder()
+                                    .url("https://www.shutterstock.com/image-vector/sample-red-square-grunge-stamp-260nw-338250266.jpg")
+                                    .build()
+                            )
+                            .build()
+                    )
+                )
+                .id("5")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
+        mSwipeRefreshLayout.isRefreshing = false
+    }
+
     //attach scroll listener for pagination
-    private fun attachPagination(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+    private fun attachScrollListener(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 // TODO: add logic
@@ -280,6 +343,43 @@ class FeedFragment :
         binding.tvNotificationCount.text = "10"
     }
 
+    // processes delete post request
+    private fun deletePost(postId: String) {
+        //TODO: set isAdmin
+        val isAdmin = false
+        val deleteExtras = DeleteExtras.Builder()
+            .entityId(postId)
+            .entityType(DELETE_TYPE_POST)
+            .build()
+        if (isAdmin) {
+            DeleteDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        } else {
+            // when user deletes their own entity
+            DeleteAlertDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        }
+    }
+
+    // Processes report action on post
+    private fun reportPost(postId: String) {
+        //create extras for [ReportActivity]
+        val reportExtras = ReportExtras.Builder()
+            .entityId(postId)
+            .type(REPORT_TYPE_POST)
+            .build()
+
+        //get Intent for [ReportActivity]
+        val intent = ReportActivity.getIntent(requireContext(), reportExtras)
+
+        //start [ReportActivity] and check for result
+        reportPostLauncher.launch(intent)
+    }
+
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostAdapter[position]
         if (item is PostViewData) {
@@ -301,8 +401,20 @@ class FeedFragment :
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
-        //TODO: Perform action on post's menu item selection
-        Toast.makeText(context, "Post id :${postId}, Title :${title}", Toast.LENGTH_SHORT).show()
+        when (title) {
+            DELETE_POST_MENU_ITEM -> {
+                deletePost(postId)
+            }
+            REPORT_POST_MENU_ITEM -> {
+                reportPost(postId)
+            }
+            PIN_POST_MENU_ITEM -> {
+                // TODO: pin post
+            }
+            UNPIN_POST_MENU_ITEM -> {
+                // TODO: unpin post
+            }
+        }
     }
 
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
@@ -327,22 +439,19 @@ class FeedFragment :
     }
 
     //opens post detail screen when add comment/comments count is clicked
-    override fun comment(postData: PostViewData) {
+    override fun comment(postId: String) {
         val postDetailExtras = PostDetailExtras.Builder()
-            .postId(postData.id)
+            .postId(postId)
             .isEditTextFocused(true)
-            .commentsCount(postData.commentsCount)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
     }
 
     //opens post detail screen when post content is clicked
-    //TODO: confirm and trigger
-    override fun postDetails(postData: PostViewData) {
+    override fun postDetail(postData: PostViewData) {
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
-            .commentsCount(postData.commentsCount)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
     }
@@ -362,4 +471,33 @@ class FeedFragment :
             px
         )
     }
+
+    // callback when self post is deleted by user
+    override fun delete(deleteExtras: DeleteExtras) {
+        // TODO: delete post by user
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
+        )
+    }
+
+    // callback when other's post is deleted by CM
+    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
+        // TODO: delete post by admin
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
+        )
+    }
+
+    // launcher to start [Report Activity] and show success dialog for result
+    private val reportPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                ReportSuccessDialog("Message").show(
+                    childFragmentManager,
+                    ReportSuccessDialog.TAG
+                )
+            }
+        }
 }

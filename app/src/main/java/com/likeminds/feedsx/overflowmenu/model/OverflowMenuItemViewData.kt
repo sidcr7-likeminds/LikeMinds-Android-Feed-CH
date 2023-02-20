@@ -9,6 +9,7 @@ import kotlinx.parcelize.Parcelize
 // entityId -> id of the corresponding data (post-id/comment-id, etc)
 @Parcelize
 class OverflowMenuItemViewData private constructor(
+    @OverflowMenuItemTitle
     var title: String,
     var entityId: String
 ) : Parcelable, BaseViewType {
@@ -16,10 +17,11 @@ class OverflowMenuItemViewData private constructor(
         get() = ITEM_OVERFLOW_MENU_ITEM
 
     class Builder {
-        private var title: String = ""
+        @OverflowMenuItemTitle
+        private var title: String = DELETE_POST_MENU_ITEM
         private var entityId: String = ""
 
-        fun title(title: String) = apply { this.title = title }
+        fun title(@OverflowMenuItemTitle title: String) = apply { this.title = title }
         fun entityId(entityId: String) = apply { this.entityId = entityId }
 
         fun build() = OverflowMenuItemViewData(

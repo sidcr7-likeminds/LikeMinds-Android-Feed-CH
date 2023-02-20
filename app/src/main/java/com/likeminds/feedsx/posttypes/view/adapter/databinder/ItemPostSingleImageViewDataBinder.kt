@@ -70,16 +70,24 @@ class ItemPostSingleImageViewDataBinder constructor(
             listener
         )
 
-        // loads post image inside the post's image view
-        ImageBindingUtil.loadImage(
+        // handles various actions for the post
+        PostTypeUtil.initActionsLayout(
+            binding.postActionsLayout,
+            data,
+            listener
+        )
+
+        // loads post image and attaches listener
+        PostTypeUtil.initPostSingleImage(
             binding.ivPost,
-            data.attachments.first().attachmentMeta.url,
-            placeholder = R.drawable.image_placeholder
+            data,
+            listener
         )
     }
 
     // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
+        overflowMenu.dismiss()
         listener.onPostMenuItemClicked(menu.entityId, menu.title)
     }
 

@@ -1,8 +1,8 @@
-package com.likeminds.feedsx.media.adapter
+package com.likeminds.feedsx.media.view.adapter
 
-import com.likeminds.feedsx.media.databinder.*
 import com.likeminds.feedsx.media.model.MediaFolderViewData
 import com.likeminds.feedsx.media.model.MediaViewData
+import com.likeminds.feedsx.media.view.adapter.databinder.*
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType

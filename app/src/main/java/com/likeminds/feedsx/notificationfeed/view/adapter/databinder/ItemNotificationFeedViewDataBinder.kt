@@ -144,6 +144,6 @@ class ItemNotificationFeedViewDataBinder constructor(
 
     // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        listener.onPostMenuItemClicked(menu.dataId, menu.title)
+        listener.onPostMenuItemClicked(menu.entityId, menu.title)
     }
 }

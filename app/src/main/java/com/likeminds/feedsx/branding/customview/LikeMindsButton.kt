@@ -2,13 +2,10 @@ package com.likeminds.feedsx.branding.customview
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Typeface
 import android.util.AttributeSet
-import android.util.Log
-import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.button.MaterialButton
-import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.branding.util.BrandingUtil
 
 internal class LikeMindsButton : MaterialButton {
@@ -32,10 +29,12 @@ internal class LikeMindsButton : MaterialButton {
         // fonts
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsButton)
         val fontStyle = array.getString(R.styleable.LikeMindsButton_font_type)
+        val buttonType = array.getString(R.styleable.LikeMindsButton_button_type)
         this.typeface = BrandingUtil.getTypeFace(context, fontStyle)
         array.recycle()
 
         // color
-        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+        if (!buttonType.equals("normal"))
+            this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
     }
 }

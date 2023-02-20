@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -74,11 +73,15 @@ class ItemPostDetailCommentViewDataBinder constructor(
             tvCommenterName.text = data.user.name
             tvCommentContent.text = data.text
 
-            if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_comment_filled)
-            else ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
+            if (data.isLiked) {
+                ivLike.setImageResource(R.drawable.ic_like_comment_filled)
+            } else {
+                ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
+            }
 
-            if (data.likesCount == 0) likesCount.hide()
-            else {
+            if (data.likesCount == 0) {
+                likesCount.hide()
+            } else {
                 likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
@@ -90,8 +93,9 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
             tvCommentTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
 
-            if (data.repliesCount == 0) groupReplies.hide()
-            else {
+            if (data.repliesCount == 0) {
+                groupReplies.hide()
+            } else {
                 groupReplies.show()
                 tvReplyCount.text = context.resources.getQuantityString(
                     R.plurals.replies,
@@ -110,20 +114,12 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 adapter = mRepliesAdapter
             }
 
-            if (data.replies.isNotEmpty()) {
-                rvReplies.show()
-                mRepliesAdapter.replace(data.replies.toList())
-                commentSeparator.hide()
-                replyCommentSeparator.show()
-                handleViewMore(data, position)
-            } else {
-                rvReplies.hide()
-                commentSeparator.show()
-                replyCommentSeparator.hide()
-            }
-
             tvReply.setOnClickListener {
-                postDetailAdapterListener.replyOnComment(data.id)
+                postDetailAdapterListener.replyOnComment(
+                    data.id,
+                    position,
+                    data.user
+                )
             }
 
             ivLike.setOnClickListener {
@@ -139,6 +135,20 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     ivCommentMenu,
                     overflowMenu
                 )
+            }
+
+            if (data.replies.isNotEmpty()) {
+                rvReplies.show()
+                mRepliesAdapter.replace(data.replies.toList())
+                commentSeparator.hide()
+                replyCommentSeparator.show()
+                tvReplyCount.isClickable = false
+                handleViewMore(data, position)
+            } else {
+                rvReplies.hide()
+                commentSeparator.show()
+                replyCommentSeparator.hide()
+                tvReplyCount.isClickable = true
             }
         }
     }
@@ -158,6 +168,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
     }
 
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
+        overflowMenu.dismiss()
         postDetailAdapterListener.onCommentMenuItemClicked(menu.entityId, menu.title)
     }
 }
