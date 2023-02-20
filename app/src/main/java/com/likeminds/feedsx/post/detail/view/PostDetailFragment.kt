@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.detail.view
 import android.app.Activity
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -86,7 +85,7 @@ class PostDetailFragment :
             show()
         }
 
-        attachPagination(
+        attachScrollListener(
             binding.rvPostDetails,
             linearLayoutManager
         )
@@ -153,7 +152,7 @@ class PostDetailFragment :
     }
 
     // attach scroll listener for pagination for comments
-    private fun attachPagination(
+    private fun attachScrollListener(
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager
     ) {

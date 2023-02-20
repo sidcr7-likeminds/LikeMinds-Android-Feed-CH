@@ -43,7 +43,7 @@ class NotificationFeedFragment :
             show()
         }
 
-        attachPagination(
+        attachScrollListener(
             binding.rvNotifications,
             linearLayoutManager
         )
@@ -174,7 +174,7 @@ class NotificationFeedFragment :
     }
 
     //attach scroll listener for pagination
-    private fun attachPagination(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+    private fun attachScrollListener(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 // TODO: add logic
