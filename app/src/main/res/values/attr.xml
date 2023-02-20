@@ -3,6 +3,7 @@
 
     <declare-styleable name="LikeMindsButton">
         <attr name="font_type" format="string" />
+        <attr name="button_type" format="string"/>
     </declare-styleable>
 
     <declare-styleable name="LikeMindsExtendedFAB">
@@ -16,6 +17,7 @@
 
     <declare-styleable name="LikeMindsEditText">
         <attr name="font_style" format="string" />
+        <attr name="et_type" format="string" />
     </declare-styleable>
 
     <declare-styleable name="AnimatedRecyclerView">

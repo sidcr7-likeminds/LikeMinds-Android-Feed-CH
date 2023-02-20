@@ -12,11 +12,12 @@ import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentMediaPickerDocumentBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapter
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.viewmodel.MediaViewModel
 import com.likeminds.feedsx.search.util.CustomSearchBar
@@ -104,11 +105,6 @@ class MediaPickerDocumentFragment :
             else -> return false
         }
         return true
-    }
-
-    override fun doCleanup() {
-        binding.searchBar.dispose()
-        super.doCleanup()
     }
 
     private fun initializeUI() {
@@ -248,10 +244,13 @@ class MediaPickerDocumentFragment :
     }
 
     private fun initializeSearchView() {
-        binding.searchBar.setSearchViewListener(
+        val searchBar = binding.searchBar
+        searchBar.initialize(lifecycleScope)
+
+        searchBar.setSearchViewListener(
             object : CustomSearchBar.SearchViewListener {
                 override fun onSearchViewClosed() {
-                    binding.searchBar.hide()
+                    searchBar.hide()
                     viewModel.clearDocumentFilter()
                 }
 
@@ -268,7 +267,7 @@ class MediaPickerDocumentFragment :
                 }
             }
         )
-        binding.searchBar.observeSearchView(false)
+        searchBar.observeSearchView(false)
     }
 
     private fun showSearchToolbar() {

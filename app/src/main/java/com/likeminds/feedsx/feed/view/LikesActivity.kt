@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ActivityLikesBinding
-import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint

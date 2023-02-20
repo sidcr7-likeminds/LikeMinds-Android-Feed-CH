@@ -1,30 +1,54 @@
 package com.likeminds.feedsx.post.detail.view
 
+import android.app.Activity
+import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
+import com.likeminds.feedsx.delete.model.DELETE_TYPE_COMMENT
+import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
+import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
+import com.likeminds.feedsx.delete.view.DeleteDialogFragment
+import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.view.LikesActivity
-import com.likeminds.feedsx.feed.view.model.LikesScreenExtras
+import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
-import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.CommentViewData
+import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
+import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
+import com.likeminds.feedsx.report.model.ReportExtras
+import com.likeminds.feedsx.report.model.ReportType
+import com.likeminds.feedsx.report.view.ReportActivity
+import com.likeminds.feedsx.report.view.ReportSuccessDialog
+import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
+import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
 class PostDetailFragment :
     BaseFragment<FragmentPostDetailBinding>(),
     PostAdapterListener,
     PostDetailAdapterListener,
-    PostDetailReplyAdapterListener {
+    PostDetailReplyAdapterListener,
+    DeleteAlertDialogFragment.DeleteAlertDialogListener,
+    DeleteDialogFragment.DeleteDialogListener {
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -47,16 +71,25 @@ class PostDetailFragment :
         initCommentEditText()
         initSwipeRefreshLayout()
         initListeners()
+
+        //TODO: testing data
+        updateCommentsCount(10)
     }
 
     // initializes the post detail screen recycler view
     private fun initRecyclerView() {
+        val linearLayoutManager = LinearLayoutManager(context)
         mPostDetailAdapter = PostDetailAdapter(this, this, this)
         binding.rvPostDetails.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = linearLayoutManager
             adapter = mPostDetailAdapter
             show()
         }
+
+        attachPagination(
+            binding.rvPostDetails,
+            linearLayoutManager
+        )
         addTestingData()
     }
 
@@ -108,6 +141,29 @@ class PostDetailFragment :
         mSwipeRefreshLayout.isRefreshing = false
     }
 
+    // TODO: call after fetching post
+    // updates the comments count on toolbar
+    private fun updateCommentsCount(commentsCount: Int) {
+        (requireActivity() as PostDetailActivity).binding.tvToolbarSubTitle.text =
+            this.resources.getQuantityString(
+                R.plurals.comments_small,
+                commentsCount,
+                commentsCount
+            )
+    }
+
+    // attach scroll listener for pagination for comments
+    private fun attachPagination(
+        recyclerView: RecyclerView,
+        layoutManager: LinearLayoutManager
+    ) {
+        recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
+            override fun onLoadMore(currentPage: Int) {
+                // TODO: add logic
+            }
+        })
+    }
+
     // initializes comment edittext with TextWatcher and focuses the keyboard
     private fun initCommentEditText() {
         binding.apply {
@@ -126,13 +182,21 @@ class PostDetailFragment :
     }
 
     private fun initListeners() {
-        binding.ivCommentSend.setOnClickListener {
-            if (parentCommentIdToReply != null) {
-                // input text is reply to a comment
-                // TODO: create a reply to comment
-            } else {
-                // input text is a comment
-                // TODO: create a new comment
+        binding.apply {
+            ivCommentSend.setOnClickListener {
+                if (parentCommentIdToReply != null) {
+                    // input text is reply to a comment
+                    // TODO: create a reply to comment
+                } else {
+                    // input text is a comment
+                    // TODO: create a new comment
+                }
+            }
+
+            ivRemoveReplyingTo.setOnClickListener {
+                parentCommentIdToReply = null
+                tvReplyingTo.hide()
+                ivRemoveReplyingTo.hide()
             }
         }
     }
@@ -143,40 +207,6 @@ class PostDetailFragment :
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostDetailAdapter.add(
             PostViewData.Builder()
-                .attachments(
-                    listOf(
-                        AttachmentViewData.Builder()
-                            .attachmentType(DOCUMENT)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .build()
-                            ).build(),
-                        AttachmentViewData.Builder()
-                            .attachmentType(DOCUMENT)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .build()
-                            ).build(),
-                        AttachmentViewData.Builder()
-                            .attachmentType(DOCUMENT)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .build()
-                            ).build(),
-                        AttachmentViewData.Builder()
-                            .attachmentType(DOCUMENT)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .build()
-                            ).build(),
-                        AttachmentViewData.Builder()
-                            .attachmentType(DOCUMENT)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .build()
-                            ).build()
-                    )
-                )
                 .id("4")
                 .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
                 .text(text)
@@ -197,6 +227,14 @@ class PostDetailFragment :
                     UserViewData.Builder()
                         .name("Siddharth Dubey")
                         .build()
+                )
+                .menuItems(
+                    listOf(
+                        OverflowMenuItemViewData.Builder().title(DELETE_COMMENT_MENU_ITEM)
+                            .entityId("1").build(),
+                        OverflowMenuItemViewData.Builder().title(REPORT_COMMENT_MENU_ITEM)
+                            .entityId("1").build()
+                    )
                 )
                 .text("This is a test comment 1")
                 .build()
@@ -267,6 +305,52 @@ class PostDetailFragment :
         postDetailExtras = arguments?.getParcelable(POST_DETAIL_EXTRAS)!!
     }
 
+    // processes delete entity request
+    private fun deleteEntity(
+        entityId: String,
+        @ReportType
+        entityType: Int
+    ) {
+        //TODO: set isAdmin
+        val isAdmin = false
+        val deleteExtras = DeleteExtras.Builder()
+            .entityId(entityId)
+            .entityType(entityType)
+            .build()
+        if (isAdmin) {
+            // when CM deletes other user's post
+            DeleteDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        } else {
+            // when user deletes their own entity
+            DeleteAlertDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        }
+    }
+
+    // Processes report action on entity
+    private fun reportEntity(
+        entityId: String,
+        @ReportType
+        entityType: Int
+    ) {
+        //create extras for [ReportActivity]
+        val reportExtras = ReportExtras.Builder()
+            .entityId(entityId)
+            .type(entityType)
+            .build()
+
+        //get Intent for [ReportActivity]
+        val intent = ReportActivity.getIntent(requireContext(), reportExtras)
+
+        //start [ReportActivity] and check for result
+        reportPostLauncher.launch(intent)
+    }
+
     // updates post view data when see more/see less is clicked
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostDetailAdapter[position]
@@ -279,13 +363,8 @@ class PostDetailFragment :
     }
 
     // callback when add comment is clicked on post
-    override fun comment(postData: PostViewData) {
+    override fun comment(postId: String) {
         binding.etComment.focusAndShowKeyboard()
-    }
-
-    // callback for post menu item click
-    override fun onPostMenuItemClicked(postId: String, title: String) {
-        //TODO: menu item handle
     }
 
     // callback when +x more text is clicked to see more documents
@@ -301,6 +380,7 @@ class PostDetailFragment :
             postData.toBuilder().isExpanded(true).build()
         )
     }
+
 
     /**
      * Scroll to a position with offset from the top header
@@ -378,18 +458,64 @@ class PostDetailFragment :
                 )
             )
             mPostDetailAdapter.update(commentPosition, comment)
+            binding.rvPostDetails.smoothScrollToPosition(
+                mPostDetailAdapter.itemCount
+            )
         }
     }
 
-    // callback when
-    override fun replyOnComment(commentId: String) {
+    // callback when replying on a comment
+    override fun replyOnComment(
+        commentId: String,
+        commentPosition: Int,
+        parentCommenter: UserViewData
+    ) {
         // TODO: fetch replies of the clicked comment
         parentCommentIdToReply = commentId
+        binding.apply {
+            tvReplyingTo.show()
+            ivRemoveReplyingTo.show()
+
+            tvReplyingTo.text = String.format(
+                getString(R.string.replying_to_s),
+                parentCommenter.name
+            )
+
+            etComment.focusAndShowKeyboard()
+
+            rvPostDetails.smoothScrollToPosition(
+                commentPosition
+            )
+        }
+    }
+
+    override fun onPostMenuItemClicked(postId: String, title: String) {
+        when (title) {
+            DELETE_POST_MENU_ITEM -> {
+                deleteEntity(postId, REPORT_TYPE_POST)
+            }
+            REPORT_POST_MENU_ITEM -> {
+                reportEntity(postId, REPORT_TYPE_POST)
+            }
+            PIN_POST_MENU_ITEM -> {
+                // TODO: pin post
+            }
+            UNPIN_POST_MENU_ITEM -> {
+                // TODO: unpin post
+            }
+        }
     }
 
     // callback for comment's menu is item
     override fun onCommentMenuItemClicked(commentId: String, title: String) {
-        //TODO: comment menu item
+        when (title) {
+            DELETE_COMMENT_MENU_ITEM -> {
+                deleteEntity(commentId, REPORT_TYPE_COMMENT)
+            }
+            REPORT_COMMENT_MENU_ITEM -> {
+                reportEntity(commentId, REPORT_TYPE_COMMENT)
+            }
+        }
     }
 
     // callback when view more replies is clicked
@@ -451,5 +577,47 @@ class PostDetailFragment :
     // callback when the item of reply menu is clicked
     override fun onReplyMenuItemClicked(replyId: String, title: String) {
         //TODO: handle menu item click for replies.
+    }
+
+    private val reportPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                ReportSuccessDialog("Message").show(
+                    childFragmentManager,
+                    ReportSuccessDialog.TAG
+                )
+            }
+        }
+
+    // callback when self post is deleted by user
+    override fun delete(deleteExtras: DeleteExtras) {
+        // TODO: delete post/comment by user
+        Log.d("TAG", "initializeListeners: ${deleteExtras.entityType}")
+        when (deleteExtras.entityType) {
+            DELETE_TYPE_POST -> showShortToast(
+                requireContext(),
+                getString(R.string.post_deleted)
+            )
+            DELETE_TYPE_COMMENT -> showShortToast(
+                requireContext(),
+                getString(R.string.comment_deleted)
+            )
+        }
+    }
+
+    // callback when other's post is deleted by CM
+    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
+        // TODO: delete post/comment by admin
+        Log.d("TAG", "initializeListeners by admin: ${deleteExtras.entityType}")
+        when (deleteExtras.entityType) {
+            DELETE_TYPE_POST -> showShortToast(
+                requireContext(),
+                getString(R.string.post_deleted)
+            )
+            DELETE_TYPE_COMMENT -> showShortToast(
+                requireContext(),
+                getString(R.string.comment_deleted)
+            )
+        }
     }
 }

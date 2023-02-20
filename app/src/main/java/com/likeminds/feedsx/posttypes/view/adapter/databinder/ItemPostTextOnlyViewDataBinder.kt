@@ -3,7 +3,9 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
+import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -30,8 +32,8 @@ class ItemPostTextOnlyViewDataBinder constructor(
     override fun bindData(binding: ItemPostTextOnlyBinding, data: PostViewData, position: Int) {
         //TODO: Testing data
         val list = listOf(
-            OverflowMenuItemViewData.Builder().title("Edit").dataId(data.id).build(),
-            OverflowMenuItemViewData.Builder().dataId(data.id).title("Delete").build()
+            OverflowMenuItemViewData.Builder().title(DELETE_POST_MENU_ITEM).entityId(data.id).build(),
+            OverflowMenuItemViewData.Builder().title(REPORT_POST_MENU_ITEM).entityId(data.id).build()
         )
 
         // sets items to overflow menu
@@ -65,7 +67,8 @@ class ItemPostTextOnlyViewDataBinder constructor(
 
     // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        listener.onPostMenuItemClicked(menu.dataId, menu.title)
+        overflowMenu.dismiss()
+        listener.onPostMenuItemClicked(menu.entityId, menu.title)
     }
 
 }

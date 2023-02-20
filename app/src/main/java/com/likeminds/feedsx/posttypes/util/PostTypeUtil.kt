@@ -3,8 +3,11 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.Gravity
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -19,11 +22,9 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -68,7 +69,7 @@ object PostTypeUtil {
         binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
     }
 
-    //to show the options on the post
+    //to show the overflow menu
     fun showOverflowMenu(ivMenu: ImageView, overflowMenu: OverflowMenuPopup) {
         overflowMenu.showAsDropDown(
             ivMenu,
@@ -162,6 +163,14 @@ object PostTypeUtil {
         if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
         else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
 
+        // bounce animation for like and save button
+        val bounceAnim: Animation by lazy {
+            AnimationUtils.loadAnimation(
+                context,
+                R.anim.bounce
+            )
+        }
+
         binding.likesCount.text =
             if (data.likesCount == 0) context.getString(R.string.like)
             else
@@ -183,10 +192,14 @@ object PostTypeUtil {
                 )
 
         binding.ivLike.setOnClickListener {
+            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+            it.startAnimation(bounceAnim)
             listener.likePost()
         }
 
         binding.ivBookmark.setOnClickListener {
+            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+            it.startAnimation(bounceAnim)
             listener.savePost()
         }
 
@@ -195,11 +208,11 @@ object PostTypeUtil {
         }
 
         binding.ivComment.setOnClickListener {
-            listener.comment(data)
+            listener.comment(data.id)
         }
 
         binding.commentsCount.setOnClickListener {
-            listener.comment(data)
+            listener.comment(data.id)
         }
     }
 
@@ -230,8 +243,9 @@ object PostTypeUtil {
         tvPostContent: TextView,
         data: PostViewData,
         itemPosition: Int,
-        adapterListener: PostAdapterListener? = null,
+        adapterListener: PostAdapterListener
     ) {
+        val context = tvPostContent.context
         val textForLinkify = data.text.getValidTextForLinkify()
 
         var alreadySeenFullContent = data.alreadySeenFullContent == true
@@ -243,28 +257,8 @@ object PostTypeUtil {
             tvPostContent.show()
         }
 
-        val trimmedText =
-            if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-                data.shortText
-            } else {
-                textForLinkify
-            }
-
-        // TODO: Confirm
-        MemberTaggingDecoder.decode(
-            tvPostContent,
-            trimmedText,
-            enableClick = true,
-            BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
-                tvPostContent.context,
-                R.color.pure_blue
-            )
-        ) { tag ->
-            onMemberTagClicked()
-        }
-
         val seeMoreColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
-        val seeMore = SpannableStringBuilder(" See More")
+        val seeMore = SpannableStringBuilder(context.getString(R.string.see_more))
         seeMore.setSpan(
             ForegroundColorSpan(seeMoreColor),
             0,
@@ -274,27 +268,16 @@ object PostTypeUtil {
         val seeMoreClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 alreadySeenFullContent = true
-                adapterListener?.updateSeenFullContent(itemPosition, true)
+                adapterListener.updateSeenFullContent(itemPosition, true)
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                ds.isUnderlineText = false
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
             }
-        }
-        val seeMoreSpannableStringBuilder = SpannableStringBuilder()
-        if (!alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-            seeMoreSpannableStringBuilder.append("...")
-            seeMoreSpannableStringBuilder.append(seeMore)
-            seeMoreSpannableStringBuilder.setSpan(
-                seeMoreClickableSpan,
-                3,
-                seeMore.length + 3,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
         }
 
         val seeLessColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
-        val seeLess = SpannableStringBuilder(" See Less")
+        val seeLess = SpannableStringBuilder(context.getString(R.string.see_less))
         seeLess.setSpan(
             ForegroundColorSpan(seeLessColor),
             0,
@@ -304,34 +287,113 @@ object PostTypeUtil {
         val seeLessClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 alreadySeenFullContent = false
-                adapterListener?.updateSeenFullContent(itemPosition, false)
+                adapterListener.updateSeenFullContent(itemPosition, false)
             }
 
-            override fun updateDrawState(ds: TextPaint) {
-                ds.isUnderlineText = false
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
             }
         }
-        val seeLessSpannableStringBuilder = SpannableStringBuilder()
-        if (alreadySeenFullContent && !data.shortText.isNullOrEmpty()) {
-            seeLessSpannableStringBuilder.append(seeLess)
-            seeLessSpannableStringBuilder.setSpan(
-                seeLessClickableSpan,
+
+        val postTextClickableSpan = object : ClickableSpan() {
+            override fun onClick(view: View) {
+                adapterListener.postDetail(data)
+            }
+
+            override fun updateDrawState(textPaint: TextPaint) {
+                textPaint.isUnderlineText = false
+            }
+        }
+
+        // post is used here to get lines count in the text view
+        tvPostContent.post {
+            val shortText: String? = SeeMoreUtil.getShortContent(
+                data.text,
+                tvPostContent,
+                3,
+                500
+            )
+
+            val trimmedText =
+                if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                    shortText
+                } else {
+                    textForLinkify
+                }
+
+            // TODO: Confirm
+            MemberTaggingDecoder.decode(
+                tvPostContent,
+                trimmedText,
+                enableClick = true,
+                BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
+                    tvPostContent.context,
+                    R.color.pure_blue
+                )
+            ) { tag ->
+                onMemberTagClicked()
+            }
+
+            val seeMoreSpannableStringBuilder = SpannableStringBuilder()
+            if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                seeMoreSpannableStringBuilder.append("...")
+                seeMoreSpannableStringBuilder.append(seeMore)
+                seeMoreSpannableStringBuilder.setSpan(
+                    seeMoreClickableSpan,
+                    3,
+                    seeMore.length + 3,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+
+            val seeLessSpannableStringBuilder = SpannableStringBuilder()
+            if (alreadySeenFullContent && !shortText.isNullOrEmpty()) {
+                seeLessSpannableStringBuilder.append(seeLess)
+                seeLessSpannableStringBuilder.setSpan(
+                    seeLessClickableSpan,
+                    0,
+                    seeLess.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+            }
+
+            val postTextSpannableStringBuilder = SpannableStringBuilder()
+            postTextSpannableStringBuilder.append(trimmedText)
+            postTextSpannableStringBuilder.setSpan(
+                postTextClickableSpan,
                 0,
-                seeLess.length,
+                trimmedText.length,
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
-        }
 
-        tvPostContent.movementMethod = CustomLinkMovementMethod {
-            //TODO: Handle links etc.
-            true
-        }
+            tvPostContent.movementMethod = CustomLinkMovementMethod {
+                //TODO: Handle links etc.
+                true
+            }
 
-        tvPostContent.text = TextUtils.concat(
-            tvPostContent.text,
-            seeMoreSpannableStringBuilder,
-            seeLessSpannableStringBuilder
+            tvPostContent.text = TextUtils.concat(
+                tvPostContent.text,
+                seeMoreSpannableStringBuilder,
+                seeLessSpannableStringBuilder
+            )
+        }
+    }
+
+    fun initPostSingleImage(
+        ivPost: ImageView,
+        data: PostViewData,
+        adapterListener: PostAdapterListener
+    ) {
+
+        ImageBindingUtil.loadImage(
+            ivPost,
+            data.attachments.first().attachmentMeta.url,
+            placeholder = R.drawable.image_placeholder
         )
+
+        ivPost.setOnClickListener {
+            adapterListener.postDetail(data)
+        }
     }
 
     // handles link view in the post

@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.media.databinder
+package com.likeminds.feedsx.media.view.adapter.databinder
 
 import android.graphics.drawable.ColorDrawable
 import android.view.LayoutInflater
@@ -11,14 +11,13 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemMediaPickerSingleBinding
-import com.likeminds.feedsx.media.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.model.MediaType
 import com.likeminds.feedsx.media.model.MediaViewData
+import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_SINGLE
-import javax.inject.Inject
 
-class MediaPickerSingleItemViewDataBinder @Inject constructor(
+class MediaPickerSingleItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
 ) : ViewDataBinder<ItemMediaPickerSingleBinding, MediaViewData>() {
 

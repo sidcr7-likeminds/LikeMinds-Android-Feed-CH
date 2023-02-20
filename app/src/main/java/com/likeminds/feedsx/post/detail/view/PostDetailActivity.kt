@@ -13,7 +13,7 @@ import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class PostDetailActivity : BaseAppCompatActivity() {
 
-    private lateinit var binding: ActivityPostDetailBinding
+    lateinit var binding: ActivityPostDetailBinding
 
     private var postDetailExtras: PostDetailExtras? = null
 
@@ -92,13 +92,6 @@ class PostDetailActivity : BaseAppCompatActivity() {
 
     private fun initActionBar() {
         setSupportActionBar(binding.toolbar)
-        val commentsCount = postDetailExtras!!.commentsCount
-        binding.tvToolbarSubTitle.text =
-            this.resources.getQuantityString(
-                R.plurals.comments_small,
-                commentsCount,
-                commentsCount
-            )
         binding.ivBack.setOnClickListener {
             onBackPressed()
         }
