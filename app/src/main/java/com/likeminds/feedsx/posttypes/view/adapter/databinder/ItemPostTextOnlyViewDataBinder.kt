@@ -36,8 +36,10 @@ class ItemPostTextOnlyViewDataBinder constructor(
     ) {
         //TODO: Testing data
         val list = listOf(
-            OverflowMenuItemViewData.Builder().title(DELETE_POST_MENU_ITEM).entityId(data.id).build(),
-            OverflowMenuItemViewData.Builder().title(REPORT_POST_MENU_ITEM).entityId(data.id).build()
+            OverflowMenuItemViewData.Builder().title(DELETE_POST_MENU_ITEM).entityId(data.id)
+                .build(),
+            OverflowMenuItemViewData.Builder().title(REPORT_POST_MENU_ITEM).entityId(data.id)
+                .build()
         )
 
         // handles various actions for the post
@@ -47,29 +49,30 @@ class ItemPostTextOnlyViewDataBinder constructor(
             listener
         )
 
-        if (data.fromPostLiked || data.fromPostSaved) return
+        if (data.fromPostLiked || data.fromPostSaved) {
+            return
+        } else {
+            // sets items to overflow menu
+            PostTypeUtil.setOverflowMenuItems(
+                overflowMenu,
+                list
+            )
 
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            list
-        )
+            // sets data to the creator frame
+            PostTypeUtil.initAuthorFrame(
+                binding.authorFrame,
+                data,
+                overflowMenu
+            )
 
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
-
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
-        )
-
+            // sets the text content of the post
+            PostTypeUtil.initTextContent(
+                binding.tvPostContent,
+                data,
+                itemPosition = position,
+                listener
+            )
+        }
     }
 
     // handles the menu item click on the post

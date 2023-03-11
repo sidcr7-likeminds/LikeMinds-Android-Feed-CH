@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
@@ -28,11 +28,11 @@ import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
+import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -126,6 +126,8 @@ class FeedFragment :
                 .id("1")
                 .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
                 .text(text)
+                .fromPostSaved(false)
+                .fromPostLiked(false)
                 .build()
         )
         text =
@@ -294,7 +296,10 @@ class FeedFragment :
     }
 
     //attach scroll listener for pagination
-    private fun attachScrollListener(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+    private fun attachScrollListener(
+        recyclerView: RecyclerView,
+        layoutManager: LinearLayoutManager
+    ) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 // TODO: add logic
@@ -385,19 +390,35 @@ class FeedFragment :
         if (item is PostViewData) {
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
+                .fromPostSaved(false)
+                .fromPostLiked(false)
                 .build()
             mPostAdapter.update(position, newViewData)
         }
     }
 
     // TODO: add fromPostSaved key while adding post data to adapter
-    override fun savePost() {
+    override fun savePost(position: Int) {
         //TODO: save post
+        val item = mPostAdapter[position]
+        if (item is PostViewData) {
+            val newViewData = item.toBuilder()
+                .fromPostSaved(true)
+                .build()
+            mPostAdapter.update(position, newViewData)
+        }
     }
 
     // TODO: add fromPostLiked key while adding post data to adapter
-    override fun likePost() {
+    override fun likePost(position: Int) {
         //TODO: like post
+        val item = mPostAdapter[position]
+        if (item is PostViewData) {
+            val newViewData = item.toBuilder()
+                .fromPostLiked(true)
+                .build()
+            mPostAdapter.update(position, newViewData)
+        }
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
@@ -425,7 +446,12 @@ class FeedFragment :
         }
 
         mPostAdapter.update(
-            position, postData.toBuilder().isExpanded(true).build()
+            position,
+            postData.toBuilder()
+                .isExpanded(true)
+                .fromPostSaved(false)
+                .fromPostLiked(false)
+                .build()
         )
     }
 

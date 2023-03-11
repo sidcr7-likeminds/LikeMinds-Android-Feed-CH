@@ -2,7 +2,6 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostSingleImageBinding
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
@@ -11,7 +10,6 @@ import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_IMAGE
 
 class ItemPostSingleImageViewDataBinder constructor(
@@ -47,42 +45,45 @@ class ItemPostSingleImageViewDataBinder constructor(
             listener
         )
 
-        if (data.fromPostLiked || data.fromPostSaved) return
+        if (data.fromPostLiked || data.fromPostSaved) {
+            return
+        } else {
+            // sets items to overflow menu
+            PostTypeUtil.setOverflowMenuItems(
+                overflowMenu,
+                data.menuItems
+            )
 
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
+            // sets data to the creator frame
+            PostTypeUtil.initAuthorFrame(
+                binding.authorFrame,
+                data,
+                overflowMenu
+            )
 
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
+            // sets the text content of the post
+            PostTypeUtil.initTextContent(
+                binding.tvPostContent,
+                data,
+                itemPosition = position,
+                listener
+            )
 
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
-        )
+            // handles various actions for the post
+            PostTypeUtil.initActionsLayout(
+                binding.postActionsLayout,
+                data,
+                listener
+            )
 
-        // handles various actions for the post
-        PostTypeUtil.initActionsLayout(
-            binding.postActionsLayout,
-            data,
-            listener
-        )
+            // loads post image and attaches listener
+            PostTypeUtil.initPostSingleImage(
+                binding.ivPost,
+                data,
+                listener
+            )
 
-        // loads post image and attaches listener
-        PostTypeUtil.initPostSingleImage(
-            binding.ivPost,
-            data,
-            listener
-        )
+        }
     }
 
     // handles the menu item click on the post

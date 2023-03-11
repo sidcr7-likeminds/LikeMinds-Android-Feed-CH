@@ -40,34 +40,36 @@ class ItemPostLinkViewDataBinder constructor(
             listener
         )
 
-        if (data.fromPostLiked || data.fromPostSaved) return
+        if (data.fromPostLiked || data.fromPostSaved) {
+            return
+        } else {
+            // sets items to overflow menu
+            PostTypeUtil.setOverflowMenuItems(
+                overflowMenu,
+                data.menuItems
+            )
 
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
+            // sets data to the creator frame
+            PostTypeUtil.initAuthorFrame(
+                binding.authorFrame,
+                data,
+                overflowMenu
+            )
 
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
+            // sets the text content of the post
+            PostTypeUtil.initTextContent(
+                binding.tvPostContent,
+                data,
+                itemPosition = position,
+                listener
+            )
 
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
-        )
-
-        // handles the link view
-        PostTypeUtil.initLinkView(
-            binding,
-            data.attachments.first().attachmentMeta.ogTags
-        )
+            // handles the link view
+            PostTypeUtil.initLinkView(
+                binding,
+                data.attachments.first().attachmentMeta.ogTags
+            )
+        }
     }
 
     // handles the menu item click on the post

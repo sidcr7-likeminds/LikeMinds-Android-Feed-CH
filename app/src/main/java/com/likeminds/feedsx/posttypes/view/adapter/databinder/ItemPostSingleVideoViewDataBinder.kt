@@ -47,39 +47,41 @@ class ItemPostSingleVideoViewDataBinder constructor(
             listener
         )
 
-        if (data.fromPostLiked || data.fromPostSaved) return
+        if (data.fromPostLiked || data.fromPostSaved) {
+            return
+        } else {
+            // sets items to overflow menu
+            PostTypeUtil.setOverflowMenuItems(
+                overflowMenu,
+                data.menuItems
+            )
 
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
+            // sets data to the creator frame
+            PostTypeUtil.initAuthorFrame(
+                binding.authorFrame,
+                data,
+                overflowMenu
+            )
 
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
+            // sets the text content of the post
+            PostTypeUtil.initTextContent(
+                binding.tvPostContent,
+                data,
+                itemPosition = position,
+                listener
+            )
 
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
-        )
+            //TODO: Migrate to exo player
+            val video: Uri =
+                Uri.parse(data.attachments.first().attachmentMeta.url)
 
-        //TODO: Migrate to exo player
-        val video: Uri =
-            Uri.parse(data.attachments.first().attachmentMeta.url)
-
-        binding.videoPost.setVideoURI(video)
-        binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
-            mp.isLooping = true
-            binding.iconVideoPlay.hide()
-            binding.videoPost.start()
-        })
+            binding.videoPost.setVideoURI(video)
+            binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
+                mp.isLooping = true
+                binding.iconVideoPlay.hide()
+                binding.videoPost.start()
+            })
+        }
     }
 
     // handles the menu item click on the post
