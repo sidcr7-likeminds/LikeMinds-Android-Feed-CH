@@ -41,10 +41,12 @@ class ItemPostDocumentsViewDataBinder constructor(
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data,
-            listener
+            listener,
+            position
         )
 
         if (data.fromPostLiked || data.fromPostSaved) {
+            listener.updateFromLikedSaved(position)
             return
         } else {
             // sets items to overflow menu

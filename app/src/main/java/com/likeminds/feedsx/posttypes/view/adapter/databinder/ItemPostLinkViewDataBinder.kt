@@ -37,10 +37,12 @@ class ItemPostLinkViewDataBinder constructor(
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data,
-            listener
+            listener,
+            position
         )
 
         if (data.fromPostLiked || data.fromPostSaved) {
+            listener.updateFromLikedSaved(position)
             return
         } else {
             // sets items to overflow menu
@@ -65,9 +67,11 @@ class ItemPostLinkViewDataBinder constructor(
             )
 
             // handles the link view
+            val linkAttachment = data.attachments.first()
+            val ogTags = linkAttachment.attachmentMeta.ogTags
             PostTypeUtil.initLinkView(
                 binding,
-                data.attachments.first().attachmentMeta.ogTags
+                ogTags
             )
         }
     }

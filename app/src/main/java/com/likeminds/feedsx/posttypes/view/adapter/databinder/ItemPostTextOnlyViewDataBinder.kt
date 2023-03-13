@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
@@ -46,12 +47,16 @@ class ItemPostTextOnlyViewDataBinder constructor(
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data,
-            listener
+            listener,
+            position
         )
 
         if (data.fromPostLiked || data.fromPostSaved) {
+            Log.d("TAG", "called:")
+            listener.updateFromLikedSaved(position)
             return
         } else {
+            Log.d("TAG", "called-1: ${data.text}")
             // sets items to overflow menu
             PostTypeUtil.setOverflowMenuItems(
                 overflowMenu,

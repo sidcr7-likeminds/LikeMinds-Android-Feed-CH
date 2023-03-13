@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.viewModels
@@ -514,6 +515,15 @@ class FeedFragment :
             requireContext(),
             getString(R.string.post_deleted)
         )
+    }
+
+    override fun updateFromLikedSaved(position: Int) {
+        var postData = mPostAdapter[position] as PostViewData
+        postData = postData.toBuilder()
+            .fromPostLiked(false)
+            .fromPostSaved(false)
+            .build()
+        mPostAdapter.updateWithoutNotifyingRV(position, postData)
     }
 
     // launcher to start [Report Activity] and show success dialog for result

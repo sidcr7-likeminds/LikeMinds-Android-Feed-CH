@@ -152,7 +152,8 @@ object PostTypeUtil {
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
         data: PostViewData,
-        listener: PostAdapterListener
+        listener: PostAdapterListener,
+        position: Int
     ) {
 
         val context = binding.root.context
@@ -194,13 +195,13 @@ object PostTypeUtil {
         binding.ivLike.setOnClickListener {
             bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
             it.startAnimation(bounceAnim)
-            listener.likePost()
+            listener.likePost(position)
         }
 
         binding.ivBookmark.setOnClickListener {
             bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
             it.startAnimation(bounceAnim)
-            listener.savePost()
+            listener.savePost(position)
         }
 
         binding.ivShare.setOnClickListener {

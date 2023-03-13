@@ -55,5 +55,6 @@ class PostAdapter constructor(
         fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
         fun showLikesScreen(postData: PostViewData)
         fun postDetail(postData: PostViewData) {}
+        fun updateFromLikedSaved(position: Int) {}
     }
 }
