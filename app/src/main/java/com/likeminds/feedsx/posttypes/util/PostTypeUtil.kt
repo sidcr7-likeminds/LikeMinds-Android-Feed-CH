@@ -3,7 +3,6 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Animation
@@ -448,7 +447,7 @@ object PostTypeUtil {
     }
 
     // checks if binder is called from liking/saving post or not
-    fun checkForBind(
+    fun initPostTypeBindData(
         authorFrame: LayoutAuthorFrameBinding,
         overflowMenu: OverflowMenuPopup,
         tvPostContent: TextView,

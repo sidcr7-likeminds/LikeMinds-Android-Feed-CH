@@ -49,7 +49,7 @@ class ItemPostSingleVideoViewDataBinder constructor(
         )
 
         // checks whether to bind complete data or not and execute corresponding lambda function
-        PostTypeUtil.checkForBind(
+        PostTypeUtil.initPostTypeBindData(
             binding.authorFrame,
             overflowMenu,
             binding.tvPostContent,
@@ -57,7 +57,7 @@ class ItemPostSingleVideoViewDataBinder constructor(
             position,
             listener,
             returnBinder = {
-                return@checkForBind
+                return@initPostTypeBindData
             }, executeBinder = {
                 //TODO: Migrate to exo player
                 val video: Uri =

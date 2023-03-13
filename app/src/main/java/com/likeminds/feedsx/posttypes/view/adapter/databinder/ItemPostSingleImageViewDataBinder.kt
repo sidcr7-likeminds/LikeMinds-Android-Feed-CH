@@ -47,7 +47,7 @@ class ItemPostSingleImageViewDataBinder constructor(
         )
 
         // checks whether to bind complete data or not and execute corresponding lambda function
-        PostTypeUtil.checkForBind(
+        PostTypeUtil.initPostTypeBindData(
             binding.authorFrame,
             overflowMenu,
             binding.tvPostContent,
@@ -55,7 +55,7 @@ class ItemPostSingleImageViewDataBinder constructor(
             position,
             listener,
             returnBinder = {
-                return@checkForBind
+                return@initPostTypeBindData
             }, executeBinder = {
                 // loads post image and attaches listener
                 PostTypeUtil.initPostSingleImage(

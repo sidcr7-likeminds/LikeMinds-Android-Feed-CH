@@ -517,6 +517,7 @@ class FeedFragment :
         )
     }
 
+    // updates the fromPostLiked/fromPostSaved variables and updates the rv list
     override fun updateFromLikedSaved(position: Int) {
         var postData = mPostAdapter[position] as PostViewData
         postData = postData.toBuilder()
