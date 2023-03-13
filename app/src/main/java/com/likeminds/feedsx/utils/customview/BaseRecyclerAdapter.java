@@ -172,6 +172,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         notifyItemChanged(position);
     }
 
+    // updates an item in rv without notifying
     public void updateWithoutNotifyingRV(int position, T baseViewType) {
         dataList.set(position, baseViewType);
     }

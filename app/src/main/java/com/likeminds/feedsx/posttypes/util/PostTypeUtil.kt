@@ -3,6 +3,7 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Animation
@@ -446,7 +447,11 @@ object PostTypeUtil {
         // TODO: Change Implementation
     }
 
+    // checks if binder is called from liking/saving post or not
     fun checkForBind(
+        authorFrame: LayoutAuthorFrameBinding,
+        overflowMenu: OverflowMenuPopup,
+        tvPostContent: TextView,
         data: PostViewData,
         position: Int,
         listener: PostAdapterListener,
@@ -454,10 +459,32 @@ object PostTypeUtil {
         executeBinder: () -> Unit
     ) {
         if (data.fromPostLiked || data.fromPostSaved) {
+            // update fromLiked/fromSaved variables and return from binder
             listener.updateFromLikedSaved(position)
             returnBinder()
         } else {
-            // call all the common funtions
+            // call all the common functions
+
+            // sets items to overflow menu
+            setOverflowMenuItems(
+                overflowMenu,
+                data.menuItems
+            )
+
+            // sets data to the creator frame
+            initAuthorFrame(
+                authorFrame,
+                data,
+                overflowMenu
+            )
+
+            // sets the text content of the post
+            initTextContent(
+                tvPostContent,
+                data,
+                itemPosition = position,
+                listener
+            )
             executeBinder()
         }
     }

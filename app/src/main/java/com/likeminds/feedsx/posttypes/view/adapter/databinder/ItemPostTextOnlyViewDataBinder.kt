@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
@@ -51,33 +50,18 @@ class ItemPostTextOnlyViewDataBinder constructor(
             position
         )
 
-        if (data.fromPostLiked || data.fromPostSaved) {
-            Log.d("TAG", "called:")
-            listener.updateFromLikedSaved(position)
-            return
-        } else {
-            Log.d("TAG", "called-1: ${data.text}")
-            // sets items to overflow menu
-            PostTypeUtil.setOverflowMenuItems(
-                overflowMenu,
-                list
-            )
-
-            // sets data to the creator frame
-            PostTypeUtil.initAuthorFrame(
-                binding.authorFrame,
-                data,
-                overflowMenu
-            )
-
-            // sets the text content of the post
-            PostTypeUtil.initTextContent(
-                binding.tvPostContent,
-                data,
-                itemPosition = position,
-                listener
-            )
-        }
+        // checks whether to bind complete data or not and execute corresponding lambda function
+        PostTypeUtil.checkForBind(
+            binding.authorFrame,
+            overflowMenu,
+            binding.tvPostContent,
+            data,
+            position,
+            listener,
+            returnBinder = {
+                return@checkForBind
+            }, executeBinder = {}
+        )
     }
 
     // handles the menu item click on the post

@@ -48,42 +48,28 @@ class ItemPostSingleVideoViewDataBinder constructor(
             position
         )
 
-        if (data.fromPostLiked || data.fromPostSaved) {
-            listener.updateFromLikedSaved(position)
-            return
-        } else {
-            // sets items to overflow menu
-            PostTypeUtil.setOverflowMenuItems(
-                overflowMenu,
-                data.menuItems
-            )
+        // checks whether to bind complete data or not and execute corresponding lambda function
+        PostTypeUtil.checkForBind(
+            binding.authorFrame,
+            overflowMenu,
+            binding.tvPostContent,
+            data,
+            position,
+            listener,
+            returnBinder = {
+                return@checkForBind
+            }, executeBinder = {
+                //TODO: Migrate to exo player
+                val video: Uri =
+                    Uri.parse(data.attachments.first().attachmentMeta.url)
 
-            // sets data to the creator frame
-            PostTypeUtil.initAuthorFrame(
-                binding.authorFrame,
-                data,
-                overflowMenu
-            )
-
-            // sets the text content of the post
-            PostTypeUtil.initTextContent(
-                binding.tvPostContent,
-                data,
-                itemPosition = position,
-                listener
-            )
-
-            //TODO: Migrate to exo player
-            val video: Uri =
-                Uri.parse(data.attachments.first().attachmentMeta.url)
-
-            binding.videoPost.setVideoURI(video)
-            binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
-                mp.isLooping = true
-                binding.iconVideoPlay.hide()
-                binding.videoPost.start()
+                binding.videoPost.setVideoURI(video)
+                binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
+                    mp.isLooping = true
+                    binding.iconVideoPlay.hide()
+                    binding.videoPost.start()
+                })
             })
-        }
     }
 
     // handles the menu item click on the post

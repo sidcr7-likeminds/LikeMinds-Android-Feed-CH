@@ -41,39 +41,27 @@ class ItemPostLinkViewDataBinder constructor(
             position
         )
 
-        if (data.fromPostLiked || data.fromPostSaved) {
-            listener.updateFromLikedSaved(position)
-            return
-        } else {
-            // sets items to overflow menu
-            PostTypeUtil.setOverflowMenuItems(
-                overflowMenu,
-                data.menuItems
-            )
-
-            // sets data to the creator frame
-            PostTypeUtil.initAuthorFrame(
-                binding.authorFrame,
-                data,
-                overflowMenu
-            )
-
-            // sets the text content of the post
-            PostTypeUtil.initTextContent(
-                binding.tvPostContent,
-                data,
-                itemPosition = position,
-                listener
-            )
-
-            // handles the link view
-            val linkAttachment = data.attachments.first()
-            val ogTags = linkAttachment.attachmentMeta.ogTags
-            PostTypeUtil.initLinkView(
-                binding,
-                ogTags
-            )
-        }
+        // checks whether to bind complete data or not and execute corresponding lambda function
+        PostTypeUtil.checkForBind(
+            binding.authorFrame,
+            overflowMenu,
+            binding.tvPostContent,
+            data,
+            position,
+            listener,
+            returnBinder = {
+                return@checkForBind
+            },
+            executeBinder = {
+                // handles the link view
+                val linkAttachment = data.attachments.first()
+                val ogTags = linkAttachment.attachmentMeta.ogTags
+                PostTypeUtil.initLinkView(
+                    binding,
+                    ogTags
+                )
+            }
+        )
     }
 
     // handles the menu item click on the post
