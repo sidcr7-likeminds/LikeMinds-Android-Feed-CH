@@ -45,6 +45,16 @@ class ItemPostDocumentsViewDataBinder constructor(
             position
         )
 
+        PostTypeUtil.checkForBind(
+            data,
+            position,
+            listener,
+            returnBinder = {
+
+            }, executeBinder = {
+
+            })
+
         if (data.fromPostLiked || data.fromPostSaved) {
             listener.updateFromLikedSaved(position)
             return

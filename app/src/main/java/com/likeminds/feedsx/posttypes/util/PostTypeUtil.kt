@@ -3,7 +3,6 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Animation
@@ -445,5 +444,21 @@ object PostTypeUtil {
     // performs action when member tag is clicked
     fun onMemberTagClicked() {
         // TODO: Change Implementation
+    }
+
+    fun checkForBind(
+        data: PostViewData,
+        position: Int,
+        listener: PostAdapterListener,
+        returnBinder: () -> Unit,
+        executeBinder: () -> Unit
+    ) {
+        if (data.fromPostLiked || data.fromPostSaved) {
+            listener.updateFromLikedSaved(position)
+            returnBinder()
+        } else {
+            // call all the common funtions
+            executeBinder()
+        }
     }
 }
