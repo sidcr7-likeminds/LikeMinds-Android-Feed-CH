@@ -27,40 +27,40 @@ class ItemPostLinkViewDataBinder constructor(
         return ItemPostLinkBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
-    override fun bindData(binding: ItemPostLinkBinding, data: PostViewData, position: Int) {
-
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
-
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
-
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
-        )
+    override fun bindData(
+        binding: ItemPostLinkBinding,
+        data: PostViewData,
+        position: Int
+    ) {
 
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data,
-            listener
+            listener,
+            position
         )
 
-        // handles the link view
-        PostTypeUtil.initLinkView(
-            binding,
-            data.attachments.first().attachmentMeta.ogTags
+        // checks whether to bind complete data or not and execute corresponding lambda function
+        PostTypeUtil.initPostTypeBindData(
+            binding.authorFrame,
+            overflowMenu,
+            binding.tvPostContent,
+            data,
+            position,
+            listener,
+            returnBinder = {
+                return@initPostTypeBindData
+            },
+            executeBinder = {
+                // handles the link view
+                val linkAttachment = data.attachments.first()
+                val ogTags = linkAttachment.attachmentMeta.ogTags
+                PostTypeUtil.initLinkView(
+                    binding,
+                    ogTags
+                )
+            }
         )
     }
 

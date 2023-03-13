@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
@@ -82,6 +83,8 @@ class PostDetailFragment :
         binding.rvPostDetails.apply {
             layoutManager = linearLayoutManager
             adapter = mPostDetailAdapter
+            if (itemAnimator is SimpleItemAnimator)
+                (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             show()
         }
 

@@ -23,7 +23,9 @@ class PostViewData private constructor(
     var comments: List<CommentViewData>,
     var createdAt: Long,
     var updatedAt: Long,
-    var user: UserViewData
+    var user: UserViewData,
+    val fromPostLiked: Boolean,
+    val fromPostSaved: Boolean
 ) : Parcelable, BaseViewType {
 
     //TODO: add post id while adding menu item
@@ -70,6 +72,8 @@ class PostViewData private constructor(
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
         private var user: UserViewData = UserViewData.Builder().build()
+        private var fromPostLiked: Boolean = false
+        private var fromPostSaved: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
@@ -97,6 +101,8 @@ class PostViewData private constructor(
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
         fun user(user: UserViewData) = apply { this.user = user }
+        fun fromPostLiked(fromPostLiked: Boolean) = apply { this.fromPostLiked = fromPostLiked }
+        fun fromPostSaved(fromPostSaved: Boolean) = apply { this.fromPostSaved = fromPostSaved }
 
         fun build() = PostViewData(
             id,
@@ -115,7 +121,9 @@ class PostViewData private constructor(
             comments,
             createdAt,
             updatedAt,
-            user
+            user,
+            fromPostLiked,
+            fromPostSaved
         )
     }
 
@@ -137,5 +145,7 @@ class PostViewData private constructor(
             .createdAt(createdAt)
             .updatedAt(updatedAt)
             .user(user)
+            .fromPostLiked(fromPostLiked)
+            .fromPostSaved(fromPostSaved)
     }
 }

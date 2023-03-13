@@ -38,36 +38,28 @@ class ItemPostMultipleMediaViewDataBinder constructor(
         position: Int
     ) {
 
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
-
-        // sets the view pager for multiple medias in the post
-        PostTypeUtil.initViewPager(binding, data)
-
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
-
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
-        )
-
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data,
-            listener
+            listener,
+            position
         )
+
+        // checks whether to bind complete data or not and execute corresponding lambda function
+        PostTypeUtil.initPostTypeBindData(
+            binding.authorFrame,
+            overflowMenu,
+            binding.tvPostContent,
+            data,
+            position,
+            listener,
+            returnBinder = {
+                return@initPostTypeBindData
+            }, executeBinder = {
+                // sets the view pager for multiple medias in the post
+                PostTypeUtil.initViewPager(binding, data)
+            })
     }
 
     // handles the menu item click on the post

@@ -3,7 +3,6 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Animation
@@ -152,7 +151,8 @@ object PostTypeUtil {
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
         data: PostViewData,
-        listener: PostAdapterListener
+        listener: PostAdapterListener,
+        position: Int
     ) {
 
         val context = binding.root.context
@@ -194,13 +194,13 @@ object PostTypeUtil {
         binding.ivLike.setOnClickListener {
             bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
             it.startAnimation(bounceAnim)
-            listener.likePost()
+            listener.likePost(position)
         }
 
         binding.ivBookmark.setOnClickListener {
             bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
             it.startAnimation(bounceAnim)
-            listener.savePost()
+            listener.savePost(position)
         }
 
         binding.ivShare.setOnClickListener {
@@ -444,5 +444,47 @@ object PostTypeUtil {
     // performs action when member tag is clicked
     fun onMemberTagClicked() {
         // TODO: Change Implementation
+    }
+
+    // checks if binder is called from liking/saving post or not
+    fun initPostTypeBindData(
+        authorFrame: LayoutAuthorFrameBinding,
+        overflowMenu: OverflowMenuPopup,
+        tvPostContent: TextView,
+        data: PostViewData,
+        position: Int,
+        listener: PostAdapterListener,
+        returnBinder: () -> Unit,
+        executeBinder: () -> Unit
+    ) {
+        if (data.fromPostLiked || data.fromPostSaved) {
+            // update fromLiked/fromSaved variables and return from binder
+            listener.updateFromLikedSaved(position)
+            returnBinder()
+        } else {
+            // call all the common functions
+
+            // sets items to overflow menu
+            setOverflowMenuItems(
+                overflowMenu,
+                data.menuItems
+            )
+
+            // sets data to the creator frame
+            initAuthorFrame(
+                authorFrame,
+                data,
+                overflowMenu
+            )
+
+            // sets the text content of the post
+            initTextContent(
+                tvPostContent,
+                data,
+                itemPosition = position,
+                listener
+            )
+            executeBinder()
+        }
     }
 }

@@ -34,46 +34,42 @@ class ItemPostSingleVideoViewDataBinder constructor(
         )
     }
 
-    override fun bindData(binding: ItemPostSingleVideoBinding, data: PostViewData, position: Int) {
-
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
-
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
-
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
-        )
+    override fun bindData(
+        binding: ItemPostSingleVideoBinding,
+        data: PostViewData,
+        position: Int
+    ) {
 
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data,
-            listener
+            listener,
+            position
         )
 
-        //TODO: Migrate to exo player
-        val video: Uri =
-            Uri.parse(data.attachments.first().attachmentMeta.url)
+        // checks whether to bind complete data or not and execute corresponding lambda function
+        PostTypeUtil.initPostTypeBindData(
+            binding.authorFrame,
+            overflowMenu,
+            binding.tvPostContent,
+            data,
+            position,
+            listener,
+            returnBinder = {
+                return@initPostTypeBindData
+            }, executeBinder = {
+                //TODO: Migrate to exo player
+                val video: Uri =
+                    Uri.parse(data.attachments.first().attachmentMeta.url)
 
-        binding.videoPost.setVideoURI(video)
-        binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
-            mp.isLooping = true
-            binding.iconVideoPlay.hide()
-            binding.videoPost.start()
-        })
+                binding.videoPost.setVideoURI(video)
+                binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
+                    mp.isLooping = true
+                    binding.iconVideoPlay.hide()
+                    binding.videoPost.start()
+                })
+            })
     }
 
     // handles the menu item click on the post

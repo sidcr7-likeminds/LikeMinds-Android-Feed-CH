@@ -75,15 +75,13 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_comment_filled)
-            }
-            else {
+            } else {
                 ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
             }
 
             if (data.likesCount == 0) {
                 likesCount.hide()
-            }
-            else {
+            } else {
                 likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
@@ -97,8 +95,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
             if (data.repliesCount == 0) {
                 groupReplies.hide()
-            }
-            else {
+            } else {
                 groupReplies.show()
                 tvReplyCount.text = context.resources.getQuantityString(
                     R.plurals.replies,

@@ -29,39 +29,38 @@ class ItemPostTextOnlyViewDataBinder constructor(
         return ItemPostTextOnlyBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
-    override fun bindData(binding: ItemPostTextOnlyBinding, data: PostViewData, position: Int) {
+    override fun bindData(
+        binding: ItemPostTextOnlyBinding,
+        data: PostViewData,
+        position: Int
+    ) {
         //TODO: Testing data
         val list = listOf(
-            OverflowMenuItemViewData.Builder().title(DELETE_POST_MENU_ITEM).entityId(data.id).build(),
-            OverflowMenuItemViewData.Builder().title(REPORT_POST_MENU_ITEM).entityId(data.id).build()
-        )
-
-        // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            list
-        )
-
-        // sets data to the creator frame
-        PostTypeUtil.initAuthorFrame(
-            binding.authorFrame,
-            data,
-            overflowMenu
-        )
-
-        // sets the text content of the post
-        PostTypeUtil.initTextContent(
-            binding.tvPostContent,
-            data,
-            itemPosition = position,
-            listener
+            OverflowMenuItemViewData.Builder().title(DELETE_POST_MENU_ITEM).entityId(data.id)
+                .build(),
+            OverflowMenuItemViewData.Builder().title(REPORT_POST_MENU_ITEM).entityId(data.id)
+                .build()
         )
 
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
             data,
-            listener
+            listener,
+            position
+        )
+
+        // checks whether to bind complete data or not and execute corresponding lambda function
+        PostTypeUtil.initPostTypeBindData(
+            binding.authorFrame,
+            overflowMenu,
+            binding.tvPostContent,
+            data,
+            position,
+            listener,
+            returnBinder = {
+                return@initPostTypeBindData
+            }, executeBinder = {}
         )
     }
 
