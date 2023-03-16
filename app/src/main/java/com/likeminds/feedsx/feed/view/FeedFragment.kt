@@ -23,9 +23,10 @@ import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
+import com.likeminds.feedsx.post.create.model.CreatePostResult
+import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
@@ -73,7 +74,8 @@ class FeedFragment :
 
     private fun initNewPostClick() {
         binding.newPostButton.setOnClickListener {
-            CreatePostActivity.start(requireContext())
+            val intent = CreatePostActivity.getIntent(requireContext())
+            createPostLauncher.launch(intent)
         }
     }
 
@@ -535,6 +537,18 @@ class FeedFragment :
                     childFragmentManager,
                     ReportSuccessDialog.TAG
                 )
+            }
+        }
+
+    private val createPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val createPostResult =
+                    result.data?.extras?.getParcelable<CreatePostResult>(
+                        CreatePostActivity.ARG_CREATE_POST_RESULT
+                    ) ?: return@registerForActivityResult
+                
+                // TODO start uploading:
             }
         }
 }

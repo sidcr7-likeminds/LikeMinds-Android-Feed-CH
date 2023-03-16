@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.post.view.adapter.databinder
+package com.likeminds.feedsx.post.create.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,7 +6,7 @@ import androidx.core.view.isVisible
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemCreatePostDocumentBinding
 import com.likeminds.feedsx.media.model.PDF
-import com.likeminds.feedsx.post.util.CreatePostListener
+import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show

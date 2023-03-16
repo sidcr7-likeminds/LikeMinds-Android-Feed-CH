@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.post.viewmodel
+package com.likeminds.feedsx.post.create.viewmodel
 
 import android.content.Context
 import android.net.Uri

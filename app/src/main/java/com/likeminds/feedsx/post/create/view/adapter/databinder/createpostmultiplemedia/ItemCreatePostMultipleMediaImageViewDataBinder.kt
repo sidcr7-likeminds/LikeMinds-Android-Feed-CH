@@ -1,11 +1,11 @@
-package com.likeminds.feedsx.post.view.adapter.databinder.createpostmultiplemedia
+package com.likeminds.feedsx.post.create.view.adapter.databinder.createpostmultiplemedia
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemCreatePostSingleImageBinding
 import com.likeminds.feedsx.media.model.IMAGE
-import com.likeminds.feedsx.post.util.CreatePostListener
+import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil

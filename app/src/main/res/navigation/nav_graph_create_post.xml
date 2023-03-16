@@ -6,6 +6,6 @@
 
     <fragment
         android:id="@+id/fragment_create_post"
-        android:name="com.likeminds.feedsx.post.view.CreatePostFragment"
+        android:name="com.likeminds.feedsx.post.create.view.CreatePostFragment"
         android:label="CreatePostFragment" />
 </navigation>

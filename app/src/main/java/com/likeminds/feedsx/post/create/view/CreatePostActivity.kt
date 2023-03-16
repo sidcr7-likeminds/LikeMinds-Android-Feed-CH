@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.post.view
+package com.likeminds.feedsx.post.create.view
 
 import android.content.Context
 import android.content.Intent
@@ -20,6 +20,8 @@ class CreatePostActivity : BaseAppCompatActivity() {
     private lateinit var navController: NavController
 
     companion object {
+
+        const val ARG_CREATE_POST_RESULT = "CreatePostResult"
 
         @JvmStatic
         fun start(context: Context) {

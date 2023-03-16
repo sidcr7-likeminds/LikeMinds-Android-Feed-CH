@@ -1,8 +1,10 @@
-package com.likeminds.feedsx.post.view
+package com.likeminds.feedsx.post.create.view
 
 import android.app.Activity
+import android.app.Instrumentation.ActivityResult
 import android.content.Intent
 import android.graphics.Color
+import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -15,10 +17,12 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
-import com.likeminds.feedsx.post.util.CreatePostListener
-import com.likeminds.feedsx.post.view.adapter.CreatePostDocumentsAdapter
-import com.likeminds.feedsx.post.view.adapter.CreatePostMultipleMediaAdapter
-import com.likeminds.feedsx.post.viewmodel.CreatePostViewModel
+import com.likeminds.feedsx.post.create.model.CreatePostResult
+import com.likeminds.feedsx.post.create.util.CreatePostListener
+import com.likeminds.feedsx.post.create.view.CreatePostActivity.Companion.ARG_CREATE_POST_RESULT
+import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
+import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
+import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
@@ -49,6 +53,30 @@ class CreatePostFragment :
         super.setUpViews()
         initAddAttachmentsView()
         initPostContentTextListener()
+        initPostDoneListener()
+    }
+
+    private fun initPostDoneListener() {
+        val createPostActivity = requireActivity() as CreatePostActivity
+        createPostActivity.binding.apply {
+            tvPostDone.setOnClickListener {
+                val text = binding.etPostContent.text.toString()
+                val result = CreatePostResult.Builder()
+                    .text(text)
+                    .attachments(selectedMediaUris)
+                    .build()
+
+                val intent = Intent().apply {
+                    putExtras(Bundle().apply {
+                        putParcelable(
+                            ARG_CREATE_POST_RESULT, result
+                        )
+                    })
+                }
+                requireActivity().setResult(Activity.RESULT_OK, intent)
+                requireActivity().finish()
+            }
+        }
     }
 
     // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
@@ -64,21 +92,23 @@ class CreatePostFragment :
 
     // initializes click listeners on add attachment layouts
     private fun initAddAttachmentsView() {
-        binding.layoutAttachFiles.setOnClickListener {
-            val extra = MediaPickerExtras.Builder()
-                .mediaTypes(listOf(PDF))
-                .allowMultipleSelect(true)
-                .build()
-            val intent = MediaPickerActivity.getIntent(requireContext(), extra)
-            documentLauncher.launch(intent)
-        }
+        binding.apply {
+            layoutAttachFiles.setOnClickListener {
+                val extra = MediaPickerExtras.Builder()
+                    .mediaTypes(listOf(PDF))
+                    .allowMultipleSelect(true)
+                    .build()
+                val intent = MediaPickerActivity.getIntent(requireContext(), extra)
+                documentLauncher.launch(intent)
+            }
 
-        binding.layoutAddImage.setOnClickListener {
-            initiateMediaPicker(listOf(IMAGE))
-        }
+            layoutAddImage.setOnClickListener {
+                initiateMediaPicker(listOf(IMAGE))
+            }
 
-        binding.layoutAddVideo.setOnClickListener {
-            initiateMediaPicker(listOf(VIDEO))
+            layoutAddVideo.setOnClickListener {
+                initiateMediaPicker(listOf(VIDEO))
+            }
         }
     }
 
@@ -186,12 +216,14 @@ class CreatePostFragment :
     // handles click action on Post button
     private fun handlePostButton(clickable: Boolean) {
         val createPostActivity = requireActivity() as CreatePostActivity
-        if (clickable) {
-            createPostActivity.binding.tvPostDone.isClickable = true
-            createPostActivity.binding.tvPostDone.setTextColor(BrandingData.getButtonsColor())
-        } else {
-            createPostActivity.binding.tvPostDone.isClickable = false
-            createPostActivity.binding.tvPostDone.setTextColor(Color.parseColor("#666666"))
+        createPostActivity.binding.apply {
+            if (clickable) {
+                tvPostDone.isClickable = true
+                tvPostDone.setTextColor(BrandingData.getButtonsColor())
+            } else {
+                tvPostDone.isClickable = false
+                tvPostDone.setTextColor(Color.parseColor("#666666"))
+            }
         }
     }
 
@@ -384,9 +416,8 @@ class CreatePostFragment :
         selectedMediaUris.removeAt(position)
         if (mediaType == PDF) {
             documentsAdapter?.removeIndex(position)
-            if(documentsAdapter?.itemCount == 0) binding.documentsAttachment.root.hide()
-        }
-        else multiMediaAdapter?.removeIndex(position)
+            if (documentsAdapter?.itemCount == 0) binding.documentsAttachment.root.hide()
+        } else multiMediaAdapter?.removeIndex(position)
         showPostMedia()
     }
 
