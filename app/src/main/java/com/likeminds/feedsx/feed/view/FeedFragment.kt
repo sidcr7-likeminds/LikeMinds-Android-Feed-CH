@@ -36,14 +36,14 @@ import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
+import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
-import com.likeminds.likemindsfeed.sdk.model.InitiateLikeMindsExtra
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -61,6 +61,9 @@ class FeedFragment :
 
     private var communityId: String = ""
     private var communityName: String = ""
+
+    private var accessToken: String = ""
+    private var refreshToken: String = ""
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -81,14 +84,8 @@ class FeedFragment :
         }
     }
 
+    // initiates SDK
     private fun initiateSDK() {
-        // TODO: where to build LMClient
-        val extra = InitiateLikeMindsExtra.Builder()
-            .application(requireActivity().application)
-            .apiKey("6a4cc38e-02c7-4dfa-96b7-68a3078ad922")
-            .build()
-        LMFeedClient.build(extra)
-        // TODO: to be set using extras?
         viewModel.initiateUser(
             "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
             "299dc20c-72e1-49cf-8018-8ae33208d0a2",
@@ -103,17 +100,16 @@ class FeedFragment :
             val data = response.data
             if (data != null) {
                 if (data.appAccess == true) {
-                    communityId = data.initiateUser?.community?.id ?: ""
-                    communityName = data.initiateUser?.community?.name ?: ""
+                    communityId = data.community?.id ?: ""
+                    communityName = data.community?.name ?: ""
+
+                    accessToken = data.accessToken ?: ""
+                    refreshToken = data.refreshToken ?: ""
 
                     initToolbar()
-
-                    Log.d(
-                        "PUI", """
-                        community name: $communityName
-                        user name: ${data.initiateUser?.user?.name}
-                    """.trimIndent()
-                    )
+                    // TODO: save in local db and then set
+                    val user = ViewDataConverter.convertUser(data.user)
+                    setUserImage(user)
                 } else {
                     Log.d(
                         LOG_TAG,
@@ -129,6 +125,7 @@ class FeedFragment :
         }
     }
 
+    // shows invalid access error and logs out invalid user
     private fun showInvalidAccess() {
         binding.apply {
             recyclerView.hide()
@@ -141,6 +138,7 @@ class FeedFragment :
         //TODO: logout
     }
 
+    // initializes various UI components
     private fun initUI() {
         //TODO: Set as per branding
         binding.isBrandingBasic = true
@@ -150,12 +148,14 @@ class FeedFragment :
         initNewPostClick()
     }
 
+    // initializes new post fab click
     private fun initNewPostClick() {
         binding.newPostButton.setOnClickListener {
             CreatePostActivity.start(requireContext())
         }
     }
 
+    // initializes universal feed recyclerview
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
         mPostAdapter = PostAdapter(this)
@@ -429,6 +429,20 @@ class FeedFragment :
 
         //TODO: testing data. add this while observing data
         binding.tvNotificationCount.text = "10"
+    }
+
+    // sets user profile image
+    private fun setUserImage(user: UserViewData?) {
+        if (user != null) {
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.id,
+                binding.memberImage,
+                showRoundImage = true,
+                objectKey = user.updatedAt
+            )
+        }
     }
 
     // processes delete post request

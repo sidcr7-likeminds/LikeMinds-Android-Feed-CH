@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -18,12 +17,10 @@ class FeedViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    private val _userData = MutableLiveData<UserViewData?>()
-    val userData: LiveData<UserViewData?> = _userData
-
     private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
     val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
 
+    // calls InitiateUser API and posts the response in LiveData
     fun initiateUser(
         apiKey: String,
         userId: String,
