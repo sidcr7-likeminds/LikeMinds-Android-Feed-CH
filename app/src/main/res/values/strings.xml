@@ -94,4 +94,7 @@
     <string name="placeholder_replies">%1$d of %2$d</string>
     <string name="reply">Reply</string>
     <string name="replying_to_s">Replying to %s</string>
+    <string name="something_went_wrong">Something went wrong!</string>
+    <string name="access_denied">Access denied!</string>
+    <string name="oops_you_don_t_seem_to_have_access_to_the_community">Oops! You don’t seem to have access to the community.</string>
 </resources>
