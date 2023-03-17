@@ -470,11 +470,14 @@ class FeedFragment :
 
     //TODO: testing data
     // Processes report action on post
-    private fun reportPost(postId: String) {
+    private fun reportPost(
+        postId: String,
+        creatorId: String
+    ) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
-            .entityCreatorId("299dc20c-72e1-49cf-8018-8ae33208d0a2")
+            .entityCreatorId(creatorId)
             .entityType(REPORT_TYPE_POST)
             .build()
 
@@ -521,13 +524,17 @@ class FeedFragment :
         }
     }
 
-    override fun onPostMenuItemClicked(postId: String, title: String) {
+    override fun onPostMenuItemClicked(
+        postId: String,
+        title: String,
+        creatorId: String
+    ) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
                 deletePost(postId)
             }
             REPORT_POST_MENU_ITEM -> {
-                reportPost(postId)
+                reportPost(postId, creatorId)
             }
             PIN_POST_MENU_ITEM -> {
                 // TODO: pin post

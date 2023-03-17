@@ -75,7 +75,11 @@ class ItemPostSingleVideoViewDataBinder constructor(
     // handles the menu item click on the post
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
         overflowMenu.dismiss()
-        listener.onPostMenuItemClicked(menu.entityId, menu.title)
+        listener.onPostMenuItemClicked(
+            menu.entityId,
+            menu.title,
+            menu.entityCreatorId
+        )
     }
 
 }

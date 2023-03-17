@@ -342,6 +342,7 @@ class PostDetailFragment :
     // Processes report action on entity
     private fun reportEntity(
         entityId: String,
+        creatorId: String,
         @ReportType
         entityType: Int
     ) {
@@ -349,7 +350,7 @@ class PostDetailFragment :
         val reportExtras = ReportExtras.Builder()
             .entityId(entityId)
             .entityType(entityType)
-            .entityCreatorId("")
+            .entityCreatorId(creatorId)
             .build()
 
         //get Intent for [ReportActivity]
@@ -497,13 +498,17 @@ class PostDetailFragment :
         }
     }
 
-    override fun onPostMenuItemClicked(postId: String, title: String) {
+    override fun onPostMenuItemClicked(
+        postId: String,
+        title: String,
+        creatorId: String
+    ) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
                 deleteEntity(postId, REPORT_TYPE_POST)
             }
             REPORT_POST_MENU_ITEM -> {
-                reportEntity(postId, REPORT_TYPE_POST)
+                reportEntity(postId, creatorId, REPORT_TYPE_POST)
             }
             PIN_POST_MENU_ITEM -> {
                 // TODO: pin post
@@ -515,13 +520,17 @@ class PostDetailFragment :
     }
 
     // callback for comment's menu is item
-    override fun onCommentMenuItemClicked(commentId: String, title: String) {
+    override fun onCommentMenuItemClicked(
+        commentId: String,
+        title: String,
+        creatorId: String
+    ) {
         when (title) {
             DELETE_COMMENT_MENU_ITEM -> {
                 deleteEntity(commentId, REPORT_TYPE_COMMENT)
             }
             REPORT_COMMENT_MENU_ITEM -> {
-                reportEntity(commentId, REPORT_TYPE_COMMENT)
+                reportEntity(commentId, creatorId, REPORT_TYPE_COMMENT)
             }
         }
     }

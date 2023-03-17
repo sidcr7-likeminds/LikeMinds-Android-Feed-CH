@@ -65,7 +65,7 @@ class PostDetailAdapter constructor(
         fun likeComment(commentId: String)
         fun fetchReplies(commentId: String, commentPosition: Int)
         fun replyOnComment(commentId: String, commentPosition: Int, parentCommenter: UserViewData)
-        fun onCommentMenuItemClicked(commentId: String, title: String)
+        fun onCommentMenuItemClicked(commentId: String, title: String, creatorId: String)
         fun showLikesScreen(postId: String, commentId: String)
     }
 }

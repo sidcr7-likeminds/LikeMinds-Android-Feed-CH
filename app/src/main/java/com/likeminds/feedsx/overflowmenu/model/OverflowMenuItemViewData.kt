@@ -11,7 +11,8 @@ import kotlinx.parcelize.Parcelize
 class OverflowMenuItemViewData private constructor(
     @OverflowMenuItemTitle
     var title: String,
-    var entityId: String
+    var entityId: String,
+    var entityCreatorId: String
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_OVERFLOW_MENU_ITEM
@@ -20,18 +21,24 @@ class OverflowMenuItemViewData private constructor(
         @OverflowMenuItemTitle
         private var title: String = DELETE_POST_MENU_ITEM
         private var entityId: String = ""
+        private var entityCreatorId: String = ""
 
         fun title(@OverflowMenuItemTitle title: String) = apply { this.title = title }
         fun entityId(entityId: String) = apply { this.entityId = entityId }
+        fun entityCreatorId(entityCreatorId: String) =
+            apply { this.entityCreatorId = entityCreatorId }
 
         fun build() = OverflowMenuItemViewData(
             title,
-            entityId
+            entityId,
+            entityCreatorId
         )
     }
 
     fun toBuilder(): Builder {
-        return Builder().title(title).entityId(entityId)
+        return Builder().title(title)
+            .entityId(entityId)
+            .entityCreatorId(entityCreatorId)
     }
 
 }

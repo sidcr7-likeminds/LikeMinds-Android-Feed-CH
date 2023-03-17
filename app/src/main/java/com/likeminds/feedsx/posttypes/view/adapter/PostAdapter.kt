@@ -51,7 +51,7 @@ class PostAdapter constructor(
         fun likePost(position: Int) {}
         fun sharePost() {}
         fun comment(postId: String)
-        fun onPostMenuItemClicked(postId: String, title: String)
+        fun onPostMenuItemClicked(postId: String, title: String, creatorId: String)
         fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
         fun showLikesScreen(postId: String)
         fun postDetail(postData: PostViewData) {}
