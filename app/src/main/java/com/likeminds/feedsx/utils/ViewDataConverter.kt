@@ -75,6 +75,7 @@ object ViewDataConverter {
             .build()
     }
 
+    // converts Like network model to view data model
     fun convertLikes(
         like: Like,
         users: Map<String, User>

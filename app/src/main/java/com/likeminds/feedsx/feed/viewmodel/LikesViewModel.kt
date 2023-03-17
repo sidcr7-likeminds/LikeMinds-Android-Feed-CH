@@ -34,6 +34,7 @@ class LikesViewModel @Inject constructor() : ViewModel() {
         const val PAGE_SIZE = 20
     }
 
+    // calls API for post likes and comments likes data
     fun getLikesData(
         postId: String,
         commentId: String?,
@@ -42,6 +43,7 @@ class LikesViewModel @Inject constructor() : ViewModel() {
     ) {
         viewModelScope.launchIO {
             if (entityType == POST) {
+                // calls getPostLikes API
                 val request = GetPostLikesRequest.Builder()
                     .postId(postId)
                     .page(page)
@@ -50,6 +52,7 @@ class LikesViewModel @Inject constructor() : ViewModel() {
 
                 postLikesDataFetched(lmFeedClient.getPostLikes(request))
             } else if (entityType == COMMENT) {
+                // calls getCommentikes API
                 val request = GetCommentLikesRequest.Builder()
                     .postId(postId)
                     .commentId(commentId!!)
@@ -62,8 +65,10 @@ class LikesViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // processes post likes api response and posts the data to LiveData
     private fun postLikesDataFetched(response: LMResponse<GetPostLikesResponse>) {
         if (response.success) {
+            // processes Likes data if API call was successful
             val data = response.data ?: return
             val totalLikes = data.totalCount
             val likes = data.likes
@@ -73,13 +78,16 @@ class LikesViewModel @Inject constructor() : ViewModel() {
             }
             _getLikesDataResponse.postValue(Pair(listOfLikeViewData, totalLikes))
         } else {
+            // posts error message if API call failed
             _getLikesDataResponse.postValue(Pair(emptyList(), 0))
             _errorMessage.postValue(response.errorMessage)
         }
     }
 
+    // processes comment like api response and posts the data to LiveData
     private fun commentLikesDataFetched(response: LMResponse<GetCommentLikesResponse>) {
         if (response.success) {
+            // processes Likes data if API call was successful
             val data = response.data ?: return
             val totalLikes = data.totalCount
             val likes = data.likes
@@ -89,6 +97,7 @@ class LikesViewModel @Inject constructor() : ViewModel() {
             }
             _getLikesDataResponse.postValue(Pair(listOfLikeViewData, totalLikes))
         } else {
+            // posts error message if API call failed
             _getLikesDataResponse.postValue(Pair(emptyList(), 0))
             _errorMessage.postValue(response.errorMessage)
         }

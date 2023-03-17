@@ -38,8 +38,10 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         initRecyclerView()
     }
 
+    // observes data
     override fun observeData() {
         super.observeData()
+        // observes likes api response
         viewModel.getLikesDataResponse.observe(viewLifecycleOwner) { response ->
             val listOfLikes = response.first
             val totalLikes = response.second
@@ -48,11 +50,13 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
             setTotalLikesCount(totalLikes)
         }
 
+        // observes error message from likes api and shows toast with error message
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             ViewUtils.showErrorMessageToast(requireContext(), error)
         }
     }
 
+    // calls api for first page data to initialize rv
     private fun initData() {
         viewModel.getLikesData(
             likesScreenExtras.postId,
@@ -62,6 +66,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         )
     }
 
+    // setup recycler view
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
         mLikesScreenAdapter = LikesScreenAdapter()
@@ -77,7 +82,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         )
     }
 
-    //attach scroll listener for pagination
+    // attach scroll listener for pagination
     private fun attachScrollListener(
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager
@@ -85,6 +90,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 if (currentPage > 0) {
+                    // calls api for paginated data
                     viewModel.getLikesData(
                         likesScreenExtras.postId,
                         likesScreenExtras.commentId,
@@ -96,6 +102,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         })
     }
 
+    // set total likes count on toolbar
     private fun setTotalLikesCount(totalLikes: Int) {
         val likesActivity = requireActivity() as LikesActivity
         likesActivity.binding.tvToolbarSubTitle.text =
