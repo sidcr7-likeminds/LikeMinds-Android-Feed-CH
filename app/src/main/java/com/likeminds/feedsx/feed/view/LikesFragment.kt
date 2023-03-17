@@ -1,14 +1,16 @@
 package com.likeminds.feedsx.feed.view
 
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
-import com.likeminds.feedsx.feed.model.LikeViewData
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.view.LikesActivity.Companion.LIKES_SCREEN_EXTRAS
 import com.likeminds.feedsx.feed.view.adapter.LikesScreenAdapter
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.feed.viewmodel.LikesViewModel
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -20,6 +22,8 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         private const val TAG = "Likes Screen"
     }
 
+    private val viewModel: LikesViewModel by viewModels()
+
     private lateinit var mLikesScreenAdapter: LikesScreenAdapter
 
     private lateinit var likesScreenExtras: LikesScreenExtras
@@ -30,7 +34,32 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
 
     override fun setUpViews() {
         super.setUpViews()
+        initData()
         initRecyclerView()
+    }
+
+    override fun observeData() {
+        super.observeData()
+        viewModel.getLikesDataResponse.observe(viewLifecycleOwner) { response ->
+            val listOfLikes = response.first
+            val totalLikes = response.second
+
+            mLikesScreenAdapter.addAll(listOfLikes)
+            setTotalLikesCount(totalLikes)
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            ViewUtils.showErrorMessageToast(requireContext(), error)
+        }
+    }
+
+    private fun initData() {
+        viewModel.getLikesData(
+            likesScreenExtras.postId,
+            likesScreenExtras.commentId,
+            likesScreenExtras.entityType,
+            1
+        )
     }
 
     private fun initRecyclerView() {
@@ -46,28 +75,6 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
             binding.rvLikes,
             linearLayoutManager
         )
-
-        //TODO: Testing data
-        mLikesScreenAdapter.add(
-            LikeViewData.Builder()
-                .id("1")
-                .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
-                .build()
-        )
-
-        mLikesScreenAdapter.add(
-            LikeViewData.Builder()
-                .id("2")
-                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
-                .build()
-        )
-
-        mLikesScreenAdapter.add(
-            LikeViewData.Builder()
-                .id("3")
-                .user(UserViewData.Builder().name("Siddharth").build())
-                .build()
-        )
     }
 
     //attach scroll listener for pagination
@@ -77,9 +84,26 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     ) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
-                // TODO: add logic
+                if (currentPage > 0) {
+                    viewModel.getLikesData(
+                        likesScreenExtras.postId,
+                        likesScreenExtras.commentId,
+                        likesScreenExtras.entityType,
+                        currentPage
+                    )
+                }
             }
         })
+    }
+
+    private fun setTotalLikesCount(totalLikes: Int) {
+        val likesActivity = requireActivity() as LikesActivity
+        likesActivity.binding.tvToolbarSubTitle.text =
+            this.resources.getQuantityString(
+                R.plurals.likes_small,
+                totalLikes,
+                totalLikes
+            )
     }
 
     override fun receiveExtras() {

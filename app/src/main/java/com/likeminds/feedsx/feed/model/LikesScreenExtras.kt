@@ -5,23 +5,35 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class LikesScreenExtras private constructor(
+    @LikesScreenEntityType
+    var entityType: Int,
     var postId: String,
-    var likesCount: Int
+    var commentId: String?,
 ) : Parcelable {
 
     class Builder {
 
+        @LikesScreenEntityType
+        private var entityType: Int = 0
         private var postId: String = ""
-        private var likesCount: Int = 0
+        private var commentId: String? = null
+
+        fun entityType(@LikesScreenEntityType entityType: Int) =
+            apply { this.entityType = entityType }
 
         fun postId(postId: String) = apply { this.postId = postId }
-        fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
+        fun commentId(commentId: String?) = apply { this.commentId = commentId }
 
-        fun build() = LikesScreenExtras(postId, likesCount)
+        fun build() = LikesScreenExtras(
+            entityType,
+            postId,
+            commentId
+        )
     }
 
     fun toBuilder(): Builder {
         return Builder().postId(postId)
-            .likesCount(likesCount)
+            .entityType(entityType)
+            .commentId(commentId)
     }
 }

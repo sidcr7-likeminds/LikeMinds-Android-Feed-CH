@@ -94,13 +94,6 @@ class LikesActivity : BaseAppCompatActivity() {
 
     private fun initActionBar() {
         setSupportActionBar(binding.toolbar)
-        val likesCount = likesScreenExtras!!.likesCount
-        binding.tvToolbarSubTitle.text =
-            this.resources.getQuantityString(
-                R.plurals.likes_small,
-                likesCount,
-                likesCount
-            )
         binding.ivBack.setOnClickListener {
             onBackPressed()
         }

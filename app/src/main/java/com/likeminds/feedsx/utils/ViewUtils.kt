@@ -54,6 +54,10 @@ object ViewUtils {
         showShortToast(context, context.getString(R.string.something_went_wrong))
     }
 
+    fun showErrorMessageToast(context: Context, errorMessage: String?) {
+        showShortToast(context, errorMessage ?: "Something went wrong!")
+    }
+
     fun FragmentManager.currentFragment(navHostId: Int): Fragment? {
         val navHostFragment = this.findFragmentById(navHostId) as? NavHostFragment
         return navHostFragment?.childFragmentManager?.fragments?.firstOrNull()

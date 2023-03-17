@@ -91,6 +91,13 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 likesCount.show()
             }
 
+            likesCount.setOnClickListener {
+                postDetailAdapterListener.showLikesScreen(
+                    data.postId,
+                    data.id
+                )
+            }
+
             tvCommentTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
 
             if (data.repliesCount == 0) {

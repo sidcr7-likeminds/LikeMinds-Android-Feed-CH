@@ -19,6 +19,7 @@ import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
+import com.likeminds.feedsx.feed.model.POST
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
@@ -203,7 +204,7 @@ class FeedFragment :
             "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
-                .id("1")
+                .id("63f4caadc52f148210f7496a")
                 .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
                 .text(text)
                 .fromPostSaved(false)
@@ -553,10 +554,10 @@ class FeedFragment :
     }
 
     // opens likes screen when likes count is clicked.
-    override fun showLikesScreen(postData: PostViewData) {
+    override fun showLikesScreen(postId: String) {
         val likesScreenExtras = LikesScreenExtras.Builder()
-            .postId(postData.id)
-            .likesCount(postData.likesCount)
+            .postId(postId)
+            .entityType(POST)
             .build()
         LikesActivity.start(requireContext(), likesScreenExtras)
     }
