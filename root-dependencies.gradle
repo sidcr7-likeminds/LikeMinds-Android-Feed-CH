@@ -30,6 +30,8 @@ versions.dotsindicator = '4.2'
 versions.swiperefreshlayout = '1.1.0'
 versions.hilt = "2.44"
 versions.stream = '1.2.1'
+versions.work_manager = '2.7.1'
+versions.gson = '2.8.6'
 ext.versions = versions
 
 
@@ -89,6 +91,14 @@ deps.exo_player = exo_player
 def stream = [:]
 stream.main = "com.annimon:stream:$versions.stream"
 deps.stream = stream
+
+def work_manager = [:]
+work_manager.main = "androidx.work:work-runtime-ktx:$versions.work_manager"
+deps.work_manager = work_manager
+
+def gson = [:]
+gson.main = "com.google.code.gson:gson:$versions.gson"
+deps.gson = gson
 
 def testing = [:]
 testing.junit = "junit:junit:$versions.junit"

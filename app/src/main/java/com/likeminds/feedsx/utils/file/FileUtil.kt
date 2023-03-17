@@ -200,6 +200,21 @@ object FileUtil {
         return getUriFromBitmapWithRandomName(context, bitmap)
     }
 
+    fun getImageDimensions(context: Context, uri: Uri): Pair<Int, Int> {
+        return try {
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uri, "r")!!
+            val fileDescriptor = parcelFileDescriptor.fileDescriptor
+            BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options)
+            parcelFileDescriptor.close()
+            Pair(options.outWidth, options.outHeight)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            Pair(0, 0)
+        }
+    }
+
     fun getSharedPdfUri(context: Context, oldUri: Uri?): Uri? {
         if (oldUri == null) {
             return null

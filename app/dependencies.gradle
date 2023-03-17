@@ -34,6 +34,12 @@ dependencies {
     //Stream
     implementation deps.stream.main
 
+    //work manager
+    implementation deps.work_manager.main
+
+    // gson
+    implementation deps.gson.main
+
     //testing
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit

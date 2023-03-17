@@ -484,6 +484,16 @@ class FeedFragment :
         reportPostLauncher.launch(intent)
     }
 
+    private fun processCreatePostRequest(createPostResult: CreatePostResult) {
+        // TODO: create AddPostRequest and hit api
+        viewModel.addPost(
+            requireContext(),
+            createPostResult.text,
+            createPostResult.attachments
+        )
+
+    }
+
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostAdapter[position]
         if (item is PostViewData) {
@@ -643,8 +653,8 @@ class FeedFragment :
                     result.data?.extras?.getParcelable<CreatePostResult>(
                         CreatePostActivity.ARG_CREATE_POST_RESULT
                     ) ?: return@registerForActivityResult
-                
-                // TODO start uploading:
+
+                processCreatePostRequest(createPostResult)
             }
         }
 }
