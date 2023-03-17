@@ -8,9 +8,11 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.posttypes.model.AttachmentMetaViewData
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.post.model.Like
 import com.likeminds.likemindsfeed.sdk.model.User
 
@@ -86,6 +88,16 @@ object ViewDataConverter {
             .createdAt(like.createdAt)
             .updatedAt(like.updatedAt)
             .user(convertUser(users[like.userId]))
+            .build()
+    }
+
+    fun convertReportTag(
+        reportTag: ReportTag
+    ): ReportTagViewData {
+        return ReportTagViewData.Builder()
+            .id(reportTag.id)
+            .name(reportTag.name)
+            .isSelected(false)
             .build()
     }
 }

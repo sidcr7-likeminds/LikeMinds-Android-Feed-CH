@@ -34,13 +34,6 @@ class ItemPostTextOnlyViewDataBinder constructor(
         data: PostViewData,
         position: Int
     ) {
-        //TODO: Testing data
-        val list = listOf(
-            OverflowMenuItemViewData.Builder().title(DELETE_POST_MENU_ITEM).entityId(data.id)
-                .build(),
-            OverflowMenuItemViewData.Builder().title(REPORT_POST_MENU_ITEM).entityId(data.id)
-                .build()
-        )
 
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(

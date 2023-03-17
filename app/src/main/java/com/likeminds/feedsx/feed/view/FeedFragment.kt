@@ -468,12 +468,14 @@ class FeedFragment :
         }
     }
 
+    //TODO: testing data
     // Processes report action on post
     private fun reportPost(postId: String) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
-            .type(REPORT_TYPE_POST)
+            .entityCreatorId("299dc20c-72e1-49cf-8018-8ae33208d0a2")
+            .entityType(REPORT_TYPE_POST)
             .build()
 
         //get Intent for [ReportActivity]

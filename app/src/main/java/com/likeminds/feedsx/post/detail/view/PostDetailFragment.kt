@@ -338,6 +338,7 @@ class PostDetailFragment :
         }
     }
 
+    // TODO testing
     // Processes report action on entity
     private fun reportEntity(
         entityId: String,
@@ -347,7 +348,8 @@ class PostDetailFragment :
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(entityId)
-            .type(entityType)
+            .entityType(entityType)
+            .entityCreatorId("")
             .build()
 
         //get Intent for [ReportActivity]
