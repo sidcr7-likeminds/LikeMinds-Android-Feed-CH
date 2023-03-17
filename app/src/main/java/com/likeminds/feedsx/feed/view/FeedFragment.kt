@@ -4,11 +4,13 @@ import android.app.Activity
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
@@ -35,9 +37,14 @@ import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
+import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.likemindsfeed.LMResponse
+import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -53,6 +60,12 @@ class FeedFragment :
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     lateinit var mPostAdapter: PostAdapter
 
+    private var communityId: String = ""
+    private var communityName: String = ""
+
+    private var accessToken: String = ""
+    private var refreshToken: String = ""
+
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
     }
@@ -60,9 +73,73 @@ class FeedFragment :
     override fun setUpViews() {
         super.setUpViews()
         initUI()
+        initiateSDK()
         initToolbar()
     }
 
+    override fun observeData() {
+        super.observeData()
+
+        viewModel.initiateUserResponse.observe(viewLifecycleOwner) { response ->
+            observeInitiateUserResponse(response)
+        }
+    }
+
+    // initiates SDK
+    private fun initiateSDK() {
+        viewModel.initiateUser(
+            "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
+            "299dc20c-72e1-49cf-8018-8ae33208d0a2",
+            "Mahir Gupta",
+            false
+        )
+    }
+
+    // observes initiate user response
+    private fun observeInitiateUserResponse(response: LMResponse<InitiateUserResponse>) {
+        if (response.success) {
+            val data = response.data
+            if (data != null) {
+                if (data.appAccess == true) {
+                    communityId = data.community?.id ?: ""
+                    communityName = data.community?.name ?: ""
+
+                    accessToken = data.accessToken ?: ""
+                    refreshToken = data.refreshToken ?: ""
+
+                    initToolbar()
+                    // TODO: save in local db and then set
+                    val user = ViewDataConverter.convertUser(data.user)
+                    setUserImage(user)
+                } else {
+                    Log.d(
+                        LOG_TAG,
+                        "initiate api sdk called -> success and have not app access"
+                    )
+                    showInvalidAccess()
+                }
+            } else {
+                ViewUtils.showSomethingWentWrongToast(requireContext())
+            }
+        } else {
+            ViewUtils.showSomethingWentWrongToast(requireContext())
+        }
+    }
+
+    // shows invalid access error and logs out invalid user
+    private fun showInvalidAccess() {
+        binding.apply {
+            recyclerView.hide()
+            layoutAccessRemoved.root.show()
+            memberImage.hide()
+            ivSearch.hide()
+            ivNotification.hide()
+        }
+
+        //TODO: logout
+    }
+
+    // initializes various UI components
     private fun initUI() {
         //TODO: Set as per branding
         binding.isBrandingBasic = true
@@ -72,6 +149,7 @@ class FeedFragment :
         initNewPostClick()
     }
 
+    // initializes new post fab click
     private fun initNewPostClick() {
         binding.newPostButton.setOnClickListener {
             val intent = CreatePostActivity.getIntent(requireContext())
@@ -79,6 +157,7 @@ class FeedFragment :
         }
     }
 
+    // initializes universal feed recyclerview
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
         mPostAdapter = PostAdapter(this)
@@ -334,6 +413,9 @@ class FeedFragment :
     private fun initToolbar() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
+        //if user is guest user hide, profile icon from toolbar
+        binding.memberImage.isVisible = !isGuestUser
+
         //click listener -> open profile screen
         binding.memberImage.setOnClickListener {
             //TODO: On member Image click
@@ -349,6 +431,20 @@ class FeedFragment :
 
         //TODO: testing data. add this while observing data
         binding.tvNotificationCount.text = "10"
+    }
+
+    // sets user profile image
+    private fun setUserImage(user: UserViewData?) {
+        if (user != null) {
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.id,
+                binding.memberImage,
+                showRoundImage = true,
+                objectKey = user.updatedAt
+            )
+        }
     }
 
     // processes delete post request
