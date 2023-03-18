@@ -83,6 +83,18 @@ class FeedFragment :
         viewModel.initiateUserResponse.observe(viewLifecycleOwner) { response ->
             observeInitiateUserResponse(response)
         }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            ViewUtils.showErrorMessageToast(requireContext(), error)
+        }
+
+        viewModel.deletePostResponse.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                ViewUtils.showShortToast(context, getString(R.string.post_deleted))
+            } else {
+                ViewUtils.showSomethingWentWrongToast(requireContext())
+            }
+        }
     }
 
     // initiates SDK
@@ -204,7 +216,7 @@ class FeedFragment :
             "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
-                .id("63f4caadc52f148210f7496a")
+                .id("6404f8eae279df2717a8dadb")
                 .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
                 .text(text)
                 .fromPostSaved(false)
@@ -451,7 +463,7 @@ class FeedFragment :
         //TODO: set isAdmin
         val isAdmin = false
         val deleteExtras = DeleteExtras.Builder()
-            .entityId(postId)
+            .postId(postId)
             .entityType(DELETE_TYPE_POST)
             .build()
         if (isAdmin) {
@@ -605,21 +617,20 @@ class FeedFragment :
         )
     }
 
+    // TODO: ask if we can use these extras here
     // callback when self post is deleted by user
-    override fun delete(deleteExtras: DeleteExtras) {
-        // TODO: delete post by user
-        ViewUtils.showShortToast(
-            requireContext(),
-            getString(R.string.post_deleted)
+    override fun selfDelete(deleteExtras: DeleteExtras) {
+        viewModel.deletePost(
+            deleteExtras.postId,
+            null
         )
     }
 
     // callback when other's post is deleted by CM
-    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
-        // TODO: delete post by admin
-        ViewUtils.showShortToast(
-            requireContext(),
-            getString(R.string.post_deleted)
+    override fun delete(deleteExtras: DeleteExtras) {
+        viewModel.deletePost(
+            deleteExtras.postId,
+            deleteExtras.reason
         )
     }
 

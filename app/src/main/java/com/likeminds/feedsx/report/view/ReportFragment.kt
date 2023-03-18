@@ -80,8 +80,8 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
             requireActivity().finish()
         }
 
-        viewModel.postReportResponse.observe(viewLifecycleOwner) { response ->
-            if (response) {
+        viewModel.postReportResponse.observe(viewLifecycleOwner) { success ->
+            if (success) {
                 Log.d(LOG_TAG, "report send successfully")
 
                 //set result, from where the result is coming.

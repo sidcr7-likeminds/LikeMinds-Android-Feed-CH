@@ -39,6 +39,6 @@ class PostDetailReplyAdapter constructor(
             currentVisibleReplies: Int
         )
 
-        fun onReplyMenuItemClicked(replyId: String, title: String) {}
+        fun onReplyMenuItemClicked(replyId: String, title: String, creatorId: String) {}
     }
 }

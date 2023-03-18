@@ -1,9 +1,9 @@
 package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -27,21 +27,18 @@ import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_D
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
+import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
-import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
-import com.likeminds.feedsx.report.model.ReportExtras
-import com.likeminds.feedsx.report.model.ReportType
+import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
 class PostDetailFragment :
@@ -51,6 +48,8 @@ class PostDetailFragment :
     PostDetailReplyAdapterListener,
     DeleteAlertDialogFragment.DeleteAlertDialogListener,
     DeleteDialogFragment.DeleteDialogListener {
+
+    private val viewModel: PostDetailViewModel by viewModels()
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -76,6 +75,26 @@ class PostDetailFragment :
 
         //TODO: testing data
         updateCommentsCount(10)
+    }
+
+    override fun observeData() {
+        super.observeData()
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            ViewUtils.showErrorMessageToast(requireContext(), error)
+        }
+
+        viewModel.deleteEntityResponse.observe(viewLifecycleOwner) { response ->
+            if (response.second) {
+                if (response.first == DELETE_TYPE_POST) {
+                    ViewUtils.showShortToast(context, getString(R.string.post_deleted))
+                } else if (response.first == DELETE_TYPE_COMMENT) {
+                    ViewUtils.showShortToast(context, getString(R.string.comment_deleted))
+                }
+            } else {
+                ViewUtils.showSomethingWentWrongToast(requireContext())
+            }
+        }
     }
 
     // initializes the post detail screen recycler view
@@ -211,7 +230,7 @@ class PostDetailFragment :
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostDetailAdapter.add(
             PostViewData.Builder()
-                .id("63f4caadc52f148210f7496a")
+                .id("6404f8eae279df2717a8dadb")
                 .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
                 .text(text)
                 .build()
@@ -226,8 +245,8 @@ class PostDetailFragment :
         mPostDetailAdapter.add(
             CommentViewData.Builder()
                 .isLiked(false)
-                .id("6412b3b39b922f785f94da50")
-                .postId("63f4caadc52f148210f7496a")
+                .id("6405c4261325be7c1eac538d")
+                .postId("6404f8eae279df2717a8dadb")
                 .user(
                     UserViewData.Builder()
                         .name("Siddharth Dubey")
@@ -313,14 +332,16 @@ class PostDetailFragment :
 
     // processes delete entity request
     private fun deleteEntity(
-        entityId: String,
+        postId: String,
         @ReportType
-        entityType: Int
+        entityType: Int,
+        commentId: String? = null
     ) {
         //TODO: set isAdmin
         val isAdmin = false
         val deleteExtras = DeleteExtras.Builder()
-            .entityId(entityId)
+            .postId(postId)
+            .commentId(commentId)
             .entityType(entityType)
             .build()
         if (isAdmin) {
@@ -521,16 +542,25 @@ class PostDetailFragment :
 
     // callback for comment's menu is item
     override fun onCommentMenuItemClicked(
+        postId: String,
         commentId: String,
         title: String,
         creatorId: String
     ) {
         when (title) {
             DELETE_COMMENT_MENU_ITEM -> {
-                deleteEntity(commentId, REPORT_TYPE_COMMENT)
+                deleteEntity(
+                    postId,
+                    REPORT_TYPE_COMMENT,
+                    commentId
+                )
             }
             REPORT_COMMENT_MENU_ITEM -> {
-                reportEntity(commentId, creatorId, REPORT_TYPE_COMMENT)
+                reportEntity(
+                    commentId,
+                    creatorId,
+                    REPORT_TYPE_COMMENT
+                )
             }
         }
     }
@@ -592,8 +622,23 @@ class PostDetailFragment :
     }
 
     // callback when the item of reply menu is clicked
-    override fun onReplyMenuItemClicked(replyId: String, title: String) {
-        //TODO: handle menu item click for replies.
+    override fun onReplyMenuItemClicked(
+        replyId: String,
+        title: String,
+        creatorId: String
+    ) {
+        when (title) {
+            DELETE_COMMENT_MENU_ITEM -> {
+                deleteEntity(replyId, REPORT_TYPE_COMMENT)
+            }
+            REPORT_COMMENT_MENU_ITEM -> {
+                reportEntity(
+                    replyId,
+                    creatorId,
+                    REPORT_TYPE_REPLY
+                )
+            }
+        }
     }
 
     private val reportPostLauncher =
@@ -607,33 +652,33 @@ class PostDetailFragment :
         }
 
     // callback when self post is deleted by user
-    override fun delete(deleteExtras: DeleteExtras) {
-        // TODO: delete post/comment by user
-        Log.d("TAG", "initializeListeners: ${deleteExtras.entityType}")
+    override fun selfDelete(deleteExtras: DeleteExtras) {
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> showShortToast(
-                requireContext(),
-                getString(R.string.post_deleted)
+            DELETE_TYPE_POST -> viewModel.deleteEntity(
+                deleteExtras.postId,
+                DELETE_TYPE_POST
             )
-            DELETE_TYPE_COMMENT -> showShortToast(
-                requireContext(),
-                getString(R.string.comment_deleted)
+            DELETE_TYPE_COMMENT -> viewModel.deleteEntity(
+                deleteExtras.postId,
+                DELETE_TYPE_COMMENT,
+                deleteExtras.commentId
             )
         }
     }
 
     // callback when other's post is deleted by CM
-    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
-        // TODO: delete post/comment by admin
-        Log.d("TAG", "initializeListeners by admin: ${deleteExtras.entityType}")
+    override fun delete(deleteExtras: DeleteExtras) {
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> showShortToast(
-                requireContext(),
-                getString(R.string.post_deleted)
+            DELETE_TYPE_POST -> viewModel.deleteEntity(
+                deleteExtras.postId,
+                DELETE_TYPE_POST,
+                reason = deleteExtras.reason
             )
-            DELETE_TYPE_COMMENT -> showShortToast(
-                requireContext(),
-                getString(R.string.comment_deleted)
+            DELETE_TYPE_COMMENT -> viewModel.deleteEntity(
+                deleteExtras.postId,
+                DELETE_TYPE_COMMENT,
+                deleteExtras.commentId,
+                deleteExtras.reason
             )
         }
     }

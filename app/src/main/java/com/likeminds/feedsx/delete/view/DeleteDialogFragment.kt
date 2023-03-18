@@ -83,17 +83,19 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
 
         binding.tvConfirm.setOnClickListener {
             val data = binding.reasonData ?: return@setOnClickListener
-            val reason = binding.etOtherReason.text.toString()
+            var reason = binding.etOtherReason.text.toString()
             if (data.value.isNotEmpty()) {
                 if (data.value == "Others" && reason.isEmpty()) {
                     return@setOnClickListener
                 }
+                if (data.value != "Others") {
+                    reason = data.value
+                }
             }
+            deleteExtras?.reason = reason
 
             deleteDialogListener?.delete(
-                deleteExtras!!,
-                data.tagId,
-                reason
+                deleteExtras!!
             )
             dismiss()
         }
@@ -140,9 +142,7 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
 
     interface DeleteDialogListener {
         fun delete(
-            deleteExtras: DeleteExtras,
-            reportTagId: String,
-            reason: String
+            deleteExtras: DeleteExtras
         )
     }
 }

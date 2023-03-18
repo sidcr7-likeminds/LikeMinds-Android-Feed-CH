@@ -44,7 +44,7 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
 
         (binding.root.parent as View).setBackgroundColor(Color.TRANSPARENT)
 
-        //TODO: testing data
+        //TODO: testing data ask if we have to add from report tags
         val list = ArrayList<ReasonChooseViewData>(
             listOf(
                 ReasonChooseViewData.Builder().value("Spam").build(),
