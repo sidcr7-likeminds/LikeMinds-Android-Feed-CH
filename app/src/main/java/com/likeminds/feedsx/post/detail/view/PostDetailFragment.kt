@@ -14,6 +14,7 @@ import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_COMMENT
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.model.DeleteType
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
 import com.likeminds.feedsx.feed.model.COMMENT
@@ -77,13 +78,16 @@ class PostDetailFragment :
         updateCommentsCount(10)
     }
 
+    // observes data
     override fun observeData() {
         super.observeData()
 
+        // observes error message if api fails with some error
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             ViewUtils.showErrorMessageToast(requireContext(), error)
         }
 
+        // observes deleteEntity live data
         viewModel.deleteEntityResponse.observe(viewLifecycleOwner) { response ->
             if (response.second) {
                 if (response.first == DELETE_TYPE_POST) {
@@ -245,8 +249,8 @@ class PostDetailFragment :
         mPostDetailAdapter.add(
             CommentViewData.Builder()
                 .isLiked(false)
-                .id("6405c4261325be7c1eac538d")
-                .postId("6404f8eae279df2717a8dadb")
+                .id("64170e93242075ceb7bcb641")
+                .postId("63fe0c5cd41532607075e56d")
                 .user(
                     UserViewData.Builder()
                         .name("Siddharth Dubey")
@@ -261,61 +265,7 @@ class PostDetailFragment :
                     )
                 )
                 .likesCount(100)
-                .text("This is a test comment 1")
-                .build()
-        )
-
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(true)
-                .id("2")
-                .user(
-                    UserViewData.Builder()
-                        .name("Ishaan Jain")
-                        .build()
-                )
-                .likesCount(10)
-                .text("This is a test comment 2")
-                .build()
-        )
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("3")
-                .user(
-                    UserViewData.Builder()
-                        .name("Natesh Rehlan")
-                        .build()
-                )
-                .likesCount(10)
-                .text("This is a test comment 3")
-                .build()
-        )
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("4")
-                .user(
-                    UserViewData.Builder()
-                        .name("Natesh Rehlan")
-                        .build()
-                )
-                .likesCount(10)
-                .text("This is a test comment 4")
-                .build()
-        )
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("5")
-                .user(
-                    UserViewData.Builder()
-                        .name("Natesh Rehlan")
-                        .build()
-                )
-                .likesCount(100)
-                .repliesCount(10)
-                .text("This is a test comment 5")
+                .text("This - 3534534534 is a test comment 1")
                 .build()
         )
     }
@@ -333,7 +283,7 @@ class PostDetailFragment :
     // processes delete entity request
     private fun deleteEntity(
         postId: String,
-        @ReportType
+        @DeleteType
         entityType: Int,
         commentId: String? = null
     ) {
@@ -526,7 +476,7 @@ class PostDetailFragment :
     ) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
-                deleteEntity(postId, REPORT_TYPE_POST)
+                deleteEntity(postId, DELETE_TYPE_POST)
             }
             REPORT_POST_MENU_ITEM -> {
                 reportEntity(postId, creatorId, REPORT_TYPE_POST)
@@ -551,7 +501,7 @@ class PostDetailFragment :
             DELETE_COMMENT_MENU_ITEM -> {
                 deleteEntity(
                     postId,
-                    REPORT_TYPE_COMMENT,
+                    DELETE_TYPE_COMMENT,
                     commentId
                 )
             }
@@ -623,13 +573,18 @@ class PostDetailFragment :
 
     // callback when the item of reply menu is clicked
     override fun onReplyMenuItemClicked(
+        postId: String,
         replyId: String,
         title: String,
         creatorId: String
     ) {
         when (title) {
             DELETE_COMMENT_MENU_ITEM -> {
-                deleteEntity(replyId, REPORT_TYPE_COMMENT)
+                deleteEntity(
+                    postId,
+                    DELETE_TYPE_COMMENT,
+                    replyId
+                )
             }
             REPORT_COMMENT_MENU_ITEM -> {
                 reportEntity(

@@ -24,6 +24,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
     private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: LiveData<String?> = _errorMessage
 
+    // calls DeletePost/DeleteComment API and posts the response/error message in LiveData
     fun deleteEntity(
         postId: String,
         entityType: Int,
@@ -35,6 +36,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             val updatedReason = if (reason.isNullOrEmpty()) null else reason
 
             if (entityType == DELETE_TYPE_POST) {
+                // processes delete post request if entity = post
                 val request = DeletePostRequest.Builder()
                     .postId(postId)
                     .deleteReason(updatedReason)
@@ -47,6 +49,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                     _errorMessage.postValue(response.errorMessage)
                 }
             } else if (entityType == DELETE_TYPE_COMMENT) {
+                // processes delete comment request if entity = comment
                 val updatedCommentId = commentId ?: ""
                 val request = DeleteCommentRequest.Builder()
                     .postId(postId)

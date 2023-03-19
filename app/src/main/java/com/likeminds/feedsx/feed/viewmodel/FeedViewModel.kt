@@ -46,6 +46,7 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // calls DeletePost API and posts the response/error message in LiveData
     fun deletePost(
         postId: String,
         reason: String?

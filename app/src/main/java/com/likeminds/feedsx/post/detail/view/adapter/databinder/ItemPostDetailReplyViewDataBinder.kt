@@ -98,6 +98,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
 
     override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
         postDetailReplyAdapterListener.onReplyMenuItemClicked(
+            menu.postId ?: "",
             menu.entityId,
             menu.title,
             menu.entityCreatorId

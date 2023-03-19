@@ -8,6 +8,7 @@ import kotlinx.parcelize.Parcelize
 // title -> title of the menu item
 // entityId -> id of the corresponding data (post-id/comment-id, etc)
 // postId -> id of post id in case of comment
+// entityCreatorId -> userId of the creator of entity
 @Parcelize
 class OverflowMenuItemViewData private constructor(
     @OverflowMenuItemTitle

@@ -41,6 +41,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     // observes data
     override fun observeData() {
         super.observeData()
+
         // observes likes api response
         viewModel.getLikesDataResponse.observe(viewLifecycleOwner) { response ->
             val listOfLikes = response.first

@@ -77,17 +77,21 @@ class FeedFragment :
         initToolbar()
     }
 
+    // observes data
     override fun observeData() {
         super.observeData()
 
+        // observes InitiateUser api response
         viewModel.initiateUserResponse.observe(viewLifecycleOwner) { response ->
             observeInitiateUserResponse(response)
         }
 
+        // observes error message if api fails with some error
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             ViewUtils.showErrorMessageToast(requireContext(), error)
         }
 
+        // observes DeletePost api response
         viewModel.deletePostResponse.observe(viewLifecycleOwner) { success ->
             if (success) {
                 ViewUtils.showShortToast(context, getString(R.string.post_deleted))
@@ -101,7 +105,7 @@ class FeedFragment :
     private fun initiateSDK() {
         viewModel.initiateUser(
             "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
-            "299dc20c-72e1-49cf-8018-8ae33208d0a2",
+            "17b78532-ea3e-479d-9d85-b26b60bb5572",
             "Mahir Gupta",
             false
         )
@@ -216,7 +220,7 @@ class FeedFragment :
             "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
-                .id("6404f8eae279df2717a8dadb")
+                .id("6404dc1de279df2717a8dad9")
                 .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
                 .text(text)
                 .fromPostSaved(false)

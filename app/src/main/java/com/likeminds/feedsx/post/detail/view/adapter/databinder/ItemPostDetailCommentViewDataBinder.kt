@@ -5,8 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
-import com.likeminds.feedsx.overflowmenu.model.DELETE_COMMENT_MENU_ITEM
-import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
@@ -68,15 +66,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
             overflowMenu,
             data.menuItems
         )
-
-        //TODO: Testing data
-        val list = listOf(
-            OverflowMenuItemViewData.Builder().title(DELETE_COMMENT_MENU_ITEM).entityId(data.id).postId(data.postId)
-                .build()
-        )
-
-        //TODO: remove
-        PostTypeUtil.setOverflowMenuItems(overflowMenu, list)
 
         binding.apply {
             val context = root.context
