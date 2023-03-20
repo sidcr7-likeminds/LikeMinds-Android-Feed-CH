@@ -7,7 +7,6 @@ import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.sdk.model.InitiateLikeMindsExtra
-import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 

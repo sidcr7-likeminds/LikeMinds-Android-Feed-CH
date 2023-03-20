@@ -2,7 +2,6 @@ package com.likeminds.feedsx.feed.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -14,7 +13,6 @@ import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
-import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -33,9 +31,6 @@ class FeedViewModel @Inject constructor() : ViewModel() {
 
     private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
     val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
-
-    @Inject
-    lateinit var postPreferences: PostPreferences
 
     // calls InitiateUser API and posts the response in LiveData
     fun initiateUser(
@@ -56,6 +51,7 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // calls AddPost API and posts the response in LiveData
     fun addPost(
         context: Context,
         postTextContent: String?,
@@ -64,10 +60,12 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             val uploadData: Pair<WorkContinuation, String>
             if (fileUris != null) {
+                // if the post has upload-able attachments
                 val updatedFileUris = includeAttachmentMetaData(context, fileUris)
                 uploadData = startMediaUploadWorker(context, updatedFileUris)
                 uploadData.first.enqueue()
             } else {
+                // if the post does not have any upload-able attachments
                 // TODO: call add post api
             }
         }
@@ -90,10 +88,6 @@ class FeedViewModel @Inject constructor() : ViewModel() {
             val name = FileUtils.getFileNameFromPath(localFilePath)
             // generates awsFolderPath to upload the file
             val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(name)
-            Log.d(
-                "PUI",
-                "includeAttachmentMetaData: ${it.uri} ft: ${it.fileType} aws: $awsFolderPath"
-            )
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)
             when (it.fileType) {
@@ -114,6 +108,7 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // creates PostAttachmentUploadWorker to start media upload
     @SuppressLint("EnqueueWork")
     private fun startMediaUploadWorker(
         context: Context,
@@ -123,7 +118,6 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(jsonAttachment)
         val workContinuation =
             WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
-        postPreferences.setAttachmentUploadWorkerUUID(oneTimeWorkRequest.id.toString())
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }
 }

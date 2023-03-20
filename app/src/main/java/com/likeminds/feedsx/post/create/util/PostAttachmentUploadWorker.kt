@@ -57,21 +57,17 @@ class PostAttachmentUploadWorker(
         convertJsonStringToAttachments(attachments)
     }
 
+    // creates list of SingleUriData from attachments JSON
     private fun convertJsonStringToAttachments(attachments: String) {
-        Log.d("PUI", "convertJsonStringToAttachments1: attachmentsToUpload.")
         val sType = object : TypeToken<List<SingleUriData>>() {}.type
         attachmentsToUpload = Gson().fromJson(attachments, sType)
-        Log.d(
-            "PUI",
-            "convertJsonStringToAttachments: attachmentsToUpload.${attachmentsToUpload[0].awsFolderPath}"
-        )
     }
 
+    // creates/resumes AWS uploads for each attachment
     override fun uploadFiles(continuation: Continuation<Int>) {
         val totalFilesToUpload = attachmentsToUpload.size
 
         uploadList = createAWSRequestList(attachmentsToUpload)
-        Log.d("PUI", "uploadFiles: uploadFiles.${uploadList.size}")
         uploadList.forEach { request ->
             val resumeAWSFileResponse =
                 UploadHelper.getInstance().getAWSFileResponse(request.awsFolderPath)
@@ -83,6 +79,7 @@ class PostAttachmentUploadWorker(
         }
     }
 
+    // resumes AWS file upload
     private fun resumeAWSUpload(
         resumeAWSFileResponse: AWSFileResponse,
         totalFilesToUpload: Int,
@@ -93,10 +90,11 @@ class PostAttachmentUploadWorker(
         if (resume == null) {
             createAWSUpload(request, totalFilesToUpload, continuation)
         } else {
-            uploadAWSFile(resumeAWSFileResponse, totalFilesToUpload, continuation)
+            setTransferObserver(resumeAWSFileResponse, totalFilesToUpload, continuation)
         }
     }
 
+    // creates and starts AWS upload
     private fun createAWSUpload(
         request: GenericFileRequest,
         totalFilesToUpload: Int,
@@ -107,7 +105,7 @@ class PostAttachmentUploadWorker(
             uploadFile(request, null)
         if (awsFileResponse != null) {
             UploadHelper.getInstance().addAWSFileResponse(awsFileResponse)
-            uploadAWSFile(awsFileResponse, totalFilesToUpload, continuation)
+            setTransferObserver(awsFileResponse, totalFilesToUpload, continuation)
         }
     }
 
@@ -118,7 +116,6 @@ class PostAttachmentUploadWorker(
      */
     private fun uploadFile(request: GenericFileRequest, uuid: String? = null): AWSFileResponse? {
         val filePath = request.localFilePath ?: return null
-        Log.d("PUI", "uploadFile: 1" + request.localFilePath)
         val file = if (request.fileType == IMAGE) {
             FileHelper.compressFile(applicationContext, filePath)
         } else {
@@ -144,7 +141,8 @@ class PostAttachmentUploadWorker(
             .build()
     }
 
-    private fun uploadAWSFile(
+    // sets a transfer listener to uploading
+    private fun setTransferObserver(
         awsFileResponse: AWSFileResponse,
         totalFilesToUpload: Int,
         continuation: Continuation<Int>
@@ -169,6 +167,7 @@ class PostAttachmentUploadWorker(
         })
     }
 
+    // onStateChanged listener for AWS file upload
     private fun onStateChanged(
         response: AWSFileResponse,
         state: TransferState?,
