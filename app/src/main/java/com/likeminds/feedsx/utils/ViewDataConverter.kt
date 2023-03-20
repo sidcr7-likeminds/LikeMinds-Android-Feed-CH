@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.utils
 
 import com.likeminds.feedsx.media.model.IMAGE
+import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -18,7 +19,7 @@ object ViewDataConverter {
      * Media Model -> View Data Model
     --------------------------------*/
 
-    // Converts the SingleDataUri (contains the data of media) to AttachmentViewData
+    // Converts the SingleUriData (contains the data of media) to AttachmentViewData
     fun convertSingleDataUri(singleUriData: SingleUriData): AttachmentViewData {
         val attachmentType: Int?
         val viewType = when (singleUriData.fileType) {
@@ -48,6 +49,16 @@ object ViewDataConverter {
                     .build()
             )
             .build()
+    }
+
+    // converts internal media filetype to FileType
+    fun convertFileType(fileType: String): Int {
+        return when (fileType) {
+            IMAGE -> com.likeminds.feedsx.utils.mediauploader.model.IMAGE
+            PDF -> com.likeminds.feedsx.utils.mediauploader.model.PDF
+            VIDEO -> com.likeminds.feedsx.utils.mediauploader.model.VIDEO
+            else -> com.likeminds.feedsx.utils.mediauploader.model.IMAGE
+        }
     }
 
     /**--------------------------------

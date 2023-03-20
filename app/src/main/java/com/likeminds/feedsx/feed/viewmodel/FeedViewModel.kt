@@ -1,6 +1,8 @@
 package com.likeminds.feedsx.feed.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,12 +13,15 @@ import com.google.gson.Gson
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
+import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
+import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
+import com.likeminds.likemindsfeed.sdk.utils.FileUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +33,9 @@ class FeedViewModel @Inject constructor() : ViewModel() {
 
     private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
     val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
+
+    @Inject
+    lateinit var postPreferences: PostPreferences
 
     // calls InitiateUser API and posts the response in LiveData
     fun initiateUser(
@@ -54,9 +62,11 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         fileUris: List<SingleUriData>?
     ) {
         viewModelScope.launch {
+            val uploadData: Pair<WorkContinuation, String>
             if (fileUris != null) {
                 val updatedFileUris = includeAttachmentMetaData(context, fileUris)
-//                startMediaUploadWorker(context, updatedFileUris)
+                uploadData = startMediaUploadWorker(context, updatedFileUris)
+                uploadData.first.enqueue()
             } else {
                 // TODO: call add post api
             }
@@ -73,34 +83,47 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         files: List<SingleUriData>,
     ): List<SingleUriData> {
         return files.map {
+            // generates localFilePath from the ContentUri provided by client
+            val localFilePath =
+                FileUtil.getRealPath(context, it.uri)
+            // generates filename from localFilePath
+            val name = FileUtils.getFileNameFromPath(localFilePath)
+            // generates awsFolderPath to upload the file
+            val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(name)
+            Log.d(
+                "PUI",
+                "includeAttachmentMetaData: ${it.uri} ft: ${it.fileType} aws: $awsFolderPath"
+            )
+            val builder = it.toBuilder().localFilePath(localFilePath)
+                .awsFolderPath(awsFolderPath)
             when (it.fileType) {
                 IMAGE -> {
                     val dimensions = FileUtil.getImageDimensions(context, it.uri)
-                    it.toBuilder().width(dimensions.first).height(dimensions.second).build()
+                    builder.width(dimensions.first).height(dimensions.second).build()
                 }
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
-                        it.toBuilder().thumbnailUri(thumbnailUri).build()
+                        builder.thumbnailUri(thumbnailUri).build()
                     } else {
-                        it
+                        builder.build()
                     }
                 }
-                else -> it
+                else -> builder.build()
             }
         }
     }
 
-//    private fun startMediaUploadWorker(
-//        context: Context,
-//        attachments: List<SingleUriData>
-//    ): Pair<WorkContinuation, String> {
-//        val jsonAttachment = Gson().toJson(attachments)
-//        val oneTimeWorkRequest =
-//            PostAttachmentUploadWorker.getInstance(jsonAttachment)
-//        val workContinuation =
-//            WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
-//        collabmatesSDK.postPreferences.setAttachmentUploadWorkerUUID(oneTimeWorkRequest.id.toString())
-//        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
-//    }
+    @SuppressLint("EnqueueWork")
+    private fun startMediaUploadWorker(
+        context: Context,
+        attachments: List<SingleUriData>
+    ): Pair<WorkContinuation, String> {
+        val jsonAttachment = Gson().toJson(attachments)
+        val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(jsonAttachment)
+        val workContinuation =
+            WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
+        postPreferences.setAttachmentUploadWorkerUUID(oneTimeWorkRequest.id.toString())
+        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
 }
