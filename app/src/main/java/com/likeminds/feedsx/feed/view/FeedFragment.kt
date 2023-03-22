@@ -88,8 +88,8 @@ class FeedFragment :
     private fun initiateSDK() {
         viewModel.initiateUser(
             "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
-            "299dc20c-72e1-49cf-8018-8ae33208d0a2",
-            "Mahir Gupta",
+            "1a46420a-9d5f-4c0b-8524-07a6addafc58",
+            "Sid-14",
             false
         )
     }
@@ -99,7 +99,13 @@ class FeedFragment :
         if (response.success) {
             val data = response.data
             if (data != null) {
-                if (data.appAccess == true) {
+                if (data.logoutResponse != null) {
+                    Log.d(
+                        LOG_TAG,
+                        "initiate api sdk called -> success and have not app access"
+                    )
+                    showInvalidAccess()
+                } else {
                     communityId = data.community?.id ?: ""
                     communityName = data.community?.name ?: ""
 
@@ -110,12 +116,6 @@ class FeedFragment :
                     // TODO: save in local db and then set
                     val user = ViewDataConverter.convertUser(data.user)
                     setUserImage(user)
-                } else {
-                    Log.d(
-                        LOG_TAG,
-                        "initiate api sdk called -> success and have not app access"
-                    )
-                    showInvalidAccess()
                 }
             } else {
                 ViewUtils.showSomethingWentWrongToast(requireContext())
@@ -437,7 +437,7 @@ class FeedFragment :
             MemberImageUtil.setImage(
                 user.imageUrl,
                 user.name,
-                user.id,
+                user.userUniqueId,
                 binding.memberImage,
                 showRoundImage = true,
                 objectKey = user.updatedAt

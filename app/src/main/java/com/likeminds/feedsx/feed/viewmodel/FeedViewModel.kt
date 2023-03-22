@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.utils.ViewDataConverter
+import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -17,7 +18,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -37,26 +39,13 @@ class FeedViewModel @Inject constructor(
         viewModelScope.launchIO {
             val request = InitiateUserRequest.Builder()
                 .apiKey(apiKey)
+                .deviceId(userPreferences.getDeviceId())
                 .userId(userId)
                 .userName(userName)
                 .isGuest(guest)
                 .build()
 
-            val response = lmFeedClient.initiateUser(request)
-            //user object
-            val user = response.data?.user
-            //add user to db
-            addUser(user)
-
-            _initiateUserResponse.postValue(response)
-        }
-    }
-
-    private fun addUser(user: User?) {
-        if (user == null) return
-        viewModelScope.launchIO {
-            val userEntity = ViewDataConverter.convertUser(user)
-            userRepository.insertUser(userEntity)
+            _initiateUserResponse.postValue(lmFeedClient.initiateUser(request))
         }
     }
 }
