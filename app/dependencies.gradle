@@ -40,5 +40,5 @@ dependencies {
     androidTestImplementation deps.testing.espresso
 
     // feed-sdk
-    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:183e5b090b"
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:4b668de429"
 }

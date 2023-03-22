@@ -61,15 +61,14 @@ object ViewDataConverter {
         if (user == null) {
             return null
         }
-        // TODO: custom title & isDeleted
         return UserViewData.Builder()
             .id(user.id)
             .name(user.name)
             .imageUrl(user.imageUrl)
             .userUniqueId(user.userUniqueId)
-//            .customTitle(user.customTitle)
+            .customTitle(user.customTitle)
             .isGuest(user.isGuest)
-//            .isDeleted(user.isDeleted)
+            .isDeleted(user.isDeleted)
             .build()
     }
 }
