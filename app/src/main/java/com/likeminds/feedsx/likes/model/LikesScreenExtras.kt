@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.feed.model
+package com.likeminds.feedsx.likes.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

@@ -1,6 +1,6 @@
 package com.likeminds.feedsx.utils
 
-import com.likeminds.feedsx.feed.model.LikeViewData
+import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO

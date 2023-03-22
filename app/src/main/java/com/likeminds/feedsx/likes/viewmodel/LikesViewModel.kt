@@ -1,12 +1,12 @@
-package com.likeminds.feedsx.feed.viewmodel
+package com.likeminds.feedsx.likes.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.feed.model.COMMENT
-import com.likeminds.feedsx.feed.model.LikeViewData
-import com.likeminds.feedsx.feed.model.POST
+import com.likeminds.feedsx.likes.model.COMMENT
+import com.likeminds.feedsx.likes.model.LikeViewData
+import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -52,7 +52,7 @@ class LikesViewModel @Inject constructor() : ViewModel() {
 
                 postLikesDataFetched(lmFeedClient.getPostLikes(request))
             } else if (entityType == COMMENT) {
-                // calls getCommentikes API
+                // calls getCommentLikes API
                 val request = GetCommentLikesRequest.Builder()
                     .postId(postId)
                     .commentId(commentId!!)

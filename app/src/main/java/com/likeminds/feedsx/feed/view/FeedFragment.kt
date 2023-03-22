@@ -18,9 +18,10 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
-import com.likeminds.feedsx.feed.model.LikesScreenExtras
-import com.likeminds.feedsx.feed.model.POST
+import com.likeminds.feedsx.likes.model.LikesScreenExtras
+import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
@@ -89,8 +90,8 @@ class FeedFragment :
     private fun initiateSDK() {
         viewModel.initiateUser(
             "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
-            "1a46420a-9d5f-4c0b-8524-07a6addafc58",
-            "Sid-14",
+            "10003",
+            "Ishaan",
             false
         )
     }
