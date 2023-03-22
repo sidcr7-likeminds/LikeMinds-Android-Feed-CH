@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.utils.UserPreferences
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.google.gson.Gson
@@ -14,18 +15,17 @@ import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.utils.coroutine.launchIO
-import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
-import com.likeminds.likemindsfeed.sdk.utils.FileUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedViewModel @Inject constructor() : ViewModel() {
+class FeedViewModel @Inject constructor(
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
@@ -42,12 +42,20 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launchIO {
             val request = InitiateUserRequest.Builder()
                 .apiKey(apiKey)
+                .deviceId(userPreferences.getDeviceId())
                 .userId(userId)
                 .userName(userName)
                 .isGuest(guest)
                 .build()
 
-            _initiateUserResponse.postValue(lmFeedClient.initiateUser(request))
+            val response = lmFeedClient.initiateUser(request)
+            val user = response.data?.user
+            val memberId = user?.id ?: -1
+
+            // store member_id in prefs
+            userPreferences.saveMemberId(memberId)
+
+            _initiateUserResponse.postValue(response)
         }
     }
 
