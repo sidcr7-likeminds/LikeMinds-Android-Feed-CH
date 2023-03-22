@@ -137,8 +137,6 @@ class FeedFragment :
             ivSearch.hide()
             ivNotification.hide()
         }
-
-        //TODO: logout
     }
 
     // initializes various UI components
@@ -487,13 +485,12 @@ class FeedFragment :
     }
 
     private fun processCreatePostRequest(createPostResult: CreatePostResult) {
-        // TODO: create AddPostRequest and hit api
         viewModel.addPost(
             requireContext(),
             createPostResult.text,
-            createPostResult.attachments
+            createPostResult.attachments,
+            createPostResult.ogTags
         )
-
     }
 
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {

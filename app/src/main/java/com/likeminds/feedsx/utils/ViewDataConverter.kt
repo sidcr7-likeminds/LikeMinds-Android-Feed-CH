@@ -8,6 +8,7 @@ import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.posttypes.model.AttachmentMetaViewData
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
+import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
@@ -96,6 +97,18 @@ object ViewDataConverter {
             .createdAt(like.createdAt)
             .updatedAt(like.updatedAt)
             .user(convertUser(users[like.userId]))
+            .build()
+    }
+
+    // converts LinkOGTags network model to view data model
+    fun convertOGTags(
+        linkOGTags: com.likeminds.likemindsfeed.post.model.LinkOGTags
+    ): LinkOGTags {
+        return LinkOGTags.Builder()
+            .title(linkOGTags.title)
+            .image(linkOGTags.image)
+            .description(linkOGTags.description)
+            .url(linkOGTags.url)
             .build()
     }
 }

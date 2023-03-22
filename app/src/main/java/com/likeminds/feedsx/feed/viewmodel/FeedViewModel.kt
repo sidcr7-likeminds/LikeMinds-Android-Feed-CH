@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.utils.UserPreferences
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.google.gson.Gson
@@ -14,12 +13,19 @@ import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
+import com.likeminds.feedsx.posttypes.model.LINK
+import com.likeminds.feedsx.posttypes.model.LinkOGTags
+import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
+import com.likeminds.likemindsfeed.post.model.AddPostRequest
+import com.likeminds.likemindsfeed.post.model.Attachment
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,7 +69,8 @@ class FeedViewModel @Inject constructor(
     fun addPost(
         context: Context,
         postTextContent: String?,
-        fileUris: List<SingleUriData>?
+        fileUris: List<SingleUriData>?,
+        ogTags: LinkOGTags?
     ) {
         viewModelScope.launch {
             val uploadData: Pair<WorkContinuation, String>
@@ -74,9 +81,22 @@ class FeedViewModel @Inject constructor(
                 uploadData.first.enqueue()
             } else {
                 // if the post does not have any upload-able attachments
-                // TODO: call add post api
+                val requestBuilder = AddPostRequest.Builder()
+                    .text(postTextContent)
+                if (ogTags != null) {
+                    // if the post has ogTags
+
+                } else {
+
+                }
             }
         }
+    }
+
+    private fun createLinkAttachment(ogTags: LinkOGTags): Attachment {
+        // TODO:
+        return Attachment.Builder().attachmentType(LINK)
+            .build()
     }
 
     /**
@@ -92,10 +112,8 @@ class FeedViewModel @Inject constructor(
             // generates localFilePath from the ContentUri provided by client
             val localFilePath =
                 FileUtil.getRealPath(context, it.uri)
-            // generates filename from localFilePath
-            val name = FileUtils.getFileNameFromPath(localFilePath)
             // generates awsFolderPath to upload the file
-            val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(name)
+            val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(it.mediaName)
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)
             when (it.fileType) {

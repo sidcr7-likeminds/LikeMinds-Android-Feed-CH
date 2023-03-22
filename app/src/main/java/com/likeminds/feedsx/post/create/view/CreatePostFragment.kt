@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.post.create.view
 
 import android.app.Activity
-import android.app.Instrumentation.ActivityResult
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -41,9 +40,12 @@ class CreatePostFragment :
     private val viewModel: CreatePostViewModel by viewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
+    private var ogTags: LinkOGTags? = null
 
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
+
+    private var hasLinkPreview = false
 
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
@@ -61,10 +63,25 @@ class CreatePostFragment :
         createPostActivity.binding.apply {
             tvPostDone.setOnClickListener {
                 val text = binding.etPostContent.text.toString()
-                val result = CreatePostResult.Builder()
-                    .text(text)
-                    .attachments(selectedMediaUris)
-                    .build()
+                val result =
+                    if (hasLinkPreview) {
+                        CreatePostResult.Builder()
+                            .text(text)
+                            .attachments(null)
+                            .ogTags(ogTags)
+                            .build()
+                    } else {
+                        val attachments =
+                            if (selectedMediaUris.isEmpty()) {
+                                null
+                            } else {
+                                selectedMediaUris
+                            }
+                        CreatePostResult.Builder()
+                            .text(text)
+                            .attachments(attachments)
+                            .build()
+                    }
 
                 val intent = Intent().apply {
                     putExtras(Bundle().apply {
@@ -76,6 +93,17 @@ class CreatePostFragment :
                 requireActivity().setResult(Activity.RESULT_OK, intent)
                 requireActivity().finish()
             }
+        }
+    }
+
+    // observes data
+    override fun observeData() {
+        super.observeData()
+
+        // observers decodeUrlResponse and returns link ogTags
+        viewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
+            this.ogTags = ogTags
+            initLinkView(ogTags)
         }
     }
 
@@ -177,15 +205,19 @@ class CreatePostFragment :
     private fun showPostMedia() {
         when {
             selectedMediaUris.size >= 1 && MediaType.isPDF(selectedMediaUris.first().fileType) -> {
+                hasLinkPreview = false
                 showAttachedDocuments()
             }
             selectedMediaUris.size == 1 && MediaType.isImage(selectedMediaUris.first().fileType) -> {
+                hasLinkPreview = false
                 showAttachedImage()
             }
             selectedMediaUris.size == 1 && MediaType.isVideo(selectedMediaUris.first().fileType) -> {
+                hasLinkPreview = false
                 showAttachedVideo()
             }
             selectedMediaUris.size >= 1 -> {
+                hasLinkPreview = false
                 showMultiMediaAttachments()
             }
             else -> {
@@ -234,45 +266,40 @@ class CreatePostFragment :
 
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
-        if (text.isNullOrEmpty()) {
-            binding.linkPreview.root.hide()
-            return
-        }
+        binding.linkPreview.apply {
+            if (text.isNullOrEmpty()) {
+                hasLinkPreview = false
+                root.hide()
+                return
+            }
 
-        val link = text.getUrlIfExist()
+            val link = text.getUrlIfExist()
 
-        if (!link.isNullOrEmpty()) {
-
-            //TODO: handle internal links
+            if (!link.isNullOrEmpty()) {
+                if (hasLinkPreview) {
+                    return
+                }
+                root.show()
+                // TODO: internal link?
 //            if (Route.isInternalLink(link)) {
 //                sharedData = sharedData.isInternalLink(true)
 //                viewModel.fetchPreview(link)
 //                setInitialDataInInternalLinkView(link)
 //            } else {
-//                ProgressHelper.showProgress(binding.inputBox.viewLink.progressBar)
-//                viewModel.decodeUrl(link)
-//            }
-            //TODO: testing data
-
-            val linkData = LinkOGTags.Builder()
-                .title("Youtube video")
-                .image("https://i.ytimg.com/vi/EbyAoYaUcVo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDiI5bXtT71sC4IAnHiDAh52LxbFA")
-                .url("https://www.youtube.com/watch?v=sAuQjwEl-Bo")
-                .description("This is a youtube video")
-                .build()
-
-            initLinkView(
-                linkData
-            )
-        } else {
-            binding.linkPreview.root.hide()
+                pbLinkPreview.show()
+                viewModel.decodeUrl(link)
+            } else {
+                hasLinkPreview = false
+                root.hide()
+            }
         }
     }
 
     // renders data in the link view
     private fun initLinkView(data: LinkOGTags) {
         binding.linkPreview.apply {
-            this.root.show()
+            hasLinkPreview = true
+            pbLinkPreview.hide()
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
                 data.title
             } else {
