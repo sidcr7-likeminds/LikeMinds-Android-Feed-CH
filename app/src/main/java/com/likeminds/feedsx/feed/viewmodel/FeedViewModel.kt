@@ -45,13 +45,19 @@ class FeedViewModel @Inject constructor(
                 .isGuest(guest)
                 .build()
 
+            //call api
             val response = lmFeedClient.initiateUser(request)
+
             val user = response.data?.user
             val id = user?.id ?: -1
 
+            //add user in local db
             addUser(user)
+
+            //save user.id in local prefs
             userPreferences.saveMemberId(id)
 
+            //send response to UI
             _initiateUserResponse.postValue(response)
         }
     }
