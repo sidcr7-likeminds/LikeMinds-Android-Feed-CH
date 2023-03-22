@@ -13,7 +13,8 @@ class UserViewData private constructor(
     var userUniqueId: String,
     var customTitle: String?,
     var isGuest: Boolean,
-    var isDeleted: Boolean,
+    var isDeleted: Boolean?,
+    var updatedAt: Long
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_USER
@@ -25,7 +26,8 @@ class UserViewData private constructor(
         private var userUniqueId: String = ""
         private var customTitle: String? = null
         private var isGuest: Boolean = false
-        private var isDeleted: Boolean = false
+        private var isDeleted: Boolean? = null
+        private var updatedAt: Long = 0
 
         fun id(id: Int) = apply { this.id = id }
         fun name(name: String) = apply { this.name = name }
@@ -33,7 +35,8 @@ class UserViewData private constructor(
         fun userUniqueId(userUniqueId: String) = apply { this.userUniqueId = userUniqueId }
         fun customTitle(customTitle: String?) = apply { this.customTitle = customTitle }
         fun isGuest(isGuest: Boolean) = apply { this.isGuest = isGuest }
-        fun isDeleted(isDeleted: Boolean) = apply { this.isDeleted = isDeleted }
+        fun isDeleted(isDeleted: Boolean?) = apply { this.isDeleted = isDeleted }
+        fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
 
         fun build() = UserViewData(
             id,
@@ -42,7 +45,8 @@ class UserViewData private constructor(
             userUniqueId,
             customTitle,
             isGuest,
-            isDeleted
+            isDeleted,
+            updatedAt
         )
     }
 
@@ -54,5 +58,6 @@ class UserViewData private constructor(
             .customTitle(customTitle)
             .isGuest(isGuest)
             .isDeleted(isDeleted)
+            .updatedAt(updatedAt)
     }
 }

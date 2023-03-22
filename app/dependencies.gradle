@@ -38,4 +38,7 @@ dependencies {
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit
     androidTestImplementation deps.testing.espresso
+
+    // feed-sdk
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:4b668de429"
 }

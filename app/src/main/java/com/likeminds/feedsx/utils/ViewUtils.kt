@@ -14,6 +14,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.NavHostFragment
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.customview.snackbar.LikeMindsSnackbar
 
 //view related utils class
@@ -47,6 +48,10 @@ object ViewUtils {
     fun showShortToast(context: Context?, text: String?) {
         if (context == null || text.isNullOrEmpty()) return
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+    }
+
+    fun showSomethingWentWrongToast(context: Context) {
+        showShortToast(context, context.getString(R.string.something_went_wrong))
     }
 
     fun FragmentManager.currentFragment(navHostId: Int): Fragment? {

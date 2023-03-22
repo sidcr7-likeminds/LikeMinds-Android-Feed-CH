@@ -202,7 +202,7 @@ class NotificationFeedFragment :
             .customTitle("Admin")
             .build()
 
-        var text = "Nishkarsh Kaushik commented on your post with photo."
+        val text = "Nishkarsh Kaushik commented on your post with photo."
         mNotificationFeedAdapter.add(
             0,
             NotificationFeedViewData.Builder()

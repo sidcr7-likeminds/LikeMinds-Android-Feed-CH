@@ -6,9 +6,11 @@ import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.posttypes.model.AttachmentMetaViewData
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.likemindsfeed.sdk.model.User
 
 object ViewDataConverter {
 
@@ -45,6 +47,28 @@ object ViewDataConverter {
                     .size(MediaUtils.getFileSizeText(singleUriData.size))
                     .build()
             )
+            .build()
+    }
+
+    /**--------------------------------
+     * Network Model -> View Data Model
+    --------------------------------*/
+
+    // converts User network model to view data model
+    fun convertUser(
+        user: User?
+    ): UserViewData? {
+        if (user == null) {
+            return null
+        }
+        return UserViewData.Builder()
+            .id(user.id)
+            .name(user.name)
+            .imageUrl(user.imageUrl)
+            .userUniqueId(user.userUniqueId)
+            .customTitle(user.customTitle)
+            .isGuest(user.isGuest)
+            .isDeleted(user.isDeleted)
             .build()
     }
 }
