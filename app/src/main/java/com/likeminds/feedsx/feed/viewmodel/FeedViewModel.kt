@@ -4,23 +4,30 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.feed.UserRepository
+import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
+import com.likeminds.likemindsfeed.sdk.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedViewModel @Inject constructor() : ViewModel() {
+class FeedViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
     private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
     val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
 
-    // calls InitiateUser API and posts the response in LiveData
+    // calls InitiateUser API
+    // store user:{} in db
+    // and posts the response in LiveData
     fun initiateUser(
         apiKey: String,
         userId: String,
@@ -35,7 +42,21 @@ class FeedViewModel @Inject constructor() : ViewModel() {
                 .isGuest(guest)
                 .build()
 
-            _initiateUserResponse.postValue(lmFeedClient.initiateUser(request))
+            val response = lmFeedClient.initiateUser(request)
+            //user object
+            val user = response.data?.user
+            //add user to db
+            addUser(user)
+
+            _initiateUserResponse.postValue(response)
+        }
+    }
+
+    private fun addUser(user: User?) {
+        if (user == null) return
+        viewModelScope.launchIO {
+            val userEntity = ViewDataConverter.convertUser(user)
+            userRepository.insertUser(userEntity)
         }
     }
 }

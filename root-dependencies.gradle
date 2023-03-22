@@ -8,7 +8,7 @@ versions.app_version_minor = '0'
 versions.app_version_patch = '0'
 versions.app_version_code = 1
 versions.core = "1.8.0"
-versions.appcompat= "1.5.1"
+versions.appcompat = "1.5.1"
 versions.material_design = "1.7.0"
 versions.constraint_layout = "2.1.4"
 versions.junit = "4.13.2"
@@ -30,6 +30,7 @@ versions.dotsindicator = '4.2'
 versions.swiperefreshlayout = '1.1.0'
 versions.hilt = "2.44"
 versions.stream = '1.2.1'
+versions.room = '2.5.0'
 ext.versions = versions
 
 
@@ -47,7 +48,7 @@ ui.material_design = "com.google.android.material:material:$versions.material_de
 ui.constraint_layout = "androidx.constraintlayout:constraintlayout:$versions.constraint_layout"
 ui.recycler_view = "androidx.recyclerview:recyclerview:$versions.recycler_view"
 ui.view_pager = "androidx.viewpager2:viewpager2:$versions.viewpager2"
-ui.circleimageview= "de.hdodenhof:circleimageview:$versions.circleimageview"
+ui.circleimageview = "de.hdodenhof:circleimageview:$versions.circleimageview"
 ui.photo_view = "com.github.chrisbanes:PhotoView:$versions.photoview"
 ui.cropper = "com.github.CanHub:Android-Image-Cropper:$versions.cropper"
 ui.drawable_toolbox = "com.github.duanhong169:drawabletoolbox:$versions.drawable_toolbox"
@@ -96,4 +97,8 @@ testing.android_junit = "androidx.test.ext:junit:$versions.android_junit"
 testing.espresso = "androidx.test.espresso:espresso-core:$versions.espresso_core"
 deps.testing = testing
 
+def room = [:]
+room.main = "androidx.room:room-runtime:$versions.room"
+room.compiler = "androidx.room:room-compiler:$versions.room"
+deps.room = room
 ext.deps = deps

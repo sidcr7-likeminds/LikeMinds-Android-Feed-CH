@@ -39,6 +39,10 @@ dependencies {
     androidTestImplementation deps.testing.android_junit
     androidTestImplementation deps.testing.espresso
 
+    //room
+    implementation deps.room.main
+    kapt deps.room.compiler
+
     // feed-sdk
-    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:183e5b090b"
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:4b668de429"
 }

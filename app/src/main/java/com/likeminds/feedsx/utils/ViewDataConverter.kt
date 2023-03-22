@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.utils
 
+import com.likeminds.feedsx.db.models.UserEntity
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
@@ -70,6 +71,22 @@ object ViewDataConverter {
 //            .customTitle(user.customTitle)
             .isGuest(user.isGuest)
 //            .isDeleted(user.isDeleted)
+            .build()
+    }
+
+    /**--------------------------------
+     * Network Model -> Db Model
+    --------------------------------*/
+    fun convertUser(user: User): UserEntity {
+        return UserEntity.Builder()
+            .id(user.id)
+            .imageUrl(user.imageUrl)
+            .isGuest(user.isGuest)
+            .name(user.name)
+            .updatedAt(user.updatedAt)
+            .customTitle(user.customTitle)
+            .isDeleted(user.isDeleted)
+            .userUniqueId(user.userUniqueId)
             .build()
     }
 }
