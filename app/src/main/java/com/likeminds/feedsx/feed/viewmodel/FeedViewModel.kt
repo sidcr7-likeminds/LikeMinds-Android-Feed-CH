@@ -39,7 +39,14 @@ class FeedViewModel @Inject constructor(
                 .isGuest(guest)
                 .build()
 
-            _initiateUserResponse.postValue(lmFeedClient.initiateUser(request))
+            val response = lmFeedClient.initiateUser(request)
+            val user = response.data?.user
+            val memberId = user?.id ?: -1
+
+            // store member_id in prefs
+            userPreferences.saveMemberId(memberId)
+
+            _initiateUserResponse.postValue(response)
         }
     }
 }

@@ -14,14 +14,14 @@ class UserPreferences @Inject constructor(
 
     companion object {
         const val USER_PREFS = "user_prefs"
-        const val MEMBER_ID = "MEMBER_ID"
+        const val MEMBER_ID = "member_id"
     }
 
-    fun getMemberId(): String {
-        return getPreference(MEMBER_ID, "") ?: ""
+    fun getMemberId(): Int {
+        return getPreference(MEMBER_ID, -1)
     }
 
-    fun saveMemberId(memberId: String) {
+    fun saveMemberId(memberId: Int) {
         putPreference(MEMBER_ID, memberId)
     }
 
