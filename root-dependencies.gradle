@@ -99,6 +99,7 @@ deps.testing = testing
 
 def room = [:]
 room.main = "androidx.room:room-runtime:$versions.room"
+room.ktx = "androidx.room:room-ktx:$versions.room"
 room.compiler = "androidx.room:room-compiler:$versions.room"
 deps.room = room
 ext.deps = deps

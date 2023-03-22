@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.feed.UserRepository
-import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -45,7 +45,23 @@ class FeedViewModel @Inject constructor(
                 .isGuest(guest)
                 .build()
 
-            _initiateUserResponse.postValue(lmFeedClient.initiateUser(request))
+            val response = lmFeedClient.initiateUser(request)
+            val user = response.data?.user
+            val id = user?.id ?: -1
+
+            addUser(user)
+            userPreferences.saveMemberId(id)
+
+            _initiateUserResponse.postValue(response)
+        }
+    }
+
+    //add user:{} into local db
+    fun addUser(user: User?) {
+        if (user == null) return
+        viewModelScope.launchIO {
+            val userEntity = ViewDataConverter.convertUser(user)
+            userRepository.insertUser(userEntity)
         }
     }
 }

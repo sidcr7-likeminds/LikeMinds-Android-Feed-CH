@@ -88,8 +88,8 @@ class FeedFragment :
     private fun initiateSDK() {
         viewModel.initiateUser(
             "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
-            "1a46420a-9d5f-4c0b-8524-07a6addafc58",
-            "Sid-14",
+            "10203",
+            "Ishaan",
             false
         )
     }
@@ -113,7 +113,6 @@ class FeedFragment :
                     refreshToken = data.refreshToken ?: ""
 
                     initToolbar()
-                    // TODO: save in local db and then set
                     val user = ViewDataConverter.convertUser(data.user)
                     setUserImage(user)
                 }
@@ -134,8 +133,6 @@ class FeedFragment :
             ivSearch.hide()
             ivNotification.hide()
         }
-
-        //TODO: logout
     }
 
     // initializes various UI components

@@ -41,6 +41,7 @@ dependencies {
 
     //room
     implementation deps.room.main
+    implementation deps.room.ktx
     kapt deps.room.compiler
 
     // feed-sdk

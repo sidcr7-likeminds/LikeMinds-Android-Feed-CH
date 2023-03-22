@@ -2,12 +2,10 @@ package com.likeminds.feedsx.db.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.likeminds.feedsx.db.utils.DbConstants
 
 @Entity(tableName = DbConstants.USER_TABLE, primaryKeys = ["id", "user_unique_id"])
-class UserEntity private constructor(
-    @PrimaryKey
+class UserEntity constructor(
     @ColumnInfo(name = "id")
     var id: Int,
     @ColumnInfo(name = "image_url")
