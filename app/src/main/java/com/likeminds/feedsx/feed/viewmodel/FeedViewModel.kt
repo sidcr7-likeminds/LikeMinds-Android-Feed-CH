@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -13,7 +14,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class FeedViewModel @Inject constructor() : ViewModel() {
+class FeedViewModel @Inject constructor(
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
@@ -30,12 +33,20 @@ class FeedViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launchIO {
             val request = InitiateUserRequest.Builder()
                 .apiKey(apiKey)
+                .deviceId(userPreferences.getDeviceId())
                 .userId(userId)
                 .userName(userName)
                 .isGuest(guest)
                 .build()
 
-            _initiateUserResponse.postValue(lmFeedClient.initiateUser(request))
+            val response = lmFeedClient.initiateUser(request)
+            val user = response.data?.user
+            val memberId = user?.id ?: -1
+
+            // store member_id in prefs
+            userPreferences.saveMemberId(memberId)
+
+            _initiateUserResponse.postValue(response)
         }
     }
 }
