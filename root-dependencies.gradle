@@ -33,6 +33,7 @@ versions.stream = '1.2.1'
 versions.work_manager = '2.7.1'
 versions.gson = '2.8.6'
 versions.aws_s3 = '2.47.0'
+versions.room = '2.5.0'
 ext.versions = versions
 
 
@@ -112,4 +113,9 @@ testing.android_junit = "androidx.test.ext:junit:$versions.android_junit"
 testing.espresso = "androidx.test.espresso:espresso-core:$versions.espresso_core"
 deps.testing = testing
 
+def room = [:]
+room.main = "androidx.room:room-runtime:$versions.room"
+room.ktx = "androidx.room:room-ktx:$versions.room"
+room.compiler = "androidx.room:room-compiler:$versions.room"
+deps.room = room
 ext.deps = deps

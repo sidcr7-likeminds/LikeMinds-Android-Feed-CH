@@ -131,7 +131,6 @@ class FeedFragment :
                     refreshToken = data.refreshToken ?: ""
 
                     initToolbar()
-                    // TODO: save in local db and then set
                     val user = ViewDataConverter.convertUser(data.user)
                     setUserImage(user)
                 }
@@ -220,7 +219,7 @@ class FeedFragment :
             "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
-                .id("63f4caadc52f148210f7496a")
+                .id("1")
                 .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
                 .text(text)
                 .fromPostSaved(false)
