@@ -28,9 +28,11 @@ class FeedViewModel @Inject constructor(
     private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
     val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
 
-    // calls InitiateUser API
-    // store user:{} in db
-    // and posts the response in LiveData
+    /***
+     * calls InitiateUser API
+     * store user:{} in db
+     * and posts the response in LiveData
+     * */
     fun initiateUser(
         apiKey: String,
         userId: String,
@@ -58,9 +60,6 @@ class FeedViewModel @Inject constructor(
 
                 //save user.id in local prefs
                 userPreferences.saveMemberId(id)
-
-                getMemberState()
-                registerDevice()
             }
             //send response to UI
             _initiateUserResponse.postValue(initiateResponse)
@@ -71,33 +70,48 @@ class FeedViewModel @Inject constructor(
     private fun addUser(user: User?) {
         if (user == null) return
         viewModelScope.launchIO {
+            //convert user into userEntity
             val userEntity = ViewDataConverter.convertUser(user)
+            //add it to local db
             userRepository.insertUser(userEntity)
+
+            //call member state api
+            getMemberState()
+
+            //call register device api
+            registerDevice()
         }
     }
 
     private fun getMemberState() {
         viewModelScope.launchIO {
+            //get member state response
             val memberStateResponse = lmFeedClient.getMemberState().data
 
             val memberState = memberStateResponse?.state ?: return@launchIO
             val isOwner = memberStateResponse.isOwner
             val userId = memberStateResponse.id
 
+            //get existing userEntity
             var userEntity = userRepository.getUser(userId)
 
+            //updated userEntity
             userEntity = userEntity.toBuilder().state(memberState).isOwner(isOwner).build()
+
+            //update userEntity in local db
             userRepository.updateUser(userEntity)
         }
     }
 
     private fun registerDevice() {
         viewModelScope.launchIO {
+            //create request
             val request = RegisterDeviceRequest.Builder()
                 .deviceId(userPreferences.getDeviceId())
                 .token("YUYUYUYUYUY") //todo fix it with proper token
                 .build()
 
+            //call api
             lmFeedClient.registerDevice(request)
         }
     }
