@@ -21,7 +21,11 @@ class UserEntity constructor(
     @ColumnInfo(name = "is_deleted")
     var isDeleted: Boolean?,
     @ColumnInfo(name = "user_unique_id")
-    var userUniqueId: String
+    var userUniqueId: String,
+    @ColumnInfo(name = "state")
+    var state: Int,
+    @ColumnInfo(name = "is_owner")
+    var isOwner: Boolean
 ) {
     class Builder {
         private var id: Int = 0
@@ -32,6 +36,8 @@ class UserEntity constructor(
         private var customTitle: String? = null
         private var isDeleted: Boolean? = null
         private var userUniqueId: String = ""
+        private var state: Int = -1
+        private var isOwner: Boolean = false
 
         fun id(id: Int) = apply { this.id = id }
         fun imageUrl(imageUrl: String) = apply { this.imageUrl = imageUrl }
@@ -41,9 +47,22 @@ class UserEntity constructor(
         fun customTitle(customTitle: String?) = apply { this.customTitle = customTitle }
         fun isDeleted(isDeleted: Boolean?) = apply { this.isDeleted = isDeleted }
         fun userUniqueId(userUniqueId: String) = apply { this.userUniqueId = userUniqueId }
+        fun state(state: Int) = apply { this.state = state }
+        fun isOwner(isOwner: Boolean) = apply { this.isOwner = isOwner }
 
         fun build() =
-            UserEntity(id, imageUrl, isGuest, name, updatedAt, customTitle, isDeleted, userUniqueId)
+            UserEntity(
+                id,
+                imageUrl,
+                isGuest,
+                name,
+                updatedAt,
+                customTitle,
+                isDeleted,
+                userUniqueId,
+                state,
+                isOwner
+            )
     }
 
     fun toBuilder(): Builder {
@@ -55,5 +74,7 @@ class UserEntity constructor(
             .customTitle(customTitle)
             .isDeleted(isDeleted)
             .userUniqueId(userUniqueId)
+            .state(state)
+            .isOwner(isOwner)
     }
 }

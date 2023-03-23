@@ -10,6 +10,7 @@ import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
+import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.sdk.model.User
@@ -46,28 +47,58 @@ class FeedViewModel @Inject constructor(
                 .build()
 
             //call api
-            val response = lmFeedClient.initiateUser(request)
+            val initiateResponse = lmFeedClient.initiateUser(request)
 
-            val user = response.data?.user
-            val id = user?.id ?: -1
+            if (initiateResponse.success) {
+                val user = initiateResponse.data?.user
+                val id = user?.id ?: -1
 
-            //add user in local db
-            addUser(user)
+                //add user in local db
+                addUser(user)
 
-            //save user.id in local prefs
-            userPreferences.saveMemberId(id)
+                //save user.id in local prefs
+                userPreferences.saveMemberId(id)
 
+                getMemberState()
+                registerDevice()
+            }
             //send response to UI
-            _initiateUserResponse.postValue(response)
+            _initiateUserResponse.postValue(initiateResponse)
         }
     }
 
     //add user:{} into local db
-    fun addUser(user: User?) {
+    private fun addUser(user: User?) {
         if (user == null) return
         viewModelScope.launchIO {
             val userEntity = ViewDataConverter.convertUser(user)
             userRepository.insertUser(userEntity)
+        }
+    }
+
+    private fun getMemberState() {
+        viewModelScope.launchIO {
+            val memberStateResponse = lmFeedClient.getMemberState().data
+
+            val memberState = memberStateResponse?.state ?: return@launchIO
+            val isOwner = memberStateResponse.isOwner
+            val userId = memberStateResponse.id
+
+            var userEntity = userRepository.getUser(userId)
+
+            userEntity = userEntity.toBuilder().state(memberState).isOwner(isOwner).build()
+            userRepository.updateUser(userEntity)
+        }
+    }
+
+    private fun registerDevice() {
+        viewModelScope.launchIO {
+            val request = RegisterDeviceRequest.Builder()
+                .deviceId(userPreferences.getDeviceId())
+                .token("YUYUYUYUYUY") //todo fix it with proper token
+                .build()
+
+            lmFeedClient.registerDevice(request)
         }
     }
 }
