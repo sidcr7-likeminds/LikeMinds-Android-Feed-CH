@@ -29,6 +29,7 @@ class PostAttachmentUploadWorker(
 
     companion object {
         const val ARG_ATTACHMENTS = "ARG_ATTACHMENTS"
+        const val TAG = "PostAttachmentUploadWorker"
 
         fun getInstance(attachments: String): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<PostAttachmentUploadWorker>()
@@ -45,6 +46,7 @@ class PostAttachmentUploadWorker(
                     OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
+                .addTag(TAG)
                 .build()
         }
     }

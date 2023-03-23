@@ -1,21 +1,18 @@
 package com.likeminds.feedsx.feed.viewmodel
 
-import android.annotation.SuppressLint
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.work.WorkContinuation
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.gson.Gson
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
-import com.likeminds.feedsx.posttypes.model.LINK
 import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -23,7 +20,6 @@ import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
-import com.likeminds.likemindsfeed.post.model.Attachment
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -37,6 +33,14 @@ class FeedViewModel @Inject constructor(
 
     private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
     val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
+
+    val workerState = MediatorLiveData<WorkInfo>()
+
+    private val _addPostResponse = MutableLiveData<Boolean>()
+    val addPostResponse: LiveData<Boolean> = _addPostResponse
+
+    private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
+    val errorMessage: LiveData<String?> = _errorMessage
 
     // calls InitiateUser API and posts the response in LiveData
     fun initiateUser(
@@ -73,30 +77,39 @@ class FeedViewModel @Inject constructor(
         ogTags: LinkOGTags?
     ) {
         viewModelScope.launch {
-            val uploadData: Pair<WorkContinuation, String>
             if (fileUris != null) {
                 // if the post has upload-able attachments
                 val updatedFileUris = includeAttachmentMetaData(context, fileUris)
-                uploadData = startMediaUploadWorker(context, updatedFileUris)
-                uploadData.first.enqueue()
+                val worker = startMediaUploadWorker(context, updatedFileUris)
+                worker.enqueue()
+                workerState.apply {
+                    addSource(worker.workInfosLiveData) { workInfoList ->
+                        val workInfo = workInfoList.firstOrNull {
+                            it.tags.contains(PostAttachmentUploadWorker.TAG)
+                        }
+
+                        if (workInfo != null) {
+                            value = workInfo
+                        }
+                    }
+                }
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
                     .text(postTextContent)
                 if (ogTags != null) {
                     // if the post has ogTags
-
+                    requestBuilder.attachments(convertAttachments(ogTags))
+                }
+                val request = requestBuilder.build()
+                val response = lmFeedClient.addPost(request)
+                if (response.success) {
+                    _addPostResponse.postValue(true)
                 } else {
-
+                    _errorMessage.postValue(response.errorMessage)
                 }
             }
         }
-    }
-
-    private fun createLinkAttachment(ogTags: LinkOGTags): Attachment {
-        // TODO:
-        return Attachment.Builder().attachmentType(LINK)
-            .build()
     }
 
     /**
@@ -135,15 +148,12 @@ class FeedViewModel @Inject constructor(
     }
 
     // creates PostAttachmentUploadWorker to start media upload
-    @SuppressLint("EnqueueWork")
     private fun startMediaUploadWorker(
         context: Context,
         attachments: List<SingleUriData>
-    ): Pair<WorkContinuation, String> {
+    ): WorkContinuation {
         val jsonAttachment = Gson().toJson(attachments)
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(jsonAttachment)
-        val workContinuation =
-            WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
-        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+        return WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
     }
 }

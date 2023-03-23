@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.work.WorkInfo
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -18,9 +19,9 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
+import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
-import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
@@ -45,6 +46,7 @@ import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,6 +86,19 @@ class FeedFragment :
 
         viewModel.initiateUserResponse.observe(viewLifecycleOwner) { response ->
             observeInitiateUserResponse(response)
+        }
+
+        viewModel.workerState.observe(viewLifecycleOwner) { workInfo ->
+            when (workInfo.state) {
+                WorkInfo.State.SUCCEEDED -> TODO()
+                WorkInfo.State.FAILED -> TODO()
+                WorkInfo.State.CANCELLED -> TODO()
+                else -> {
+                    val progress = MediaUploadWorker.getProgress(workInfo)
+
+                }
+            }
+
         }
     }
 

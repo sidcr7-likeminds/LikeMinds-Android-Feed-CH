@@ -6,13 +6,12 @@ import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
-import com.likeminds.feedsx.posttypes.model.AttachmentMetaViewData
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.LinkOGTags
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.likemindsfeed.post.model.Attachment
+import com.likeminds.likemindsfeed.post.model.AttachmentMeta
 import com.likeminds.likemindsfeed.post.model.Like
 import com.likeminds.likemindsfeed.sdk.model.User
 
@@ -62,6 +61,43 @@ object ViewDataConverter {
             VIDEO -> com.likeminds.feedsx.utils.mediauploader.model.VIDEO
             else -> com.likeminds.feedsx.utils.mediauploader.model.IMAGE
         }
+    }
+
+    /**--------------------------------
+     * View Data Model -> Network Model
+    --------------------------------*/
+
+    // creates attachment list of Network Model for link attachment
+    fun convertAttachments(
+        linkOGTags: LinkOGTags
+    ): List<Attachment> {
+        return listOf(
+            Attachment.Builder()
+                .attachmentType(LINK)
+                .attachmentMeta(convertAttachmentMeta(linkOGTags))
+                .build()
+        )
+    }
+
+    // creates AttachmentMeta Network Model for link attachment meta
+    fun convertAttachmentMeta(
+        linkOGTags: LinkOGTags
+    ): AttachmentMeta {
+        return AttachmentMeta.Builder()
+            .ogTags(convertOGTags(linkOGTags))
+            .build()
+    }
+
+    // converts LinkOGTags view data model to network model
+    fun convertOGTags(
+        linkOGTags: LinkOGTags
+    ): com.likeminds.likemindsfeed.post.model.LinkOGTags {
+        return com.likeminds.likemindsfeed.post.model.LinkOGTags.Builder()
+            .title(linkOGTags.title)
+            .image(linkOGTags.image)
+            .description(linkOGTags.description)
+            .url(linkOGTags.url)
+            .build()
     }
 
     /**--------------------------------

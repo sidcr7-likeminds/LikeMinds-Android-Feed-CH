@@ -88,6 +88,13 @@ object ViewUtils {
         }
     }
 
+    fun String.isValidUrl(): Boolean {
+        if (this.isEmpty()) {
+            return false
+        }
+        return Patterns.WEB_URL.matcher(this).matches()
+    }
+
     // shows short length snackbar
     fun showShortSnack(view: View, text: String?, anchorView: View? = null) {
         if (text.isNullOrEmpty()) return
