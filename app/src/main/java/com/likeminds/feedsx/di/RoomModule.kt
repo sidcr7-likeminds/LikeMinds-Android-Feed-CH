@@ -3,6 +3,7 @@ package com.likeminds.feedsx.di
 import android.content.Context
 import androidx.room.Room
 import com.likeminds.feedsx.db.FeedSXDatabase
+import com.likeminds.feedsx.db.dao.PostDao
 import com.likeminds.feedsx.db.dao.UserDao
 import com.likeminds.feedsx.db.utils.DbConstants
 import dagger.Module
@@ -28,5 +29,11 @@ class RoomModule {
     @Singleton
     fun provideUserDao(db: FeedSXDatabase): UserDao {
         return db.userDao()
+    }
+
+    @Provides
+    @Singleton
+    fun providePostDao(db: FeedSXDatabase): PostDao {
+        return db.postDao()
     }
 }

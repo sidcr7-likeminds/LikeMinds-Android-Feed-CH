@@ -1,38 +1,21 @@
 package com.likeminds.feedsx.post.create.model
 
 import android.os.Parcelable
-import com.likeminds.feedsx.media.model.SingleUriData
-import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class CreatePostResult private constructor(
-    var text: String?,
-    var attachments: ArrayList<SingleUriData>?,
-    var ogTags: LinkOGTags?
+    var showUploader: Boolean
 ) : Parcelable {
-
     class Builder {
-        private var text: String? = null
-        private var attachments: ArrayList<SingleUriData>? = null
-        private var ogTags: LinkOGTags? = null
+        private var showUploader: Boolean = false
 
-        fun text(text: String?) = apply { this.text = text }
-        fun attachments(attachments: ArrayList<SingleUriData>?) =
-            apply { this.attachments = attachments }
+        fun showUploader(showUploader: Boolean) = apply { this.showUploader = showUploader }
 
-        fun ogTags(ogTags: LinkOGTags?) = apply { this.ogTags = ogTags }
-
-        fun build() = CreatePostResult(
-            text,
-            attachments,
-            ogTags
-        )
+        fun build() = CreatePostResult(showUploader)
     }
 
     fun toBuilder(): Builder {
-        return Builder().text(text)
-            .ogTags(ogTags)
-            .attachments(attachments)
+        return Builder().showUploader(showUploader)
     }
 }

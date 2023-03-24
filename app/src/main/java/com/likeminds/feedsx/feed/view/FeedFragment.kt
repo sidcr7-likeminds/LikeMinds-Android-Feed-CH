@@ -88,18 +88,17 @@ class FeedFragment :
             observeInitiateUserResponse(response)
         }
 
-        viewModel.workerState.observe(viewLifecycleOwner) { workInfo ->
-            when (workInfo.state) {
-                WorkInfo.State.SUCCEEDED -> TODO()
-                WorkInfo.State.FAILED -> TODO()
-                WorkInfo.State.CANCELLED -> TODO()
-                else -> {
-                    val progress = MediaUploadWorker.getProgress(workInfo)
-
-                }
-            }
-
-        }
+//        viewModel.workerState.observe(viewLifecycleOwner) { workInfo ->
+//            when (workInfo.state) {
+//                WorkInfo.State.SUCCEEDED -> TODO()
+//                WorkInfo.State.FAILED -> TODO()
+//                WorkInfo.State.CANCELLED -> TODO()
+//                else -> {
+//                    val progress = MediaUploadWorker.getProgress(workInfo)
+//
+//                }
+//            }
+//        }
     }
 
     // initiates SDK
@@ -498,15 +497,6 @@ class FeedFragment :
         reportPostLauncher.launch(intent)
     }
 
-    private fun processCreatePostRequest(createPostResult: CreatePostResult) {
-        viewModel.addPost(
-            requireContext(),
-            createPostResult.text,
-            createPostResult.attachments,
-            createPostResult.ogTags
-        )
-    }
-
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostAdapter[position]
         if (item is PostViewData) {
@@ -667,7 +657,7 @@ class FeedFragment :
                         CreatePostActivity.ARG_CREATE_POST_RESULT
                     ) ?: return@registerForActivityResult
 
-                processCreatePostRequest(createPostResult)
+//                processCreatePostRequest(createPostResult)
             }
         }
 }

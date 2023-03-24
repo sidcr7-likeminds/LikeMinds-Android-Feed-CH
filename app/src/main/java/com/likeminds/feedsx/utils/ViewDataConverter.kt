@@ -1,7 +1,8 @@
 package com.likeminds.feedsx.utils
 
-import com.likeminds.feedsx.likes.model.LikeViewData
+import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.db.models.UserEntity
+import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
@@ -9,7 +10,6 @@ import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
-import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 import com.likeminds.likemindsfeed.post.model.Attachment
@@ -109,9 +109,9 @@ object ViewDataConverter {
     // converts User network model to view data model
     fun convertUser(
         user: User?
-    ): UserViewData? {
+    ): UserViewData {
         if (user == null) {
-            return null
+            return UserViewData.Builder().build()
         }
         return UserViewData.Builder()
             .id(user.id)
@@ -153,6 +153,7 @@ object ViewDataConverter {
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
+
     fun convertUser(user: User): UserEntity {
         return UserEntity.Builder()
             .id(user.id)
@@ -163,6 +164,14 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isDeleted(user.isDeleted)
             .userUniqueId(user.userUniqueId)
+            .build()
+    }
+
+    fun convertPost(user: User): PostEntity {
+        return PostEntity.Builder()
+            .id()
+            .thumbnail()
+            .uuid()
             .build()
     }
 }

@@ -37,6 +37,7 @@ import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import com.likeminds.feedsx.utils.ViewUtils.show
+import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,14 +60,13 @@ class CreatePostFragment :
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
 
-    private var previewedLinkUrl: String? = null
-
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
     }
 
     override fun setUpViews() {
         super.setUpViews()
+
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
@@ -77,35 +77,32 @@ class CreatePostFragment :
         createPostActivity.binding.apply {
             tvPostDone.setOnClickListener {
                 val text = binding.etPostContent.text.toString()
-                val result =
-                    if (previewedLinkUrl != null && ogTags != null) {
-                        CreatePostResult.Builder()
-                            .text(text)
-                            .attachments(null)
-                            .ogTags(ogTags)
-                            .build()
-                    } else {
-                        val attachments =
-                            if (selectedMediaUris.isEmpty()) {
-                                null
-                            } else {
-                                selectedMediaUris
-                            }
-                        CreatePostResult.Builder()
-                            .text(text)
-                            .attachments(attachments)
-                            .build()
+                if (selectedMediaUris.isNotEmpty()) {
+                    viewModel.addPost(
+                        requireContext(),
+                        text,
+                        selectedMediaUris,
+                        ogTags
+                    )
+                    val result = CreatePostResult.Builder().showUploader(true).build()
+                    val intent = Intent().apply {
+                        putExtras(Bundle().apply {
+                            putParcelable(
+                                ARG_CREATE_POST_RESULT, result
+                            )
+                        })
                     }
-
-                val intent = Intent().apply {
-                    putExtras(Bundle().apply {
-                        putParcelable(
-                            ARG_CREATE_POST_RESULT, result
-                        )
-                    })
+                    requireActivity().setResult(Activity.RESULT_OK, intent)
+                    requireActivity().finish()
+                } else {
+                    //todo: create post activity finish
+                    viewModel.addPost(
+                        requireContext(),
+                        text,
+                        ogTags = ogTags
+                    )
+                    CreatePostResult.Builder().showUploader(false).build()
                 }
-                requireActivity().setResult(Activity.RESULT_OK, intent)
-                requireActivity().finish()
             }
         }
     }
@@ -118,7 +115,7 @@ class CreatePostFragment :
         viewModel.errorMessage.observe(viewLifecycleOwner) {
             val postText = binding.etPostContent.text.toString()
             val link = postText.getUrlIfExist()
-            if (link != previewedLinkUrl) {
+            if (link != ogTags?.url) {
                 clearPreviewLink()
             }
         }
@@ -128,11 +125,20 @@ class CreatePostFragment :
             this.ogTags = ogTags
             initLinkView(ogTags)
         }
+
+        // TODO: add post error
+
+        // observes addPostResponse, once post is created
+        viewModel.addPostResponse.observe(viewLifecycleOwner) {
+            // TODO: show the post
+            showShortToast(requireContext(), getString(R.string.post_created))
+            requireActivity().finish()
+        }
     }
 
     // clears link preview
     private fun clearPreviewLink() {
-        previewedLinkUrl = null
+        ogTags = null
         binding.linkPreview.apply {
             root.hide()
         }
@@ -261,19 +267,19 @@ class CreatePostFragment :
     private fun showPostMedia() {
         when {
             selectedMediaUris.size >= 1 && MediaType.isPDF(selectedMediaUris.first().fileType) -> {
-                previewedLinkUrl = null
+                ogTags = null
                 showAttachedDocuments()
             }
             selectedMediaUris.size == 1 && MediaType.isImage(selectedMediaUris.first().fileType) -> {
-                previewedLinkUrl = null
+                ogTags = null
                 showAttachedImage()
             }
             selectedMediaUris.size == 1 && MediaType.isVideo(selectedMediaUris.first().fileType) -> {
-                previewedLinkUrl = null
+                ogTags = null
                 showAttachedVideo()
             }
             selectedMediaUris.size >= 1 -> {
-                previewedLinkUrl = null
+                ogTags = null
                 showMultiMediaAttachments()
             }
             else -> {
@@ -292,21 +298,23 @@ class CreatePostFragment :
     // adds text watcher on post content edit text
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun initPostContentTextListener() {
-        binding.etPostContent.textChanges()
-            .debounce(500)
-            .distinctUntilChanged()
-            .onEach {
-                val text = it?.toString()?.trim()
-                if (text.isNullOrEmpty()) {
-                    clearPreviewLink()
-                    if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                    else handlePostButton(true)
-                } else {
-                    showPostMedia()
-                    handlePostButton(true)
+        binding.etPostContent.apply {
+            textChanges()
+                .debounce(500)
+                .distinctUntilChanged()
+                .onEach {
+                    val text = it?.toString()?.trim()
+                    if (text.isNullOrEmpty()) {
+                        clearPreviewLink()
+                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
+                        else handlePostButton(true)
+                    } else {
+                        showPostMedia()
+                        handlePostButton(true)
+                    }
                 }
-            }
-            .launchIn(lifecycleScope)
+                .launchIn(lifecycleScope)
+        }
     }
 
     // handles click action on Post button
@@ -333,19 +341,19 @@ class CreatePostFragment :
         binding.linkPreview.apply {
             clearPreviewLink()
             if (text.isNullOrEmpty()) {
-                previewedLinkUrl = null
+                ogTags = null
                 return
             }
 
             val link = text.getUrlIfExist()
 
             if (!link.isNullOrEmpty()) {
-                if (link == previewedLinkUrl) {
+                if (link == ogTags?.url) {
                     return
                 }
                 viewModel.decodeUrl(link)
             } else {
-                previewedLinkUrl = null
+                ogTags = null
                 clearPreviewLink()
             }
         }
@@ -355,7 +363,6 @@ class CreatePostFragment :
     private fun initLinkView(data: LinkOGTags) {
         binding.linkPreview.apply {
             root.show()
-            previewedLinkUrl = data.url
 
             val isImageValid = (data.image != null && data.image.isValidUrl())
             ivLink.isVisible = isImageValid
