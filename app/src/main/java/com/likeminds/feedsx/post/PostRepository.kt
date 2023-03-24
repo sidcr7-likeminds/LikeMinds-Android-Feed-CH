@@ -21,7 +21,11 @@ class PostRepository @Inject constructor(
         postDao.updatePost(post)
     }
 
+    suspend fun getLatestPostWithAttachments(): PostWithAttachments {
+        return postDao.getLatestPostWithAttachments()
+    }
+
     suspend fun getPostWithAttachments(id: Long): List<PostWithAttachments> {
-        return postDao.getPost(id)
+        return postDao.getPostsWithAttachments(id)
     }
 }

@@ -11,6 +11,7 @@ class SingleUriData private constructor(
     var fileType: String,
     var width: Int?,
     var height: Int?,
+    @Transient
     var thumbnailUri: Uri?,
     var size: Long,
     var mediaName: String?,

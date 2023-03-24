@@ -4,15 +4,15 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.likeminds.feedsx.db.dao.PostDao
 import com.likeminds.feedsx.db.dao.UserDao
-import com.likeminds.feedsx.db.models.*
+import com.likeminds.feedsx.db.models.AttachmentEntity
+import com.likeminds.feedsx.db.models.PostEntity
+import com.likeminds.feedsx.db.models.UserEntity
 
 @Database(
     entities = [
         UserEntity::class,
         PostEntity::class,
-        AttachmentEntity::class,
-        AttachmentMetaEntity::class,
-        LinkOGTagsEntity::class
+        AttachmentEntity::class
     ], version = 1, exportSchema = false
 )
 abstract class FeedSXDatabase : RoomDatabase() {

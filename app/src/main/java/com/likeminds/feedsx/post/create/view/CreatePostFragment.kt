@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.create.view
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
-import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.EditText
@@ -23,9 +22,7 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
-import com.likeminds.feedsx.post.create.model.CreatePostResult
 import com.likeminds.feedsx.post.create.util.CreatePostListener
-import com.likeminds.feedsx.post.create.view.CreatePostActivity.Companion.ARG_CREATE_POST_RESULT
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
@@ -84,15 +81,6 @@ class CreatePostFragment :
                         selectedMediaUris,
                         ogTags
                     )
-                    val result = CreatePostResult.Builder().showUploader(true).build()
-                    val intent = Intent().apply {
-                        putExtras(Bundle().apply {
-                            putParcelable(
-                                ARG_CREATE_POST_RESULT, result
-                            )
-                        })
-                    }
-                    requireActivity().setResult(Activity.RESULT_OK, intent)
                     requireActivity().finish()
                 } else {
                     //todo: create post activity finish
@@ -101,7 +89,6 @@ class CreatePostFragment :
                         text,
                         ogTags = ogTags
                     )
-                    CreatePostResult.Builder().showUploader(false).build()
                 }
             }
         }

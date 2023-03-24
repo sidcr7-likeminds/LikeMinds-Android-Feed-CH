@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.media.model.SingleUriData
+import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
@@ -25,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val postRepository: PostRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 
@@ -124,6 +126,17 @@ class FeedViewModel @Inject constructor(
 
             //call api
             lmFeedClient.registerDevice(request)
+        }
+    }
+
+    fun checkPosting() {
+        viewModelScope.launchIO {
+            val postWithAttachments = postRepository.getLatestPostWithAttachments()
+            if (postWithAttachments.post.isPosted) {
+                return@launchIO
+            } else {
+
+            }
         }
     }
 

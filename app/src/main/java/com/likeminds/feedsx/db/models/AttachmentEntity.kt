@@ -16,16 +16,14 @@ class AttachmentEntity constructor(
     @Embedded
     val attachmentMeta: AttachmentMetaEntity,
     @ColumnInfo(name = "post_id")
-    val postId: Long,
-    @ColumnInfo(name = "dynamic_type")
-    val dynamicType: Int?
+    val postId: Long
 ) {
     class Builder {
         private var id: Long = 0
         private var attachmentType: Int = 0
-        private var attachmentMeta: AttachmentMetaEntity = AttachmentMetaEntity.Builder().build()
+        private var attachmentMeta: AttachmentMetaEntity =
+            AttachmentMetaEntity.Builder().build()
         private var postId: Long = 0
-        private var dynamicType: Int? = null
 
         fun id(id: Long) = apply { this.id = id }
         fun attachmentType(attachmentType: Int) = apply { this.attachmentType = attachmentType }
@@ -33,14 +31,12 @@ class AttachmentEntity constructor(
             apply { this.attachmentMeta = attachmentMeta }
 
         fun postId(postId: Long) = apply { this.postId = postId }
-        fun dynamicType(dynamicType: Int?) = apply { this.dynamicType = dynamicType }
 
         fun build() = AttachmentEntity(
             id,
             attachmentType,
             attachmentMeta,
             postId,
-            dynamicType
         )
     }
 
@@ -49,6 +45,5 @@ class AttachmentEntity constructor(
             .attachmentType(attachmentType)
             .attachmentMeta(attachmentMeta)
             .postId(postId)
-            .dynamicType(dynamicType)
     }
 }

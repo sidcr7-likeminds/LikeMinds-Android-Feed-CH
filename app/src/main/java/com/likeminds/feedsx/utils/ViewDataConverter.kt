@@ -1,5 +1,8 @@
 package com.likeminds.feedsx.utils
 
+import android.util.Base64
+import com.likeminds.feedsx.db.models.AttachmentEntity
+import com.likeminds.feedsx.db.models.AttachmentMetaEntity
 import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.db.models.UserEntity
 import com.likeminds.feedsx.likes.model.LikeViewData
@@ -9,6 +12,7 @@ import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
@@ -154,6 +158,64 @@ object ViewDataConverter {
      * Network Model -> Db Model
     --------------------------------*/
 
+    fun convertPost(
+        temporaryId: Long,
+        uuid: String,
+        thumbnail: String,
+        text: String?
+    ): PostEntity {
+        return PostEntity.Builder()
+            .id(temporaryId)
+            .uuid(uuid)
+            .thumbnail(thumbnail)
+            .text(text)
+            .build()
+    }
+
+    fun convertAttachment(
+        postId: Long,
+        singleUriData: SingleUriData
+    ): AttachmentEntity {
+        val attachmentType = when (singleUriData.fileType) {
+            IMAGE -> {
+                com.likeminds.feedsx.posttypes.model.IMAGE
+            }
+            VIDEO -> {
+                com.likeminds.feedsx.posttypes.model.VIDEO
+            }
+            else -> {
+                com.likeminds.feedsx.posttypes.model.DOCUMENT
+            }
+        }
+        return AttachmentEntity.Builder()
+            .postId(postId)
+            .attachmentType(attachmentType)
+            .attachmentMeta(convertAttachmentMeta(singleUriData))
+            .build()
+    }
+
+    fun convertAttachmentMeta(
+        singleUriData: SingleUriData
+    ): AttachmentMetaEntity {
+        val url = String(
+            Base64.decode(
+                AWSKeys.getBucketBaseUrl(),
+                Base64.DEFAULT
+            )
+        ) + singleUriData.awsFolderPath
+        return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
+            .url(url)
+            .uri(singleUriData.uri.toString())
+            .pageCount(singleUriData.pdfPageCount)
+            .size(MediaUtils.getFileSizeText(singleUriData.size))
+            .duration(singleUriData.duration.toString())
+            .build()
+    }
+
+    /**--------------------------------
+     * Network Model -> Db Model
+    --------------------------------*/
+
     fun convertUser(user: User): UserEntity {
         return UserEntity.Builder()
             .id(user.id)
@@ -166,12 +228,4 @@ object ViewDataConverter {
             .userUniqueId(user.userUniqueId)
             .build()
     }
-
-//    fun convertPost(user: User): PostEntity {
-//        return PostEntity.Builder()
-////            .id()
-////            .thumbnail()
-////            .uuid()
-////            .build()
-//    }
 }

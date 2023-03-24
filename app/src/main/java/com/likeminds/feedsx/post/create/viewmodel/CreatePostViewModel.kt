@@ -1,25 +1,24 @@
 package com.likeminds.feedsx.post.create.viewmodel
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.gson.Gson
-import com.likeminds.feedsx.db.models.AttachmentEntity
-import com.likeminds.feedsx.db.models.AttachmentMetaEntity
-import com.likeminds.feedsx.db.models.LinkOGTagsEntity
-import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
+import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.LinkOGTags
 import com.likeminds.feedsx.utils.ViewDataConverter
+import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -27,7 +26,6 @@ import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.helper.model.DecodeUrlRequest
 import com.likeminds.likemindsfeed.helper.model.DecodeUrlResponse
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
-import com.likeminds.likemindsfeed.sdk.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
@@ -41,8 +39,6 @@ class CreatePostViewModel @Inject constructor(
 
     private val _decodeUrlResponse = MutableLiveData<LinkOGTags>()
     val decodeUrlResponse: LiveData<LinkOGTags> = _decodeUrlResponse
-
-    val workerState = MediatorLiveData<WorkInfo>()
 
     private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: LiveData<String?> = _errorMessage
@@ -94,22 +90,17 @@ class CreatePostViewModel @Inject constructor(
             if (fileUris != null) {
                 // if the post has upload-able attachments
                 val updatedFileUris = includeAttachmentMetaData(context, fileUris)
-                val worker = startMediaUploadWorker(context, updatedFileUris)
+                val uploadData = startMediaUploadWorker(context, updatedFileUris)
 
-                worker.enqueue()
-                workerState.apply {
-                    addSource(worker.workInfosLiveData) { workInfoList ->
-                        val workInfo = workInfoList.firstOrNull {
-                            it.tags.contains(PostAttachmentUploadWorker.TAG)
-                        }
+                // adds post data in local db
+                addPost(
+                    uploadData.second,
+                    updatedText,
+                    updatedFileUris
+                )
 
-                        if (workInfo != null) {
-                            value = workInfo
-                        }
-                    }
-                }
+//                uploadData.first.enqueue()
             } else {
-                addPost()
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
                     .text(updatedText)
@@ -125,39 +116,33 @@ class CreatePostViewModel @Inject constructor(
                     _errorMessage.postValue(response.errorMessage)
                 }
             }
-            // adds post data in local db
-//            addPost()
         }
     }
 
     //add post:{} into local db
-    private fun addPost() {
+    private fun addPost(
+        uuid: String,
+        text: String?,
+        fileUris: List<SingleUriData>? = null
+    ) {
         viewModelScope.launchIO {
-            // convert post into postEntity
-            val postId = System.currentTimeMillis()
-            val postEntity = PostEntity.Builder()
-                .id(postId)
-                .text("abcd")
-                .uuid("1234")
-                .build()
-            val attachments = listOf(
-                AttachmentEntity.Builder()
-                    .attachmentType(4)
-                    .attachmentMeta(
-                        AttachmentMetaEntity.Builder()
-                            .ogTags(
-                                LinkOGTagsEntity.Builder()
-                                    .image("https://www.facebook.com/images/fb_icon_325x325.png")
-                                    .title("Facebook - log in or sign up")
-                                    .description("Log into Facebook to start sharing and connecting with your friends, family, and people you know.")
-                                    .url("https://www.facebook.com")
-                                    .build()
-                            )
-                            .build()
-                    )
-                    .postId(postId)
-                    .build()
+            if (fileUris == null) {
+                return@launchIO
+            }
+            val temporaryPostId = System.currentTimeMillis()
+            val thumbnailUri = fileUris.first().thumbnailUri
+            val postEntity = ViewDataConverter.convertPost(
+                temporaryPostId,
+                uuid,
+                thumbnailUri.toString(),
+                text
             )
+            val attachments = fileUris.map {
+                convertAttachment(
+                    temporaryPostId,
+                    it
+                )
+            }
             // add it to local db
             postRepository.insertPostWithAttachments(postEntity, attachments)
         }
@@ -182,29 +167,42 @@ class CreatePostViewModel @Inject constructor(
                 .awsFolderPath(awsFolderPath)
             when (it.fileType) {
                 IMAGE -> {
+                    Log.d("PUI", "includeAttachmentMetaData: ${it.uri}")
                     val dimensions = FileUtil.getImageDimensions(context, it.uri)
-                    builder.width(dimensions.first).height(dimensions.second).build()
+                    builder.width(dimensions.first)
+                        .thumbnailUri(it.uri)
+                        .height(dimensions.second)
+                        .build()
                 }
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
+                        Log.d("PUI", "includeAttachmentMetaData: $thumbnailUri")
                         builder.thumbnailUri(thumbnailUri).build()
                     } else {
                         builder.build()
                     }
                 }
-                else -> builder.build()
+                else -> {
+                    val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
+                    Log.d("PUI", "includeAttachmentMetaData: $thumbnailUri")
+                    builder
+                        .thumbnailUri(thumbnailUri)
+                        .build()
+                }
             }
         }
     }
 
     // creates PostAttachmentUploadWorker to start media upload
+    @SuppressLint("EnqueueWork")
     private fun startMediaUploadWorker(
         context: Context,
         attachments: List<SingleUriData>
-    ): WorkContinuation {
+    ): Pair<WorkContinuation, String> {
         val jsonAttachment = Gson().toJson(attachments)
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(jsonAttachment)
-        return WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
+        val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
+        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }
 }
