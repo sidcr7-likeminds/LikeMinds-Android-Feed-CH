@@ -2,8 +2,8 @@ package com.likeminds.feedsx.utils
 
 import android.widget.ImageView
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.generator.ColorGenerator
 import com.likeminds.feedsx.utils.generator.TextDrawable
-import com.likeminds.likemindschat.utils.generator.ColorGenerator
 
 object MemberImageUtil {
 

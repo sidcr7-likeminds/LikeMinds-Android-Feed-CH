@@ -20,10 +20,10 @@ object TimeUtil {
             ((timestamp - (days * DAY_IN_MILLIS) - (hours * HOUR_IN_MILLIS)) / MINUTE_IN_MILLIS).toInt()
         return when {
             days == 0 && hours == 0 && minutes > 0 -> "$minutes min"
-            days == 0 && hours == 1 -> "$hours h"
-            days == 0 && hours > 1 -> "$hours h"
-            days == 1 && hours == 0 -> "$days d"
-            days >= 1 -> "$days d"
+            days == 0 && hours == 1 -> "${hours}h"
+            days == 0 && hours > 1 -> "${hours}h"
+            days == 1 && hours == 0 -> "${days}d"
+            days >= 1 -> "${days}d"
             else -> "Just Now"
         }
     }

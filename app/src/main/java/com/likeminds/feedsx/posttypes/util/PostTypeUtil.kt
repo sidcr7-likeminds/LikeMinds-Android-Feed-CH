@@ -66,14 +66,15 @@ object PostTypeUtil {
         MemberImageUtil.setImage(
             user.imageUrl,
             user.name,
-            data.id,
+            user.userUniqueId,
             binding.memberImage,
             showRoundImage = true
         )
 
         binding.viewDotEdited.hide()
         binding.tvEdited.hide()
-        binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
+        val timeDifference = System.currentTimeMillis() - data.createdAt
+        binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(timeDifference)
     }
 
     //to show the overflow menu
