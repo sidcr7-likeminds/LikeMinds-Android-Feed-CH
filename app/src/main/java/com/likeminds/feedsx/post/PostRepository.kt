@@ -1,14 +1,16 @@
 package com.likeminds.feedsx.post
 
 import com.likeminds.feedsx.db.dao.PostDao
+import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.db.models.PostEntity
+import com.likeminds.feedsx.db.models.PostWithAttachments
 import javax.inject.Inject
 
 class PostRepository @Inject constructor(
     private val postDao: PostDao
 ) {
-    suspend fun insertPost(post: PostEntity) {
-        postDao.insertPost(post)
+    suspend fun insertPostWithAttachments(post: PostEntity, attachments: List<AttachmentEntity>) {
+        postDao.insertPostWithAttachments(post, attachments)
     }
 
     suspend fun updatePost(post: PostEntity) {
@@ -19,7 +21,7 @@ class PostRepository @Inject constructor(
         postDao.updatePost(post)
     }
 
-    suspend fun getPost(id: Int): PostEntity {
+    suspend fun getPostWithAttachments(id: Long): List<PostWithAttachments> {
         return postDao.getPost(id)
     }
 }

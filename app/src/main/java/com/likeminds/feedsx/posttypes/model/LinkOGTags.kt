@@ -10,7 +10,6 @@ class LinkOGTags private constructor(
     val description: String?,
     val url: String?,
 ) : Parcelable {
-
     class Builder {
         private var title: String? = null
         private var image: String? = null

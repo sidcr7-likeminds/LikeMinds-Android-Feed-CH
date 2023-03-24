@@ -167,11 +167,11 @@ object ViewDataConverter {
             .build()
     }
 
-    fun convertPost(user: User): PostEntity {
-        return PostEntity.Builder()
-            .id()
-            .thumbnail()
-            .uuid()
-            .build()
-    }
+//    fun convertPost(user: User): PostEntity {
+//        return PostEntity.Builder()
+////            .id()
+////            .thumbnail()
+////            .uuid()
+////            .build()
+//    }
 }

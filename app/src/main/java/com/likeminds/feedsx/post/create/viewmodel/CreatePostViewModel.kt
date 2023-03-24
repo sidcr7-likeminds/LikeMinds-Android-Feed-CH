@@ -7,6 +7,10 @@ import androidx.work.WorkContinuation
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.gson.Gson
+import com.likeminds.feedsx.db.models.AttachmentEntity
+import com.likeminds.feedsx.db.models.AttachmentMetaEntity
+import com.likeminds.feedsx.db.models.LinkOGTagsEntity
+import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.MediaViewData
@@ -92,9 +96,6 @@ class CreatePostViewModel @Inject constructor(
                 val updatedFileUris = includeAttachmentMetaData(context, fileUris)
                 val worker = startMediaUploadWorker(context, updatedFileUris)
 
-                // adds post data in local db
-                addPost()
-
                 worker.enqueue()
                 workerState.apply {
                     addSource(worker.workInfosLiveData) { workInfoList ->
@@ -108,6 +109,7 @@ class CreatePostViewModel @Inject constructor(
                     }
                 }
             } else {
+                addPost()
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
                     .text(updatedText)
@@ -123,17 +125,41 @@ class CreatePostViewModel @Inject constructor(
                     _errorMessage.postValue(response.errorMessage)
                 }
             }
+            // adds post data in local db
+//            addPost()
         }
     }
 
     //add post:{} into local db
-    private fun addPost(user: User?) {
-        if (user == null) return
+    private fun addPost() {
         viewModelScope.launchIO {
             // convert post into postEntity
-            val postEntity = ViewDataConverter.convertUser(user)
+            val postId = System.currentTimeMillis()
+            val postEntity = PostEntity.Builder()
+                .id(postId)
+                .text("abcd")
+                .uuid("1234")
+                .build()
+            val attachments = listOf(
+                AttachmentEntity.Builder()
+                    .attachmentType(4)
+                    .attachmentMeta(
+                        AttachmentMetaEntity.Builder()
+                            .ogTags(
+                                LinkOGTagsEntity.Builder()
+                                    .image("https://www.facebook.com/images/fb_icon_325x325.png")
+                                    .title("Facebook - log in or sign up")
+                                    .description("Log into Facebook to start sharing and connecting with your friends, family, and people you know.")
+                                    .url("https://www.facebook.com")
+                                    .build()
+                            )
+                            .build()
+                    )
+                    .postId(postId)
+                    .build()
+            )
             // add it to local db
-            postRepository.insertPost(postEntity)
+            postRepository.insertPostWithAttachments(postEntity, attachments)
         }
     }
 
