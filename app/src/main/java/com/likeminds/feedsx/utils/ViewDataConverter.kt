@@ -1,10 +1,8 @@
 package com.likeminds.feedsx.utils
 
+import android.net.Uri
 import android.util.Base64
-import com.likeminds.feedsx.db.models.AttachmentEntity
-import com.likeminds.feedsx.db.models.AttachmentMetaEntity
-import com.likeminds.feedsx.db.models.PostEntity
-import com.likeminds.feedsx.db.models.UserEntity
+import com.likeminds.feedsx.db.models.*
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.PDF
@@ -73,6 +71,39 @@ object ViewDataConverter {
      * View Data Model -> Network Model
     --------------------------------*/
 
+    fun convertAttachments(
+        attachments: List<AttachmentViewData>
+    ): List<Attachment> {
+        return attachments.map {
+            convertAttachment(it)
+        }
+    }
+
+    fun convertAttachment(
+        attachment: AttachmentViewData
+    ): Attachment {
+        return Attachment.Builder()
+            .attachmentType(attachment.attachmentType)
+            .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+            .build()
+    }
+
+    // TODO: handle fields
+    fun convertAttachmentMeta(
+        attachmentMeta: AttachmentMetaViewData
+    ): AttachmentMeta {
+        return AttachmentMeta.Builder().name(attachmentMeta.name)
+            .ogTags(convertOGTags(attachmentMeta.ogTags))
+            .url(attachmentMeta.url)
+//            .size((attachmentMeta.size))
+//            .duration(attachmentMeta.duration)
+            .pageCount(attachmentMeta.pageCount)
+            .format(attachmentMeta.format)
+//            .height()
+//            .width()
+            .build()
+    }
+
     // creates attachment list of Network Model for link attachment
     fun convertAttachments(
         linkOGTags: LinkOGTags
@@ -86,7 +117,7 @@ object ViewDataConverter {
     }
 
     // creates AttachmentMeta Network Model for link attachment meta
-    fun convertAttachmentMeta(
+    private fun convertAttachmentMeta(
         linkOGTags: LinkOGTags
     ): AttachmentMeta {
         return AttachmentMeta.Builder()
@@ -95,7 +126,7 @@ object ViewDataConverter {
     }
 
     // converts LinkOGTags view data model to network model
-    fun convertOGTags(
+    private fun convertOGTags(
         linkOGTags: LinkOGTags
     ): com.likeminds.likemindsfeed.post.model.LinkOGTags {
         return com.likeminds.likemindsfeed.post.model.LinkOGTags.Builder()
@@ -155,7 +186,7 @@ object ViewDataConverter {
     }
 
     /**--------------------------------
-     * Network Model -> Db Model
+     * View Data -> Db Model
     --------------------------------*/
 
     fun convertPost(
@@ -226,6 +257,45 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isDeleted(user.isDeleted)
             .userUniqueId(user.userUniqueId)
+            .build()
+    }
+
+    /**--------------------------------
+     * Db Model -> View Data Model
+    --------------------------------*/
+
+    fun convertPost(postWithAttachments: PostWithAttachments): PostViewData {
+        val post = postWithAttachments.post
+        val attachments = postWithAttachments.attachments
+        return PostViewData.Builder()
+            .id(post.id.toString())
+            .thumbnail(post.thumbnail)
+            .uuid(post.uuid)
+            .isPosted(post.isPosted)
+            .attachments(convertAttachmentsEntity(attachments))
+            .build()
+    }
+
+    private fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
+        return attachments.map { attachment ->
+            convertAttachment(attachment)
+        }
+    }
+
+    fun convertAttachment(attachment: AttachmentEntity): AttachmentViewData {
+        return AttachmentViewData.Builder()
+            .dynamicViewType(attachment.attachmentType)
+            .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+            .build()
+    }
+
+    private fun convertAttachmentMeta(attachmentMeta: AttachmentMetaEntity): AttachmentMetaViewData {
+        return AttachmentMetaViewData.Builder()
+            .url(attachmentMeta.url)
+            .name(attachmentMeta.name)
+            .size(attachmentMeta.size)
+            .duration(attachmentMeta.duration)
+            .uri(Uri.parse(attachmentMeta.uri))
             .build()
     }
 }

@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -45,9 +48,12 @@ import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
+import com.likeminds.likemindsfeed.post.model.AddPostResponse
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.*
 
 
 @AndroidEntryPoint
@@ -68,6 +74,8 @@ class FeedFragment :
     private var accessToken: String = ""
     private var refreshToken: String = ""
 
+    private val workersMap by lazy { ArrayList<UUID>() }
+
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
     }
@@ -84,6 +92,14 @@ class FeedFragment :
 
         viewModel.initiateUserResponse.observe(viewLifecycleOwner) { response ->
             observeInitiateUserResponse(response)
+        }
+
+        viewModel.postingData.observe(viewLifecycleOwner) { data ->
+            observePostingData(data)
+        }
+
+        viewModel.addPostResponse.observe(viewLifecycleOwner) { response ->
+            observeAddPostResponse(response)
         }
 
 //        viewModel.workerState.observe(viewLifecycleOwner) { workInfo ->
@@ -143,6 +159,68 @@ class FeedFragment :
         } else {
             ViewUtils.showSomethingWentWrongToast(requireContext())
         }
+    }
+
+    private fun observePostingData(postingData: PostViewData) {
+        binding.layoutPosting.apply {
+            root.show()
+            if (postingData.thumbnail.isNullOrEmpty()) {
+                ivPostThumbnail.hide()
+            } else {
+                ivPostThumbnail.show()
+                ivPostThumbnail.setImageURI(Uri.parse(postingData.thumbnail))
+            }
+            observeMediaUpload(postingData)
+        }
+    }
+
+    private fun observeMediaUpload(postingData: PostViewData) {
+        if (postingData.uuid.isEmpty()) {
+            return
+        }
+        val uuid = UUID.fromString(postingData.uuid)
+        Log.d("PUI", "observeMediaUpload uuid: $uuid")
+        if (!workersMap.contains(uuid)) {
+            workersMap.add(uuid)
+            WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
+                .observe(viewLifecycleOwner) { workInfo ->
+                    observeMediaWorker(workInfo, postingData)
+                }
+        }
+    }
+
+    private fun observeMediaWorker(
+        workInfo: WorkInfo,
+        postingData: PostViewData
+    ) {
+        when (workInfo.state) {
+            WorkInfo.State.SUCCEEDED -> {
+                Log.d("PUI", "SUCCEEDED: true")
+                binding.layoutPosting.apply {
+                    postingProgress.hide()
+                    ivPosted.show()
+                }
+                viewModel.addPost(postingData)
+            }
+            WorkInfo.State.FAILED -> {
+                // TODO:
+            }
+            WorkInfo.State.CANCELLED -> {
+                // TODO:
+            }
+            else -> {
+                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
+                Log.d("PUI", "observeMediaWorker: $progress")
+                binding.layoutPosting.apply {
+                    val progressValue = (progress.first / progress.second).toInt()
+                    postingProgress.progress = progressValue
+                }
+            }
+        }
+    }
+
+    private fun observeAddPostResponse(response: AddPostResponse) {
+        // TODO: add item in feed list
     }
 
     // shows invalid access error and logs out invalid user

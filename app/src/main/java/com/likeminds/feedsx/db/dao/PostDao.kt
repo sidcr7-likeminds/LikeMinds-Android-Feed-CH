@@ -21,10 +21,10 @@ interface PostDao {
     @Delete
     suspend fun deletePost(post: PostEntity)
 
-    //get the latest post in db
+    //get the latest post in db which is not posted
     @Transaction
-    @Query("SELECT * FROM ${DbConstants.POST_TABLE} ORDER BY id DESC LIMIT 1")
-    suspend fun getLatestPostWithAttachments(): PostWithAttachments
+    @Query("SELECT * FROM ${DbConstants.POST_TABLE} WHERE is_posted = 0 ORDER BY id DESC LIMIT 1")
+    suspend fun getLatestPostWithAttachments(): PostWithAttachments?
 
     //get post for a particular post.id (temporaryId)
     @Transaction

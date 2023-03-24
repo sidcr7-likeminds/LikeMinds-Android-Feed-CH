@@ -93,13 +93,13 @@ class CreatePostViewModel @Inject constructor(
                 val uploadData = startMediaUploadWorker(context, updatedFileUris)
 
                 // adds post data in local db
-                addPost(
+                storePost(
                     uploadData.second,
                     updatedText,
                     updatedFileUris
                 )
-
-//                uploadData.first.enqueue()
+                Log.d("PUI", "addPost: ${uploadData.second}")
+                uploadData.first.enqueue()
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
@@ -120,7 +120,7 @@ class CreatePostViewModel @Inject constructor(
     }
 
     //add post:{} into local db
-    private fun addPost(
+    private fun storePost(
         uuid: String,
         text: String?,
         fileUris: List<SingleUriData>? = null
@@ -167,7 +167,6 @@ class CreatePostViewModel @Inject constructor(
                 .awsFolderPath(awsFolderPath)
             when (it.fileType) {
                 IMAGE -> {
-                    Log.d("PUI", "includeAttachmentMetaData: ${it.uri}")
                     val dimensions = FileUtil.getImageDimensions(context, it.uri)
                     builder.width(dimensions.first)
                         .thumbnailUri(it.uri)
@@ -177,7 +176,6 @@ class CreatePostViewModel @Inject constructor(
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
-                        Log.d("PUI", "includeAttachmentMetaData: $thumbnailUri")
                         builder.thumbnailUri(thumbnailUri).build()
                     } else {
                         builder.build()
@@ -185,7 +183,6 @@ class CreatePostViewModel @Inject constructor(
                 }
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
-                    Log.d("PUI", "includeAttachmentMetaData: $thumbnailUri")
                     builder
                         .thumbnailUri(thumbnailUri)
                         .build()

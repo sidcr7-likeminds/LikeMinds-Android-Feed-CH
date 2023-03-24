@@ -13,22 +13,22 @@ class PostEntity constructor(
     @ColumnInfo(name = "text")
     var text: String?,
     @ColumnInfo(name = "thumbnail")
-    var thumbnail: String,
+    var thumbnail: String?,
     @ColumnInfo(name = "uuid")
     var uuid: String,
-    @ColumnInfo("isPosted")
+    @ColumnInfo("is_posted")
     var isPosted: Boolean
 ) {
     class Builder {
         private var id: Long = 0
         private var text: String? = null
-        private var thumbnail: String = ""
+        private var thumbnail: String? = null
         private var uuid: String = ""
         private var isPosted: Boolean = false
 
         fun id(id: Long) = apply { this.id = id }
         fun text(text: String?) = apply { this.text = text }
-        fun thumbnail(thumbnail: String) = apply { this.thumbnail = thumbnail }
+        fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
 

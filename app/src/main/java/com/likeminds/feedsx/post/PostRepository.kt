@@ -21,7 +21,7 @@ class PostRepository @Inject constructor(
         postDao.updatePost(post)
     }
 
-    suspend fun getLatestPostWithAttachments(): PostWithAttachments {
+    suspend fun getLatestPostWithAttachments(): PostWithAttachments? {
         return postDao.getLatestPostWithAttachments()
     }
 
