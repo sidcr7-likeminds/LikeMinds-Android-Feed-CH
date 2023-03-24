@@ -5,16 +5,17 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.feed.UserRepository
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
-import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
-import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.sdk.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,12 +26,22 @@ class FeedViewModel @Inject constructor(
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
-    val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
+    private val _userResponse = MutableLiveData<UserViewData>()
+    val userResponse: LiveData<UserViewData> = _userResponse
+
+    private val _logoutResponse = MutableLiveData<Boolean>()
+    val logoutResponse: LiveData<Boolean> = _logoutResponse
+
+    sealed class ErrorMessageEvent {
+        data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
+    }
+
+    private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
+    val errorEventFlow = errorEventChannel.receiveAsFlow()
 
     /***
      * calls InitiateUser API
-     * store user:{} in db
+     * stores user:{} in db
      * and posts the response in LiveData
      * */
     fun initiateUser(
@@ -52,17 +63,26 @@ class FeedViewModel @Inject constructor(
             val initiateResponse = lmFeedClient.initiateUser(request)
 
             if (initiateResponse.success) {
-                val user = initiateResponse.data?.user
-                val id = user?.id ?: -1
+                val data = initiateResponse.data ?: return@launchIO
+                if (data.logoutResponse != null) {
+                    //user is invalid
+                    _logoutResponse.postValue(true)
+                } else {
+                    val user = data.user
+                    val id = user?.id ?: -1
 
-                //add user in local db
-                addUser(user)
+                    //add user in local db
+                    addUser(user)
 
-                //save user.id in local prefs
-                userPreferences.saveMemberId(id)
+                    //save user.id in local prefs
+                    userPreferences.saveMemberId(id)
+
+                    //post the user response in LiveData
+                    _userResponse.postValue(ViewDataConverter.convertUser(user))
+                }
+            } else {
+                errorEventChannel.send(ErrorMessageEvent.InitiateUser(initiateResponse.errorMessage))
             }
-            //send response to UI
-            _initiateUserResponse.postValue(initiateResponse)
         }
     }
 
