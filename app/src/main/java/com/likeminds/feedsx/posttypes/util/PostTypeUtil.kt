@@ -3,6 +3,7 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
+import android.text.util.Linkify
 import android.view.Gravity
 import android.view.View
 import android.view.animation.Animation
@@ -10,6 +11,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
@@ -33,19 +35,20 @@ import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
 
 object PostTypeUtil {
-
-    private const val TAG = "PostTypeUtil"
     private const val SHOW_MORE_COUNT = 2
 
     // initializes author data frame on the post
-    fun initAuthorFrame(
+    private fun initAuthorFrame(
         binding: LayoutAuthorFrameBinding,
         data: PostViewData,
         overflowMenu: OverflowMenuPopup
     ) {
-        //TODO: Change pin filled drawable
-        if (data.isPinned) binding.ivPin.show()
-        else binding.ivPin.hide()
+
+        if (data.isPinned) {
+            binding.ivPin.show()
+        } else {
+            binding.ivPin.hide()
+        }
 
         binding.ivPostMenu.setOnClickListener {
             showOverflowMenu(binding.ivPostMenu, overflowMenu)
@@ -54,7 +57,12 @@ object PostTypeUtil {
         // creator data
         val user = data.user
         binding.tvMemberName.text = user.name
-        binding.tvCustomTitle.text = user.customTitle
+        if (user.customTitle.isNullOrEmpty()) {
+            binding.tvCustomTitle.hide()
+        } else {
+            binding.tvCustomTitle.show()
+            binding.tvCustomTitle.text = user.customTitle
+        }
         MemberImageUtil.setImage(
             user.imageUrl,
             user.name,
@@ -157,11 +165,17 @@ object PostTypeUtil {
 
         val context = binding.root.context
 
-        if (data.isLiked) binding.ivLike.setImageResource(R.drawable.ic_like_filled)
-        else binding.ivLike.setImageResource(R.drawable.ic_like_unfilled)
+        if (data.isLiked) {
+            binding.ivLike.setImageResource(R.drawable.ic_like_filled)
+        } else {
+            binding.ivLike.setImageResource(R.drawable.ic_like_unfilled)
+        }
 
-        if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
-        else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+        if (data.isSaved) {
+            binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+        } else {
+            binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+        }
 
         // bounce animation for like and save button
         val bounceAnim: Animation by lazy {
@@ -239,13 +253,18 @@ object PostTypeUtil {
     }
 
     // handles the text content of each post
-    fun initTextContent(
+    private fun initTextContent(
         tvPostContent: TextView,
         data: PostViewData,
         itemPosition: Int,
         adapterListener: PostAdapterListener
     ) {
         val context = tvPostContent.context
+
+        /**
+         * Text is modified as Linkify doesn't accept texts with these specific unicode characters
+         * @see #Linkify.containsUnsupportedCharacters(String)
+         */
         val textForLinkify = data.text.getValidTextForLinkify()
 
         var alreadySeenFullContent = data.alreadySeenFullContent == true
@@ -366,6 +385,7 @@ object PostTypeUtil {
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
+            LinkifyCompat.addLinks(tvPostContent, Linkify.WEB_URLS)
             tvPostContent.movementMethod = CustomLinkMovementMethod {
                 //TODO: Handle links etc.
                 true
@@ -399,7 +419,7 @@ object PostTypeUtil {
     // handles link view in the post
     fun initLinkView(
         binding: ItemPostLinkBinding,
-        data: LinkOGTags
+        data: LinkOGTagsViewData
     ) {
         val isYoutubeLink = data.url?.isValidYoutubeLink() == true
         binding.tvLinkTitle.text = if (data.title?.isNotBlank() == true) {

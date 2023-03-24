@@ -28,16 +28,15 @@ import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.post.view.CreatePostActivity
-import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
-import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -55,13 +54,8 @@ class FeedFragment :
     private val viewModel: FeedViewModel by viewModels()
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
-    lateinit var mPostAdapter: PostAdapter
-
-    private var communityId: String = ""
-    private var communityName: String = ""
-
-    private var accessToken: String = ""
-    private var refreshToken: String = ""
+    private lateinit var mPostAdapter: PostAdapter
+    private lateinit var mScrollListener: EndlessRecyclerScrollListener
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -82,15 +76,6 @@ class FeedFragment :
             observeUserResponse(response)
         }
 
-        // observes error events
-        viewModel.errorEventFlow.onEach { response ->
-            when (response) {
-                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
-                    ViewUtils.showSomethingWentWrongToast(requireContext())
-                }
-            }
-        }
-
         // observes logoutResponse LiveData
         viewModel.logoutResponse.observe(viewLifecycleOwner) {
             Log.d(
@@ -99,12 +84,51 @@ class FeedFragment :
             )
             showInvalidAccess()
         }
+
+        // observe universal feed
+        viewModel.universalFeedResponse.observe(viewLifecycleOwner) { pair ->
+            ProgressHelper.hideProgress(binding.progressBar)
+            //page in api send
+            val page = pair.first
+
+            //list of post
+            val feed = pair.second
+
+            //if pull to refresh is called
+            if (mSwipeRefreshLayout.isRefreshing) {
+                mPostAdapter.setItemsViaDiffUtilForFeed(feed)
+                mSwipeRefreshLayout.isRefreshing = false
+            }
+
+            //normal adding
+            if (page == 1) {
+                mPostAdapter.setItemsViaDiffUtilForFeed(feed)
+            } else {
+                mPostAdapter.addAll(feed)
+            }
+        }
+
+        //observes errorMessage for the apis
+        viewModel.errorMessageEventFlow.onEach { response ->
+            when (response) {
+                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                }
+                is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
+                    val errorMessage = response.errorMessage
+                    mSwipeRefreshLayout.isRefreshing = false
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
     }
 
     // initiates SDK
     private fun initiateSDK() {
+        ProgressHelper.showProgress(binding.progressBar)
         viewModel.initiateUser(
-            "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
+            "69edd43f-4a5e-4077-9c50-2b7aa740acce",
             "10203",
             "Ishaan",
             false
@@ -152,53 +176,13 @@ class FeedFragment :
         binding.recyclerView.apply {
             layoutManager = linearLayoutManager
             adapter = mPostAdapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val isExtended = binding.newPostButton.isExtended
-
-                    // Scroll down
-                    if (dy > 20 && isExtended) {
-                        binding.newPostButton.shrink()
-                    }
-
-                    // Scroll up
-                    if (dy < -20 && !isExtended) {
-                        binding.newPostButton.extend()
-                    }
-
-                    // At the top
-                    if (!recyclerView.canScrollVertically(-1)) {
-                        binding.newPostButton.extend()
-                    }
-                }
-            })
             if (itemAnimator is SimpleItemAnimator)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             show()
         }
-
         attachScrollListener(
             binding.recyclerView,
             linearLayoutManager
-        )
-
-        //TODO: Remove Testing data
-        addTestingData()
-    }
-
-    private fun addTestingData() {
-        val text =
-            "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("1")
-                .user(UserViewData.Builder().name("Sid").customTitle("Admin").build())
-                .text(text)
-                .fromPostSaved(false)
-                .fromPostLiked(false)
-                .build()
         )
     }
 
@@ -211,37 +195,9 @@ class FeedFragment :
 
         mSwipeRefreshLayout.setOnRefreshListener {
             mSwipeRefreshLayout.isRefreshing = true
-            fetchRefreshedData()
+            mScrollListener.resetData()
+            viewModel.getUniversalFeed(1)
         }
-    }
-
-    //TODO: Call api and refresh the feed data
-    private fun fetchRefreshedData() {
-        //TODO: testing data
-
-        val text =
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
-        mPostAdapter.add(
-            0,
-            PostViewData.Builder()
-                .attachments(
-                    listOf(
-                        AttachmentViewData.Builder()
-                            .attachmentType(IMAGE)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .url("https://www.shutterstock.com/image-vector/sample-red-square-grunge-stamp-260nw-338250266.jpg")
-                                    .build()
-                            )
-                            .build()
-                    )
-                )
-                .id("5")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        mSwipeRefreshLayout.isRefreshing = false
     }
 
     //attach scroll listener for pagination
@@ -249,9 +205,11 @@ class FeedFragment :
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager
     ) {
-        recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
+        mScrollListener = object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
-                // TODO: add logic
+                if (currentPage > 0) {
+                    viewModel.getUniversalFeed(currentPage)
+                }
             }
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -274,7 +232,8 @@ class FeedFragment :
                     binding.newPostButton.extend()
                 }
             }
-        })
+        }
+        recyclerView.addOnScrollListener(mScrollListener)
     }
 
     private fun initToolbar() {
@@ -453,11 +412,7 @@ class FeedFragment :
      * @param position Index of the item to scroll to
      */
     private fun scrollToPositionWithOffset(position: Int) {
-        val px = if (binding.vTopBackground.height == 0) {
-            (ViewUtils.dpToPx(75) * 1.5).toInt()
-        } else {
-            (binding.vTopBackground.height * 1.5).toInt()
-        }
+        val px = (ViewUtils.dpToPx(75) * 1.5).toInt()
         (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
             position,
             px

@@ -5,12 +5,12 @@ import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
-import com.likeminds.feedsx.posttypes.model.AttachmentMetaViewData
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
 
 object ViewDataConverter {
@@ -42,7 +42,6 @@ object ViewDataConverter {
             .attachmentMeta(
                 AttachmentMetaViewData.Builder()
                     .name(singleUriData.mediaName)
-                    .uri(singleUriData.uri)
                     .duration(singleUriData.duration.toString())
                     .pageCount(singleUriData.pdfPageCount)
                     .size(MediaUtils.getFileSizeText(singleUriData.size))
@@ -58,10 +57,8 @@ object ViewDataConverter {
     // converts User network model to view data model
     fun convertUser(
         user: User?
-    ): UserViewData? {
-        if (user == null) {
-            return null
-        }
+    ): UserViewData {
+        if (user == null) return UserViewData.Builder().build()
         return UserViewData.Builder()
             .id(user.id)
             .name(user.name)
@@ -73,10 +70,121 @@ object ViewDataConverter {
             .build()
     }
 
+    private fun createDeletedUser(): UserViewData {
+        val tempUserId = (System.currentTimeMillis() / 1000).toInt()
+        return UserViewData.Builder()
+            .id(tempUserId)
+            .name("Deleted User")
+            .imageUrl("")
+            .userUniqueId("$tempUserId")
+            .customTitle(null)
+            .isGuest(false)
+            .isDeleted(true)
+            .build()
+    }
+
+    /**
+     * convert list of [Post] and usersMap [Map] of String to User
+     * to [PostViewData]
+     *
+     * @param posts: list of [Post]
+     * @param usersMap: [Map] of String to User
+     * */
+    fun convertUniversalFeedPosts(
+        posts: List<Post>,
+        usersMap: Map<String, User>
+    ): List<PostViewData> {
+        return posts.map { post ->
+            val postCreator = post.userId
+            val user = usersMap[postCreator]
+            val postId = post.id
+
+            val userViewData = if (user == null) {
+                createDeletedUser()
+            } else {
+                convertUser(user)
+            }
+
+            PostViewData.Builder()
+                .id(postId)
+                .text(post.text)
+                .communityId(post.communityId)
+                .isPinned(post.isPinned)
+                .isSaved(post.isSaved)
+                .isLiked(post.isLiked)
+                .menuItems(convertOverflowMenuItems(post.menuItems, postId))
+                .attachments(convertAttachments(post.attachments))
+                .userId(postCreator)
+                .likesCount(post.likesCount)
+                .commentsCount(post.commentsCount)
+                .createdAt(post.createdAt)
+                .updatedAt(post.updatedAt)
+                .user(userViewData)
+                .build()
+        }
+    }
+
+    private fun convertOverflowMenuItems(
+        menuItems: List<MenuItem>,
+        entityId: String
+    ): List<OverflowMenuItemViewData> {
+        return menuItems.map { menuItem ->
+            OverflowMenuItemViewData.Builder()
+                .title(menuItem.title)
+                .entityId(entityId)
+                .build()
+        }
+    }
+
+    /**
+     * convert list of [Attachment] to list of [AttachmentViewData]
+     * @param attachments: list of [Attachment]
+     **/
+    private fun convertAttachments(attachments: List<Attachment>?): List<AttachmentViewData> {
+        if (attachments == null) return emptyList()
+        return attachments.map { attachment ->
+            AttachmentViewData.Builder()
+                .attachmentType(attachment.attachmentType)
+                .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+                .build()
+        }
+    }
+
+    /**
+     * convert [AttachmentMeta] to [AttachmentMetaViewData]
+     * @param attachmentMeta: object of [AttachmentMeta]
+     **/
+    private fun convertAttachmentMeta(attachmentMeta: AttachmentMeta): AttachmentMetaViewData {
+        return AttachmentMetaViewData.Builder()
+            .name(attachmentMeta.name)
+            .url(attachmentMeta.url)
+            .format(attachmentMeta.format)
+            .size(MediaUtils.getFileSizeText(attachmentMeta.size ?: 0L))
+            .duration(MediaUtils.formatSeconds(attachmentMeta.duration ?: 0))
+            .pageCount(attachmentMeta.pageCount)
+            .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
+            .width(attachmentMeta.width)
+            .height(attachmentMeta.height)
+            .build()
+    }
+
+    /**
+     * convert [LinkOGTags] to [LinkOGTagsViewData]
+     * @param linkOGTags: object of [LinkOGTags]
+     **/
+    private fun convertLinkOGTags(linkOGTags: LinkOGTags): LinkOGTagsViewData {
+        return LinkOGTagsViewData.Builder()
+            .url(linkOGTags.url)
+            .description(linkOGTags.description)
+            .title(linkOGTags.title)
+            .image(linkOGTags.image)
+            .build()
+    }
+
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
-    fun convertUser(user: User): UserEntity {
+    fun createUserEntity(user: User): UserEntity {
         return UserEntity.Builder()
             .id(user.id)
             .imageUrl(user.imageUrl)

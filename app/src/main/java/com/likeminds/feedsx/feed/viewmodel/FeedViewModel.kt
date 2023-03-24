@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.feed.UserRepository
+import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
@@ -13,6 +14,7 @@ import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.sdk.model.User
+import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -32,12 +34,20 @@ class FeedViewModel @Inject constructor(
     private val _logoutResponse = MutableLiveData<Boolean>()
     val logoutResponse: LiveData<Boolean> = _logoutResponse
 
+    private val _universalFeedResponse = MutableLiveData<Pair<Int, List<PostViewData>>>()
+    val universalFeedResponse: LiveData<Pair<Int, List<PostViewData>>> = _universalFeedResponse
+
+    private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
+    val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
+
     sealed class ErrorMessageEvent {
         data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
+        data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
     }
 
-    private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
-    val errorEventFlow = errorEventChannel.receiveAsFlow()
+    companion object {
+        const val PAGE_SIZE = 20
+    }
 
     /***
      * calls InitiateUser API
@@ -77,11 +87,13 @@ class FeedViewModel @Inject constructor(
                     //save user.id in local prefs
                     userPreferences.saveMemberId(id)
 
+                    getUniversalFeed(1)
+
                     //post the user response in LiveData
                     _userResponse.postValue(ViewDataConverter.convertUser(user))
                 }
             } else {
-                errorEventChannel.send(ErrorMessageEvent.InitiateUser(initiateResponse.errorMessage))
+                errorMessageChannel.send(ErrorMessageEvent.InitiateUser(initiateResponse.errorMessage))
             }
         }
     }
@@ -91,7 +103,7 @@ class FeedViewModel @Inject constructor(
         if (user == null) return
         viewModelScope.launchIO {
             //convert user into userEntity
-            val userEntity = ViewDataConverter.convertUser(user)
+            val userEntity = ViewDataConverter.createUserEntity(user)
             //add it to local db
             userRepository.insertUser(userEntity)
 
@@ -103,6 +115,7 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    //call member state api
     private fun getMemberState() {
         viewModelScope.launchIO {
             //get member state response
@@ -123,6 +136,7 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    //call register device
     private fun registerDevice() {
         viewModelScope.launchIO {
             //create request
@@ -133,6 +147,35 @@ class FeedViewModel @Inject constructor(
 
             //call api
             lmFeedClient.registerDevice(request)
+        }
+    }
+
+    //get universal feed
+    fun getUniversalFeed(page: Int) {
+        viewModelScope.launchIO {
+            val request = GetFeedRequest.Builder()
+                .page(page)
+                .pageSize(PAGE_SIZE)
+                .build()
+
+            //call universal feed api
+            val response = lmFeedClient.getFeed(request)
+
+            if (response.success) {
+                val data = response.data ?: return@launchIO
+                val posts = data.posts
+                val usersMap = data.users
+
+                //convert to view data
+                val listOfPostViewData =
+                    ViewDataConverter.convertUniversalFeedPosts(posts, usersMap)
+
+                //send it to ui
+                _universalFeedResponse.postValue(Pair(page, listOfPostViewData))
+            } else {
+                //for error
+                errorMessageChannel.send(ErrorMessageEvent.UniversalFeed(response.errorMessage))
+            }
         }
     }
 }

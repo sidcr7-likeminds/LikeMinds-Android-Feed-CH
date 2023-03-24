@@ -30,8 +30,6 @@ class PostViewData private constructor(
 
     //TODO: add post id while adding menu item
 
-    //TODO: Change see more limit count
-
     override val viewType: Int
         get() = when {
             (attachments.size == 1 && attachments.first().attachmentType == IMAGE) -> {
@@ -46,7 +44,7 @@ class PostViewData private constructor(
             (attachments.size > 1 && (attachments.first().attachmentType == IMAGE || attachments.first().attachmentType == VIDEO)) -> {
                 ITEM_POST_MULTIPLE_MEDIA
             }
-            (attachments.isNotEmpty() && attachments.first().attachmentType == LINK) -> {
+            (attachments.size == 1 && attachments.first().attachmentType == LINK) -> {
                 ITEM_POST_LINK
             }
             else -> {

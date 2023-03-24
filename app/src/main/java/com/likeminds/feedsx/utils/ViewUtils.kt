@@ -50,6 +50,10 @@ object ViewUtils {
         Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
     }
 
+    fun showErrorMessageToast(context: Context, errorMessage: String?) {
+        showShortToast(context, errorMessage ?: "Something went wrong!")
+    }
+
     fun showSomethingWentWrongToast(context: Context) {
         showShortToast(context, context.getString(R.string.something_went_wrong))
     }
