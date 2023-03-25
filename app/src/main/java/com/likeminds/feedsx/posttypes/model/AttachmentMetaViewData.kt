@@ -17,7 +17,6 @@ class AttachmentMetaViewData private constructor(
     var width: Int?,
     var height: Int?
 ) : Parcelable {
-
     class Builder {
         private var name: String? = null
         private var url: String? = null

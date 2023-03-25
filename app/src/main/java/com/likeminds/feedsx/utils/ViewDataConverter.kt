@@ -50,6 +50,8 @@ object ViewDataConverter {
                     .duration(singleUriData.duration)
                     .format(singleUriData.format)
                     .pageCount(singleUriData.pdfPageCount)
+                    .width(singleUriData.width)
+                    .height(singleUriData.height)
                     .size(singleUriData.size)
                     .build()
             )
@@ -336,6 +338,10 @@ object ViewDataConverter {
             .size(singleUriData.size)
             .duration(singleUriData.duration)
             .format(singleUriData.format)
+            .awsFolderPath(singleUriData.awsFolderPath)
+            .localFilePath(singleUriData.localFilePath)
+            .width(singleUriData.width)
+            .height(singleUriData.height)
             .build()
     }
 
@@ -393,6 +399,8 @@ object ViewDataConverter {
             .duration(attachmentMeta.duration)
             .format(attachmentMeta.format)
             .uri(Uri.parse(attachmentMeta.uri))
+            .width(attachmentMeta.width)
+            .height(attachmentMeta.height)
             .build()
     }
 }

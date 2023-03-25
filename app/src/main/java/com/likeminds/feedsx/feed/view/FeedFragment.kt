@@ -149,7 +149,7 @@ class FeedFragment :
                 }
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
-                        mPostAdapter.add(response.post)
+                        mPostAdapter.add(0, response.post)
                         removePostingView()
                     }
                 }

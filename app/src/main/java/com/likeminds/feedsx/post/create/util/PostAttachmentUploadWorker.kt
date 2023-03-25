@@ -6,15 +6,14 @@ import androidx.work.*
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.services.s3.model.CannedAccessControlList
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import com.likeminds.feedsx.media.model.SingleUriData
+import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.mediauploader.model.AWSFileResponse
 import com.likeminds.feedsx.utils.mediauploader.model.GenericFileRequest
 import com.likeminds.feedsx.utils.mediauploader.model.IMAGE
 import com.likeminds.feedsx.utils.mediauploader.utils.FileHelper
 import com.likeminds.feedsx.utils.mediauploader.utils.UploadHelper
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.Continuation
@@ -24,18 +23,22 @@ class PostAttachmentUploadWorker(
     workerParams: WorkerParameters
 ) : MediaUploadWorker(context, workerParams) {
 
-    private val attachments by lazy { getStringParam(ARG_ATTACHMENTS) }
-    private lateinit var attachmentsToUpload: List<SingleUriData>
+    private val postId by lazy { getLongParam(ARG_POST_ID) }
+    private val totalMediaCount by lazy { getIntParam(ARG_TOTAL_MEDIA_COUNT) }
+
+    private lateinit var attachmentsToUpload: List<AttachmentEntity>
 
     companion object {
-        const val ARG_ATTACHMENTS = "ARG_ATTACHMENTS"
+        const val ARG_POST_ID = "ARG_POST_ID"
+        const val ARG_TOTAL_MEDIA_COUNT = "ARG_TOTAL_MEDIA_COUNT"
         const val TAG = "PostAttachmentUploadWorker"
 
-        fun getInstance(attachments: String): OneTimeWorkRequest {
+        fun getInstance(postId: Long, totalMediaCount: Int): OneTimeWorkRequest {
             return OneTimeWorkRequestBuilder<PostAttachmentUploadWorker>()
                 .setInputData(
                     workDataOf(
-                        ARG_ATTACHMENTS to attachments
+                        ARG_POST_ID to postId,
+                        ARG_TOTAL_MEDIA_COUNT to totalMediaCount
                     )
                 )
                 .setConstraints(
@@ -52,31 +55,28 @@ class PostAttachmentUploadWorker(
     }
 
     override fun checkArgs() {
-        require(ARG_ATTACHMENTS)
+        require(ARG_POST_ID)
+        require(ARG_TOTAL_MEDIA_COUNT)
     }
 
+    // gets list of attachments from DB
     override fun init() {
-        convertJsonStringToAttachments(attachments)
-    }
-
-    // creates list of SingleUriData from attachments JSON
-    private fun convertJsonStringToAttachments(attachments: String) {
-        val sType = object : TypeToken<List<SingleUriData>>() {}.type
-        attachmentsToUpload = Gson().fromJson(attachments, sType)
+        runBlocking {
+            val postWithAttachments = postRepository.getPostWithAttachments(postId)
+            attachmentsToUpload = postWithAttachments.attachments
+        }
     }
 
     // creates/resumes AWS uploads for each attachment
     override fun uploadFiles(continuation: Continuation<Int>) {
-        val totalFilesToUpload = attachmentsToUpload.size
-
         uploadList = createAWSRequestList(attachmentsToUpload)
         uploadList.forEach { request ->
             val resumeAWSFileResponse =
                 UploadHelper.getInstance().getAWSFileResponse(request.awsFolderPath)
             if (resumeAWSFileResponse != null) {
-                resumeAWSUpload(resumeAWSFileResponse, totalFilesToUpload, continuation, request)
+                resumeAWSUpload(resumeAWSFileResponse, totalMediaCount, continuation, request)
             } else {
-                createAWSUpload(request, totalFilesToUpload, continuation)
+                createAWSUpload(request, totalMediaCount, continuation)
             }
         }
     }

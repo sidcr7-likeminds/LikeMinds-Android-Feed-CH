@@ -5,6 +5,7 @@ import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
+import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.likemindsfeed.LMFeedClient
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
@@ -14,6 +15,9 @@ class FeedSXApplication @Inject constructor() : Application() {
 
     @Inject
     lateinit var transferUtility: TransferUtility
+
+    @Inject
+    lateinit var postRepository: PostRepository
 
     companion object {
         const val LOG_TAG = "LikeMinds"

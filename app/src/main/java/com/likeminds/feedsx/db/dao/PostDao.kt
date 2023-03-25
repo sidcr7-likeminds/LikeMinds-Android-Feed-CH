@@ -33,5 +33,5 @@ interface PostDao {
     //get post for a particular post.id (temporaryId)
     @Transaction
     @Query("SELECT * FROM ${DbConstants.POST_TABLE} WHERE id = :id")
-    suspend fun getPostsWithAttachments(id: Long): List<PostWithAttachments>
+    suspend fun getPostWithAttachments(id: Long): PostWithAttachments
 }

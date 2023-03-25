@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
-import com.google.gson.Gson
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.MediaViewData
@@ -38,6 +37,8 @@ class CreatePostViewModel @Inject constructor(
 
     private val _decodeUrlResponse = MutableLiveData<LinkOGTagsViewData>()
     val decodeUrlResponse: LiveData<LinkOGTagsViewData> = _decodeUrlResponse
+
+    private var temporaryPostId: Long? = null
 
     private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: LiveData<String?> = _errorMessage
@@ -88,8 +89,14 @@ class CreatePostViewModel @Inject constructor(
             }
             if (fileUris != null) {
                 // if the post has upload-able attachments
+                temporaryPostId = System.currentTimeMillis()
+                val postId = temporaryPostId ?: 0
                 val updatedFileUris = includeAttachmentMetaData(context, fileUris)
-                val uploadData = startMediaUploadWorker(context, updatedFileUris)
+                val uploadData = startMediaUploadWorker(
+                    context,
+                    postId,
+                    updatedFileUris.size
+                )
 
                 // adds post data in local db
                 storePost(
@@ -127,7 +134,7 @@ class CreatePostViewModel @Inject constructor(
             if (fileUris == null) {
                 return@launchIO
             }
-            val temporaryPostId = System.currentTimeMillis()
+            val temporaryPostId = temporaryPostId ?: 0
             val thumbnailUri = fileUris.first().thumbnailUri
             val postEntity = ViewDataConverter.convertPost(
                 temporaryPostId,
@@ -196,10 +203,10 @@ class CreatePostViewModel @Inject constructor(
     @SuppressLint("EnqueueWork")
     private fun startMediaUploadWorker(
         context: Context,
-        attachments: List<SingleUriData>
+        postId: Long,
+        filesCount: Int
     ): Pair<WorkContinuation, String> {
-        val jsonAttachment = Gson().toJson(attachments)
-        val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(jsonAttachment)
+        val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
         val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }

@@ -6,8 +6,9 @@ import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import com.likeminds.feedsx.FeedSXApplication
-import com.likeminds.feedsx.media.model.SingleUriData
-import com.likeminds.feedsx.utils.ViewDataConverter
+import com.likeminds.feedsx.db.models.AttachmentEntity
+import com.likeminds.feedsx.utils.getIntOrNull
+import com.likeminds.feedsx.utils.getLongOrNull
 import com.likeminds.feedsx.utils.mediauploader.model.GenericFileRequest
 import com.likeminds.feedsx.utils.mediauploader.model.WORKER_FAILURE
 import com.likeminds.feedsx.utils.mediauploader.model.WORKER_RETRY
@@ -24,6 +25,7 @@ abstract class MediaUploadWorker(
 ) : CoroutineWorker(appContext, params) {
 
     protected val transferUtility by lazy { (appContext.applicationContext as FeedSXApplication).transferUtility }
+    protected val postRepository by lazy { (appContext.applicationContext as FeedSXApplication).postRepository }
 
     private val progressMap by lazy { HashMap<Int, Pair<Long, Long>>() }
     protected var uploadedCount = 0
@@ -104,8 +106,13 @@ abstract class MediaUploadWorker(
         }
     }
 
-    protected fun getStringParam(key: String): String {
-        return params.inputData.getString(key)
+    protected fun getLongParam(key: String): Long {
+        return params.inputData.getLongOrNull(key)
+            ?: throw Error("$key is required")
+    }
+
+    protected fun getIntParam(key: String): Int {
+        return params.inputData.getIntOrNull(key)
             ?: throw Error("$key is required")
     }
 
@@ -114,21 +121,22 @@ abstract class MediaUploadWorker(
     }
 
     protected fun createAWSRequestList(
-        attachmentsToUpload: List<SingleUriData>
+        attachmentsToUpload: List<AttachmentEntity>
     ): ArrayList<GenericFileRequest> {
         val awsFileRequestList = ArrayList<GenericFileRequest>()
         attachmentsToUpload.mapIndexed { index, attachment ->
+            val attachmentMeta = attachment.attachmentMeta
             val request = GenericFileRequest.Builder()
-                .name(attachment.mediaName)
-                .fileType(ViewDataConverter.convertFileType(attachment.fileType))
-                .awsFolderPath(attachment.awsFolderPath!!)
-                .localFilePath(attachment.localFilePath)
+                .name(attachmentMeta.name)
+                .fileType(attachment.attachmentType)
+                .awsFolderPath(attachmentMeta.awsFolderPath!!)
+                .localFilePath(attachmentMeta.localFilePath)
                 .index(index)
-                .width(attachment.width)
-                .height(attachment.height)
-                .pageCount(attachment.pdfPageCount)
-                .duration(attachment.duration)
-                .size(attachment.size)
+                .width(attachmentMeta.width)
+                .height(attachmentMeta.height)
+                .pageCount(attachmentMeta.pageCount)
+                .duration(attachmentMeta.duration)
+                .size(attachmentMeta.size)
                 .build()
             awsFileRequestList.add(request)
         }
