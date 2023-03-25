@@ -120,8 +120,62 @@ class FeedFragment :
                     mSwipeRefreshLayout.isRefreshing = false
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
+                is FeedViewModel.ErrorMessageEvent.LikePost -> {
+                    val postId = response.postId
+
+                    //get post and index
+                    val pair = getIndexAndPostFromAdapter(postId)
+                    val post = pair.second
+                    val index = pair.first
+
+                    //update post view data
+                    val updatedPost = post.toBuilder()
+                        .isLiked(false)
+                        .fromPostLiked(true)
+                        .likesCount(post.likesCount - 1)
+                        .build()
+
+                    //update recycler view
+                    mPostAdapter.update(index, updatedPost)
+
+                    //show error message
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                }
+                is FeedViewModel.ErrorMessageEvent.SavePost -> {
+                    val postId = response.postId
+
+                    //get post and index
+                    val pair = getIndexAndPostFromAdapter(postId)
+                    val post = pair.second
+                    val index = pair.first
+
+                    //update post view data
+                    val updatedPost = post.toBuilder()
+                        .isSaved(false)
+                        .fromPostSaved(true)
+                        .build()
+
+                    //update recycler view
+                    mPostAdapter.update(index, updatedPost)
+
+                    //show error message
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                }
             }
         }.observeInLifecycle(viewLifecycleOwner)
+    }
+
+    //get index and post from the adapter using postId
+    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
+        val index = mPostAdapter.items().indexOfFirst {
+            (it as PostViewData).id == postId
+        }
+
+        val post = mPostAdapter.items()[index] as PostViewData
+
+        return Pair(index, post)
     }
 
     // initiates SDK
@@ -322,26 +376,44 @@ class FeedFragment :
         }
     }
 
-    // TODO: add fromPostSaved key while adding post data to adapter
     override fun savePost(position: Int) {
-        //TODO: save post
+        //get item
         val item = mPostAdapter[position]
         if (item is PostViewData) {
+            //update the post view data
             val newViewData = item.toBuilder()
                 .fromPostSaved(true)
+                .isSaved(!item.isSaved)
                 .build()
+            //call api
+            viewModel.savePost(newViewData.id)
+
+            //update recycler
             mPostAdapter.update(position, newViewData)
         }
     }
 
-    // TODO: add fromPostLiked key while adding post data to adapter
     override fun likePost(position: Int) {
-        //TODO: like post
+        //get item
         val item = mPostAdapter[position]
         if (item is PostViewData) {
+            //new like count
+            val newLikesCount = if (item.isLiked) {
+                item.likesCount - 1
+            } else {
+                item.likesCount + 1
+            }
+
+            //update post view data
             val newViewData = item.toBuilder()
                 .fromPostLiked(true)
+                .isLiked(!item.isLiked)
+                .likesCount(newLikesCount)
                 .build()
+
+            //call api
+            viewModel.likePost(newViewData.id)
+            //update recycler
             mPostAdapter.update(position, newViewData)
         }
     }

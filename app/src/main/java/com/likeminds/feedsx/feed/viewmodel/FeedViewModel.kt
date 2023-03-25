@@ -13,6 +13,8 @@ import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
+import com.likeminds.likemindsfeed.post.model.LikePostRequest
+import com.likeminds.likemindsfeed.post.model.SavePostRequest
 import com.likeminds.likemindsfeed.sdk.model.User
 import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -43,6 +45,9 @@ class FeedViewModel @Inject constructor(
     sealed class ErrorMessageEvent {
         data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
         data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
+        data class LikePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
+
+        data class SavePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
     }
 
     companion object {
@@ -175,6 +180,40 @@ class FeedViewModel @Inject constructor(
             } else {
                 //for error
                 errorMessageChannel.send(ErrorMessageEvent.UniversalFeed(response.errorMessage))
+            }
+        }
+    }
+
+    //for like/unlike a post
+    fun likePost(postId: String) {
+        viewModelScope.launchIO {
+            val request = LikePostRequest.Builder()
+                .postId(postId)
+                .build()
+
+            //call like post api
+            val response = lmFeedClient.likePost(request)
+
+            //check for error
+            if (!response.success) {
+                errorMessageChannel.send(ErrorMessageEvent.LikePost(postId, response.errorMessage))
+            }
+        }
+    }
+
+    //for save/un-save a post
+    fun savePost(postId: String) {
+        viewModelScope.launchIO {
+            val request = SavePostRequest.Builder()
+                .postId(postId)
+                .build()
+
+            //call save post api
+            val response = lmFeedClient.savePost(request)
+
+            //check for error
+            if (!response.success) {
+                errorMessageChannel.send(ErrorMessageEvent.SavePost(postId, response.errorMessage))
             }
         }
     }
