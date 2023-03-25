@@ -351,8 +351,14 @@ object FileUtil {
         //TODO: use user_unique_id
         val userUniqueId = "6a4cc38e-02c7-4dfa-96b7-68a3078ad922"
         val fileNameWithoutExtension = fileName?.substringBeforeLast(".")
-        val extension = fileName?.substringAfterLast(".", "")
+        val extension = getFileExtensionFromFileName(fileName)
         return "post/$userUniqueId/" + fileNameWithoutExtension + "-" + System.currentTimeMillis() + "." + extension
+    }
+
+    fun getFileExtensionFromFileName(
+        fileName: String?
+    ): String? {
+        return fileName?.substringAfterLast(".", "")
     }
 }
 

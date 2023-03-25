@@ -6,6 +6,7 @@ import androidx.core.view.isVisible
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemCreatePostDocumentBinding
 import com.likeminds.feedsx.media.model.PDF
+import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -61,9 +62,10 @@ class ItemCreatePostDocumentViewDataBinder constructor(
                 R.string.placeholder_pages, noOfPage
             )
         }
-        if (!attachmentMeta.size.isNullOrEmpty()) {
+        if (attachmentMeta.size != null) {
+            val size = MediaUtils.getFileSizeText(attachmentMeta.size)
             binding.tvMeta2.show()
-            binding.tvMeta2.text = attachmentMeta.size
+            binding.tvMeta2.text = size
             if (binding.tvMeta1.isVisible) {
                 binding.viewMetaDot1.show()
             }

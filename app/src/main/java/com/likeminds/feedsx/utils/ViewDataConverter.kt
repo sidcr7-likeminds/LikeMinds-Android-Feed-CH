@@ -8,7 +8,6 @@ import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
-import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
@@ -48,9 +47,10 @@ object ViewDataConverter {
                 AttachmentMetaViewData.Builder()
                     .name(singleUriData.mediaName)
                     .uri(singleUriData.uri)
-                    .duration(singleUriData.duration.toString())
+                    .duration(singleUriData.duration)
+                    .format(singleUriData.format)
                     .pageCount(singleUriData.pdfPageCount)
-                    .size(MediaUtils.getFileSizeText(singleUriData.size))
+                    .size(singleUriData.size)
                     .build()
             )
             .build()
@@ -87,19 +87,18 @@ object ViewDataConverter {
             .build()
     }
 
-    // TODO: handle fields
     private fun convertAttachmentMeta(
         attachmentMeta: AttachmentMetaViewData
     ): AttachmentMeta {
         return AttachmentMeta.Builder().name(attachmentMeta.name)
             .ogTags(convertOGTags(attachmentMeta.ogTags))
             .url(attachmentMeta.url)
-//            .size((attachmentMeta.size))
-//            .duration(attachmentMeta.duration)
+            .size(attachmentMeta.size)
+            .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .format(attachmentMeta.format)
-//            .height()
-//            .width()
+            .height(attachmentMeta.height)
+            .width(attachmentMeta.width)
             .build()
     }
 
@@ -127,8 +126,8 @@ object ViewDataConverter {
     // converts LinkOGTags view data model to network model
     private fun convertOGTags(
         linkOGTagsViewData: LinkOGTagsViewData
-    ): com.likeminds.likemindsfeed.post.model.LinkOGTags {
-        return com.likeminds.likemindsfeed.post.model.LinkOGTags.Builder()
+    ): LinkOGTags {
+        return LinkOGTags.Builder()
             .title(linkOGTagsViewData.title)
             .image(linkOGTagsViewData.image)
             .description(linkOGTagsViewData.description)
@@ -259,8 +258,8 @@ object ViewDataConverter {
             .name(attachmentMeta.name)
             .url(attachmentMeta.url)
             .format(attachmentMeta.format)
-            .size(MediaUtils.getFileSizeText(attachmentMeta.size ?: 0L))
-            .duration(MediaUtils.formatSeconds(attachmentMeta.duration ?: 0))
+            .size(attachmentMeta.size)
+            .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
             .width(attachmentMeta.width)
@@ -321,7 +320,7 @@ object ViewDataConverter {
             .build()
     }
 
-    fun convertAttachmentMeta(
+    private fun convertAttachmentMeta(
         singleUriData: SingleUriData
     ): AttachmentMetaEntity {
         val url = String(
@@ -334,8 +333,9 @@ object ViewDataConverter {
             .url(url)
             .uri(singleUriData.uri.toString())
             .pageCount(singleUriData.pdfPageCount)
-            .size(MediaUtils.getFileSizeText(singleUriData.size))
-            .duration(singleUriData.duration.toString())
+            .size(singleUriData.size)
+            .duration(singleUriData.duration)
+            .format(singleUriData.format)
             .build()
     }
 
@@ -391,6 +391,7 @@ object ViewDataConverter {
             .name(attachmentMeta.name)
             .size(attachmentMeta.size)
             .duration(attachmentMeta.duration)
+            .format(attachmentMeta.format)
             .uri(Uri.parse(attachmentMeta.uri))
             .build()
     }

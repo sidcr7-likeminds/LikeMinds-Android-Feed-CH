@@ -14,10 +14,8 @@ import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
-import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
-import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
 import com.likeminds.likemindsfeed.sdk.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,6 +42,8 @@ class FeedViewModel @Inject constructor(
 
     sealed class ErrorMessageEvent {
         data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
+
+        data class AddPost(val errorMessage: String?): ErrorMessageEvent()
     }
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)

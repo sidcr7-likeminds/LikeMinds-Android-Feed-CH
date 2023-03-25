@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.*
+import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.posttypes.model.*
@@ -38,7 +39,7 @@ object PostTypeUtil {
     private const val SHOW_MORE_COUNT = 2
 
     // initializes author data frame on the post
-    fun initAuthorFrame(
+    private fun initAuthorFrame(
         binding: LayoutAuthorFrameBinding,
         data: PostViewData,
         overflowMenu: OverflowMenuPopup
@@ -132,9 +133,9 @@ object PostTypeUtil {
                 R.string.placeholder_pages, noOfPage
             )
         }
-        if (!attachmentMeta.size.isNullOrEmpty()) {
+        if (attachmentMeta.size != null) {
             binding.tvMeta2.show()
-            binding.tvMeta2.text = attachmentMeta.size
+            binding.tvMeta2.text = MediaUtils.getFileSizeText(attachmentMeta.size)
             if (binding.tvMeta1.isVisible) {
                 binding.viewMetaDot1.show()
             }
@@ -241,7 +242,7 @@ object PostTypeUtil {
     }
 
     // handles the text content of each post
-    fun initTextContent(
+    private fun initTextContent(
         tvPostContent: TextView,
         data: PostViewData,
         itemPosition: Int,
@@ -444,7 +445,7 @@ object PostTypeUtil {
     }
 
     // performs action when member tag is clicked
-    fun onMemberTagClicked() {
+    private fun onMemberTagClicked() {
         // TODO: Change Implementation
     }
 

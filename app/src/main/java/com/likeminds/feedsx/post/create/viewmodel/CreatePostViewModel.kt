@@ -182,8 +182,10 @@ class CreatePostViewModel @Inject constructor(
                 }
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
+                    val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
                     builder
                         .thumbnailUri(thumbnailUri)
+                        .format(format)
                         .build()
                 }
             }

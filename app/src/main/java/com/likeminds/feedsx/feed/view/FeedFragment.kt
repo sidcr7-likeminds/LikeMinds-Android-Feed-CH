@@ -30,9 +30,9 @@ import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
+import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
@@ -48,9 +48,6 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.observeInLifecycle
-import com.likeminds.likemindsfeed.LMResponse
-import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
-import com.likeminds.likemindsfeed.post.model.AddPostResponse
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 import java.util.*
@@ -95,15 +92,6 @@ class FeedFragment :
             observeUserResponse(response)
         }
 
-        // observes error events
-        viewModel.errorEventFlow.onEach { response ->
-            when (response) {
-                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
-                    ViewUtils.showSomethingWentWrongToast(requireContext())
-                }
-            }
-        }
-
         // observes logoutResponse LiveData
         viewModel.logoutResponse.observe(viewLifecycleOwner) {
             Log.d(
@@ -113,14 +101,30 @@ class FeedFragment :
             showInvalidAccess()
         }
 
+        observeErrors()
         observePosting()
     }
 
     override fun onResume() {
         super.onResume()
 
-        initPostingView()
+        removePostingView()
         viewModel.checkPosting()
+    }
+
+    // observes error events
+    private fun observeErrors() {
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is FeedViewModel.ErrorMessageEvent.AddPost -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                    removePostingView()
+                }
+            }
+        }
     }
 
     private fun observePosting() {
@@ -136,6 +140,7 @@ class FeedFragment :
                             ivPostThumbnail.show()
                             ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
                         }
+                        postingProgress.progress = 0
                         postingProgress.show()
                         ivPosted.hide()
                         observeMediaUpload(post)
@@ -144,8 +149,8 @@ class FeedFragment :
                 }
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
-                        layoutPosting.root.hide()
-                        newPostButton.show()
+                        mPostAdapter.add(response.post)
+                        removePostingView()
                     }
                 }
             }
@@ -168,8 +173,11 @@ class FeedFragment :
         setUserImage(user)
     }
 
-    private fun initPostingView() {
-        binding.layoutPosting.root.hide()
+    private fun removePostingView() {
+        binding.apply {
+            layoutPosting.root.hide()
+            newPostButton.show()
+        }
     }
 
     private fun observeMediaUpload(postingData: PostViewData) {
@@ -207,17 +215,13 @@ class FeedFragment :
             }
             else -> {
                 val progress = MediaUploadWorker.getProgress(workInfo) ?: return
-                Log.d("PUI", "observeMediaWorker: $progress")
                 binding.layoutPosting.apply {
-                    val progressValue = (progress.first / progress.second).toInt()
+                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
+                    val progressValue = percentage.toInt()
                     postingProgress.progress = progressValue
                 }
             }
         }
-    }
-
-    private fun observeAddPostResponse(response: AddPostResponse) {
-        // TODO: add item in feed list
     }
 
     // shows invalid access error and logs out invalid user
