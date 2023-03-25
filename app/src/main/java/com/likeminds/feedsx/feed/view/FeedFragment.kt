@@ -30,22 +30,24 @@ import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
-import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.post.view.CreatePostActivity
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
-import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
+import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
+import com.likeminds.feedsx.utils.observeInLifecycle
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.post.model.AddPostResponse
@@ -64,7 +66,7 @@ class FeedFragment :
     private val viewModel: FeedViewModel by viewModels()
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
-    private lateinit var mPostAdapter: PostAdapter
+    lateinit var mPostAdapter: PostAdapter
 
     private var communityId: String = ""
     private var communityName: String = ""
@@ -88,8 +90,27 @@ class FeedFragment :
     override fun observeData() {
         super.observeData()
 
-        viewModel.initiateUserResponse.observe(viewLifecycleOwner) { response ->
-            observeInitiateUserResponse(response)
+        // observes userResponse LiveData
+        viewModel.userResponse.observe(viewLifecycleOwner) { response ->
+            observeUserResponse(response)
+        }
+
+        // observes error events
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
+                    ViewUtils.showSomethingWentWrongToast(requireContext())
+                }
+            }
+        }
+
+        // observes logoutResponse LiveData
+        viewModel.logoutResponse.observe(viewLifecycleOwner) {
+            Log.d(
+                LOG_TAG,
+                "initiate api sdk called -> success and have not app access"
+            )
+            showInvalidAccess()
         }
 
         observePosting()
@@ -141,38 +162,14 @@ class FeedFragment :
         )
     }
 
-    private fun initPostingView() {
-        binding.layoutPosting.root.hide()
+    // observes user response from InitiateUser
+    private fun observeUserResponse(user: UserViewData?) {
+        initToolbar()
+        setUserImage(user)
     }
 
-    // observes initiate user response
-    private fun observeInitiateUserResponse(response: LMResponse<InitiateUserResponse>) {
-        if (response.success) {
-            val data = response.data
-            if (data != null) {
-                if (data.logoutResponse != null) {
-                    Log.d(
-                        LOG_TAG,
-                        "initiate api sdk called -> success and have not app access"
-                    )
-                    showInvalidAccess()
-                } else {
-                    communityId = data.community?.id ?: ""
-                    communityName = data.community?.name ?: ""
-
-                    accessToken = data.accessToken ?: ""
-                    refreshToken = data.refreshToken ?: ""
-
-                    initToolbar()
-                    val user = ViewDataConverter.convertUser(data.user)
-                    setUserImage(user)
-                }
-            } else {
-                ViewUtils.showSomethingWentWrongToast(requireContext())
-            }
-        } else {
-            ViewUtils.showSomethingWentWrongToast(requireContext())
-        }
+    private fun initPostingView() {
+        binding.layoutPosting.root.hide()
     }
 
     private fun observeMediaUpload(postingData: PostViewData) {
@@ -306,6 +303,30 @@ class FeedFragment :
 
     //TODO: Call api and refresh the feed data
     private fun fetchRefreshedData() {
+        //TODO: testing data
+
+        val text =
+            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
+        mPostAdapter.add(
+            0,
+            PostViewData.Builder()
+                .attachments(
+                    listOf(
+                        AttachmentViewData.Builder()
+                            .attachmentType(IMAGE)
+                            .attachmentMeta(
+                                AttachmentMetaViewData.Builder()
+                                    .url("https://www.shutterstock.com/image-vector/sample-red-square-grunge-stamp-260nw-338250266.jpg")
+                                    .build()
+                            )
+                            .build()
+                    )
+                )
+                .id("5")
+                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
+                .text(text)
+                .build()
+        )
         mSwipeRefreshLayout.isRefreshing = false
     }
 
