@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.utils.mediauploader
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkInfo
@@ -27,7 +26,7 @@ abstract class MediaUploadWorker(
     protected val transferUtility by lazy { (appContext.applicationContext as FeedSXApplication).transferUtility }
 
     private val progressMap by lazy { HashMap<Int, Pair<Long, Long>>() }
-    private var uploadedCount = 0
+    protected var uploadedCount = 0
     protected val failedIndex by lazy { ArrayList<Int>() }
     protected lateinit var uploadList: ArrayList<GenericFileRequest>
 
@@ -119,7 +118,6 @@ abstract class MediaUploadWorker(
     ): ArrayList<GenericFileRequest> {
         val awsFileRequestList = ArrayList<GenericFileRequest>()
         attachmentsToUpload.mapIndexed { index, attachment ->
-            Log.d("PUI", "createAWSRequestList: ${attachment.awsFolderPath}")
             val request = GenericFileRequest.Builder()
                 .name(attachment.mediaName)
                 .fileType(ViewDataConverter.convertFileType(attachment.fileType))
@@ -143,10 +141,8 @@ abstract class MediaUploadWorker(
     ) {
         if (totalFilesToUpload == uploadedCount + failedIndex.size) {
             if (totalFilesToUpload == uploadedCount) {
-                Log.d("PUI", "checkWorkerComplete: ")
                 continuation.resume(WORKER_SUCCESS)
             } else {
-                Log.d("PUI", "checkWorkerComplete: failed")
                 continuation.resume(WORKER_FAILURE)
             }
         }

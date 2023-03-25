@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.create.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
@@ -16,7 +15,7 @@ import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
-import com.likeminds.feedsx.posttypes.model.LinkOGTags
+import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -37,14 +36,14 @@ class CreatePostViewModel @Inject constructor(
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    private val _decodeUrlResponse = MutableLiveData<LinkOGTags>()
-    val decodeUrlResponse: LiveData<LinkOGTags> = _decodeUrlResponse
+    private val _decodeUrlResponse = MutableLiveData<LinkOGTagsViewData>()
+    val decodeUrlResponse: LiveData<LinkOGTagsViewData> = _decodeUrlResponse
 
     private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: LiveData<String?> = _errorMessage
 
-    private val _addPostResponse = MutableLiveData<Boolean>()
-    val addPostResponse: LiveData<Boolean> = _addPostResponse
+    private val _postAdded = MutableLiveData<Boolean>()
+    val postAdded: LiveData<Boolean> = _postAdded
 
     fun fetchUriDetails(
         context: Context,
@@ -68,7 +67,7 @@ class CreatePostViewModel @Inject constructor(
             // processes link og tags if API call was successful
             val data = response.data ?: return
             val ogTags = data.ogTags
-            _decodeUrlResponse.postValue(ViewDataConverter.convertOGTags(ogTags))
+            _decodeUrlResponse.postValue(ViewDataConverter.convertLinkOGTags(ogTags))
         } else {
             // posts error message if API call failed
             _errorMessage.postValue(response.errorMessage)
@@ -80,7 +79,7 @@ class CreatePostViewModel @Inject constructor(
         context: Context,
         postTextContent: String?,
         fileUris: List<SingleUriData>? = null,
-        ogTags: LinkOGTags? = null
+        ogTags: LinkOGTagsViewData? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
@@ -98,7 +97,6 @@ class CreatePostViewModel @Inject constructor(
                     updatedText,
                     updatedFileUris
                 )
-                Log.d("PUI", "addPost: ${uploadData.second}")
                 uploadData.first.enqueue()
             } else {
                 // if the post does not have any upload-able attachments
@@ -111,7 +109,7 @@ class CreatePostViewModel @Inject constructor(
                 val request = requestBuilder.build()
                 val response = lmFeedClient.addPost(request)
                 if (response.success) {
-                    _addPostResponse.postValue(true)
+                    _postAdded.postValue(true)
                 } else {
                     _errorMessage.postValue(response.errorMessage)
                 }
@@ -145,6 +143,7 @@ class CreatePostViewModel @Inject constructor(
             }
             // add it to local db
             postRepository.insertPostWithAttachments(postEntity, attachments)
+            _postAdded.postValue(true)
         }
     }
 

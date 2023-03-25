@@ -17,8 +17,12 @@ class PostRepository @Inject constructor(
         postDao.updatePost(post)
     }
 
+    suspend fun updateIsPosted(id: Long, isPosted: Boolean) {
+        postDao.updateIsPosted(id, isPosted)
+    }
+
     suspend fun deletePost(post: PostEntity) {
-        postDao.updatePost(post)
+        postDao.deletePost(post)
     }
 
     suspend fun getLatestPostWithAttachments(): PostWithAttachments? {

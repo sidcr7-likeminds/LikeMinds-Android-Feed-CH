@@ -157,7 +157,6 @@ class PostAttachmentUploadWorker(
             }
 
             override fun onProgressChanged(id: Int, bytesCurrent: Long, bytesTotal: Long) {
-                Log.d("PUI", "onStateChanged: bytes $bytesCurrent")
                 setProgress(id, bytesCurrent, bytesTotal)
             }
 
@@ -186,10 +185,11 @@ class PostAttachmentUploadWorker(
                 //TODO : Uploading completed.
                 Log.d(
                     "PUI", """
-                    onStateChanged: uploaded $response
                     url: $downloadUri
                 """.trimIndent()
                 )
+                uploadedCount += 1
+                checkWorkerComplete(totalFilesToUpload, continuation)
             }
             TransferState.FAILED -> {
                 failedIndex.add(response.index)

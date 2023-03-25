@@ -9,8 +9,8 @@ import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachments
 import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
+import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -18,9 +18,10 @@ import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
-import com.likeminds.likemindsfeed.post.model.AddPostResponse
 import com.likeminds.likemindsfeed.sdk.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,15 +33,19 @@ class FeedViewModel @Inject constructor(
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
+    private var temporaryPostId: Long? = null
+
     private val _initiateUserResponse = MutableLiveData<LMResponse<InitiateUserResponse>>()
     val initiateUserResponse: LiveData<LMResponse<InitiateUserResponse>> = _initiateUserResponse
 
-    // TODO make a flow with _postingData and also set isPosted to true in db
-    private val _addPostResponse = MutableLiveData<AddPostResponse>()
-    val addPostResponse: LiveData<AddPostResponse> = _addPostResponse
+    sealed class PostDataEvent {
+        data class PostDbData(val post: PostViewData) : PostDataEvent()
 
-    private val _postingData = MutableLiveData<PostViewData>()
-    val postingData: LiveData<PostViewData> = _postingData
+        data class PostResponseData(val post: PostViewData) : PostDataEvent()
+    }
+
+    private val postDataEventChannel = Channel<PostDataEvent>(Channel.BUFFERED)
+    val postDataEventFlow = postDataEventChannel.receiveAsFlow()
 
     private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: LiveData<String?> = _errorMessage
@@ -88,7 +93,7 @@ class FeedViewModel @Inject constructor(
         if (user == null) return
         viewModelScope.launchIO {
             //convert user into userEntity
-            val userEntity = ViewDataConverter.convertUser(user)
+            val userEntity = ViewDataConverter.convertUserEntity(user)
             //add it to local db
             userRepository.insertUser(userEntity)
 
@@ -139,7 +144,8 @@ class FeedViewModel @Inject constructor(
             if (postWithAttachments == null || postWithAttachments.post.isPosted) {
                 return@launchIO
             } else {
-                _postingData.postValue(convertPost(postWithAttachments))
+                temporaryPostId = postWithAttachments.post.id
+                postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
             }
         }
     }
@@ -149,16 +155,27 @@ class FeedViewModel @Inject constructor(
         viewModelScope.launchIO {
             val request = AddPostRequest.Builder()
                 .text(postingData.text)
-                .attachments(convertAttachments(postingData.attachments))
+                .attachments(createAttachments(postingData.attachments))
                 .build()
 
             val response = lmFeedClient.addPost(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
-                _addPostResponse.postValue(data)
+                postDataEventChannel.send(
+                    PostDataEvent.PostResponseData(
+                        convertPost(
+                            data.post,
+                            data.users
+                        )
+                    )
+                )
             } else {
                 // TODO: flow error message
             }
+
+            //set isPosted in db to true
+            val id = temporaryPostId ?: 0
+            postRepository.updateIsPosted(id, true)
         }
     }
 }

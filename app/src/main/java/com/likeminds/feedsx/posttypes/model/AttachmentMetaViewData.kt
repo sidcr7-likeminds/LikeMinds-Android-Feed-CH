@@ -13,7 +13,9 @@ class AttachmentMetaViewData private constructor(
     val size: String?,
     val duration: String?,
     val pageCount: Int?,
-    val ogTags: LinkOGTags,
+    val ogTags: LinkOGTagsViewData,
+    var width: Int?,
+    var height: Int?
 ) : Parcelable {
 
     class Builder {
@@ -24,7 +26,9 @@ class AttachmentMetaViewData private constructor(
         private var size: String? = null
         private var duration: String? = null
         private var pageCount: Int? = null
-        private var ogTags: LinkOGTags = LinkOGTags.Builder().build()
+        private var ogTags: LinkOGTagsViewData = LinkOGTagsViewData.Builder().build()
+        private var width: Int? = null
+        private var height: Int? = null
 
         fun name(name: String?) = apply { this.name = name }
         fun url(url: String?) = apply { this.url = url }
@@ -33,7 +37,9 @@ class AttachmentMetaViewData private constructor(
         fun size(size: String?) = apply { this.size = size }
         fun duration(duration: String?) = apply { this.duration = duration }
         fun pageCount(pageCount: Int?) = apply { this.pageCount = pageCount }
-        fun ogTags(ogTags: LinkOGTags) = apply { this.ogTags = ogTags }
+        fun ogTags(ogTags: LinkOGTagsViewData) = apply { this.ogTags = ogTags }
+        fun width(width: Int?) = apply { this.width = width }
+        fun height(height: Int?) = apply { this.height = height }
 
         fun build() = AttachmentMetaViewData(
             name,
@@ -43,7 +49,9 @@ class AttachmentMetaViewData private constructor(
             size,
             duration,
             pageCount,
-            ogTags
+            ogTags,
+            width,
+            height
         )
     }
 
@@ -57,5 +65,7 @@ class AttachmentMetaViewData private constructor(
             .duration(duration)
             .pageCount(pageCount)
             .ogTags(ogTags)
+            .width(width)
+            .height(height)
     }
 }

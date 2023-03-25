@@ -9,14 +9,13 @@ import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
-import com.likeminds.likemindsfeed.post.model.Attachment
-import com.likeminds.likemindsfeed.post.model.AttachmentMeta
-import com.likeminds.likemindsfeed.post.model.Like
+import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
 
 object ViewDataConverter {
@@ -71,7 +70,7 @@ object ViewDataConverter {
      * View Data Model -> Network Model
     --------------------------------*/
 
-    fun convertAttachments(
+    fun createAttachments(
         attachments: List<AttachmentViewData>
     ): List<Attachment> {
         return attachments.map {
@@ -89,7 +88,7 @@ object ViewDataConverter {
     }
 
     // TODO: handle fields
-    fun convertAttachmentMeta(
+    private fun convertAttachmentMeta(
         attachmentMeta: AttachmentMetaViewData
     ): AttachmentMeta {
         return AttachmentMeta.Builder().name(attachmentMeta.name)
@@ -106,34 +105,34 @@ object ViewDataConverter {
 
     // creates attachment list of Network Model for link attachment
     fun convertAttachments(
-        linkOGTags: LinkOGTags
+        linkOGTagsViewData: LinkOGTagsViewData
     ): List<Attachment> {
         return listOf(
             Attachment.Builder()
                 .attachmentType(LINK)
-                .attachmentMeta(convertAttachmentMeta(linkOGTags))
+                .attachmentMeta(convertAttachmentMeta(linkOGTagsViewData))
                 .build()
         )
     }
 
     // creates AttachmentMeta Network Model for link attachment meta
     private fun convertAttachmentMeta(
-        linkOGTags: LinkOGTags
+        linkOGTagsViewData: LinkOGTagsViewData
     ): AttachmentMeta {
         return AttachmentMeta.Builder()
-            .ogTags(convertOGTags(linkOGTags))
+            .ogTags(convertOGTags(linkOGTagsViewData))
             .build()
     }
 
     // converts LinkOGTags view data model to network model
     private fun convertOGTags(
-        linkOGTags: LinkOGTags
+        linkOGTagsViewData: LinkOGTagsViewData
     ): com.likeminds.likemindsfeed.post.model.LinkOGTags {
         return com.likeminds.likemindsfeed.post.model.LinkOGTags.Builder()
-            .title(linkOGTags.title)
-            .image(linkOGTags.image)
-            .description(linkOGTags.description)
-            .url(linkOGTags.url)
+            .title(linkOGTagsViewData.title)
+            .image(linkOGTagsViewData.image)
+            .description(linkOGTagsViewData.description)
+            .url(linkOGTagsViewData.url)
             .build()
     }
 
@@ -159,29 +158,126 @@ object ViewDataConverter {
             .build()
     }
 
+    private fun createDeletedUser(): UserViewData {
+        val tempUserId = (System.currentTimeMillis() / 1000).toInt()
+        return UserViewData.Builder()
+            .id(tempUserId)
+            .name("Deleted User")
+            .imageUrl("")
+            .userUniqueId("$tempUserId")
+            .customTitle(null)
+            .isGuest(false)
+            .isDeleted(true)
+            .build()
+    }
+
     // converts Like network model to view data model
     fun convertLikes(
         like: Like,
         users: Map<String, User>
     ): LikeViewData {
+        val likeCreator = like.userId
+        val user = users[likeCreator]
+        val userViewData = if (user == null) {
+            createDeletedUser()
+        } else {
+            convertUser(user)
+        }
+
         return LikeViewData.Builder()
             .id(like.id)
             .userId(like.userId)
             .createdAt(like.createdAt)
             .updatedAt(like.updatedAt)
-            .user(convertUser(users[like.userId]))
+            .user(userViewData)
             .build()
     }
 
-    // converts LinkOGTags network model to view data model
-    fun convertOGTags(
-        linkOGTags: com.likeminds.likemindsfeed.post.model.LinkOGTags
-    ): LinkOGTags {
-        return LinkOGTags.Builder()
+    fun convertPost(
+        post: Post,
+        users: Map<String, User>
+    ): PostViewData {
+        val postCreator = post.userId
+        val user = users[postCreator]
+        val postId = post.id
+        val userViewData = if (user == null) {
+            createDeletedUser()
+        } else {
+            convertUser(user)
+        }
+
+        return PostViewData.Builder()
+            .id(post.id)
+            .text(post.text)
+            .communityId(post.communityId)
+            .isPinned(post.isPinned)
+            .isSaved(post.isSaved)
+            .isLiked(post.isLiked)
+            .menuItems(convertOverflowMenuItems(post.menuItems, postId))
+            .attachments(convertAttachments(post.attachments))
+            .userId(postCreator)
+            .likesCount(post.likesCount)
+            .commentsCount(post.commentsCount)
+            .createdAt(post.createdAt)
+            .updatedAt(post.updatedAt)
+            .user(userViewData)
+            .build()
+    }
+
+    private fun convertOverflowMenuItems(
+        menuItems: List<MenuItem>,
+        entityId: String
+    ): List<OverflowMenuItemViewData> {
+        return menuItems.map { menuItem ->
+            OverflowMenuItemViewData.Builder()
+                .title(menuItem.title)
+                .entityId(entityId)
+                .build()
+        }
+    }
+
+    /**
+     * convert list of [Attachment] to list of [AttachmentViewData]
+     * @param attachments: list of [Attachment]
+     **/
+    private fun convertAttachments(attachments: List<Attachment>?): List<AttachmentViewData> {
+        if (attachments == null) return emptyList()
+        return attachments.map { attachment ->
+            AttachmentViewData.Builder()
+                .attachmentType(attachment.attachmentType)
+                .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+                .build()
+        }
+    }
+
+    /**
+     * convert [AttachmentMeta] to [AttachmentMetaViewData]
+     * @param attachmentMeta: object of [AttachmentMeta]
+     **/
+    private fun convertAttachmentMeta(attachmentMeta: AttachmentMeta): AttachmentMetaViewData {
+        return AttachmentMetaViewData.Builder()
+            .name(attachmentMeta.name)
+            .url(attachmentMeta.url)
+            .format(attachmentMeta.format)
+            .size(MediaUtils.getFileSizeText(attachmentMeta.size ?: 0L))
+            .duration(MediaUtils.formatSeconds(attachmentMeta.duration ?: 0))
+            .pageCount(attachmentMeta.pageCount)
+            .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
+            .width(attachmentMeta.width)
+            .height(attachmentMeta.height)
+            .build()
+    }
+
+    /**
+     * convert [LinkOGTagsViewData] to [LinkOGTagsViewData]
+     * @param linkOGTags: object of [LinkOGTagsViewData]
+     **/
+    fun convertLinkOGTags(linkOGTags: LinkOGTags): LinkOGTagsViewData {
+        return LinkOGTagsViewData.Builder()
+            .url(linkOGTags.url)
+            .description(linkOGTags.description)
             .title(linkOGTags.title)
             .image(linkOGTags.image)
-            .description(linkOGTags.description)
-            .url(linkOGTags.url)
             .build()
     }
 
@@ -247,7 +343,7 @@ object ViewDataConverter {
      * Network Model -> Db Model
     --------------------------------*/
 
-    fun convertUser(user: User): UserEntity {
+    fun convertUserEntity(user: User): UserEntity {
         return UserEntity.Builder()
             .id(user.id)
             .imageUrl(user.imageUrl)
@@ -284,7 +380,7 @@ object ViewDataConverter {
 
     fun convertAttachment(attachment: AttachmentEntity): AttachmentViewData {
         return AttachmentViewData.Builder()
-            .dynamicViewType(attachment.attachmentType)
+            .attachmentType(attachment.attachmentType)
             .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
             .build()
     }

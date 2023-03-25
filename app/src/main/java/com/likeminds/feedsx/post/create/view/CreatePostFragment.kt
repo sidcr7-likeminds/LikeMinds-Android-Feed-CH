@@ -26,7 +26,7 @@ import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
-import com.likeminds.feedsx.posttypes.model.LinkOGTags
+import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
@@ -34,7 +34,6 @@ import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +51,7 @@ class CreatePostFragment :
     private val viewModel: CreatePostViewModel by viewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
-    private var ogTags: LinkOGTags? = null
+    private var ogTags: LinkOGTagsViewData? = null
 
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
@@ -81,9 +80,8 @@ class CreatePostFragment :
                         selectedMediaUris,
                         ogTags
                     )
-                    requireActivity().finish()
                 } else {
-                    //todo: create post activity finish
+                    //todo: add loader on post button
                     viewModel.addPost(
                         requireContext(),
                         text,
@@ -116,9 +114,8 @@ class CreatePostFragment :
         // TODO: add post error
 
         // observes addPostResponse, once post is created
-        viewModel.addPostResponse.observe(viewLifecycleOwner) {
+        viewModel.postAdded.observe(viewLifecycleOwner) {
             // TODO: show the post
-            showShortToast(requireContext(), getString(R.string.post_created))
             requireActivity().finish()
         }
     }
@@ -347,7 +344,7 @@ class CreatePostFragment :
     }
 
     // renders data in the link view
-    private fun initLinkView(data: LinkOGTags) {
+    private fun initLinkView(data: LinkOGTagsViewData) {
         binding.linkPreview.apply {
             root.show()
 

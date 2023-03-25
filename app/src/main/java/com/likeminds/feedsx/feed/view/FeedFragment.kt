@@ -41,10 +41,7 @@ import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
-import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -53,6 +50,7 @@ import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.post.model.AddPostResponse
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.onEach
 import java.util.*
 
 
@@ -94,31 +92,43 @@ class FeedFragment :
             observeInitiateUserResponse(response)
         }
 
-        viewModel.postingData.observe(viewLifecycleOwner) { data ->
-            observePostingData(data)
-        }
-
-        viewModel.addPostResponse.observe(viewLifecycleOwner) { response ->
-            observeAddPostResponse(response)
-        }
-
-//        viewModel.workerState.observe(viewLifecycleOwner) { workInfo ->
-//            when (workInfo.state) {
-//                WorkInfo.State.SUCCEEDED -> TODO()
-//                WorkInfo.State.FAILED -> TODO()
-//                WorkInfo.State.CANCELLED -> TODO()
-//                else -> {
-//                    val progress = MediaUploadWorker.getProgress(workInfo)
-//
-//                }
-//            }
-//        }
+        observePosting()
     }
 
     override fun onResume() {
         super.onResume()
 
+        initPostingView()
         viewModel.checkPosting()
+    }
+
+    private fun observePosting() {
+        viewModel.postDataEventFlow.onEach { response ->
+            when (response) {
+                is FeedViewModel.PostDataEvent.PostDbData -> {
+                    val post = response.post
+                    binding.layoutPosting.apply {
+                        root.show()
+                        if (post.thumbnail.isNullOrEmpty()) {
+                            ivPostThumbnail.hide()
+                        } else {
+                            ivPostThumbnail.show()
+                            ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
+                        }
+                        postingProgress.show()
+                        ivPosted.hide()
+                        observeMediaUpload(post)
+                    }
+                    binding.newPostButton.hide()
+                }
+                is FeedViewModel.PostDataEvent.PostResponseData -> {
+                    binding.apply {
+                        layoutPosting.root.hide()
+                        newPostButton.show()
+                    }
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
     }
 
     // initiates SDK
@@ -129,6 +139,10 @@ class FeedFragment :
             "Ishaan",
             false
         )
+    }
+
+    private fun initPostingView() {
+        binding.layoutPosting.root.hide()
     }
 
     // observes initiate user response
@@ -161,25 +175,11 @@ class FeedFragment :
         }
     }
 
-    private fun observePostingData(postingData: PostViewData) {
-        binding.layoutPosting.apply {
-            root.show()
-            if (postingData.thumbnail.isNullOrEmpty()) {
-                ivPostThumbnail.hide()
-            } else {
-                ivPostThumbnail.show()
-                ivPostThumbnail.setImageURI(Uri.parse(postingData.thumbnail))
-            }
-            observeMediaUpload(postingData)
-        }
-    }
-
     private fun observeMediaUpload(postingData: PostViewData) {
         if (postingData.uuid.isEmpty()) {
             return
         }
         val uuid = UUID.fromString(postingData.uuid)
-        Log.d("PUI", "observeMediaUpload uuid: $uuid")
         if (!workersMap.contains(uuid)) {
             workersMap.add(uuid)
             WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)

@@ -92,8 +92,8 @@ object PostDiffUtilHelper {
     }
 
     fun linkOGTagsViewData(
-        oldItem: LinkOGTags,
-        newItem: LinkOGTags
+        oldItem: LinkOGTagsViewData,
+        newItem: LinkOGTagsViewData
     ): Boolean {
         return oldItem.url == newItem.url
                 && oldItem.description == newItem.description

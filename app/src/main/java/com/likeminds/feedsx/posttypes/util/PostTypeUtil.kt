@@ -401,7 +401,7 @@ object PostTypeUtil {
     // handles link view in the post
     fun initLinkView(
         binding: ItemPostLinkBinding,
-        data: LinkOGTags
+        data: LinkOGTagsViewData
     ) {
         val isYoutubeLink = data.url?.isValidYoutubeLink() == true
         binding.tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
