@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.utils.mediauploader
 
 import android.content.Context
+import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkInfo
@@ -61,6 +62,7 @@ abstract class MediaUploadWorker(
             val result = suspendCoroutine<Int> { continuation ->
                 uploadFiles(continuation)
             }
+            Log.d("PUI", "doWork: called $result")
             return@withContext when (result) {
                 WORKER_SUCCESS -> {
                     Result.success()
@@ -68,7 +70,11 @@ abstract class MediaUploadWorker(
                 WORKER_RETRY -> {
                     Result.retry()
                 }
+                WORKER_FAILURE -> {
+                    getFailureResult(failedIndex.toIntArray())
+                }
                 else -> {
+                    Log.d("TAG", "doWork: ff")
                     getFailureResult(failedIndex.toIntArray())
                 }
             }
@@ -149,8 +155,10 @@ abstract class MediaUploadWorker(
     ) {
         if (totalFilesToUpload == uploadedCount + failedIndex.size) {
             if (totalFilesToUpload == uploadedCount) {
+                Log.d("PUI", "success")
                 continuation.resume(WORKER_SUCCESS)
             } else {
+                Log.d("PUI", "failure")
                 continuation.resume(WORKER_FAILURE)
             }
         }

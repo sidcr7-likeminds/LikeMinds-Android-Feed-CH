@@ -370,7 +370,7 @@ object ViewDataConverter {
         val post = postWithAttachments.post
         val attachments = postWithAttachments.attachments
         return PostViewData.Builder()
-            .id(post.id.toString())
+            .temporaryId(post.id)
             .thumbnail(post.thumbnail)
             .uuid(post.uuid)
             .isPosted(post.isPosted)

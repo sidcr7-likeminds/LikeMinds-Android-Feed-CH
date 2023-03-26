@@ -6,17 +6,19 @@ import androidx.work.*
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.services.s3.model.CannedAccessControlList
-import com.likeminds.feedsx.db.models.AttachmentEntity
+import com.likeminds.feedsx.db.models.PostWithAttachments
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.mediauploader.model.AWSFileResponse
 import com.likeminds.feedsx.utils.mediauploader.model.GenericFileRequest
 import com.likeminds.feedsx.utils.mediauploader.model.IMAGE
+import com.likeminds.feedsx.utils.mediauploader.model.WORKER_SUCCESS
 import com.likeminds.feedsx.utils.mediauploader.utils.FileHelper
 import com.likeminds.feedsx.utils.mediauploader.utils.UploadHelper
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
 
 class PostAttachmentUploadWorker(
     context: Context,
@@ -26,7 +28,7 @@ class PostAttachmentUploadWorker(
     private val postId by lazy { getLongParam(ARG_POST_ID) }
     private val totalMediaCount by lazy { getIntParam(ARG_TOTAL_MEDIA_COUNT) }
 
-    private lateinit var attachmentsToUpload: List<AttachmentEntity>
+    private lateinit var postWithAttachments: PostWithAttachments
 
     companion object {
         const val ARG_POST_ID = "ARG_POST_ID"
@@ -62,13 +64,26 @@ class PostAttachmentUploadWorker(
     // gets list of attachments from DB
     override fun init() {
         runBlocking {
-            val postWithAttachments = postRepository.getPostWithAttachments(postId)
-            attachmentsToUpload = postWithAttachments.attachments
+            postWithAttachments = postRepository.getPostWithAttachments(postId)
         }
     }
 
     // creates/resumes AWS uploads for each attachment
     override fun uploadFiles(continuation: Continuation<Int>) {
+        val attachmentsToUpload = if (failedIndex.isNotEmpty()) {
+            postWithAttachments.attachments.filterIndexed { index, _ ->
+                failedIndex.contains(index)
+            }
+        } else {
+            postWithAttachments.attachments
+        }
+
+        if (attachmentsToUpload.isEmpty()) {
+            continuation.resume(WORKER_SUCCESS)
+            return
+        }
+
+        Log.d("PUI", "uploadFiles: ${attachmentsToUpload.size}")
         uploadList = createAWSRequestList(attachmentsToUpload)
         uploadList.forEach { request ->
             val resumeAWSFileResponse =
@@ -103,8 +118,7 @@ class PostAttachmentUploadWorker(
         continuation: Continuation<Int>
     ) {
         val awsFileResponse =
-            //TODO: uuid
-            uploadFile(request, null)
+            uploadFile(request, postWithAttachments.post.uuid)
         if (awsFileResponse != null) {
             UploadHelper.getInstance().addAWSFileResponse(awsFileResponse)
             setTransferObserver(awsFileResponse, totalFilesToUpload, continuation)
@@ -162,6 +176,7 @@ class PostAttachmentUploadWorker(
 
             override fun onError(id: Int, ex: Exception?) {
                 ex?.printStackTrace()
+                Log.d("PUI", "onStateChanged: onError ${awsFileResponse.name}")
                 failedIndex.add(awsFileResponse.index)
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }
@@ -192,6 +207,7 @@ class PostAttachmentUploadWorker(
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }
             TransferState.FAILED -> {
+                Log.d("PUI", "onStateChanged: failedIndex ${response.name}")
                 failedIndex.add(response.index)
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }

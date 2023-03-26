@@ -21,6 +21,10 @@ class PostRepository @Inject constructor(
         postDao.updateIsPosted(id, isPosted)
     }
 
+    suspend fun updateUploadWorkerUUID(postId: Long, uuid: String) {
+        postDao.updateUploadWorkerUUID(postId, uuid)
+    }
+
     suspend fun deletePost(post: PostEntity) {
         postDao.deletePost(post)
     }

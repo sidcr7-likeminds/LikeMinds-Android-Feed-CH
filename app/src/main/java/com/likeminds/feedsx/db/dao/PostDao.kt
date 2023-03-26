@@ -17,6 +17,10 @@ interface PostDao {
     @Update
     suspend fun updatePost(post: PostEntity)
 
+    //update post upload uuid in local db
+    @Query("UPDATE ${DbConstants.POST_TABLE} SET uuid = :uuid WHERE id =:id")
+    suspend fun updateUploadWorkerUUID(id: Long, uuid: String)
+
     // updates is_posted key in db
     @Query("UPDATE ${DbConstants.POST_TABLE} SET is_posted = :isPosted WHERE id =:id")
     suspend fun updateIsPosted(id: Long, isPosted: Boolean)

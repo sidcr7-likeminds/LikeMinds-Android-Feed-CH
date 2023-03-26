@@ -28,7 +28,8 @@ class PostViewData private constructor(
     val fromPostSaved: Boolean,
     val thumbnail: String?,
     val uuid: String,
-    val isPosted: Boolean
+    val isPosted: Boolean,
+    val temporaryId: Long?
 ) : Parcelable, BaseViewType {
 
     //TODO: add post id while adding menu item
@@ -80,6 +81,7 @@ class PostViewData private constructor(
         private var thumbnail: String? = null
         private var uuid: String = ""
         private var isPosted: Boolean = false
+        private var temporaryId: Long? = null
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
@@ -112,6 +114,7 @@ class PostViewData private constructor(
         fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
+        fun temporaryId(temporaryId: Long?) = apply { this.temporaryId = temporaryId }
 
         fun build() = PostViewData(
             id,
@@ -135,7 +138,8 @@ class PostViewData private constructor(
             fromPostSaved,
             thumbnail,
             uuid,
-            isPosted
+            isPosted,
+            temporaryId
         )
     }
 
@@ -162,5 +166,6 @@ class PostViewData private constructor(
             .thumbnail(thumbnail)
             .uuid(uuid)
             .isPosted(isPosted)
+            .temporaryId(temporaryId)
     }
 }

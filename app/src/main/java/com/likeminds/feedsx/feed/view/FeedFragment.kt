@@ -65,11 +65,7 @@ class FeedFragment :
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     lateinit var mPostAdapter: PostAdapter
 
-    private var communityId: String = ""
-    private var communityName: String = ""
-
-    private var accessToken: String = ""
-    private var refreshToken: String = ""
+    private var alreadyPosting: Boolean = false
 
     private val workersMap by lazy { ArrayList<UUID>() }
 
@@ -108,8 +104,11 @@ class FeedFragment :
     override fun onResume() {
         super.onResume()
 
-        removePostingView()
-        viewModel.checkPosting()
+        Log.d("PUI", "onResume: $alreadyPosting")
+        if (!alreadyPosting) {
+            removePostingView()
+            viewModel.checkIfPosting()
+        }
     }
 
     // observes error events
@@ -131,6 +130,7 @@ class FeedFragment :
         viewModel.postDataEventFlow.onEach { response ->
             when (response) {
                 is FeedViewModel.PostDataEvent.PostDbData -> {
+                    alreadyPosting = true
                     val post = response.post
                     binding.layoutPosting.apply {
                         root.show()
@@ -143,6 +143,7 @@ class FeedFragment :
                         postingProgress.progress = 0
                         postingProgress.show()
                         ivPosted.hide()
+                        tvRetry.hide()
                         observeMediaUpload(post)
                     }
                     binding.newPostButton.hide()
@@ -175,6 +176,7 @@ class FeedFragment :
 
     private fun removePostingView() {
         binding.apply {
+            alreadyPosting = false
             layoutPosting.root.hide()
             newPostButton.show()
         }
@@ -198,20 +200,26 @@ class FeedFragment :
         workInfo: WorkInfo,
         postingData: PostViewData
     ) {
+        Log.d("PUI", "observeMediaWorker: ")
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
-                Log.d("PUI", "SUCCEEDED: true")
                 binding.layoutPosting.apply {
                     postingProgress.hide()
+                    tvRetry.hide()
                     ivPosted.show()
                 }
                 viewModel.addPost(postingData)
             }
             WorkInfo.State.FAILED -> {
-                // TODO:
-            }
-            WorkInfo.State.CANCELLED -> {
-                // TODO:
+                Log.d("PUI", "observeMediaWorker: FAILED")
+                val indexList = workInfo.outputData.getIntArray(
+                    MediaUploadWorker.ARG_MEDIA_INDEX_LIST
+                ) ?: return
+                Log.d("PUI", "observeMediaWorker: ${indexList.size}")
+                initRetryAction(
+                    postingData.temporaryId,
+                    indexList.size
+                )
             }
             else -> {
                 val progress = MediaUploadWorker.getProgress(workInfo) ?: return
@@ -220,6 +228,21 @@ class FeedFragment :
                     val progressValue = percentage.toInt()
                     postingProgress.progress = progressValue
                 }
+            }
+        }
+    }
+
+    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
+        binding.layoutPosting.apply {
+            ivPosted.hide()
+            postingProgress.hide()
+            tvRetry.show()
+            tvRetry.setOnClickListener {
+                viewModel.createRetryPostMediaWorker(
+                    requireContext(),
+                    temporaryId,
+                    attachmentCount
+                )
             }
         }
     }

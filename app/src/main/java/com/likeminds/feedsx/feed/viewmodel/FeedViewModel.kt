@@ -1,11 +1,17 @@
 package com.likeminds.feedsx.feed.viewmodel
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkContinuation
+import androidx.work.WorkManager
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.post.PostRepository
+import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
@@ -43,7 +49,7 @@ class FeedViewModel @Inject constructor(
     sealed class ErrorMessageEvent {
         data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
 
-        data class AddPost(val errorMessage: String?): ErrorMessageEvent()
+        data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
@@ -155,12 +161,41 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    fun checkPosting() {
+    fun createRetryPostMediaWorker(
+        context: Context,
+        postId: Long?,
+        attachmentCount: Int,
+    ) {
+        viewModelScope.launchIO {
+            if (postId == null || attachmentCount <= 0) {
+                return@launchIO
+            }
+            val uploadData = startMediaUploadWorker(context, postId, attachmentCount)
+            postRepository.updateUploadWorkerUUID(postId, uploadData.second)
+            uploadData.first.enqueue()
+            checkIfPosting()
+        }
+    }
+
+    // creates PostAttachmentUploadWorker to start media upload
+    @SuppressLint("EnqueueWork")
+    private fun startMediaUploadWorker(
+        context: Context,
+        postId: Long,
+        filesCount: Int
+    ): Pair<WorkContinuation, String> {
+        val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
+        val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
+        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
+
+    fun checkIfPosting() {
         viewModelScope.launchIO {
             val postWithAttachments = postRepository.getLatestPostWithAttachments()
             if (postWithAttachments == null || postWithAttachments.post.isPosted) {
                 return@launchIO
             } else {
+                Log.d("PUI", "checkIfPosting: ")
                 temporaryPostId = postWithAttachments.post.id
                 postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
             }
@@ -187,7 +222,7 @@ class FeedViewModel @Inject constructor(
                     )
                 )
             } else {
-                // TODO: flow error message
+                errorEventChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
             }
 
             //set isPosted in db to true
