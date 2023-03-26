@@ -160,6 +160,7 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    // starts a media upload worker to retry failed uploads
     fun createRetryPostMediaWorker(
         context: Context,
         postId: Long?,
@@ -188,6 +189,7 @@ class FeedViewModel @Inject constructor(
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }
 
+    // checks and sends the Post data if there is a post pending in db
     fun checkIfPosting() {
         viewModelScope.launchIO {
             val postWithAttachments = postRepository.getLatestPostWithAttachments()

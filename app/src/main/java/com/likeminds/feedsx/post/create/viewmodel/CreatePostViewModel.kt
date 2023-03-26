@@ -62,6 +62,7 @@ class CreatePostViewModel @Inject constructor(
         mediaRepository.getLocalUrisDetails(context, uris, callback)
     }
 
+    // calls DecodeUrl API
     fun decodeUrl(url: String) {
         viewModelScope.launchIO {
             val request = DecodeUrlRequest.Builder().url(url).build()
@@ -71,6 +72,7 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+    // processes and posts the DecodeUrl response in LiveData
     private fun postDecodeUrlResponse(response: LMResponse<DecodeUrlResponse>) {
         viewModelScope.launchIO {
             if (response.success) {

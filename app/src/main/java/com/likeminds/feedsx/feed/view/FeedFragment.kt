@@ -33,7 +33,8 @@ import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
@@ -106,6 +107,7 @@ class FeedFragment :
 
         if (!alreadyPosting) {
             removePostingView()
+            // checks if there is a pending post in db
             viewModel.checkIfPosting()
         }
     }
@@ -125,9 +127,11 @@ class FeedFragment :
         }
     }
 
+    // observes post data while creating post
     private fun observePosting() {
         viewModel.postDataEventFlow.onEach { response ->
             when (response) {
+                // when the post data comes from local db
                 is FeedViewModel.PostDataEvent.PostDbData -> {
                     alreadyPosting = true
                     val post = response.post
@@ -147,6 +151,7 @@ class FeedFragment :
                     }
                     binding.newPostButton.hide()
                 }
+                // when the post data comes from api response
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
                         mPostAdapter.add(0, response.post)
@@ -173,6 +178,7 @@ class FeedFragment :
         setUserImage(user)
     }
 
+    // removes the posting view and shows create post button
     private fun removePostingView() {
         binding.apply {
             alreadyPosting = false
@@ -181,6 +187,7 @@ class FeedFragment :
         }
     }
 
+    // finds the upload worker by UUID and observes the worker
     private fun observeMediaUpload(postingData: PostViewData) {
         if (postingData.uuid.isEmpty()) {
             return
@@ -195,12 +202,14 @@ class FeedFragment :
         }
     }
 
+    // observes the media worker through various worker lifecycle
     private fun observeMediaWorker(
         workInfo: WorkInfo,
         postingData: PostViewData
     ) {
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
+                // uploading completed, call the add post api
                 binding.layoutPosting.apply {
                     postingProgress.hide()
                     tvRetry.hide()
@@ -209,6 +218,7 @@ class FeedFragment :
                 viewModel.addPost(postingData)
             }
             WorkInfo.State.FAILED -> {
+                // uploading failed, initiate retry mechanism
                 val indexList = workInfo.outputData.getIntArray(
                     MediaUploadWorker.ARG_MEDIA_INDEX_LIST
                 ) ?: return
@@ -218,6 +228,7 @@ class FeedFragment :
                 )
             }
             else -> {
+                // uploading in progress, map the progress to progress bar
                 val progress = MediaUploadWorker.getProgress(workInfo) ?: return
                 binding.layoutPosting.apply {
                     val percentage = (((1.0 * progress.first) / progress.second) * 100)
@@ -228,6 +239,7 @@ class FeedFragment :
         }
     }
 
+    // initializes retry mechanism for attachments uploading
     private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
         binding.layoutPosting.apply {
             ivPosted.hide()
@@ -577,7 +589,7 @@ class FeedFragment :
         mPostAdapter.updateWithoutNotifyingRV(position, postData)
     }
 
-    // launcher to start [Report Activity] and show success dialog for result
+    // launcher to start [ReportActivity] and show success dialog for result
     private val reportPostLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
