@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.post.create.util
 
 import android.content.Context
-import android.util.Log
 import androidx.work.*
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
@@ -83,7 +82,6 @@ class PostAttachmentUploadWorker(
             return
         }
 
-        Log.d("PUI", "uploadFiles: ${attachmentsToUpload.size}")
         uploadList = createAWSRequestList(attachmentsToUpload)
         uploadList.forEach { request ->
             val resumeAWSFileResponse =
@@ -176,7 +174,6 @@ class PostAttachmentUploadWorker(
 
             override fun onError(id: Int, ex: Exception?) {
                 ex?.printStackTrace()
-                Log.d("PUI", "onStateChanged: onError ${awsFileResponse.name}")
                 failedIndex.add(awsFileResponse.index)
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }
@@ -196,18 +193,10 @@ class PostAttachmentUploadWorker(
         when (state) {
             TransferState.COMPLETED -> {
                 UploadHelper.getInstance().removeAWSFileResponse(response)
-                val downloadUri = response.downloadUrl
-                //TODO : Uploading completed.
-                Log.d(
-                    "PUI", """
-                    url: $downloadUri
-                """.trimIndent()
-                )
                 uploadedCount += 1
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }
             TransferState.FAILED -> {
-                Log.d("PUI", "onStateChanged: failedIndex ${response.name}")
                 failedIndex.add(response.index)
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }

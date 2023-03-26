@@ -100,4 +100,8 @@
     <string name="post_created">Post created successfully!</string>
     <string name="posting">Posting</string>
     <string name="retry">Retry</string>
+    <plurals name="you_can_select_upto_x_items">
+        <item quantity="one">You can select upto 1 item!</item>
+        <item quantity="other">You can select upto %d items!</item>
+    </plurals>
 </resources>

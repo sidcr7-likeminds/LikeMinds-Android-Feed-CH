@@ -25,6 +25,8 @@ import com.likeminds.likemindsfeed.helper.model.DecodeUrlRequest
 import com.likeminds.likemindsfeed.helper.model.DecodeUrlResponse
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
@@ -40,8 +42,14 @@ class CreatePostViewModel @Inject constructor(
 
     private var temporaryPostId: Long? = null
 
-    private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
-    val errorMessage: LiveData<String?> = _errorMessage
+    sealed class ErrorMessageEvent {
+        data class DecodeUrl(val errorMessage: String?) : ErrorMessageEvent()
+
+        data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
+    }
+
+    private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
+    val errorEventFlow = errorEventChannel.receiveAsFlow()
 
     private val _postAdded = MutableLiveData<Boolean>()
     val postAdded: LiveData<Boolean> = _postAdded
@@ -64,14 +72,16 @@ class CreatePostViewModel @Inject constructor(
     }
 
     private fun postDecodeUrlResponse(response: LMResponse<DecodeUrlResponse>) {
-        if (response.success) {
-            // processes link og tags if API call was successful
-            val data = response.data ?: return
-            val ogTags = data.ogTags
-            _decodeUrlResponse.postValue(ViewDataConverter.convertLinkOGTags(ogTags))
-        } else {
-            // posts error message if API call failed
-            _errorMessage.postValue(response.errorMessage)
+        viewModelScope.launchIO {
+            if (response.success) {
+                // processes link og tags if API call was successful
+                val data = response.data ?: return@launchIO
+                val ogTags = data.ogTags
+                _decodeUrlResponse.postValue(ViewDataConverter.convertLinkOGTags(ogTags))
+            } else {
+                // posts error message if API call failed
+                errorEventChannel.send(ErrorMessageEvent.DecodeUrl(response.errorMessage))
+            }
         }
     }
 
@@ -118,7 +128,7 @@ class CreatePostViewModel @Inject constructor(
                 if (response.success) {
                     _postAdded.postValue(true)
                 } else {
-                    _errorMessage.postValue(response.errorMessage)
+                    errorEventChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
                 }
             }
         }

@@ -2,7 +2,6 @@ package com.likeminds.feedsx.feed.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -195,7 +194,6 @@ class FeedViewModel @Inject constructor(
             if (postWithAttachments == null || postWithAttachments.post.isPosted) {
                 return@launchIO
             } else {
-                Log.d("PUI", "checkIfPosting: ")
                 temporaryPostId = postWithAttachments.post.id
                 postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
             }

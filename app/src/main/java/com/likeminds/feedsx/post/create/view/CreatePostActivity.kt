@@ -21,7 +21,7 @@ class CreatePostActivity : BaseAppCompatActivity() {
 
     companion object {
 
-        const val ARG_CREATE_POST_RESULT = "CreatePostResult"
+        const val POST_ATTACHMENTS_LIMIT = 10
 
         @JvmStatic
         fun start(context: Context) {

@@ -104,7 +104,6 @@ class FeedFragment :
     override fun onResume() {
         super.onResume()
 
-        Log.d("PUI", "onResume: $alreadyPosting")
         if (!alreadyPosting) {
             removePostingView()
             viewModel.checkIfPosting()
@@ -200,7 +199,6 @@ class FeedFragment :
         workInfo: WorkInfo,
         postingData: PostViewData
     ) {
-        Log.d("PUI", "observeMediaWorker: ")
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
                 binding.layoutPosting.apply {
@@ -211,11 +209,9 @@ class FeedFragment :
                 viewModel.addPost(postingData)
             }
             WorkInfo.State.FAILED -> {
-                Log.d("PUI", "observeMediaWorker: FAILED")
                 val indexList = workInfo.outputData.getIntArray(
                     MediaUploadWorker.ARG_MEDIA_INDEX_LIST
                 ) ?: return
-                Log.d("PUI", "observeMediaWorker: ${indexList.size}")
                 initRetryAction(
                     postingData.temporaryId,
                     indexList.size
@@ -330,30 +326,6 @@ class FeedFragment :
 
     //TODO: Call api and refresh the feed data
     private fun fetchRefreshedData() {
-        //TODO: testing data
-
-        val text =
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
-        mPostAdapter.add(
-            0,
-            PostViewData.Builder()
-                .attachments(
-                    listOf(
-                        AttachmentViewData.Builder()
-                            .attachmentType(IMAGE)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .url("https://www.shutterstock.com/image-vector/sample-red-square-grunge-stamp-260nw-338250266.jpg")
-                                    .build()
-                            )
-                            .build()
-                    )
-                )
-                .id("5")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
         mSwipeRefreshLayout.isRefreshing = false
     }
 

@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
@@ -23,17 +24,20 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.post.create.util.CreatePostListener
+import com.likeminds.feedsx.post.create.view.CreatePostActivity.Companion.POST_ATTACHMENTS_LIMIT
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import com.likeminds.feedsx.utils.ViewUtils.show
+import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import dagger.hilt.android.AndroidEntryPoint
@@ -81,7 +85,7 @@ class CreatePostFragment :
                         ogTags
                     )
                 } else {
-                    //todo: add loader on post button
+                    handlePostButton(clickable = true, showProgress = false)
                     viewModel.addPost(
                         requireContext(),
                         text,
@@ -97,13 +101,7 @@ class CreatePostFragment :
         super.observeData()
 
         // observes error message
-        viewModel.errorMessage.observe(viewLifecycleOwner) {
-            val postText = binding.etPostContent.text.toString()
-            val link = postText.getUrlIfExist()
-            if (link != ogTags?.url) {
-                clearPreviewLink()
-            }
-        }
+        observeErrors()
 
         // observes decodeUrlResponse and returns link ogTags
         viewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
@@ -111,12 +109,28 @@ class CreatePostFragment :
             initLinkView(ogTags)
         }
 
-        // TODO: add post error
-
         // observes addPostResponse, once post is created
         viewModel.postAdded.observe(viewLifecycleOwner) {
-            // TODO: show the post
             requireActivity().finish()
+        }
+    }
+
+    // observes error events
+    private fun observeErrors() {
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is CreatePostViewModel.ErrorMessageEvent.DecodeUrl -> {
+                    val postText = binding.etPostContent.text.toString()
+                    val link = postText.getUrlIfExist()
+                    if (link != ogTags?.url) {
+                        clearPreviewLink()
+                    }
+                }
+                is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
+                    handlePostButton(clickable = true, showProgress = false)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+            }
         }
     }
 
@@ -234,8 +248,24 @@ class CreatePostFragment :
             )
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
+                attachmentsLimitExceeded()
                 showAttachedDocuments()
             }
+        }
+    }
+
+    // shows toast and removes extra items if attachments limit is exceeded
+    private fun attachmentsLimitExceeded() {
+        if (selectedMediaUris.size > 10) {
+            showErrorMessageToast(
+                requireContext(), requireContext().resources.getQuantityString(
+                    R.plurals.you_can_select_upto_x_items,
+                    POST_ATTACHMENTS_LIMIT,
+                    POST_ATTACHMENTS_LIMIT
+                )
+            )
+            val size = selectedMediaUris.size
+            selectedMediaUris.subList(POST_ATTACHMENTS_LIMIT, size).clear()
         }
     }
 
@@ -249,6 +279,7 @@ class CreatePostFragment :
 
     // handles the logic to show the type of post
     private fun showPostMedia() {
+        attachmentsLimitExceeded()
         when {
             selectedMediaUris.size >= 1 && MediaType.isPDF(selectedMediaUris.first().fileType) -> {
                 ogTags = null
@@ -302,15 +333,24 @@ class CreatePostFragment :
     }
 
     // handles click action on Post button
-    private fun handlePostButton(clickable: Boolean) {
+    private fun handlePostButton(
+        clickable: Boolean,
+        showProgress: Boolean? = null
+    ) {
         val createPostActivity = requireActivity() as CreatePostActivity
         createPostActivity.binding.apply {
-            if (clickable) {
-                tvPostDone.isClickable = true
-                tvPostDone.setTextColor(BrandingData.getButtonsColor())
+            if (showProgress == true || showProgress != null) {
+                pbPosting.show()
+                tvPostDone.hide()
             } else {
-                tvPostDone.isClickable = false
-                tvPostDone.setTextColor(Color.parseColor("#666666"))
+                pbPosting.hide()
+                if (clickable) {
+                    tvPostDone.isClickable = true
+                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
+                } else {
+                    tvPostDone.isClickable = false
+                    tvPostDone.setTextColor(Color.parseColor("#666666"))
+                }
             }
         }
     }
@@ -504,6 +544,12 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.show()
+            multipleMediaAttachment.btnAddMore.visibility =
+                if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
             multipleMediaAttachment.btnAddMore.setOnClickListener {
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
@@ -532,6 +578,12 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.show()
             multipleMediaAttachment.root.hide()
+            documentsAttachment.btnAddMore.visibility =
+                if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
             documentsAttachment.btnAddMore.setOnClickListener {
                 initiateMediaPicker(listOf(PDF))
             }
