@@ -81,12 +81,27 @@ object ViewDataConverter {
         users: Map<String, User>
     ): List<LikeViewData> {
         return likes.map { like ->
+            //get user id
+            val likedById = like.userId
+
+            //get user
+            val likedBy = users[likedById]
+
+            //convert view data
+            val likedByViewData = if (likedBy == null) {
+                //todo create deleted user
+                UserViewData.Builder().build()
+            } else {
+                convertUser(likedBy)
+            }
+
+            //create likeview data
             LikeViewData.Builder()
                 .id(like.id)
                 .userId(like.userId)
                 .createdAt(like.createdAt)
                 .updatedAt(like.updatedAt)
-                .user(convertUser(users[like.userId]))
+                .user(likedByViewData)
                 .build()
         }
     }
@@ -94,7 +109,7 @@ object ViewDataConverter {
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
-    fun convertUser(user: User): UserEntity {
+    fun convertUserEntity(user: User): UserEntity {
         return UserEntity.Builder()
             .id(user.id)
             .imageUrl(user.imageUrl)

@@ -91,7 +91,7 @@ class FeedViewModel @Inject constructor(
         if (user == null) return
         viewModelScope.launchIO {
             //convert user into userEntity
-            val userEntity = ViewDataConverter.convertUser(user)
+            val userEntity = ViewDataConverter.convertUserEntity(user)
             //add it to local db
             userRepository.insertUser(userEntity)
 
