@@ -12,9 +12,8 @@ import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
-import com.likeminds.likemindsfeed.sdk.model.User
-import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import com.likeminds.likemindsfeed.post.model.DeletePostRequest
+import com.likeminds.likemindsfeed.sdk.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -33,6 +32,9 @@ class FeedViewModel @Inject constructor(
 
     private val _logoutResponse = MutableLiveData<Boolean>()
     val logoutResponse: LiveData<Boolean> = _logoutResponse
+
+    private val _deletePostData = MutableLiveData<Pair<String, UserViewData>>()
+    val deletePostData: LiveData<Pair<String, UserViewData>> = _deletePostData
 
     sealed class ErrorMessageEvent {
         data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
@@ -162,6 +164,14 @@ class FeedViewModel @Inject constructor(
             } else {
                 _errorMessage.postValue(response.errorMessage)
             }
+        }
+    }
+
+    fun getUserFromDb(postId: String) {
+        viewModelScope.launchIO {
+            val userViewData =
+                ViewDataConverter.convertUser(userRepository.getUser(userPreferences.getMemberId()))
+            _deletePostData.postValue(Pair(postId, userViewData))
         }
     }
 }

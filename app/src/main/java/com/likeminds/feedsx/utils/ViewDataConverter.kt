@@ -133,4 +133,21 @@ object ViewDataConverter {
             .isSelected(false)
             .build()
     }
+
+    /**--------------------------------
+     * Db Model -> View Data Model
+    --------------------------------*/
+    fun convertUser(user: UserEntity): UserViewData {
+        return UserViewData.Builder()
+            .id(user.id)
+            .imageUrl(user.imageUrl)
+            .isGuest(user.isGuest)
+            .name(user.name)
+            .updatedAt(user.updatedAt)
+            .customTitle(user.customTitle)
+            .isDeleted(user.isDeleted)
+            .state(user.state)
+            .userUniqueId(user.userUniqueId)
+            .build()
+    }
 }

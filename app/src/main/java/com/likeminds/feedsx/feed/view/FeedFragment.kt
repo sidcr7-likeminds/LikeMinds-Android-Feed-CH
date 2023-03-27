@@ -18,9 +18,10 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
-import com.likeminds.feedsx.feed.model.LikesScreenExtras
-import com.likeminds.feedsx.feed.model.POST
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.likes.model.LikesScreenExtras
+import com.likeminds.feedsx.likes.model.POST
+import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
@@ -38,13 +39,11 @@ import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.likemindsfeed.LMResponse
-import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
+import com.likeminds.feedsx.utils.model.MemberState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 
@@ -60,12 +59,6 @@ class FeedFragment :
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     lateinit var mPostAdapter: PostAdapter
-
-    private var communityId: String = ""
-    private var communityName: String = ""
-
-    private var accessToken: String = ""
-    private var refreshToken: String = ""
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -116,6 +109,11 @@ class FeedFragment :
             } else {
                 ViewUtils.showSomethingWentWrongToast(requireContext())
             }
+        }
+
+        // observes deletePostData
+        viewModel.deletePostData.observe(viewLifecycleOwner) {
+            deletePost(it.first, it.second)
         }
     }
 
@@ -333,21 +331,21 @@ class FeedFragment :
     }
 
     // processes delete post request
-    private fun deletePost(postId: String) {
-        //TODO: set isAdmin
-        val isAdmin = false
+    private fun deletePost(postId: String, user: UserViewData) {
+        val post = mPostAdapter.getPostById(postId)
         val deleteExtras = DeleteExtras.Builder()
-            .entityId(postId)
+            .postId(postId)
             .entityType(DELETE_TYPE_POST)
             .build()
-        if (isAdmin) {
-            DeleteDialogFragment.showDialog(
+        if (post.userId == user.userUniqueId) {
+            // when user deletes their own entity
+            DeleteAlertDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
-        } else {
-            // when user deletes their own entity
-            DeleteAlertDialogFragment.showDialog(
+        } else if (MemberState.isAdmin(user.state)) {
+            // when user is admin
+            DeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
@@ -355,14 +353,12 @@ class FeedFragment :
     }
 
     // Processes report action on post
-    private fun reportPost(
-        postId: String,
-        creatorId: String
-    ) {
+    private fun reportPost(postId: String) {
+        val post = mPostAdapter.getPostById(postId)
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
-            .entityCreatorId(creatorId)
+            .entityCreatorId(post.userId)
             .entityType(REPORT_TYPE_POST)
             .build()
 
@@ -416,7 +412,7 @@ class FeedFragment :
     ) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
-                deletePost(postId)
+                viewModel.getUserFromDb(postId)
             }
             REPORT_POST_MENU_ITEM -> {
                 reportPost(postId)
@@ -490,7 +486,6 @@ class FeedFragment :
         )
     }
 
-    // TODO: ask if we can use these extras here
     // callback when self post is deleted by user
     override fun selfDelete(deleteExtras: DeleteExtras) {
         viewModel.deletePost(

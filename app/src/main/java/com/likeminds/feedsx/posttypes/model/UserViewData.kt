@@ -14,7 +14,8 @@ class UserViewData private constructor(
     var customTitle: String?,
     var isGuest: Boolean,
     var isDeleted: Boolean?,
-    var updatedAt: Long
+    var updatedAt: Long,
+    var state: Int
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_USER
@@ -28,6 +29,7 @@ class UserViewData private constructor(
         private var isGuest: Boolean = false
         private var isDeleted: Boolean? = null
         private var updatedAt: Long = 0
+        private var state: Int = -1
 
         fun id(id: Int) = apply { this.id = id }
         fun name(name: String) = apply { this.name = name }
@@ -37,6 +39,7 @@ class UserViewData private constructor(
         fun isGuest(isGuest: Boolean) = apply { this.isGuest = isGuest }
         fun isDeleted(isDeleted: Boolean?) = apply { this.isDeleted = isDeleted }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
+        fun state(state: Int) = apply { this.state = state }
 
         fun build() = UserViewData(
             id,
@@ -46,7 +49,8 @@ class UserViewData private constructor(
             customTitle,
             isGuest,
             isDeleted,
-            updatedAt
+            updatedAt,
+            state
         )
     }
 
@@ -59,5 +63,6 @@ class UserViewData private constructor(
             .isGuest(isGuest)
             .isDeleted(isDeleted)
             .updatedAt(updatedAt)
+            .state(state)
     }
 }

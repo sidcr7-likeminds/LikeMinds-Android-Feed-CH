@@ -469,6 +469,7 @@ class PostDetailFragment :
         }
     }
 
+    // TODO: remove creator id
     override fun onPostMenuItemClicked(
         postId: String,
         title: String,
@@ -490,6 +491,7 @@ class PostDetailFragment :
         }
     }
 
+    // todo remove post id and creator id
     // callback for comment's menu is item
     override fun onCommentMenuItemClicked(
         postId: String,

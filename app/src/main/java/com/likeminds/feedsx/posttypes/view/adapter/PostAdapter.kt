@@ -15,6 +15,13 @@ class PostAdapter constructor(
         initViewDataBinders()
     }
 
+    fun getPostById(postId: String): PostViewData {
+        val items = items() as List<PostViewData>
+        return items.filter {
+            it.id == postId
+        }[0]
+    }
+
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(6)
 
@@ -51,6 +58,7 @@ class PostAdapter constructor(
         fun likePost(position: Int) {}
         fun sharePost() {}
         fun comment(postId: String)
+        // TODO: remove creator id
         fun onPostMenuItemClicked(postId: String, title: String, creatorId: String)
         fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
         fun showLikesScreen(postId: String)
