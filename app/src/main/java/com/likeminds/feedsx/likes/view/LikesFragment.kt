@@ -5,9 +5,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
+import com.likeminds.feedsx.likes.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.view.LikesActivity.Companion.LIKES_SCREEN_EXTRAS
-import com.likeminds.feedsx.likes.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.likes.viewmodel.LikesViewModel
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
@@ -42,7 +42,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
     override fun observeData() {
         super.observeData()
         // observes likes api response
-        viewModel.getLikesDataResponse.observe(viewLifecycleOwner) { response ->
+        viewModel.likesResponse.observe(viewLifecycleOwner) { response ->
             val listOfLikes = response.first
             val totalLikes = response.second
 
@@ -53,6 +53,7 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
         // observes error message from likes api and shows toast with error message
         viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
             ViewUtils.showErrorMessageToast(requireContext(), error)
+            requireActivity().finish()
         }
     }
 

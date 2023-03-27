@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.utils
 
-import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.db.models.UserEntity
+import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
@@ -77,17 +77,20 @@ object ViewDataConverter {
 
     // converts Like network model to view data model
     fun convertLikes(
-        like: Like,
+        likes: List<Like>,
         users: Map<String, User>
-    ): LikeViewData {
-        return LikeViewData.Builder()
-            .id(like.id)
-            .userId(like.userId)
-            .createdAt(like.createdAt)
-            .updatedAt(like.updatedAt)
-            .user(convertUser(users[like.userId]))
-            .build()
-            }
+    ): List<LikeViewData> {
+        return likes.map { like ->
+            LikeViewData.Builder()
+                .id(like.id)
+                .userId(like.userId)
+                .createdAt(like.createdAt)
+                .updatedAt(like.updatedAt)
+                .user(convertUser(users[like.userId]))
+                .build()
+        }
+    }
+
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
