@@ -14,7 +14,6 @@ class AttachmentViewData private constructor(
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
-        //TODO for multiple media
         get() = when {
             dynamicViewType != null -> {
                 dynamicViewType!!

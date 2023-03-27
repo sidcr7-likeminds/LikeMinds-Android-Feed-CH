@@ -4,8 +4,6 @@ import java.text.DecimalFormat
 import kotlin.math.log10
 import kotlin.math.pow
 
-//TODO: Move to file utils
-
 /**
  * Used for the pretty formatting of bytes for user display.
  */

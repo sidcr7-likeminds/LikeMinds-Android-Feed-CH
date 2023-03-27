@@ -399,6 +399,18 @@ object PostTypeUtil {
         }
     }
 
+    // sets image in the multiple media image view
+    fun initMultipleMediaImage(
+        ivPost: ImageView,
+        data: AttachmentViewData
+    ) {
+        ImageBindingUtil.loadImage(
+            ivPost,
+            data.attachmentMeta.url,
+            placeholder = R.drawable.image_placeholder
+        )
+    }
+
     // handles link view in the post
     fun initLinkView(
         binding: ItemPostLinkBinding,
