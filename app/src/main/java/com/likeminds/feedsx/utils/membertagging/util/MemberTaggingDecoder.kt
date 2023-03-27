@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.utils.membertagging
+package com.likeminds.feedsx.utils.membertagging.util
 
 import android.net.Uri
 import android.text.Spannable
@@ -6,8 +6,6 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.widget.EditText
 import android.widget.TextView
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingClickableSpan
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoderListener
 
 object MemberTaggingDecoder {
 

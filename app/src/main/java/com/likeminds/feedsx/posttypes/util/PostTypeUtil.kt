@@ -29,7 +29,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
-import com.likeminds.feedsx.utils.membertagging.MemberTaggingDecoder
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
 
