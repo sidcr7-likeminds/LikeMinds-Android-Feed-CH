@@ -1,10 +1,10 @@
-package com.collabmates.membertagging.adapter
+package com.likeminds.feedsx.utils.membertagging.view.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.collabmates.membertagging.databinding.ItemMemberBinding
-import com.collabmates.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.databinding.ItemMemberBinding
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 
 internal class MemberAdapter(
     private val darkMode: Boolean,

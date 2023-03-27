@@ -1,4 +1,4 @@
-package com.collabmates.membertagging.model
+package com.likeminds.feedsx.utils.membertagging.model
 
 import android.graphics.drawable.Drawable
 
@@ -14,7 +14,6 @@ class MemberTagViewData private constructor(
     var description: String,
     var isLastItem: Boolean
 ) {
-
     class Builder {
         private var name: String = ""
         private var imageUrl: String = ""

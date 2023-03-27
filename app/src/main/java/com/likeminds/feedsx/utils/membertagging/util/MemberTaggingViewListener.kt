@@ -1,6 +1,6 @@
 package com.likeminds.feedsx.utils.membertagging.util
 
-import com.collabmates.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 
 interface MemberTaggingViewListener {
 

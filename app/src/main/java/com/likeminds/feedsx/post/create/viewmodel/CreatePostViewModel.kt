@@ -222,4 +222,10 @@ class CreatePostViewModel @Inject constructor(
         val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }
+
+    fun getMembersForTagging() {
+        viewModelScope.launchIO {
+
+        }
+    }
 }

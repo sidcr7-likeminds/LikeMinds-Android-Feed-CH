@@ -1,6 +1,6 @@
-package com.collabmates.membertagging.adapter
+package com.likeminds.feedsx.utils.membertagging.view.adapter
 
-import com.collabmates.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 
 internal interface MemberAdapterClickListener {
 

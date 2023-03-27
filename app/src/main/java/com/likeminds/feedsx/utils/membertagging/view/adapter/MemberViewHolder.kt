@@ -1,10 +1,10 @@
-package com.collabmates.membertagging.adapter
+package com.likeminds.feedsx.utils.membertagging.view.adapter
 
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.collabmates.membertagging.databinding.ItemMemberBinding
-import com.collabmates.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.databinding.ItemMemberBinding
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 
 internal class MemberViewHolder(
     val binding: ItemMemberBinding,

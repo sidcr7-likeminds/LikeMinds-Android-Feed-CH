@@ -7,10 +7,10 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.collabmates.membertagging.adapter.MemberAdapter
-import com.collabmates.membertagging.adapter.MemberAdapterClickListener
-import com.collabmates.membertagging.model.MemberTagViewData
-import com.collabmates.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapter
+import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapterClickListener
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.LayoutMemberTaggingBinding
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
