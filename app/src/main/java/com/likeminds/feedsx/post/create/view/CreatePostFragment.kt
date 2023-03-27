@@ -32,7 +32,6 @@ import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -43,6 +42,7 @@ import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import dagger.hilt.android.AndroidEntryPoint
@@ -113,7 +113,7 @@ class CreatePostFragment :
 //            }
 
             override fun callApi(page: Int, searchName: String) {
-//                viewModel.getMembersForTagging(page, searchName)
+                viewModel.getMembersForTagging(page, searchName)
             }
         })
     }
@@ -146,8 +146,7 @@ class CreatePostFragment :
     override fun observeData() {
         super.observeData()
 
-        // observes error message
-        observeErrors()
+        observeMembersTaggingList()
 
         // observes decodeUrlResponse and returns link ogTags
         viewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
@@ -158,6 +157,18 @@ class CreatePostFragment :
         // observes addPostResponse, once post is created
         viewModel.postAdded.observe(viewLifecycleOwner) {
             requireActivity().finish()
+        }
+        observeErrors()
+    }
+
+    /**
+     * Observes for member tagging list, This is a live observer which will update itself on addition of new members
+     * [taggingData] contains first -> page called in api
+     * second -> Community Members and Groups
+     */
+    private fun observeMembersTaggingList() {
+        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
+            MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
 
@@ -174,7 +185,10 @@ class CreatePostFragment :
                 }
                 is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
                     handlePostButton(clickable = true, showProgress = false)
-                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                    showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is CreatePostViewModel.ErrorMessageEvent.GetTaggingList -> {
+                    showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
         }

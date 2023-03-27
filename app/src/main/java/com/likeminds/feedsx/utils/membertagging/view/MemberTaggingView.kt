@@ -7,14 +7,14 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapter
-import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapterClickListener
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
-import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.LayoutMemberTaggingBinding
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.util.*
+import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapter
+import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapterClickListener
 
 /**
  * This is a constraint layout, so it cannot be considered as a popup window or a dialog, which will
