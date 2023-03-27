@@ -366,6 +366,19 @@ object ViewDataConverter {
      * Db Model -> View Data Model
     --------------------------------*/
 
+    fun convertUser(user: UserEntity): UserViewData {
+        return UserViewData.Builder()
+            .id(user.id)
+            .imageUrl(user.imageUrl)
+            .isGuest(user.isGuest)
+            .name(user.name)
+            .updatedAt(user.updatedAt)
+            .customTitle(user.customTitle)
+            .isDeleted(user.isDeleted)
+            .userUniqueId(user.userUniqueId)
+            .build()
+    }
+
     fun convertPost(postWithAttachments: PostWithAttachments): PostViewData {
         val post = postWithAttachments.post
         val attachments = postWithAttachments.attachments

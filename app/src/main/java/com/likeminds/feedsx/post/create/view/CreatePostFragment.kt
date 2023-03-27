@@ -29,7 +29,9 @@ import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
+import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
@@ -67,9 +69,29 @@ class CreatePostFragment :
     override fun setUpViews() {
         super.setUpViews()
 
+        fetchUserFromDB()
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
+    }
+
+    private fun fetchUserFromDB() {
+        viewModel.fetchUserFromDB()
+    }
+
+    // sets data to the author frame
+    private fun initAuthorFrame(user: UserViewData) {
+        binding.authorFrame.apply {
+            tvCreatorName.text = user.name
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.userUniqueId,
+                creatorImage,
+                showRoundImage = true,
+                objectKey = user.updatedAt
+            )
+        }
     }
 
     private fun initPostDoneListener() {
@@ -102,6 +124,11 @@ class CreatePostFragment :
 
         // observes error message
         observeErrors()
+
+        // observes userData and initializes the user view
+        viewModel.userData.observe(viewLifecycleOwner) {
+            initAuthorFrame(it)
+        }
 
         // observes decodeUrlResponse and returns link ogTags
         viewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->

@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
+import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.MediaViewData
@@ -15,8 +16,11 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
+import com.likeminds.feedsx.utils.ViewDataConverter.convertUser
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -31,6 +35,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val userPreferences: UserPreferences,
     private val postRepository: PostRepository,
     private val mediaRepository: MediaRepository
 ) : ViewModel() {
@@ -39,6 +45,9 @@ class CreatePostViewModel @Inject constructor(
 
     private val _decodeUrlResponse = MutableLiveData<LinkOGTagsViewData>()
     val decodeUrlResponse: LiveData<LinkOGTagsViewData> = _decodeUrlResponse
+
+    private val _userData = MutableLiveData<UserViewData>()
+    val userData: LiveData<UserViewData> = _userData
 
     private var temporaryPostId: Long? = null
 
@@ -60,6 +69,17 @@ class CreatePostViewModel @Inject constructor(
         callback: (media: List<MediaViewData>) -> Unit,
     ) {
         mediaRepository.getLocalUrisDetails(context, uris, callback)
+    }
+
+    // fetches user from DB and posts in the live data
+    fun fetchUserFromDB() {
+        viewModelScope.launchIO {
+            val userId = userPreferences.getMemberId()
+
+            // fetches user from DB with user.id
+            val userEntity = userRepository.getUser(userId)
+            _userData.postValue(convertUser(userEntity))
+        }
     }
 
     // calls DecodeUrl API
@@ -179,8 +199,12 @@ class CreatePostViewModel @Inject constructor(
             // generates localFilePath from the ContentUri provided by client
             val localFilePath =
                 FileUtil.getRealPath(context, it.uri)
+
             // generates awsFolderPath to upload the file
-            val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(it.mediaName)
+            val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                it.mediaName,
+                _userData.value?.userUniqueId
+            )
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)
             when (it.fileType) {
