@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -20,6 +22,11 @@ import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
 import com.likeminds.feedsx.feed.model.LikesScreenExtras
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
+import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
+import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
+import com.likeminds.feedsx.media.util.LMExoplayer
+import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
@@ -31,7 +38,7 @@ import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
@@ -42,20 +49,24 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
-
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FeedFragment :
     BaseFragment<FragmentFeedBinding>(),
     PostAdapterListener,
     DeleteDialogFragment.DeleteDialogListener,
-    DeleteAlertDialogFragment.DeleteAlertDialogListener {
+    DeleteAlertDialogFragment.DeleteAlertDialogListener,
+    LMExoplayerListener {
 
     private val viewModel: FeedViewModel by viewModels()
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
+
+    @Inject
+    lateinit var lmExoplayer: LMExoplayer
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
@@ -167,15 +178,34 @@ class FeedFragment :
         }.observeInLifecycle(viewLifecycleOwner)
     }
 
-    //get index and post from the adapter using postId
-    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
-        val index = mPostAdapter.items().indexOfFirst {
-            (it as PostViewData).id == postId
-        }
+    override fun onStart() {
+        super.onStart()
+        initializeExoplayer()
+    }
 
-        val post = mPostAdapter.items()[index] as PostViewData
+    override fun onStop() {
+        super.onStop()
+        lmExoplayer.release()
+    }
 
-        return Pair(index, post)
+    private fun initializeExoplayer() {
+        lmExoplayer.initialize(this)
+    }
+
+    override fun videoEnded(positionOfItemInAdapter: Int) {
+        super.videoEnded(positionOfItemInAdapter)
+        if (positionOfItemInAdapter == -1) return
+
+        val post = getPostFromAdapter(positionOfItemInAdapter)
+        val attachment = post.attachments.first()
+        val newAttachments = attachment.toBuilder()
+            .mediaActions(MEDIA_ACTION_NONE)
+            .build()
+        val newPost = post.toBuilder()
+            .attachments(listOf(newAttachments))
+            .fromVideoAction(true)
+            .build()
+        mPostAdapter.update(positionOfItemInAdapter, newPost)
     }
 
     // initiates SDK
@@ -266,6 +296,7 @@ class FeedFragment :
                 }
             }
 
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
@@ -285,8 +316,13 @@ class FeedFragment :
                 if (!recyclerView.canScrollVertically(-1)) {
                     binding.newPostButton.extend()
                 }
+
+                val firstCompletelyVisibleItem =
+                    layoutManager.findFirstCompletelyVisibleItemPosition()
+                Log.d("PUI", "firstCompletelyVisibleItem: $firstCompletelyVisibleItem")
             }
         }
+
         recyclerView.addOnScrollListener(mScrollListener)
     }
 
@@ -435,6 +471,63 @@ class FeedFragment :
         }
     }
 
+    override fun sendMediaItemToExoPlayer(
+        position: Int,
+        playerView: StyledPlayerView,
+        item: MediaItem
+    ) {
+        super.sendMediaItemToExoPlayer(position, playerView, item)
+        Log.d("PUI", "setting player to view")
+        playerView.player = lmExoplayer.exoplayer
+        lmExoplayer.setMediaItem(position, item)
+    }
+
+    override fun playPauseOnVideo(position: Int) {
+        super.playPauseOnVideo(position)
+        val post = getPostFromAdapter(position)
+        val attachment = post.attachments.first()
+        when (attachment.mediaActions) {
+            MEDIA_ACTION_PLAY -> {
+                Log.d("PUI", "state play")
+                lmExoplayer.pause()
+                val newAttachments = attachment.toBuilder()
+                    .mediaActions(MEDIA_ACTION_PAUSE)
+                    .build()
+                val newPost = post.toBuilder()
+                    .attachments(listOf(newAttachments))
+                    .fromVideoAction(true)
+                    .build()
+                mPostAdapter.update(position, newPost)
+            }
+            MEDIA_ACTION_NONE -> {
+                Log.d("PUI", "state none")
+                val newAttachments = attachment.toBuilder()
+                    .mediaActions(MEDIA_ACTION_PLAY)
+                    .build()
+                val newPost = post.toBuilder()
+                    .attachments(listOf(newAttachments))
+                    .fromVideoAction(true)
+                    .build()
+                Log.d("PUI", "play")
+                lmExoplayer.play()
+                Log.d("PUI", "update rv")
+                mPostAdapter.update(position, newPost)
+            }
+            MEDIA_ACTION_PAUSE -> {
+                Log.d("PUI", "state pause")
+                val newAttachments = attachment.toBuilder()
+                    .mediaActions(MEDIA_ACTION_PLAY)
+                    .build()
+                val newPost = post.toBuilder()
+                    .attachments(listOf(newAttachments))
+                    .fromVideoAction(true)
+                    .build()
+                mPostAdapter.update(position, newPost)
+                lmExoplayer.play()
+            }
+        }
+    }
+
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostAdapter.items().size - 1) {
             binding.recyclerView.post {
@@ -515,6 +608,7 @@ class FeedFragment :
         postData = postData.toBuilder()
             .fromPostLiked(false)
             .fromPostSaved(false)
+            .fromVideoAction(false)
             .build()
         mPostAdapter.updateWithoutNotifyingRV(position, postData)
     }
@@ -529,4 +623,19 @@ class FeedFragment :
                 )
             }
         }
+
+    //get index and post from the adapter using postId
+    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
+        val index = mPostAdapter.items().indexOfFirst {
+            (it as PostViewData).id == postId
+        }
+
+        val post = getPostFromAdapter(index)
+
+        return Pair(index, post)
+    }
+
+    private fun getPostFromAdapter(position: Int): PostViewData {
+        return mPostAdapter.items()[position] as PostViewData
+    }
 }

@@ -1,17 +1,20 @@
 package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
-import android.media.MediaPlayer.OnPreparedListener
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import com.google.android.exoplayer2.MediaItem
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
+import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
+import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
+import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.utils.ViewUtils.hide
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 
@@ -27,11 +30,18 @@ class ItemPostSingleVideoViewDataBinder constructor(
 
     override fun createBinder(parent: ViewGroup): ItemPostSingleVideoBinding {
         overflowMenu = OverflowMenuPopup.create(parent.context, this)
-        return ItemPostSingleVideoBinding.inflate(
+        val binding = ItemPostSingleVideoBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
         )
+
+        binding.iconVideoPlay.setOnClickListener {
+            val position = binding.position ?: return@setOnClickListener
+            listener.playPauseOnVideo(position)
+        }
+
+        return binding
     }
 
     override fun bindData(
@@ -40,6 +50,8 @@ class ItemPostSingleVideoViewDataBinder constructor(
         position: Int
     ) {
 
+        binding.position = position
+
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
@@ -47,6 +59,19 @@ class ItemPostSingleVideoViewDataBinder constructor(
             listener,
             position
         )
+
+        val attachment = data.attachments.first()
+        when (attachment.mediaActions) {
+            MEDIA_ACTION_NONE -> {
+                binding.iconVideoPlay.setImageResource(R.drawable.ic_play)
+            }
+            MEDIA_ACTION_PLAY -> {
+                binding.iconVideoPlay.setImageResource(R.drawable.ic_pause)
+            }
+            MEDIA_ACTION_PAUSE -> {
+                binding.iconVideoPlay.setImageResource(R.drawable.ic_play)
+            }
+        }
 
         // checks whether to bind complete data or not and execute corresponding lambda function
         PostTypeUtil.initPostTypeBindData(
@@ -59,16 +84,15 @@ class ItemPostSingleVideoViewDataBinder constructor(
             returnBinder = {
                 return@initPostTypeBindData
             }, executeBinder = {
-                //TODO: Migrate to exo player
-                val video: Uri =
-                    Uri.parse(data.attachments.first().attachmentMeta.url)
-
-                binding.videoPost.setVideoURI(video)
-                binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
-                    mp.isLooping = true
-                    binding.iconVideoPlay.hide()
-                    binding.videoPost.start()
-                })
+                val videoUri = Uri.parse(data.attachments.first().attachmentMeta.url)
+                val mediaItem = MediaItem.fromUri(videoUri)
+                listener.sendMediaItemToExoPlayer(position, binding.videoPost, mediaItem)
+//                binding.videoPost.setVideoURI(video)
+//                binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
+//                    mp.isLooping = true
+//                    binding.iconVideoPlay.hide()
+//                    binding.videoPost.start()
+//                })
             })
     }
 

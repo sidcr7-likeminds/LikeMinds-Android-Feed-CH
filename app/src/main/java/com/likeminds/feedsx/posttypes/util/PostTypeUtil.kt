@@ -22,7 +22,7 @@ import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
@@ -478,7 +478,7 @@ object PostTypeUtil {
         returnBinder: () -> Unit,
         executeBinder: () -> Unit
     ) {
-        if (data.fromPostLiked || data.fromPostSaved) {
+        if (data.fromPostLiked || data.fromPostSaved || data.fromVideoAction) {
             // update fromLiked/fromSaved variables and return from binder
             listener.updateFromLikedSaved(position)
             returnBinder()

@@ -3,14 +3,12 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostTextOnlyBinding
-import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_TEXT_ONLY
 
@@ -34,13 +32,6 @@ class ItemPostTextOnlyViewDataBinder constructor(
         data: PostViewData,
         position: Int
     ) {
-        //TODO: Testing data
-        val list = listOf(
-            OverflowMenuItemViewData.Builder().title(DELETE_POST_MENU_ITEM).entityId(data.id)
-                .build(),
-            OverflowMenuItemViewData.Builder().title(REPORT_POST_MENU_ITEM).entityId(data.id)
-                .build()
-        )
 
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(

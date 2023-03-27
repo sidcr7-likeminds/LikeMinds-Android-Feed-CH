@@ -25,7 +25,8 @@ class PostViewData private constructor(
     var updatedAt: Long,
     var user: UserViewData,
     val fromPostLiked: Boolean,
-    val fromPostSaved: Boolean
+    val fromPostSaved: Boolean,
+    val fromVideoAction: Boolean
 ) : Parcelable, BaseViewType {
 
     //TODO: add post id while adding menu item
@@ -72,6 +73,7 @@ class PostViewData private constructor(
         private var user: UserViewData = UserViewData.Builder().build()
         private var fromPostLiked: Boolean = false
         private var fromPostSaved: Boolean = false
+        private var fromVideoAction: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
@@ -101,6 +103,8 @@ class PostViewData private constructor(
         fun user(user: UserViewData) = apply { this.user = user }
         fun fromPostLiked(fromPostLiked: Boolean) = apply { this.fromPostLiked = fromPostLiked }
         fun fromPostSaved(fromPostSaved: Boolean) = apply { this.fromPostSaved = fromPostSaved }
+        fun fromVideoAction(fromVideoAction: Boolean) =
+            apply { this.fromVideoAction = fromVideoAction }
 
         fun build() = PostViewData(
             id,
@@ -121,7 +125,8 @@ class PostViewData private constructor(
             updatedAt,
             user,
             fromPostLiked,
-            fromPostSaved
+            fromPostSaved,
+            fromVideoAction
         )
     }
 
@@ -145,5 +150,6 @@ class PostViewData private constructor(
             .user(user)
             .fromPostLiked(fromPostLiked)
             .fromPostSaved(fromPostSaved)
+            .fromVideoAction(fromVideoAction)
     }
 }
