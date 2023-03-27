@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.utils
 
-import com.likeminds.feedsx.feed.model.LikeViewData
+import com.likeminds.feedsx.db.models.UserEntity
+import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
@@ -65,29 +66,61 @@ object ViewDataConverter {
         if (user == null) {
             return UserViewData.Builder().build()
         }
-        // TODO: custom title & isDeleted
         return UserViewData.Builder()
             .id(user.id)
             .name(user.name)
             .imageUrl(user.imageUrl)
             .userUniqueId(user.userUniqueId)
-//            .customTitle(user.customTitle)
+            .customTitle(user.customTitle)
             .isGuest(user.isGuest)
-//            .isDeleted(user.isDeleted)
+            .isDeleted(user.isDeleted)
             .build()
     }
 
     // converts Like network model to view data model
     fun convertLikes(
-        like: Like,
+        likes: List<Like>,
         users: Map<String, User>
-    ): LikeViewData {
-        return LikeViewData.Builder()
-            .id(like.id)
-            .userId(like.userId)
-            .createdAt(like.createdAt)
-            .updatedAt(like.updatedAt)
-            .user(convertUser(users[like.userId]))
+    ): List<LikeViewData> {
+        return likes.map { like ->
+            //get user id
+            val likedById = like.userId
+
+            //get user
+            val likedBy = users[likedById]
+
+            //convert view data
+            val likedByViewData = if (likedBy == null) {
+                //todo create deleted user
+                UserViewData.Builder().build()
+            } else {
+                convertUser(likedBy)
+            }
+
+            //create likeview data
+            LikeViewData.Builder()
+                .id(like.id)
+                .userId(like.userId)
+                .createdAt(like.createdAt)
+                .updatedAt(like.updatedAt)
+                .user(likedByViewData)
+                .build()
+        }
+    }
+
+    /**--------------------------------
+     * Network Model -> Db Model
+    --------------------------------*/
+    fun convertUserEntity(user: User): UserEntity {
+        return UserEntity.Builder()
+            .id(user.id)
+            .imageUrl(user.imageUrl)
+            .isGuest(user.isGuest)
+            .name(user.name)
+            .updatedAt(user.updatedAt)
+            .customTitle(user.customTitle)
+            .isDeleted(user.isDeleted)
+            .userUniqueId(user.userUniqueId)
             .build()
     }
 

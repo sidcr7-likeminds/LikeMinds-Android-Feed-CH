@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.feed.model
+package com.likeminds.feedsx.likes.model
 
 import androidx.annotation.IntDef
 

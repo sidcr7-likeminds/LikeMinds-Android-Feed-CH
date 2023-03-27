@@ -46,6 +46,7 @@ import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserResponse
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.onEach
 
 
 @AndroidEntryPoint
@@ -77,13 +78,30 @@ class FeedFragment :
         initToolbar()
     }
 
-    // observes data
     override fun observeData() {
         super.observeData()
 
-        // observes InitiateUser api response
-        viewModel.initiateUserResponse.observe(viewLifecycleOwner) { response ->
-            observeInitiateUserResponse(response)
+        // observes userResponse LiveData
+        viewModel.userResponse.observe(viewLifecycleOwner) { response ->
+            observeUserResponse(response)
+        }
+
+        // observes error events
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
+                    ViewUtils.showSomethingWentWrongToast(requireContext())
+                }
+            }
+        }
+
+        // observes logoutResponse LiveData
+        viewModel.logoutResponse.observe(viewLifecycleOwner) {
+            Log.d(
+                LOG_TAG,
+                "initiate api sdk called -> success and have not app access"
+            )
+            showInvalidAccess()
         }
 
         // observes error message if api fails with some error
@@ -105,41 +123,16 @@ class FeedFragment :
     private fun initiateSDK() {
         viewModel.initiateUser(
             "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
-            "17b78532-ea3e-479d-9d85-b26b60bb5572",
-            "Mahir Gupta",
+            "10203",
+            "Ishaan",
             false
         )
     }
 
-    // observes initiate user response
-    private fun observeInitiateUserResponse(response: LMResponse<InitiateUserResponse>) {
-        if (response.success) {
-            val data = response.data
-            if (data != null) {
-                if (data.appAccess == true) {
-                    communityId = data.community?.id ?: ""
-                    communityName = data.community?.name ?: ""
-
-                    accessToken = data.accessToken ?: ""
-                    refreshToken = data.refreshToken ?: ""
-
-                    initToolbar()
-                    // TODO: save in local db and then set
-                    val user = ViewDataConverter.convertUser(data.user)
-                    setUserImage(user)
-                } else {
-                    Log.d(
-                        LOG_TAG,
-                        "initiate api sdk called -> success and have not app access"
-                    )
-                    showInvalidAccess()
-                }
-            } else {
-                ViewUtils.showSomethingWentWrongToast(requireContext())
-            }
-        } else {
-            ViewUtils.showSomethingWentWrongToast(requireContext())
-        }
+    // observes user response from InitiateUser
+    private fun observeUserResponse(user: UserViewData?) {
+        initToolbar()
+        setUserImage(user)
     }
 
     // shows invalid access error and logs out invalid user
@@ -151,8 +144,6 @@ class FeedFragment :
             ivSearch.hide()
             ivNotification.hide()
         }
-
-        //TODO: logout
     }
 
     // initializes various UI components
@@ -216,7 +207,7 @@ class FeedFragment :
     }
 
     private fun addTestingData() {
-        var text =
+        val text =
             "My <<Ankit Garg|route://member/1278>> name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostAdapter.add(
             PostViewData.Builder()
@@ -225,127 +216,6 @@ class FeedFragment :
                 .text(text)
                 .fromPostSaved(false)
                 .fromPostLiked(false)
-                .build()
-        )
-        text =
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("2")
-                .likesCount(10)
-                .commentsCount(4)
-                .isLiked(true)
-                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("3")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .attachments(
-                    listOf(
-                        AttachmentViewData.Builder()
-                            .attachmentType(LINK)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .ogTags(
-                                        LinkOGTags.Builder()
-                                            .title("Youtube video")
-                                            .image("https://i.ytimg.com/vi/EbyAoYaUcVo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDiI5bXtT71sC4IAnHiDAh52LxbFA")
-                                            .url("https://www.youtube.com/watch?v=sAuQjwEl-Bo")
-                                            .description("This is a youtube video")
-                                            .build()
-                                    )
-                                    .build()
-                            ).build()
-                    )
-                )
-                .id("4")
-                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .attachments(
-                    listOf(
-                        AttachmentViewData.Builder()
-                            .attachmentType(IMAGE)
-                            .attachmentMeta(
-                                AttachmentMetaViewData.Builder()
-                                    .url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQKEHgSbU751Z6Gn5FsbVMw7x_VFyKGwwHEEUiC9HtnKw&s")
-                                    .build()
-                            )
-                            .build()
-                    )
-                )
-                .id("5")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("6")
-                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("7")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("8")
-                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("9")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("10")
-                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-        text =
-            "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text. All the Lorem Ipsum generators on the Internet tend to repeat predefined chunks as necessary, making this the first true generator on the Internet. It uses a dictionary of over 200 Latin words, combined with a handful of model sentence structures, to generate Lorem Ipsum which looks reasonable. The generated Lorem Ipsum is therefore always free from repetition, injected humour, or non-characteristic words etc."
-        mPostAdapter.add(
-            PostViewData.Builder()
-                .id("11")
-                .user(UserViewData.Builder().name("Natesh").customTitle("Admin").build())
-                .text(text)
                 .build()
         )
     }
@@ -454,7 +324,7 @@ class FeedFragment :
             MemberImageUtil.setImage(
                 user.imageUrl,
                 user.name,
-                user.id,
+                user.userUniqueId,
                 binding.memberImage,
                 showRoundImage = true,
                 objectKey = user.updatedAt
@@ -467,7 +337,7 @@ class FeedFragment :
         //TODO: set isAdmin
         val isAdmin = false
         val deleteExtras = DeleteExtras.Builder()
-            .postId(postId)
+            .entityId(postId)
             .entityType(DELETE_TYPE_POST)
             .build()
         if (isAdmin) {
@@ -484,7 +354,6 @@ class FeedFragment :
         }
     }
 
-    //TODO: testing data
     // Processes report action on post
     private fun reportPost(
         postId: String,
@@ -550,7 +419,7 @@ class FeedFragment :
                 deletePost(postId)
             }
             REPORT_POST_MENU_ITEM -> {
-                reportPost(postId, creatorId)
+                reportPost(postId)
             }
             PIN_POST_MENU_ITEM -> {
                 // TODO: pin post

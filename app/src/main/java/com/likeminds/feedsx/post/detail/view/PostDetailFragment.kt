@@ -17,10 +17,10 @@ import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.model.DeleteType
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
-import com.likeminds.feedsx.feed.model.COMMENT
-import com.likeminds.feedsx.feed.model.LikesScreenExtras
-import com.likeminds.feedsx.feed.model.POST
-import com.likeminds.feedsx.feed.view.LikesActivity
+import com.likeminds.feedsx.likes.model.COMMENT
+import com.likeminds.feedsx.likes.model.LikesScreenExtras
+import com.likeminds.feedsx.likes.model.POST
+import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
