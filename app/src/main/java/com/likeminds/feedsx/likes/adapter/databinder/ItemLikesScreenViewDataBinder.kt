@@ -1,10 +1,11 @@
-package com.likeminds.feedsx.feed.view.adapter.databinder
+package com.likeminds.feedsx.likes.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemLikesScreenBinding
-import com.likeminds.feedsx.feed.model.LikeViewData
+import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_LIKES_SCREEN
@@ -35,10 +36,18 @@ class ItemLikesScreenViewDataBinder : ViewDataBinder<ItemLikesScreenBinding, Lik
             showRoundImage = true
         )
 
-        binding.tvMemberName.text = user.name
-        if (!user.customTitle.isNullOrEmpty()) {
-            binding.viewDot.show()
-            binding.tvCustomTitle.text = user.customTitle
+        binding.apply {
+            tvMemberName.text = user.name
+            if (!user.customTitle.isNullOrEmpty()) {
+                viewDot.show()
+                tvCustomTitle.show()
+                tvCustomTitle.text = user.customTitle
+            } else {
+                viewDot.hide()
+                tvCustomTitle.hide()
+            }
         }
+        binding.tvMemberName.text = user.name
+
     }
 }

@@ -76,6 +76,13 @@ class ItemPostDetailReplyViewDataBinder constructor(
                 likesCount.show()
             }
 
+            likesCount.setOnClickListener {
+                postDetailAdapterListener.showLikesScreen(
+                    data.postId,
+                    data.id
+                )
+            }
+
             ivLike.setOnClickListener {
                 postDetailAdapterListener.likeComment(data.id)
             }

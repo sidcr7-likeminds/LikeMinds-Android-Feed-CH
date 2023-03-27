@@ -154,65 +154,70 @@ object PostTypeUtil {
         listener: PostAdapterListener,
         position: Int
     ) {
+        binding.apply {
+            val context = root.context
+            if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_filled)
+            else ivLike.setImageResource(R.drawable.ic_like_unfilled)
 
-        val context = binding.root.context
+            if (data.isSaved) ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+            else ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
 
-        if (data.isLiked) binding.ivLike.setImageResource(R.drawable.ic_like_filled)
-        else binding.ivLike.setImageResource(R.drawable.ic_like_unfilled)
-
-        if (data.isSaved) binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
-        else binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
-
-        // bounce animation for like and save button
-        val bounceAnim: Animation by lazy {
-            AnimationUtils.loadAnimation(
-                context,
-                R.anim.bounce
-            )
-        }
-
-        binding.likesCount.text =
-            if (data.likesCount == 0) context.getString(R.string.like)
-            else
-                context.resources.getQuantityString(
-                    R.plurals.likes,
-                    data.likesCount,
-                    data.likesCount
+            // bounce animation for like and save button
+            val bounceAnim: Animation by lazy {
+                AnimationUtils.loadAnimation(
+                    context,
+                    R.anim.bounce
                 )
+            }
 
-        binding.likesCount.setOnClickListener { listener.showLikesScreen(data) }
+            likesCount.text =
+                if (data.likesCount == 0) context.getString(R.string.like)
+                else
+                    context.resources.getQuantityString(
+                        R.plurals.likes,
+                        data.likesCount,
+                        data.likesCount
+                    )
 
-        binding.commentsCount.text =
-            if (data.commentsCount == 0) context.getString(R.string.add_comment)
-            else
-                context.resources.getQuantityString(
-                    R.plurals.comments,
-                    data.commentsCount,
-                    data.commentsCount
-                )
+            likesCount.setOnClickListener {
+                if (data.likesCount == 0) {
+                    return@setOnClickListener
+                }
+                listener.showLikesScreen(data.id)
+            }
 
-        binding.ivLike.setOnClickListener {
-            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
-            it.startAnimation(bounceAnim)
-            listener.likePost(position)
-        }
+            commentsCount.text =
+                if (data.commentsCount == 0) context.getString(R.string.add_comment)
+                else
+                    context.resources.getQuantityString(
+                        R.plurals.comments,
+                        data.commentsCount,
+                        data.commentsCount
+                    )
 
-        binding.ivBookmark.setOnClickListener {
-            bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
-            it.startAnimation(bounceAnim)
-            listener.savePost(position)
-        }
+            ivLike.setOnClickListener {
+                bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+                it.startAnimation(bounceAnim)
+                listener.likePost(position)
+            }
 
-        binding.ivShare.setOnClickListener {
-            listener.sharePost()
-        }
+            ivBookmark.setOnClickListener {
+                bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+                it.startAnimation(bounceAnim)
+                listener.savePost(position)
+            }
 
-        binding.ivComment.setOnClickListener {
-            listener.comment(data.id)
-        }
+            ivShare.setOnClickListener {
+                listener.sharePost()
+            }
 
-        binding.commentsCount.setOnClickListener {
-            listener.comment(data.id)
+            ivComment.setOnClickListener {
+                listener.comment(data.id)
+            }
+
+            commentsCount.setOnClickListener {
+                listener.comment(data.id)
+            }
         }
     }
 
