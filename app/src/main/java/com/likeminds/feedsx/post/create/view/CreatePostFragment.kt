@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -40,6 +41,10 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
+import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -57,6 +62,8 @@ class CreatePostFragment :
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
 
+    private lateinit var memberTagging: MemberTaggingView
+
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
 
@@ -67,9 +74,48 @@ class CreatePostFragment :
     override fun setUpViews() {
         super.setUpViews()
 
+        initMemberTaggingView()
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
+    }
+
+    private fun initMemberTaggingView() {
+        memberTagging = binding.memberTaggingView
+        memberTagging.initialize(
+            MemberTaggingExtras.Builder()
+                .editText(binding.etPostContent)
+                .maxHeightInPercentage(0.4f)
+                .color(
+                    BrandingData.currentAdvanced?.third
+                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                )
+                .build()
+        )
+        memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun onMemberTagged(user: MemberTagViewData) {
+//                viewModel.sendUserTagEvent(
+//                    user,
+//                    communityId
+//                )
+            }
+
+//            override fun onShow() {
+//                binding.inputBox.clChatContainer.setBackgroundResource(R.drawable.background_white_24_bottom_black10_1)
+//            }
+//
+//            override fun onHide() {
+//                if (isReplyViewVisible() || isLinkViewVisible() || isInternalLinkViewVisible()) {
+//                    binding.inputBox.clChatContainer.setBackgroundResource(R.drawable.background_white_12top_24_bottom_black10_1)
+//                } else {
+//                    binding.inputBox.clChatContainer.setBackgroundResource(R.drawable.background_white_24_black10_1)
+//                }
+//            }
+
+            override fun callApi(page: Int, searchName: String) {
+//                viewModel.getMembersForTagging(page, searchName)
+            }
+        })
     }
 
     private fun initPostDoneListener() {
