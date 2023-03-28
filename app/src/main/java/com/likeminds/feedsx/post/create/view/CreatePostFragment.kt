@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +42,10 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
+import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -61,6 +66,10 @@ class CreatePostFragment :
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
 
+    private lateinit var etPostTextChangeListener: TextWatcher
+
+    private lateinit var memberTagging: MemberTaggingView
+
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
     }
@@ -69,17 +78,81 @@ class CreatePostFragment :
         super.setUpViews()
 
         fetchUserFromDB()
+        initMemberTaggingView()
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
+    }
+
+    private fun fetchUserFromDB() {
+        viewModel.fetchUserFromDB()
+    }
+
+    // sets data to the author frame
+    private fun initAuthorFrame(user: UserViewData) {
+        binding.authorFrame.apply {
+            tvCreatorName.text = user.name
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.userUniqueId,
+                creatorImage,
+                showRoundImage = true,
+                objectKey = user.updatedAt
+            )
+        }
+    }
+
+    // TODO: remove branding
+    private fun initMemberTaggingView() {
+        memberTagging = binding.memberTaggingView
+        memberTagging.initialize(
+            MemberTaggingExtras.Builder()
+                .editText(binding.etPostContent)
+                .maxHeightInPercentage(0.4f)
+                .color(
+                    BrandingData.currentAdvanced?.third
+                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                )
+                .build()
+        )
+        memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun callApi(page: Int, searchName: String) {
+                viewModel.getMembersForTagging(page, searchName)
+            }
+        })
+    }
+
+    private fun initPostDoneListener() {
+        val createPostActivity = requireActivity() as CreatePostActivity
+        createPostActivity.binding.apply {
+            tvPostDone.setOnClickListener {
+                val text = binding.etPostContent.text
+                val updatedText = memberTagging.replaceSelectedMembers(text).trim()
+                if (selectedMediaUris.isNotEmpty()) {
+                    viewModel.addPost(
+                        requireContext(),
+                        updatedText,
+                        selectedMediaUris,
+                        ogTags
+                    )
+                } else {
+                    handlePostButton(clickable = true, showProgress = false)
+                    viewModel.addPost(
+                        requireContext(),
+                        updatedText,
+                        ogTags = ogTags
+                    )
+                }
+            }
+        }
     }
 
     // observes data
     override fun observeData() {
         super.observeData()
 
-        // observes error message
-        observeErrors()
+        observeMembersTaggingList()
 
         // observes userData and initializes the user view
         viewModel.userData.observe(viewLifecycleOwner) {
@@ -105,6 +178,18 @@ class CreatePostFragment :
                 finish()
             }
         }
+        observeErrors()
+    }
+
+    /**
+     * Observes for member tagging list, This is a live observer which will update itself on addition of new members
+     * [taggingData] contains first -> page called in api
+     * second -> Community Members and Groups
+     */
+    private fun observeMembersTaggingList() {
+        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
+            MemberTaggingUtil.setMembersInView(memberTagging, result)
+        }
     }
 
     // observes error events
@@ -122,12 +207,11 @@ class CreatePostFragment :
                     handlePostButton(clickable = true, showProgress = false)
                     showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+                is CreatePostViewModel.ErrorMessageEvent.GetTaggingList -> {
+                    showErrorMessageToast(requireContext(), response.errorMessage)
+                }
             }
         }
-    }
-
-    private fun fetchUserFromDB() {
-        viewModel.fetchUserFromDB()
     }
 
     // initializes click listeners on add attachment layouts
@@ -149,28 +233,6 @@ class CreatePostFragment :
             layoutAddVideo.setOnClickListener {
                 initiateMediaPicker(listOf(VIDEO))
             }
-        }
-    }
-
-    // adds text watcher on post content edit text
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    private fun initPostContentTextListener() {
-        binding.etPostContent.apply {
-            textChanges()
-                .debounce(500)
-                .distinctUntilChanged()
-                .onEach {
-                    val text = it?.toString()?.trim()
-                    if (text.isNullOrEmpty()) {
-                        clearPreviewLink()
-                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                        else handlePostButton(true)
-                    } else {
-                        showPostMedia()
-                        handlePostButton(true)
-                    }
-                }
-                .launchIn(lifecycleScope)
         }
     }
 
@@ -231,7 +293,7 @@ class CreatePostFragment :
     @CheckResult
     fun EditText.textChanges(): Flow<CharSequence?> {
         return callbackFlow<CharSequence?> {
-            val listener = object : TextWatcher {
+            etPostTextChangeListener = object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) = Unit
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -244,8 +306,8 @@ class CreatePostFragment :
                     (this@callbackFlow).trySend(s.toString())
                 }
             }
-            addTextChangedListener(listener)
-            awaitClose { removeTextChangedListener(listener) }
+            addTextChangedListener(etPostTextChangeListener)
+            awaitClose { removeTextChangedListener(etPostTextChangeListener) }
         }.onStart { emit(text) }
     }
 
@@ -367,6 +429,173 @@ class CreatePostFragment :
                 handlePostButton(!text.isNullOrEmpty())
                 handleAddAttachmentLayouts(true)
             }
+        }
+    }
+
+    // adds text watcher on post content edit text
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private fun initPostContentTextListener() {
+        binding.etPostContent.apply {
+            textChanges()
+                .debounce(500)
+                .distinctUntilChanged()
+                .onEach {
+                    val text = it?.toString()?.trim()
+                    if (text.isNullOrEmpty()) {
+                        clearPreviewLink()
+                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
+                        else handlePostButton(true)
+                    } else {
+                        showPostMedia()
+                        handlePostButton(true)
+                    }
+                }
+                .launchIn(lifecycleScope)
+        }
+    }
+
+    // handles click action on Post button
+    private fun handlePostButton(
+        clickable: Boolean,
+        showProgress: Boolean? = null
+    ) {
+        val createPostActivity = requireActivity() as CreatePostActivity
+        createPostActivity.binding.apply {
+            if (showProgress == true || showProgress != null) {
+                pbPosting.show()
+                tvPostDone.hide()
+            } else {
+                pbPosting.hide()
+                if (clickable) {
+                    tvPostDone.isClickable = true
+                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
+                } else {
+                    tvPostDone.isClickable = false
+                    tvPostDone.setTextColor(Color.parseColor("#666666"))
+                }
+            }
+        }
+    }
+
+    // handles visibility of add attachment layouts
+    private fun handleAddAttachmentLayouts(show: Boolean) {
+        binding.groupAddAttachments.isVisible = show
+    }
+
+    // shows link preview for link post type
+    private fun showLinkPreview(text: String?) {
+        binding.linkPreview.apply {
+            if (text.isNullOrEmpty()) {
+                clearPreviewLink()
+                return
+            }
+            val link = text.getUrlIfExist()
+            if (ogTags != null && link.equals(ogTags?.url)) {
+                return
+            }
+            if (!link.isNullOrEmpty()) {
+                if (link == ogTags?.url) {
+                    return
+                }
+                viewModel.decodeUrl(link)
+            } else {
+                clearPreviewLink()
+            }
+        }
+    }
+
+    // renders data in the link view
+    private fun initLinkView(data: LinkOGTagsViewData) {
+        binding.linkPreview.apply {
+            root.show()
+
+            val isImageValid = (data.image != null && data.image.isValidUrl())
+            ivLink.isVisible = isImageValid
+            handleLinkPreviewConstraints(this, isImageValid)
+
+            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+                data.title
+            } else {
+                root.context.getString(R.string.link)
+            }
+            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
+            tvLinkDescription.text = data.description
+
+            if (isImageValid) {
+                ImageBindingUtil.loadImage(
+                    ivLink,
+                    data.image,
+                    placeholder = R.drawable.ic_link_primary_40dp,
+                    cornerRadius = 8
+                )
+            }
+
+            tvLinkUrl.text = data.url
+            ivCross.setOnClickListener {
+                binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
+                clearPreviewLink()
+            }
+        }
+    }
+
+    // if image url is invalid/empty then handle link preview constraints
+    private fun handleLinkPreviewConstraints(
+        linkPreview: LayoutCreatePostLinkBinding,
+        isImageValid: Boolean
+    ) {
+        linkPreview.apply {
+            val constraintLayout: ConstraintLayout = clLink
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            if (isImageValid) {
+                val margin = dpToPx(16)
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.END,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.END,
+                    margin
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.START,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.START,
+                    margin
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.TOP,
+                    ivLink.id,
+                    ConstraintSet.BOTTOM,
+                    margin
+                )
+            } else {
+                val margin16 = dpToPx(16)
+                val margin4 = dpToPx(4)
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.TOP,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.TOP,
+                    margin16
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.START,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.START,
+                    margin16
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.END,
+                    ivCross.id,
+                    ConstraintSet.START,
+                    margin4
+                )
+            }
+            constraintSet.applyTo(constraintLayout)
         }
     }
 

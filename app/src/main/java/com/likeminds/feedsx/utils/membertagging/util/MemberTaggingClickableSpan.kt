@@ -3,7 +3,6 @@ package com.likeminds.feedsx.utils.membertagging.util
 import android.text.TextPaint
 import android.text.style.ClickableSpan
 import android.view.View
-import com.likeminds.feedsx.utils.membertagging.MemberTaggingDecoder
 
 class MemberTaggingClickableSpan(
     val color: Int,

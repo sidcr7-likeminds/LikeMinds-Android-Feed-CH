@@ -23,10 +23,14 @@ import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
 import com.likeminds.feedsx.utils.ViewDataConverter.convertUser
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.helper.model.DecodeUrlRequest
 import com.likeminds.likemindsfeed.helper.model.DecodeUrlResponse
+import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
+import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -46,6 +50,13 @@ class CreatePostViewModel @Inject constructor(
     private val _decodeUrlResponse = MutableLiveData<LinkOGTagsViewData>()
     val decodeUrlResponse: LiveData<LinkOGTagsViewData> = _decodeUrlResponse
 
+    /**
+     * [taggingData] contains first -> page called
+     * second -> Community Members and Groups
+     * */
+    private val _taggingData = MutableLiveData<Pair<Int, ArrayList<MemberTagViewData>>?>()
+    val taggingData: LiveData<Pair<Int, ArrayList<MemberTagViewData>>?> = _taggingData
+
     private val _userData = MutableLiveData<UserViewData>()
     val userData: LiveData<UserViewData> = _userData
 
@@ -55,6 +66,8 @@ class CreatePostViewModel @Inject constructor(
         data class DecodeUrl(val errorMessage: String?) : ErrorMessageEvent()
 
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
+
+        data class GetTaggingList(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
@@ -245,5 +258,42 @@ class CreatePostViewModel @Inject constructor(
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
         val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
+
+    // calls api to get members for tagging
+    fun getMembersForTagging(
+        page: Int,
+        searchName: String
+    ) {
+        viewModelScope.launchIO {
+            val request = GetTaggingListRequest.Builder()
+                .page(page)
+                .pageSize(MemberTaggingUtil.PAGE_SIZE)
+                .searchName(searchName)
+                .build()
+
+            val response = lmFeedClient.getTaggingList(request)
+            taggingResponseFetched(page, response)
+        }
+    }
+
+    // processes tagging list response and sends response to the view
+    private fun taggingResponseFetched(
+        page: Int,
+        response: LMResponse<GetTaggingListResponse>
+    ) {
+        viewModelScope.launchIO {
+            if (response.success) {
+                val data = response.data ?: return@launchIO
+                _taggingData.postValue(
+                    Pair(
+                        page,
+                        MemberTaggingUtil.getTaggingData(data.members)
+                    )
+                )
+            } else {
+                errorEventChannel.send(ErrorMessageEvent.GetTaggingList(response.errorMessage))
+            }
+        }
     }
 }

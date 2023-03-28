@@ -2,7 +2,6 @@ package com.likeminds.feedsx.utils
 
 import android.net.Uri
 import android.util.Base64
-import android.util.Log
 import com.likeminds.feedsx.db.models.*
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.likes.model.LikeViewData
@@ -14,10 +13,12 @@ import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
+import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
+import com.likeminds.likemindsfeed.helper.model.TagMember
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
 
@@ -260,7 +261,10 @@ object ViewDataConverter {
      * convert [AttachmentMeta] to [AttachmentMetaViewData]
      * @param attachmentMeta: object of [AttachmentMeta]
      **/
-    private fun convertAttachmentMeta(attachmentMeta: AttachmentMeta): AttachmentMetaViewData {
+    private fun convertAttachmentMeta(attachmentMeta: AttachmentMeta?): AttachmentMetaViewData {
+        if (attachmentMeta == null) {
+            return AttachmentMetaViewData.Builder().build()
+        }
         return AttachmentMetaViewData.Builder()
             .name(attachmentMeta.name)
             .url(attachmentMeta.url)
@@ -284,6 +288,22 @@ object ViewDataConverter {
             .description(linkOGTags.description)
             .title(linkOGTags.title)
             .image(linkOGTags.image)
+            .build()
+    }
+
+    fun convertMemberTag(tagMember: TagMember): MemberTagViewData {
+        val nameDrawable = MemberImageUtil.getNameDrawable(
+            MemberImageUtil.SIXTY_PX,
+            tagMember.id.toString(),
+            tagMember.name
+        )
+        return MemberTagViewData.Builder()
+            .id(tagMember.id)
+            .imageUrl(tagMember.imageUrl)
+            .isGuest(tagMember.isGuest)
+            .name(tagMember.name)
+            .userUniqueId(tagMember.userUniqueId)
+            .placeHolder(nameDrawable.first)
             .build()
     }
 
