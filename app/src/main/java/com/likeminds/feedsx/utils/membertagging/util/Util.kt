@@ -11,7 +11,7 @@ import androidx.annotation.FloatRange
 
 internal object Util {
 
-    private const val DEFAULT_MAX_HEIGHT = 200
+    private const val DEFAULT_MAX_HEIGHT = 300
 
     @JvmSynthetic
     internal fun dpToPx(dp: Int): Int {

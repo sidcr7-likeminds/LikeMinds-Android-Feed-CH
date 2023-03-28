@@ -34,7 +34,6 @@ import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -66,6 +65,10 @@ class CreatePostFragment :
 
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
+
+    private lateinit var etPostTextChangeListener: TextWatcher
+
+    private lateinit var memberTagging: MemberTaggingView
 
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
@@ -124,11 +127,12 @@ class CreatePostFragment :
         val createPostActivity = requireActivity() as CreatePostActivity
         createPostActivity.binding.apply {
             tvPostDone.setOnClickListener {
-                val text = binding.etPostContent.text.toString()
+                val text = binding.etPostContent.text
+                val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 if (selectedMediaUris.isNotEmpty()) {
                     viewModel.addPost(
                         requireContext(),
-                        text,
+                        updatedText,
                         selectedMediaUris,
                         ogTags
                     )
@@ -136,7 +140,7 @@ class CreatePostFragment :
                     handlePostButton(clickable = true, showProgress = false)
                     viewModel.addPost(
                         requireContext(),
-                        text,
+                        updatedText,
                         ogTags = ogTags
                     )
                 }
@@ -216,7 +220,7 @@ class CreatePostFragment :
     @CheckResult
     fun EditText.textChanges(): Flow<CharSequence?> {
         return callbackFlow<CharSequence?> {
-            val listener = object : TextWatcher {
+            etPostTextChangeListener = object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) = Unit
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -229,8 +233,8 @@ class CreatePostFragment :
                     (this@callbackFlow).trySend(s.toString())
                 }
             }
-            addTextChangedListener(listener)
-            awaitClose { removeTextChangedListener(listener) }
+            addTextChangedListener(etPostTextChangeListener)
+            awaitClose { removeTextChangedListener(etPostTextChangeListener) }
         }.onStart { emit(text) }
     }
 
@@ -430,21 +434,20 @@ class CreatePostFragment :
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
         binding.linkPreview.apply {
-            clearPreviewLink()
             if (text.isNullOrEmpty()) {
-                ogTags = null
+                clearPreviewLink()
                 return
             }
-
             val link = text.getUrlIfExist()
-
+            if (ogTags != null && link.equals(ogTags?.url)) {
+                return
+            }
             if (!link.isNullOrEmpty()) {
                 if (link == ogTags?.url) {
                     return
                 }
                 viewModel.decodeUrl(link)
             } else {
-                ogTags = null
                 clearPreviewLink()
             }
         }
@@ -478,7 +481,8 @@ class CreatePostFragment :
 
             tvLinkUrl.text = data.url
             ivCross.setOnClickListener {
-                this.root.hide()
+                binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
+                clearPreviewLink()
             }
         }
     }
