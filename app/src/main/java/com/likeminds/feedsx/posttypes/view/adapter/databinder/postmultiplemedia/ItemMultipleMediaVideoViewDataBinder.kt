@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia
 
-import android.media.MediaPlayer
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -31,10 +30,10 @@ class ItemMultipleMediaVideoViewDataBinder :
             Uri.parse("https://media.geeksforgeeks.org/wp-content/uploads/20201217192146/Screenrecorder-2020-12-17-19-17-36-828.mp4?_=1")
 
         binding.videoPost.setVideoURI(video)
-        binding.videoPost.setOnPreparedListener(MediaPlayer.OnPreparedListener { mp ->
+        binding.videoPost.setOnPreparedListener { mp ->
             mp.isLooping = true
             binding.iconVideoPlay.hide()
             binding.videoPost.start()
-        })
+        }
     }
 }

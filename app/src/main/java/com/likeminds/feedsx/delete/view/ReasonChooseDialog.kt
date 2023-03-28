@@ -3,13 +3,18 @@ package com.likeminds.feedsx.delete.view
 import android.graphics.Color
 import android.view.View
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import com.likeminds.feedsx.databinding.DialogReasonChooseBinding
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter
 import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter.ReasonChooseAdapterListener
+import com.likeminds.feedsx.delete.viewmodel.ReasonChooseViewModel
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseBottomSheetFragment
-import com.likeminds.feedsx.utils.model.BaseViewType
+import dagger.hilt.android.AndroidEntryPoint
 
+// bottom sheet dialog to show the reasons list
+@AndroidEntryPoint
 class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
     ReasonChooseAdapterListener {
 
@@ -21,7 +26,9 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
             ReasonChooseDialog().show(fragmentManager, TAG)
     }
 
-    lateinit var reasonChooseAdapter: ReasonChooseAdapter
+    private val viewModel: ReasonChooseViewModel by viewModels()
+
+    private lateinit var reasonChooseAdapter: ReasonChooseAdapter
 
     private var reasonChooseDialogListener: ReasonChooseDialogListener? = null
 
@@ -32,6 +39,23 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
     override fun setUpViews() {
         super.setUpViews()
         initializeUI()
+        initData()
+    }
+
+    // observes data
+    override fun observeData() {
+        super.observeData()
+
+        // observes [listOfTagViewData] and replaces items in sheet
+        viewModel.listOfTagViewData.observe(viewLifecycleOwner) { tags ->
+            reasonChooseAdapter.replace(tags)
+        }
+
+        // observes [errorMessage] and shows error toast
+        viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
+            ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+            dismiss()
+        }
     }
 
     // initialized listener and adds data to the list
@@ -44,23 +68,16 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
 
         (binding.root.parent as View).setBackgroundColor(Color.TRANSPARENT)
 
-        //TODO: testing data
-        val list = ArrayList<ReasonChooseViewData>(
-            listOf(
-                ReasonChooseViewData.Builder().value("Spam").build(),
-                ReasonChooseViewData.Builder().value("Hate Speech").build(),
-                ReasonChooseViewData.Builder().value("Nudity").build(),
-                ReasonChooseViewData.Builder().value("Terrorism").build(),
-                ReasonChooseViewData.Builder().value("Others").build()
-            )
-        )
-
         reasonChooseAdapter = ReasonChooseAdapter(this)
         binding.rvReasons.apply {
             setHasFixedSize(true)
             adapter = reasonChooseAdapter
         }
-        reasonChooseAdapter.replace(list as List<BaseViewType>?)
+    }
+
+    // fetches report tags
+    private fun initData() {
+        viewModel.getReportTags()
     }
 
     // callback when one of the item from reason list is selected

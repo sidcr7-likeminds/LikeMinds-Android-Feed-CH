@@ -18,6 +18,9 @@ dependencies {
     implementation deps.hilt.main
     kapt deps.hilt.compiler
 
+    //exoplayer
+    implementation deps.exo_player.main
+
     //lifecycle and viewmodel
     implementation deps.lifecycle.viewmodel
     implementation deps.lifecycle.livedata

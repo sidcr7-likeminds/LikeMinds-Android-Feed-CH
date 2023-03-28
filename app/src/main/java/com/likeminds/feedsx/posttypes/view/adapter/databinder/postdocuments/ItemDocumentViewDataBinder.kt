@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemDocumentBinding
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS_ITEM
 

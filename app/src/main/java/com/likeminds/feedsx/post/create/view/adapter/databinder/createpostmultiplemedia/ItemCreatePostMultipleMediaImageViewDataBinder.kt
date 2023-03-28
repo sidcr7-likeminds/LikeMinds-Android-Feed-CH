@@ -34,7 +34,7 @@ class ItemCreatePostMultipleMediaImageViewDataBinder constructor(
 
         ImageBindingUtil.loadImage(
             binding.ivSingleImagePost,
-            data.attachmentMeta.uri,
+            data.attachmentMeta.url,
             placeholder = R.drawable.image_placeholder
         )
 

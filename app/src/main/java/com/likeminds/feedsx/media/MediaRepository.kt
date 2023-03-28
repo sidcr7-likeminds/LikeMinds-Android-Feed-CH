@@ -22,7 +22,6 @@ import com.likeminds.feedsx.utils.ValueUtils.getMimeType
 import com.likeminds.feedsx.utils.ValueUtils.getOrDefault
 import com.likeminds.feedsx.utils.file.isLargeFile
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
-import com.likeminds.likemindschat.utils.*
 import java.util.*
 import javax.inject.Inject
 

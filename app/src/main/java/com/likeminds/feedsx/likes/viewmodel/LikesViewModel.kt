@@ -23,9 +23,9 @@ class LikesViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    private val _getLikesDataResponse: MutableLiveData<Pair<List<LikeViewData>, Int>> =
+    private val _likesResponse: MutableLiveData<Pair<List<LikeViewData>, Int>> =
         MutableLiveData()
-    val getLikesDataResponse: LiveData<Pair<List<LikeViewData>, Int>> = _getLikesDataResponse
+    val likesResponse: LiveData<Pair<List<LikeViewData>, Int>> = _likesResponse
 
     private val _errorMessage: MutableLiveData<String?> = MutableLiveData()
     val errorMessage: LiveData<String?> = _errorMessage
@@ -42,25 +42,28 @@ class LikesViewModel @Inject constructor() : ViewModel() {
         page: Int
     ) {
         viewModelScope.launchIO {
-            if (entityType == POST) {
-                // calls getPostLikes API
-                val request = GetPostLikesRequest.Builder()
-                    .postId(postId)
-                    .page(page)
-                    .pageSize(PAGE_SIZE)
-                    .build()
+            when (entityType) {
+                POST -> {
+                    // calls getPostLikes API
+                    val request = GetPostLikesRequest.Builder()
+                        .postId(postId)
+                        .page(page)
+                        .pageSize(PAGE_SIZE)
+                        .build()
 
-                postLikesDataFetched(lmFeedClient.getPostLikes(request))
-            } else if (entityType == COMMENT) {
-                // calls getCommentLikes API
-                val request = GetCommentLikesRequest.Builder()
-                    .postId(postId)
-                    .commentId(commentId!!)
-                    .page(page)
-                    .pageSize(PAGE_SIZE)
-                    .build()
+                    postLikesDataFetched(lmFeedClient.getPostLikes(request))
+                }
+                COMMENT -> {
+                    // calls getCommentLikes API
+                    val request = GetCommentLikesRequest.Builder()
+                        .postId(postId)
+                        .commentId(commentId!!)
+                        .page(page)
+                        .pageSize(PAGE_SIZE)
+                        .build()
 
-                commentLikesDataFetched(lmFeedClient.getCommentLikes(request))
+                    commentLikesDataFetched(lmFeedClient.getCommentLikes(request))
+                }
             }
         }
     }
@@ -73,13 +76,10 @@ class LikesViewModel @Inject constructor() : ViewModel() {
             val totalLikes = data.totalCount
             val likes = data.likes
 
-            val listOfLikeViewData = likes.map {
-                ViewDataConverter.convertLikes(it, data.users)
-            }
-            _getLikesDataResponse.postValue(Pair(listOfLikeViewData, totalLikes))
+            val listOfLikeViewData = ViewDataConverter.convertLikes(likes, data.users)
+            _likesResponse.postValue(Pair(listOfLikeViewData, totalLikes))
         } else {
             // posts error message if API call failed
-            _getLikesDataResponse.postValue(Pair(emptyList(), 0))
             _errorMessage.postValue(response.errorMessage)
         }
     }
@@ -92,13 +92,10 @@ class LikesViewModel @Inject constructor() : ViewModel() {
             val totalLikes = data.totalCount
             val likes = data.likes
 
-            val listOfLikeViewData = likes.map {
-                ViewDataConverter.convertLikes(it, data.users)
-            }
-            _getLikesDataResponse.postValue(Pair(listOfLikeViewData, totalLikes))
+            val listOfLikeViewData = ViewDataConverter.convertLikes(likes, data.users)
+            _likesResponse.postValue(Pair(listOfLikeViewData, totalLikes))
         } else {
             // posts error message if API call failed
-            _getLikesDataResponse.postValue(Pair(emptyList(), 0))
             _errorMessage.postValue(response.errorMessage)
         }
     }

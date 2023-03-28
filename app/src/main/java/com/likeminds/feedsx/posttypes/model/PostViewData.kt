@@ -26,6 +26,7 @@ class PostViewData private constructor(
     var user: UserViewData,
     val fromPostLiked: Boolean,
     val fromPostSaved: Boolean,
+    val fromVideoAction: Boolean,
     val thumbnail: String?,
     val uuid: String,
     val isPosted: Boolean,
@@ -33,8 +34,6 @@ class PostViewData private constructor(
 ) : Parcelable, BaseViewType {
 
     //TODO: add post id while adding menu item
-
-    //TODO: Change see more limit count
 
     override val viewType: Int
         get() = when {
@@ -50,7 +49,7 @@ class PostViewData private constructor(
             (attachments.size > 1 && (attachments.first().attachmentType == IMAGE || attachments.first().attachmentType == VIDEO)) -> {
                 ITEM_POST_MULTIPLE_MEDIA
             }
-            (attachments.isNotEmpty() && attachments.first().attachmentType == LINK) -> {
+            (attachments.size == 1 && attachments.first().attachmentType == LINK) -> {
                 ITEM_POST_LINK
             }
             else -> {
@@ -82,6 +81,7 @@ class PostViewData private constructor(
         private var uuid: String = ""
         private var isPosted: Boolean = false
         private var temporaryId: Long? = null
+        private var fromVideoAction: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
@@ -111,6 +111,8 @@ class PostViewData private constructor(
         fun user(user: UserViewData) = apply { this.user = user }
         fun fromPostLiked(fromPostLiked: Boolean) = apply { this.fromPostLiked = fromPostLiked }
         fun fromPostSaved(fromPostSaved: Boolean) = apply { this.fromPostSaved = fromPostSaved }
+        fun fromVideoAction(fromVideoAction: Boolean) =
+            apply { this.fromVideoAction = fromVideoAction }
         fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
@@ -136,6 +138,7 @@ class PostViewData private constructor(
             user,
             fromPostLiked,
             fromPostSaved,
+            fromVideoAction,
             thumbnail,
             uuid,
             isPosted,
@@ -163,6 +166,7 @@ class PostViewData private constructor(
             .user(user)
             .fromPostLiked(fromPostLiked)
             .fromPostSaved(fromPostSaved)
+            .fromVideoAction(fromVideoAction)
             .thumbnail(thumbnail)
             .uuid(uuid)
             .isPosted(isPosted)

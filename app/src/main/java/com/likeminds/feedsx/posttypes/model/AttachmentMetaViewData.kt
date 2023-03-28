@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.posttypes.model
 
-import android.net.Uri
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
@@ -8,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 class AttachmentMetaViewData private constructor(
     val name: String?,
     val url: String?,
-    val uri: Uri?,
     val format: String?,
     val size: Long?,
     val duration: Int?,
@@ -20,7 +18,6 @@ class AttachmentMetaViewData private constructor(
     class Builder {
         private var name: String? = null
         private var url: String? = null
-        private var uri: Uri? = null
         private var format: String? = null
         private var size: Long? = null
         private var duration: Int? = null
@@ -31,7 +28,6 @@ class AttachmentMetaViewData private constructor(
 
         fun name(name: String?) = apply { this.name = name }
         fun url(url: String?) = apply { this.url = url }
-        fun uri(uri: Uri?) = apply { this.uri = uri }
         fun format(format: String?) = apply { this.format = format }
         fun size(size: Long?) = apply { this.size = size }
         fun duration(duration: Int?) = apply { this.duration = duration }
@@ -43,7 +39,6 @@ class AttachmentMetaViewData private constructor(
         fun build() = AttachmentMetaViewData(
             name,
             url,
-            uri,
             format,
             size,
             duration,
@@ -58,7 +53,6 @@ class AttachmentMetaViewData private constructor(
         return Builder()
             .name(name)
             .url(url)
-            .uri(uri)
             .format(format)
             .size(size)
             .duration(duration)
