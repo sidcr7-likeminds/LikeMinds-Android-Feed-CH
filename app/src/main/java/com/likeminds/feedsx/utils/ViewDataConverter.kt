@@ -17,8 +17,8 @@ import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
-import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.helper.model.TagMember
+import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
 
@@ -206,8 +206,8 @@ object ViewDataConverter {
                 .isSaved(post.isSaved)
                 .isLiked(post.isLiked)
                 .menuItems(convertOverflowMenuItems(post.menuItems))
-                .comments(convertComments(post.replies))
-            .attachments(convertAttachments(post.attachments))
+//                .comments(convertComments(post.replies))
+                .attachments(convertAttachments(post.attachments))
                 .userId(postCreator)
                 .likesCount(post.likesCount)
                 .commentsCount(post.commentsCount)
@@ -222,10 +222,7 @@ object ViewDataConverter {
         comments: List<CommentViewData>
     ): List<CommentViewData> {
         return comments.map { comment ->
-            OverflowMenuItemViewData.Builder()
-                .title(menuItem.title)
-                .entityId(comment)
-                .build()
+            comment
         }
     }
 
@@ -330,7 +327,7 @@ object ViewDataConverter {
                 convertUser(likedBy)
             }
 
-            //create likeview data
+            //create like view data
             LikeViewData.Builder()
                 .id(like.id)
                 .userId(like.userId)

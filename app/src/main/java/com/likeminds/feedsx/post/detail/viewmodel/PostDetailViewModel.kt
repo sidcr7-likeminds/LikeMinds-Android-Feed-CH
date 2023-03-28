@@ -60,12 +60,12 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
-                _postResponse.postValue(
-                    Pair(
-                        page,
-                        ViewDataConverter.convertPost(post, users)
-                    )
-                )
+//                _postResponse.postValue(
+//                    Pair(
+//                        page,
+//                        ViewDataConverter.convertPost(post, users)
+//                    )
+//                )
             } else {
                 errorEventChannel.send(ErrorMessageEvent.GetPost(response.errorMessage))
             }

@@ -157,58 +157,6 @@ class PostDetailFragment :
         })
     }
 
-    override fun observeData() {
-        super.observeData()
-
-        observeMembersTaggingList()
-        observeErrors()
-    }
-
-    /**
-     * Observes for member tagging list, This is a live observer which will update itself on addition of new members
-     * [taggingData] contains first -> page called in api
-     * second -> Community Members and Groups
-     */
-    private fun observeMembersTaggingList() {
-        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
-            MemberTaggingUtil.setMembersInView(memberTagging, result)
-        }
-    }
-
-    // observes error events
-    private fun observeErrors() {
-        viewModel.errorEventFlow.onEach { response ->
-            when (response) {
-                is PostDetailViewModel.ErrorMessageEvent.GetTaggingList -> {
-                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
-                }
-            }
-        }
-    }
-
-    /**
-     * initializes the [memberTaggingView] with the edit text
-     * also sets listener to the [memberTaggingView]
-     */
-    private fun initMemberTaggingView() {
-        memberTagging = binding.memberTaggingView
-        memberTagging.initialize(
-            MemberTaggingExtras.Builder()
-                .editText(binding.etComment)
-                .maxHeightInPercentage(0.4f)
-                .color(
-                    BrandingData.currentAdvanced?.third
-                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
-                )
-                .build()
-        )
-        memberTagging.addListener(object : MemberTaggingViewListener {
-            override fun callApi(page: Int, searchName: String) {
-                viewModel.getMembersForTagging(page, searchName)
-            }
-        })
-    }
-
     // initializes the post detail screen recycler view
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
