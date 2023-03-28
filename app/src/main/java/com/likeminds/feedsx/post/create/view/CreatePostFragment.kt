@@ -74,49 +74,6 @@ class CreatePostFragment :
         initPostDoneListener()
     }
 
-    private fun fetchUserFromDB() {
-        viewModel.fetchUserFromDB()
-    }
-
-    // sets data to the author frame
-    private fun initAuthorFrame(user: UserViewData) {
-        binding.authorFrame.apply {
-            tvCreatorName.text = user.name
-            MemberImageUtil.setImage(
-                user.imageUrl,
-                user.name,
-                user.userUniqueId,
-                creatorImage,
-                showRoundImage = true,
-                objectKey = user.updatedAt
-            )
-        }
-    }
-
-    private fun initPostDoneListener() {
-        val createPostActivity = requireActivity() as CreatePostActivity
-        createPostActivity.binding.apply {
-            tvPostDone.setOnClickListener {
-                val text = binding.etPostContent.text.toString()
-                if (selectedMediaUris.isNotEmpty()) {
-                    viewModel.addPost(
-                        requireContext(),
-                        text,
-                        selectedMediaUris,
-                        ogTags
-                    )
-                } else {
-                    handlePostButton(clickable = true, showProgress = false)
-                    viewModel.addPost(
-                        requireContext(),
-                        text,
-                        ogTags = ogTags
-                    )
-                }
-            }
-        }
-    }
-
     // observes data
     override fun observeData() {
         super.observeData()
@@ -169,6 +126,96 @@ class CreatePostFragment :
         }
     }
 
+    private fun fetchUserFromDB() {
+        viewModel.fetchUserFromDB()
+    }
+
+    // initializes click listeners on add attachment layouts
+    private fun initAddAttachmentsView() {
+        binding.apply {
+            layoutAttachFiles.setOnClickListener {
+                val extra = MediaPickerExtras.Builder()
+                    .mediaTypes(listOf(PDF))
+                    .allowMultipleSelect(true)
+                    .build()
+                val intent = MediaPickerActivity.getIntent(requireContext(), extra)
+                documentLauncher.launch(intent)
+            }
+
+            layoutAddImage.setOnClickListener {
+                initiateMediaPicker(listOf(IMAGE))
+            }
+
+            layoutAddVideo.setOnClickListener {
+                initiateMediaPicker(listOf(VIDEO))
+            }
+        }
+    }
+
+    // adds text watcher on post content edit text
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private fun initPostContentTextListener() {
+        binding.etPostContent.apply {
+            textChanges()
+                .debounce(500)
+                .distinctUntilChanged()
+                .onEach {
+                    val text = it?.toString()?.trim()
+                    if (text.isNullOrEmpty()) {
+                        clearPreviewLink()
+                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
+                        else handlePostButton(true)
+                    } else {
+                        showPostMedia()
+                        handlePostButton(true)
+                    }
+                }
+                .launchIn(lifecycleScope)
+        }
+    }
+
+    // initializes post done button click listener
+    private fun initPostDoneListener() {
+        val createPostActivity = requireActivity() as CreatePostActivity
+        createPostActivity.binding.apply {
+            tvPostDone.setOnClickListener {
+                val text = binding.etPostContent.text.toString()
+                if (selectedMediaUris.isNotEmpty()) {
+                    // when user has selected some medias to upload
+                    viewModel.addPost(
+                        requireContext(),
+                        text,
+                        selectedMediaUris,
+                        ogTags
+                    )
+                } else {
+                    // when user didn't select any media while creating post
+                    handlePostButton(clickable = true, showProgress = false)
+                    viewModel.addPost(
+                        requireContext(),
+                        text,
+                        ogTags = ogTags
+                    )
+                }
+            }
+        }
+    }
+
+    // sets data to the author frame
+    private fun initAuthorFrame(user: UserViewData) {
+        binding.authorFrame.apply {
+            tvCreatorName.text = user.name
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.userUniqueId,
+                creatorImage,
+                showRoundImage = true,
+                objectKey = user.updatedAt
+            )
+        }
+    }
+
     // clears link preview
     private fun clearPreviewLink() {
         ogTags = null
@@ -213,28 +260,6 @@ class CreatePostFragment :
         galleryLauncher.launch(intent)
     }
 
-    // initializes click listeners on add attachment layouts
-    private fun initAddAttachmentsView() {
-        binding.apply {
-            layoutAttachFiles.setOnClickListener {
-                val extra = MediaPickerExtras.Builder()
-                    .mediaTypes(listOf(PDF))
-                    .allowMultipleSelect(true)
-                    .build()
-                val intent = MediaPickerActivity.getIntent(requireContext(), extra)
-                documentLauncher.launch(intent)
-            }
-
-            layoutAddImage.setOnClickListener {
-                initiateMediaPicker(listOf(IMAGE))
-            }
-
-            layoutAddVideo.setOnClickListener {
-                initiateMediaPicker(listOf(VIDEO))
-            }
-        }
-    }
-
     // process the result obtained from media picker
     private fun checkMediaPickedResult(result: MediaPickerResult?) {
         if (result != null) {
@@ -260,6 +285,14 @@ class CreatePostFragment :
                 }
             }
         }
+    }
+
+    // converts the picked media to SingleUriData and adds to the selected media
+    private fun onMediaPicked(result: MediaPickerResult) {
+        val data =
+            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        selectedMediaUris.addAll(data)
+        showPostMedia()
     }
 
     private fun onMediaPickedFromGallery(data: Intent?) {
@@ -304,14 +337,6 @@ class CreatePostFragment :
         }
     }
 
-    // converts the picked media to SingleUriData and adds to the selected media
-    private fun onMediaPicked(result: MediaPickerResult) {
-        val data =
-            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
-        selectedMediaUris.addAll(data)
-        showPostMedia()
-    }
-
     // handles the logic to show the type of post
     private fun showPostMedia() {
         attachmentsLimitExceeded()
@@ -342,173 +367,6 @@ class CreatePostFragment :
                 handlePostButton(!text.isNullOrEmpty())
                 handleAddAttachmentLayouts(true)
             }
-        }
-    }
-
-    // adds text watcher on post content edit text
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    private fun initPostContentTextListener() {
-        binding.etPostContent.apply {
-            textChanges()
-                .debounce(500)
-                .distinctUntilChanged()
-                .onEach {
-                    val text = it?.toString()?.trim()
-                    if (text.isNullOrEmpty()) {
-                        clearPreviewLink()
-                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                        else handlePostButton(true)
-                    } else {
-                        showPostMedia()
-                        handlePostButton(true)
-                    }
-                }
-                .launchIn(lifecycleScope)
-        }
-    }
-
-    // handles click action on Post button
-    private fun handlePostButton(
-        clickable: Boolean,
-        showProgress: Boolean? = null
-    ) {
-        val createPostActivity = requireActivity() as CreatePostActivity
-        createPostActivity.binding.apply {
-            if (showProgress == true || showProgress != null) {
-                pbPosting.show()
-                tvPostDone.hide()
-            } else {
-                pbPosting.hide()
-                if (clickable) {
-                    tvPostDone.isClickable = true
-                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
-                } else {
-                    tvPostDone.isClickable = false
-                    tvPostDone.setTextColor(Color.parseColor("#666666"))
-                }
-            }
-        }
-    }
-
-    // handles visibility of add attachment layouts
-    private fun handleAddAttachmentLayouts(show: Boolean) {
-        binding.groupAddAttachments.isVisible = show
-    }
-
-    // shows link preview for link post type
-    private fun showLinkPreview(text: String?) {
-        binding.linkPreview.apply {
-            clearPreviewLink()
-            if (text.isNullOrEmpty()) {
-                ogTags = null
-                return
-            }
-
-            val link = text.getUrlIfExist()
-
-            if (!link.isNullOrEmpty()) {
-                if (link == ogTags?.url) {
-                    return
-                }
-                viewModel.decodeUrl(link)
-            } else {
-                ogTags = null
-                clearPreviewLink()
-            }
-        }
-    }
-
-    // renders data in the link view
-    private fun initLinkView(data: LinkOGTagsViewData) {
-        binding.linkPreview.apply {
-            root.show()
-
-            val isImageValid = (data.image != null && data.image.isValidUrl())
-            ivLink.isVisible = isImageValid
-            handleLinkPreviewConstraints(this, isImageValid)
-
-            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-                data.title
-            } else {
-                root.context.getString(R.string.link)
-            }
-            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-            tvLinkDescription.text = data.description
-
-            if (isImageValid) {
-                ImageBindingUtil.loadImage(
-                    ivLink,
-                    data.image,
-                    placeholder = R.drawable.ic_link_primary_40dp,
-                    cornerRadius = 8
-                )
-            }
-
-            tvLinkUrl.text = data.url
-            ivCross.setOnClickListener {
-                this.root.hide()
-            }
-        }
-    }
-
-    // if image url is invalid/empty then handle link preview constraints
-    private fun handleLinkPreviewConstraints(
-        linkPreview: LayoutCreatePostLinkBinding,
-        isImageValid: Boolean
-    ) {
-        linkPreview.apply {
-            val constraintLayout: ConstraintLayout = clLink
-            val constraintSet = ConstraintSet()
-            constraintSet.clone(constraintLayout)
-            if (isImageValid) {
-                val margin = dpToPx(16)
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.END,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.END,
-                    margin
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.START,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.START,
-                    margin
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.TOP,
-                    ivLink.id,
-                    ConstraintSet.BOTTOM,
-                    margin
-                )
-            } else {
-                val margin16 = dpToPx(16)
-                val margin4 = dpToPx(4)
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.TOP,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.TOP,
-                    margin16
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.START,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.START,
-                    margin16
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.END,
-                    ivCross.id,
-                    ConstraintSet.START,
-                    margin4
-                )
-            }
-            constraintSet.applyTo(constraintLayout)
         }
     }
 
@@ -635,6 +493,151 @@ class CreatePostFragment :
                 }
             }
             documentsAdapter!!.replace(attachments)
+        }
+    }
+
+    // shows link preview for link post type
+    private fun showLinkPreview(text: String?) {
+        binding.linkPreview.apply {
+            clearPreviewLink()
+            if (text.isNullOrEmpty()) {
+                ogTags = null
+                return
+            }
+
+            val link = text.getUrlIfExist()
+
+            if (!link.isNullOrEmpty()) {
+                if (link == ogTags?.url) {
+                    return
+                }
+                viewModel.decodeUrl(link)
+            } else {
+                ogTags = null
+                clearPreviewLink()
+            }
+        }
+    }
+
+    // renders data in the link view
+    private fun initLinkView(data: LinkOGTagsViewData) {
+        binding.linkPreview.apply {
+            root.show()
+
+            val isImageValid = (data.image != null && data.image.isValidUrl())
+            ivLink.isVisible = isImageValid
+            handleLinkPreviewConstraints(this, isImageValid)
+
+            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+                data.title
+            } else {
+                root.context.getString(R.string.link)
+            }
+            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
+            tvLinkDescription.text = data.description
+
+            if (isImageValid) {
+                ImageBindingUtil.loadImage(
+                    ivLink,
+                    data.image,
+                    placeholder = R.drawable.ic_link_primary_40dp,
+                    cornerRadius = 8
+                )
+            }
+
+            tvLinkUrl.text = data.url
+            ivCross.setOnClickListener {
+                this.root.hide()
+            }
+        }
+    }
+
+    // handles visibility of add attachment layouts
+    private fun handleAddAttachmentLayouts(show: Boolean) {
+        binding.groupAddAttachments.isVisible = show
+    }
+
+    // handles Post Done button click-ability
+    private fun handlePostButton(
+        clickable: Boolean,
+        showProgress: Boolean? = null
+    ) {
+        val createPostActivity = requireActivity() as CreatePostActivity
+        createPostActivity.binding.apply {
+            if (showProgress == true || showProgress != null) {
+                pbPosting.show()
+                tvPostDone.hide()
+            } else {
+                pbPosting.hide()
+                if (clickable) {
+                    tvPostDone.isClickable = true
+                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
+                } else {
+                    tvPostDone.isClickable = false
+                    tvPostDone.setTextColor(Color.parseColor("#666666"))
+                }
+            }
+        }
+    }
+
+    // if image url is invalid/empty then handle link preview constraints
+    private fun handleLinkPreviewConstraints(
+        linkPreview: LayoutCreatePostLinkBinding,
+        isImageValid: Boolean
+    ) {
+        linkPreview.apply {
+            val constraintLayout: ConstraintLayout = clLink
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            if (isImageValid) {
+                val margin = dpToPx(16)
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.END,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.END,
+                    margin
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.START,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.START,
+                    margin
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.TOP,
+                    ivLink.id,
+                    ConstraintSet.BOTTOM,
+                    margin
+                )
+            } else {
+                val margin16 = dpToPx(16)
+                val margin4 = dpToPx(4)
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.TOP,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.TOP,
+                    margin16
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.START,
+                    ConstraintSet.PARENT_ID,
+                    ConstraintSet.START,
+                    margin16
+                )
+                constraintSet.connect(
+                    tvLinkTitle.id,
+                    ConstraintSet.END,
+                    ivCross.id,
+                    ConstraintSet.START,
+                    margin4
+                )
+            }
+            constraintSet.applyTo(constraintLayout)
         }
     }
 

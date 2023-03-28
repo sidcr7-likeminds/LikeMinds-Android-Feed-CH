@@ -118,7 +118,7 @@ class FeedFragment :
         viewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId).first
             mPostAdapter.removeIndex(indexToRemove)
-            ViewUtils.showShortToast(
+            showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
             )
@@ -133,7 +133,7 @@ class FeedFragment :
                     }
                     .show()
             } else {
-                ViewUtils.showShortToast(requireContext(), "Post unpinned!")
+                showShortToast(requireContext(), "Post unpinned!")
             }
         }
 
@@ -147,6 +147,134 @@ class FeedFragment :
     private fun observeUserResponse(user: UserViewData?) {
         initToolbar()
         setUserImage(user)
+    }
+
+
+    //observe feed response
+    private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
+        //hide progress bar
+        ProgressHelper.hideProgress(binding.progressBar)
+        //page in api send
+        val page = pair.first
+
+        //list of post
+        val feed = pair.second
+
+        //if pull to refresh is called
+        if (mSwipeRefreshLayout.isRefreshing) {
+            setFeedAndScrollToTop(feed)
+            mSwipeRefreshLayout.isRefreshing = false
+        }
+
+        //normal adding
+        if (page == 1) {
+            setFeedAndScrollToTop(feed)
+        } else {
+            mPostAdapter.addAll(feed)
+        }
+    }
+
+    // observes post live data
+    private fun observePosting() {
+        viewModel.postDataEventFlow.onEach { response ->
+            when (response) {
+                // when the post data comes from local db
+                is FeedViewModel.PostDataEvent.PostDbData -> {
+                    alreadyPosting = true
+                    val post = response.post
+                    binding.layoutPosting.apply {
+                        root.show()
+                        if (post.thumbnail.isNullOrEmpty()) {
+                            ivPostThumbnail.hide()
+                        } else {
+                            ivPostThumbnail.show()
+                            ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
+                        }
+                        postingProgress.progress = 0
+                        postingProgress.show()
+                        ivPosted.hide()
+                        tvRetry.hide()
+                        observeMediaUpload(post)
+                    }
+                }
+                // when the post data comes from api response
+                is FeedViewModel.PostDataEvent.PostResponseData -> {
+                    binding.apply {
+                        mPostAdapter.add(0, response.post)
+                        recyclerView.scrollToPosition(0)
+                        removePostingView()
+                    }
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
+    }
+
+    // finds the upload worker by UUID and observes the worker
+    private fun observeMediaUpload(postingData: PostViewData) {
+        if (postingData.uuid.isEmpty()) {
+            return
+        }
+        val uuid = UUID.fromString(postingData.uuid)
+        if (!workersMap.contains(uuid)) {
+            workersMap.add(uuid)
+            WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
+                .observe(viewLifecycleOwner) { workInfo ->
+                    observeMediaWorker(workInfo, postingData)
+                }
+        }
+    }
+
+    // observes the media worker through various worker lifecycle
+    private fun observeMediaWorker(
+        workInfo: WorkInfo,
+        postingData: PostViewData
+    ) {
+        when (workInfo.state) {
+            WorkInfo.State.SUCCEEDED -> {
+                // uploading completed, call the add post api
+                binding.layoutPosting.apply {
+                    postingProgress.hide()
+                    tvRetry.hide()
+                    ivPosted.show()
+                }
+                viewModel.addPost(postingData)
+            }
+            WorkInfo.State.FAILED -> {
+                // uploading failed, initiate retry mechanism
+                val indexList = workInfo.outputData.getIntArray(
+                    MediaUploadWorker.ARG_MEDIA_INDEX_LIST
+                ) ?: return
+                initRetryAction(
+                    postingData.temporaryId,
+                    indexList.size
+                )
+            }
+            else -> {
+                // uploading in progress, map the progress to progress bar
+                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
+                binding.layoutPosting.apply {
+                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
+                    val progressValue = percentage.toInt()
+                    postingProgress.progress = progressValue
+                }
+            }
+        }
+    }
+
+    // initializes retry mechanism for attachments uploading
+    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
+        binding.layoutPosting.apply {
+            ivPosted.hide()
+            postingProgress.hide()
+            tvRetry.show()
+            tvRetry.setOnClickListener {
+                viewModel.createRetryPostMediaWorker(
+                    requireContext(),
+                    temporaryId,
+                    attachmentCount
+                )
+            }
+        }
     }
 
     //observe error handling
@@ -232,152 +360,6 @@ class FeedFragment :
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 removePostingView()
             }
-        }
-    }
-
-    private fun observePosting() {
-        viewModel.postDataEventFlow.onEach { response ->
-            when (response) {
-                // when the post data comes from local db
-                is FeedViewModel.PostDataEvent.PostDbData -> {
-                    alreadyPosting = true
-                    val post = response.post
-                    binding.layoutPosting.apply {
-                        root.show()
-                        if (post.thumbnail.isNullOrEmpty()) {
-                            ivPostThumbnail.hide()
-                        } else {
-                            ivPostThumbnail.show()
-                            ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
-                        }
-                        postingProgress.progress = 0
-                        postingProgress.show()
-                        ivPosted.hide()
-                        tvRetry.hide()
-                        observeMediaUpload(post)
-                    }
-                }
-                // when the post data comes from api response
-                is FeedViewModel.PostDataEvent.PostResponseData -> {
-                    binding.apply {
-                        mPostAdapter.add(0, response.post)
-                        recyclerView.scrollToPosition(0)
-                        removePostingView()
-                    }
-                }
-            }
-        }.observeInLifecycle(viewLifecycleOwner)
-    }
-
-
-    //observe feed response
-    private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
-        //hide progress bar
-        ProgressHelper.hideProgress(binding.progressBar)
-        //page in api send
-        val page = pair.first
-
-        //list of post
-        val feed = pair.second
-
-        //if pull to refresh is called
-        if (mSwipeRefreshLayout.isRefreshing) {
-            setFeedAndScrollToTop(feed)
-            mSwipeRefreshLayout.isRefreshing = false
-        }
-
-        //normal adding
-        if (page == 1) {
-            setFeedAndScrollToTop(feed)
-        } else {
-            mPostAdapter.addAll(feed)
-        }
-    }
-
-    // removes the posting view and shows create post button
-    private fun removePostingView() {
-        binding.apply {
-            alreadyPosting = false
-            layoutPosting.root.hide()
-        }
-    }
-
-    // finds the upload worker by UUID and observes the worker
-    private fun observeMediaUpload(postingData: PostViewData) {
-        if (postingData.uuid.isEmpty()) {
-            return
-        }
-        val uuid = UUID.fromString(postingData.uuid)
-        if (!workersMap.contains(uuid)) {
-            workersMap.add(uuid)
-            WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
-                .observe(viewLifecycleOwner) { workInfo ->
-                    observeMediaWorker(workInfo, postingData)
-                }
-        }
-    }
-
-    // observes the media worker through various worker lifecycle
-    private fun observeMediaWorker(
-        workInfo: WorkInfo,
-        postingData: PostViewData
-    ) {
-        when (workInfo.state) {
-            WorkInfo.State.SUCCEEDED -> {
-                // uploading completed, call the add post api
-                binding.layoutPosting.apply {
-                    postingProgress.hide()
-                    tvRetry.hide()
-                    ivPosted.show()
-                }
-                viewModel.addPost(postingData)
-            }
-            WorkInfo.State.FAILED -> {
-                // uploading failed, initiate retry mechanism
-                val indexList = workInfo.outputData.getIntArray(
-                    MediaUploadWorker.ARG_MEDIA_INDEX_LIST
-                ) ?: return
-                initRetryAction(
-                    postingData.temporaryId,
-                    indexList.size
-                )
-            }
-            else -> {
-                // uploading in progress, map the progress to progress bar
-                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
-                binding.layoutPosting.apply {
-                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
-                    val progressValue = percentage.toInt()
-                    postingProgress.progress = progressValue
-                }
-            }
-        }
-    }
-
-    // initializes retry mechanism for attachments uploading
-    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
-        binding.layoutPosting.apply {
-            ivPosted.hide()
-            postingProgress.hide()
-            tvRetry.show()
-            tvRetry.setOnClickListener {
-                viewModel.createRetryPostMediaWorker(
-                    requireContext(),
-                    temporaryId,
-                    attachmentCount
-                )
-            }
-        }
-    }
-
-    // shows invalid access error and logs out invalid user
-    private fun showInvalidAccess() {
-        binding.apply {
-            recyclerView.hide()
-            layoutAccessRemoved.root.show()
-            memberImage.hide()
-            ivSearch.hide()
-            ivNotification.hide()
         }
     }
 
@@ -543,7 +525,18 @@ class FeedFragment :
         }
 
         //TODO: testing data. add this while observing data
-        binding.tvNotificationCount.text = "10"
+        binding.tvNotificationCount.text = "${10}"
+    }
+
+    // shows invalid access error and logs out invalid user
+    private fun showInvalidAccess() {
+        binding.apply {
+            recyclerView.hide()
+            layoutAccessRemoved.root.show()
+            memberImage.hide()
+            ivSearch.hide()
+            ivNotification.hide()
+        }
     }
 
     // sets user profile image
@@ -557,6 +550,14 @@ class FeedFragment :
                 showRoundImage = true,
                 objectKey = user.updatedAt
             )
+        }
+    }
+
+    // removes the posting view and shows create post button
+    private fun removePostingView() {
+        binding.apply {
+            alreadyPosting = false
+            layoutPosting.root.hide()
         }
     }
 
