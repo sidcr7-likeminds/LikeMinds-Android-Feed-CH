@@ -260,6 +260,7 @@ class CreatePostViewModel @Inject constructor(
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }
 
+    // calls api to get members for tagging
     fun getMembersForTagging(
         page: Int,
         searchName: String
@@ -276,6 +277,7 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+    // processes tagging list response and sends response to the view
     private fun taggingResponseFetched(
         page: Int,
         response: LMResponse<GetTaggingListResponse>

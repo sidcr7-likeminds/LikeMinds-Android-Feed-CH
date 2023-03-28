@@ -2,7 +2,6 @@ package com.likeminds.feedsx.delete.view
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.DialogFragmentDeleteAlertBinding
@@ -74,7 +73,6 @@ class DeleteAlertDialogFragment : BaseDialogFragment<DialogFragmentDeleteAlertBi
     private fun initializeListeners() {
 
         binding.tvDelete.setOnClickListener {
-            Log.d("TAG", "initializeListeners: $deleteAlertDialogListener")
             deleteAlertDialogListener?.delete(
                 deleteExtras!!
             )

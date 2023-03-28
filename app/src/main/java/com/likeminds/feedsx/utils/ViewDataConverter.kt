@@ -2,7 +2,6 @@ package com.likeminds.feedsx.utils
 
 import android.net.Uri
 import android.util.Base64
-import android.util.Log
 import com.likeminds.feedsx.db.models.*
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
@@ -43,7 +42,6 @@ object ViewDataConverter {
                 ITEM_CREATE_POST_DOCUMENTS_ITEM
             }
         }
-        Log.d("PUI", "convertSingleDataUri: ${singleUriData.pdfPageCount}")
         return AttachmentViewData.Builder()
             .dynamicViewType(viewType)
             .attachmentType(attachmentType)
@@ -96,7 +94,6 @@ object ViewDataConverter {
     private fun convertAttachmentMeta(
         attachmentMeta: AttachmentMetaViewData
     ): AttachmentMeta {
-        Log.d("PUI", "convertAttachmentMeta-1: ${attachmentMeta.pageCount}")
         return AttachmentMeta.Builder().name(attachmentMeta.name)
             .ogTags(convertOGTags(attachmentMeta.ogTags))
             .url(attachmentMeta.url)
@@ -355,7 +352,6 @@ object ViewDataConverter {
                 Base64.DEFAULT
             )
         ) + singleUriData.awsFolderPath
-        Log.d("PUI", "convertAttachmentMeta: ${singleUriData.pdfPageCount}")
         return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
             .url(url)
             .uri(singleUriData.uri.toString())

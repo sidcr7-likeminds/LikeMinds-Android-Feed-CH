@@ -33,7 +33,7 @@ object MemberTaggingDecoder {
             val end = matchResult.range.last
             val value = matchResult.value
             val tag = value.substring(2, value.length - 2).split("\\|".toRegex())
-            val memberName = SpannableString(tag[0])
+            val memberName = SpannableString("@${tag[0]}")
             if (enableClick) {
                 memberName.setSpan(
                     MemberTaggingClickableSpan(
@@ -83,7 +83,7 @@ object MemberTaggingDecoder {
             val end = matchResult.range.last
             val value = matchResult.value
             val tag = value.substring(2, value.length - 2).split("\\|".toRegex())
-            val memberName = SpannableString(tag[0])
+            val memberName = SpannableString("@${tag[0]}")
             memberName.setSpan(
                 MemberTaggingClickableSpan(highlightColor, value),
                 0,
@@ -102,7 +102,7 @@ object MemberTaggingDecoder {
 
     /**
      * @return decoded String with member names and text instead of the whole encoded text
-     * example - "Hi, <<Harsh|route://member/181>>. How are you?" will return "Hi, Harsh. How are you?"
+     * example - "Hi, <<Harsh|route://member/181>>. How are you?" will return "Hi, @Harsh. How are you?"
      */
     @JvmStatic
     fun decode(text: String?): String {
@@ -151,7 +151,7 @@ object MemberTaggingDecoder {
         matches.forEach { matchResult ->
             val value = matchResult.value
             val tag = value.substring(2, value.length - 2).split("\\|".toRegex())
-            val memberName = tag[0]
+            val memberName = "@${tag[0]}"
             val memberRoute = tag[1]
             val routeSplits = memberRoute.split("/".toRegex())
             val memberId = routeSplits[routeSplits.size - 1]

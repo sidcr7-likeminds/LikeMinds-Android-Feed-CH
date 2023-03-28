@@ -1,9 +1,10 @@
 package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -27,6 +28,7 @@ import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_D
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
+import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -43,6 +45,11 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
+import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+import kotlinx.coroutines.flow.onEach
 
 class PostDetailFragment :
     BaseFragment<FragmentPostDetailBinding>(),
@@ -52,12 +59,16 @@ class PostDetailFragment :
     DeleteAlertDialogFragment.DeleteAlertDialogListener,
     DeleteDialogFragment.DeleteDialogListener {
 
+    private val viewModel: PostDetailViewModel by viewModels()
+
     private lateinit var postDetailExtras: PostDetailExtras
 
     private lateinit var mPostDetailAdapter: PostDetailAdapter
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     private var parentCommentIdToReply: String? = null
+
+    private lateinit var memberTagging: MemberTaggingView
 
     companion object {
         const val REPLIES_THRESHOLD = 3
@@ -69,6 +80,8 @@ class PostDetailFragment :
 
     override fun setUpViews() {
         super.setUpViews()
+
+        initMemberTaggingView()
         initRecyclerView()
         initCommentEditText()
         initSwipeRefreshLayout()
@@ -76,6 +89,58 @@ class PostDetailFragment :
 
         //TODO: testing data
         updateCommentsCount(10)
+    }
+
+    override fun observeData() {
+        super.observeData()
+
+        observeMembersTaggingList()
+        observeErrors()
+    }
+
+    /**
+     * Observes for member tagging list, This is a live observer which will update itself on addition of new members
+     * [taggingData] contains first -> page called in api
+     * second -> Community Members and Groups
+     */
+    private fun observeMembersTaggingList() {
+        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
+            MemberTaggingUtil.setMembersInView(memberTagging, result)
+        }
+    }
+
+    // observes error events
+    private fun observeErrors() {
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is PostDetailViewModel.ErrorMessageEvent.GetTaggingList -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+            }
+        }
+    }
+
+    /**
+     * initializes the [memberTaggingView] with the edit text
+     * also sets listener to the [memberTaggingView]
+     */
+    private fun initMemberTaggingView() {
+        memberTagging = binding.memberTaggingView
+        memberTagging.initialize(
+            MemberTaggingExtras.Builder()
+                .editText(binding.etComment)
+                .maxHeightInPercentage(0.4f)
+                .color(
+                    BrandingData.currentAdvanced?.third
+                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                )
+                .build()
+        )
+        memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun callApi(page: Int, searchName: String) {
+                viewModel.getMembersForTagging(page, searchName)
+            }
+        })
     }
 
     // initializes the post detail screen recycler view
@@ -188,6 +253,8 @@ class PostDetailFragment :
     private fun initListeners() {
         binding.apply {
             ivCommentSend.setOnClickListener {
+                val text = binding.etComment.text
+                val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 if (parentCommentIdToReply != null) {
                     // input text is reply to a comment
                     // TODO: create a reply to comment
@@ -598,7 +665,6 @@ class PostDetailFragment :
     // callback when self post is deleted by user
     override fun delete(deleteExtras: DeleteExtras) {
         // TODO: delete post/comment by user
-        Log.d("TAG", "initializeListeners: ${deleteExtras.entityType}")
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> showShortToast(
                 requireContext(),
@@ -614,7 +680,6 @@ class PostDetailFragment :
     // callback when other's post is deleted by CM
     override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
         // TODO: delete post/comment by admin
-        Log.d("TAG", "initializeListeners by admin: ${deleteExtras.entityType}")
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> showShortToast(
                 requireContext(),
