@@ -464,7 +464,7 @@ class FeedFragment :
 
     //set posts through diff utils and scroll to top of the feed
     private fun setFeedAndScrollToTop(feed: List<PostViewData>) {
-        mPostAdapter.setItemsViaDiffUtilForFeed(feed)
+        mPostAdapter.replace(feed)
         binding.recyclerView.scrollToPosition(0)
     }
 
