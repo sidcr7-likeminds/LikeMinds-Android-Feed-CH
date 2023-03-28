@@ -13,6 +13,7 @@ import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
+import com.likeminds.likemindsfeed.post.model.DeletePostRequest
 import com.likeminds.likemindsfeed.post.model.LikePostRequest
 import com.likeminds.likemindsfeed.post.model.SavePostRequest
 import com.likeminds.likemindsfeed.sdk.model.User
@@ -39,6 +40,9 @@ class FeedViewModel @Inject constructor(
     private val _universalFeedResponse = MutableLiveData<Pair<Int, List<PostViewData>>>()
     val universalFeedResponse: LiveData<Pair<Int, List<PostViewData>>> = _universalFeedResponse
 
+    private val _deletePostResponse = MutableLiveData<String>()
+    val deletePostResponse: LiveData<String> = _deletePostResponse
+
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
 
@@ -46,12 +50,16 @@ class FeedViewModel @Inject constructor(
         data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
         data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
         data class LikePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
-
         data class SavePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
+        data class DeletePost(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     companion object {
         const val PAGE_SIZE = 20
+    }
+
+    fun getUserUniqueId(): String {
+        return userPreferences.getMemberId()
     }
 
     /***
@@ -84,7 +92,7 @@ class FeedViewModel @Inject constructor(
                     _logoutResponse.postValue(true)
                 } else {
                     val user = data.user
-                    val id = user?.id ?: -1
+                    val id = user?.userUniqueId ?: ""
 
                     //add user in local db
                     addUser(user)
@@ -128,7 +136,7 @@ class FeedViewModel @Inject constructor(
 
             val memberState = memberStateResponse?.state ?: return@launchIO
             val isOwner = memberStateResponse.isOwner
-            val userId = memberStateResponse.id
+            val userId = memberStateResponse.userUniqueId
 
             //get existing userEntity
             var userEntity = userRepository.getUser(userId)
@@ -214,6 +222,26 @@ class FeedViewModel @Inject constructor(
             //check for error
             if (!response.success) {
                 errorMessageChannel.send(ErrorMessageEvent.SavePost(postId, response.errorMessage))
+            }
+        }
+    }
+
+    // calls DeletePost API and posts the response/error message in LiveData
+    fun deletePost(
+        postId: String,
+        reason: String? = null
+    ) {
+        viewModelScope.launchIO {
+            val request = DeletePostRequest.Builder()
+                .postId(postId)
+                .deleteReason(reason)
+                .build()
+
+            val response = lmFeedClient.deletePost(request)
+            if (response.success) {
+                _deletePostResponse.postValue(postId)
+            } else {
+                errorMessageChannel.send(ErrorMessageEvent.DeletePost(response.errorMessage))
             }
         }
     }

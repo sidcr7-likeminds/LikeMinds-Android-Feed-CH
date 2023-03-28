@@ -7,7 +7,6 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ReasonChooseViewData private constructor(
-    val tagId: String,
     val value: String,
     val hideBottomLine: Boolean?
 ) : Parcelable, BaseViewType {
@@ -16,25 +15,21 @@ class ReasonChooseViewData private constructor(
         get() = ITEM_REASON_CHOOSE
 
     class Builder {
-        private var tagId: String = ""
         private var value: String = ""
         private var hideBottomLine: Boolean? = null
 
-        fun tagId(tagId: String) = apply { this.tagId = tagId }
         fun value(value: String) = apply { this.value = value }
         fun hideBottomLine(hideBottomLine: Boolean?) =
             apply { this.hideBottomLine = hideBottomLine }
 
         fun build() = ReasonChooseViewData(
-            tagId,
             value,
             hideBottomLine
         )
     }
 
     fun toBuilder(): Builder {
-        return Builder().tagId(tagId)
-            .value(value)
+        return Builder().value(value)
             .hideBottomLine(hideBottomLine)
     }
 }

@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.utils
 
 import com.likeminds.feedsx.db.models.UserEntity
+import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.SingleUriData
@@ -224,6 +225,16 @@ object ViewDataConverter {
                 .isSelected(false)
                 .build()
         }
+    }
+
+    fun convertDeleteTag(
+        tags: List<ReportTag>
+    ): MutableList<ReasonChooseViewData> {
+        return tags.map { tag ->
+            ReasonChooseViewData.Builder()
+                .value(tag.name)
+                .build()
+        }.toMutableList()
     }
 
     /**--------------------------------
