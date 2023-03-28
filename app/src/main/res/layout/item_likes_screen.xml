@@ -63,9 +63,9 @@
             app:layout_constraintBottom_toBottomOf="@id/tv_member_name"
             app:layout_constraintStart_toEndOf="@+id/view_dot"
             app:layout_constraintTop_toTopOf="@+id/tv_member_name"
+            app:textType="special"
             tools:fontFamily="@font/roboto_medium"
             tools:text="Community Member" />
-        <!--                    app:textType="special" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

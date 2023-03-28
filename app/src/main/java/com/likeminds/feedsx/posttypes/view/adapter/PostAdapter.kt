@@ -55,7 +55,7 @@ interface PostAdapterListener {
     fun comment(postId: String)
     fun onPostMenuItemClicked(postId: String, title: String)
     fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
-    fun showLikesScreen(postData: PostViewData)
+    fun showLikesScreen(postId: String)
     fun postDetail(postData: PostViewData) {}
     fun updateFromLikedSaved(position: Int) {}
     fun sendMediaItemToExoPlayer(

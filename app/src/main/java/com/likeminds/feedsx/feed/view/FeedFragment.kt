@@ -20,8 +20,10 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
-import com.likeminds.feedsx.feed.model.LikesScreenExtras
+import com.likeminds.feedsx.likes.model.LikesScreenExtras
+import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
@@ -85,6 +87,15 @@ class FeedFragment :
         // observes userResponse LiveData
         viewModel.userResponse.observe(viewLifecycleOwner) { response ->
             observeUserResponse(response)
+        }
+
+        // observes error events
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
+                    ViewUtils.showSomethingWentWrongToast(requireContext())
+                }
+            }
         }
 
         // observes logoutResponse LiveData
@@ -260,6 +271,28 @@ class FeedFragment :
         binding.recyclerView.apply {
             layoutManager = linearLayoutManager
             adapter = mPostAdapter
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val isExtended = binding.newPostButton.isExtended
+
+                    // Scroll down
+                    if (dy > 20 && isExtended) {
+                        binding.newPostButton.shrink()
+                    }
+
+                    // Scroll up
+                    if (dy < -20 && !isExtended) {
+                        binding.newPostButton.extend()
+                    }
+
+                    // At the top
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        binding.newPostButton.extend()
+                    }
+                }
+            })
             if (itemAnimator is SimpleItemAnimator)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             show()
@@ -546,10 +579,10 @@ class FeedFragment :
     }
 
     // opens likes screen when likes count is clicked.
-    override fun showLikesScreen(postData: PostViewData) {
+    override fun showLikesScreen(postId: String) {
         val likesScreenExtras = LikesScreenExtras.Builder()
-            .postId(postData.id)
-            .likesCount(postData.likesCount)
+            .postId(postId)
+            .entityType(POST)
             .build()
         LikesActivity.start(requireContext(), likesScreenExtras)
     }

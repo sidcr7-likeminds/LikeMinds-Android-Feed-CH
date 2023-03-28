@@ -16,8 +16,10 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
-import com.likeminds.feedsx.feed.model.LikesScreenExtras
-import com.likeminds.feedsx.feed.view.LikesActivity
+import com.likeminds.feedsx.likes.model.COMMENT
+import com.likeminds.feedsx.likes.model.LikesScreenExtras
+import com.likeminds.feedsx.likes.model.POST
+import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
@@ -209,7 +211,7 @@ class PostDetailFragment :
             "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
         mPostDetailAdapter.add(
             PostViewData.Builder()
-                .id("4")
+                .id("63f4caadc52f148210f7496a")
                 .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
                 .text(text)
                 .build()
@@ -224,7 +226,8 @@ class PostDetailFragment :
         mPostDetailAdapter.add(
             CommentViewData.Builder()
                 .isLiked(false)
-                .id("1")
+                .id("6412b3b39b922f785f94da50")
+                .postId("63f4caadc52f148210f7496a")
                 .user(
                     UserViewData.Builder()
                         .name("Siddharth Dubey")
@@ -238,6 +241,7 @@ class PostDetailFragment :
                             .entityId("1").build()
                     )
                 )
+                .likesCount(100)
                 .text("This is a test comment 1")
                 .build()
         )
@@ -400,11 +404,11 @@ class PostDetailFragment :
         )
     }
 
-    // callback when likes count is clicked - opens likes screen
-    override fun showLikesScreen(postData: PostViewData) {
+    // callback when likes count of post is clicked - opens likes screen
+    override fun showLikesScreen(postId: String) {
         val likesScreenExtras = LikesScreenExtras.Builder()
-            .postId(postData.id)
-            .likesCount(postData.likesCount)
+            .postId(postId)
+            .entityType(POST)
             .build()
         LikesActivity.start(requireContext(), likesScreenExtras)
     }
@@ -621,5 +625,15 @@ class PostDetailFragment :
                 getString(R.string.comment_deleted)
             )
         }
+    }
+
+    // callback when likes count of a comment is clicked - opens likes screen
+    override fun showLikesScreen(postId: String, commentId: String) {
+        val likesScreenExtras = LikesScreenExtras.Builder()
+            .postId(postId)
+            .commentId(commentId)
+            .entityType(COMMENT)
+            .build()
+        LikesActivity.start(requireContext(), likesScreenExtras)
     }
 }

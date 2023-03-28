@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.feed.view
+package com.likeminds.feedsx.likes.view
 
 import android.content.Context
 import android.content.Intent
@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ActivityLikesBinding
-import com.likeminds.feedsx.feed.model.LikesScreenExtras
+import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,13 +94,6 @@ class LikesActivity : BaseAppCompatActivity() {
 
     private fun initActionBar() {
         setSupportActionBar(binding.toolbar)
-        val likesCount = likesScreenExtras!!.likesCount
-        binding.tvToolbarSubTitle.text =
-            this.resources.getQuantityString(
-                R.plurals.likes_small,
-                likesCount,
-                likesCount
-            )
         binding.ivBack.setOnClickListener {
             onBackPressed()
         }
