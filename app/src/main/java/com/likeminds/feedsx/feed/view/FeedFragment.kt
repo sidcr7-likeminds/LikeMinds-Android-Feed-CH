@@ -25,9 +25,6 @@ import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
-import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
-import com.likeminds.feedsx.delete.view.DeleteDialogFragment
-import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
@@ -44,9 +41,6 @@ import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.view.CreatePostActivity
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
@@ -61,11 +55,9 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
-import com.likeminds.feedsx.utils.observeInLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 import java.util.*
-
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -234,6 +226,10 @@ class FeedFragment :
                 //show error message
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+            }
+            is FeedViewModel.ErrorMessageEvent.AddPost -> {
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                removePostingView()
             }
         }
     }

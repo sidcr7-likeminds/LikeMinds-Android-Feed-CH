@@ -9,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.likeminds.feedsx.feed.UserRepository
-import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -22,11 +21,7 @@ import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
-import com.likeminds.likemindsfeed.post.model.AddPostRequest
-import com.likeminds.likemindsfeed.post.model.DeletePostRequest
-import com.likeminds.likemindsfeed.post.model.LikePostRequest
-import com.likeminds.likemindsfeed.post.model.PinPostRequest
-import com.likeminds.likemindsfeed.post.model.SavePostRequest
+import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
 import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -356,7 +351,7 @@ class FeedViewModel @Inject constructor(
                     )
                 )
             } else {
-                errorEventChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
+                errorMessageChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
             }
 
             //set isPosted in db to true

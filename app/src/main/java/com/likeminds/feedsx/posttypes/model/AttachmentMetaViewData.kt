@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.posttypes.model
 
+import android.net.Uri
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
@@ -12,8 +13,9 @@ class AttachmentMetaViewData private constructor(
     val duration: Int?,
     val pageCount: Int?,
     val ogTags: LinkOGTagsViewData,
-    var width: Int?,
-    var height: Int?
+    val width: Int?,
+    val height: Int?,
+    val uri: Uri?
 ) : Parcelable {
     class Builder {
         private var name: String? = null
@@ -25,6 +27,7 @@ class AttachmentMetaViewData private constructor(
         private var ogTags: LinkOGTagsViewData = LinkOGTagsViewData.Builder().build()
         private var width: Int? = null
         private var height: Int? = null
+        private var uri: Uri? = null
 
         fun name(name: String?) = apply { this.name = name }
         fun url(url: String?) = apply { this.url = url }
@@ -35,6 +38,7 @@ class AttachmentMetaViewData private constructor(
         fun ogTags(ogTags: LinkOGTagsViewData) = apply { this.ogTags = ogTags }
         fun width(width: Int?) = apply { this.width = width }
         fun height(height: Int?) = apply { this.height = height }
+        fun uri(uri: Uri?) = apply { this.uri = uri }
 
         fun build() = AttachmentMetaViewData(
             name,
@@ -45,7 +49,8 @@ class AttachmentMetaViewData private constructor(
             pageCount,
             ogTags,
             width,
-            height
+            height,
+            uri
         )
     }
 
@@ -60,5 +65,6 @@ class AttachmentMetaViewData private constructor(
             .ogTags(ogTags)
             .width(width)
             .height(height)
+            .uri(uri)
     }
 }

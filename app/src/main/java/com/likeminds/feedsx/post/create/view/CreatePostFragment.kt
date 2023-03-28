@@ -30,11 +30,6 @@ import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdap
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.post.util.CreatePostListener
-import com.likeminds.feedsx.post.view.adapter.CreatePostDocumentsAdapter
-import com.likeminds.feedsx.post.view.adapter.CreatePostMultipleMediaAdapter
-import com.likeminds.feedsx.post.viewmodel.CreatePostViewModel
-import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
