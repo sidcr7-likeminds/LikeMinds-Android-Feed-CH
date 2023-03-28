@@ -3,9 +3,6 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostLinkBinding
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
@@ -14,16 +11,12 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_LINK
 
 class ItemPostLinkViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<ItemPostLinkBinding, PostViewData>(),
-    OverflowMenuAdapterListener {
-
-    private lateinit var overflowMenu: OverflowMenuPopup
+) : ViewDataBinder<ItemPostLinkBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_LINK
 
     override fun createBinder(parent: ViewGroup): ItemPostLinkBinding {
-        overflowMenu = OverflowMenuPopup.create(parent.context, this)
         return ItemPostLinkBinding.inflate(LayoutInflater.from(parent.context), parent, false)
     }
 
@@ -32,7 +25,6 @@ class ItemPostLinkViewDataBinder constructor(
         data: PostViewData,
         position: Int
     ) {
-
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
@@ -44,7 +36,6 @@ class ItemPostLinkViewDataBinder constructor(
         // checks whether to bind complete data or not and execute corresponding lambda function
         PostTypeUtil.initPostTypeBindData(
             binding.authorFrame,
-            overflowMenu,
             binding.tvPostContent,
             data,
             position,
@@ -63,11 +54,4 @@ class ItemPostLinkViewDataBinder constructor(
             }
         )
     }
-
-    // handles the menu item click on the post
-    override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        overflowMenu.dismiss()
-        listener.onPostMenuItemClicked(menu.entityId, menu.title)
-    }
-
 }

@@ -15,6 +15,7 @@ import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.post.model.DeletePostRequest
 import com.likeminds.likemindsfeed.post.model.LikePostRequest
+import com.likeminds.likemindsfeed.post.model.PinPostRequest
 import com.likeminds.likemindsfeed.post.model.SavePostRequest
 import com.likeminds.likemindsfeed.sdk.model.User
 import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
@@ -43,6 +44,9 @@ class FeedViewModel @Inject constructor(
     private val _deletePostResponse = MutableLiveData<String>()
     val deletePostResponse: LiveData<String> = _deletePostResponse
 
+    private val _pinPostResponse = MutableLiveData<String>()
+    val pinPostResponse: LiveData<String> = _pinPostResponse
+
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
 
@@ -52,6 +56,7 @@ class FeedViewModel @Inject constructor(
         data class LikePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
         data class SavePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
         data class DeletePost(val errorMessage: String?) : ErrorMessageEvent()
+        data class PinPost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
     }
 
     companion object {
@@ -242,6 +247,22 @@ class FeedViewModel @Inject constructor(
                 _deletePostResponse.postValue(postId)
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.DeletePost(response.errorMessage))
+            }
+        }
+    }
+
+    fun pinPost(postId: String) {
+        viewModelScope.launchIO {
+            val request = PinPostRequest.Builder()
+                .postId(postId)
+                .build()
+
+            val response = lmFeedClient.pinPost(request)
+
+            if (response.success) {
+                _pinPostResponse.postValue(postId)
+            } else {
+                errorMessageChannel.send(ErrorMessageEvent.PinPost(postId, response.errorMessage))
             }
         }
     }

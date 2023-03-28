@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.google.android.material.snackbar.Snackbar
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -118,6 +119,7 @@ class FeedFragment :
             //normal adding
             if (page == 1) {
                 mPostAdapter.setItemsViaDiffUtilForFeed(feed)
+                binding.recyclerView.scrollToPosition(0)
             } else {
                 mPostAdapter.addAll(feed)
             }
@@ -130,6 +132,19 @@ class FeedFragment :
                 requireContext(),
                 getString(R.string.post_deleted)
             )
+        }
+
+        viewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
+            val post = getIndexAndPostFromAdapter(postId).second
+            if (post.isPinned) {
+                Snackbar.make(binding.root, "Post pinned to top!", Snackbar.LENGTH_LONG)
+                    .setAction("Refresh") {
+                        refreshFeed()
+                    }
+                    .show()
+            } else {
+                ViewUtils.showShortToast(requireContext(), "Post unpinned!")
+            }
         }
 
         //observes errorMessage for the apis
@@ -200,6 +215,26 @@ class FeedFragment :
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
             is FeedViewModel.ErrorMessageEvent.DeletePost -> {
+                val errorMessage = response.errorMessage
+                ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+            }
+            is FeedViewModel.ErrorMessageEvent.PinPost -> {
+                val postId = response.postId
+
+                //get post and index
+                val pair = getIndexAndPostFromAdapter(postId)
+                val post = pair.second
+                val index = pair.first
+
+                //update post view data
+                val updatedPost = post.toBuilder()
+                    .isPinned(!post.isPinned)
+                    .build()
+
+                //update recycler view
+                mPostAdapter.update(index, updatedPost)
+
+                //show error message
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
@@ -306,10 +341,14 @@ class FeedFragment :
         )
 
         mSwipeRefreshLayout.setOnRefreshListener {
-            mSwipeRefreshLayout.isRefreshing = true
-            mScrollListener.resetData()
-            viewModel.getUniversalFeed(1)
+            refreshFeed()
         }
+    }
+
+    private fun refreshFeed() {
+        mSwipeRefreshLayout.isRefreshing = true
+        mScrollListener.resetData()
+        viewModel.getUniversalFeed(1)
     }
 
     //attach scroll listener for pagination
@@ -451,6 +490,7 @@ class FeedFragment :
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
+        Log.d("PUI", "postId menu: $postId")
         when (title) {
             DELETE_POST_MENU_ITEM -> {
                 deletePost(postId)
@@ -459,10 +499,10 @@ class FeedFragment :
                 reportPost(postId)
             }
             PIN_POST_MENU_ITEM -> {
-                // TODO: pin post
+                pinPost(postId)
             }
             UNPIN_POST_MENU_ITEM -> {
-                // TODO: unpin post
+                unpinPost(postId)
             }
         }
     }
@@ -565,6 +605,66 @@ class FeedFragment :
                 )
             }
         }
+
+    private fun pinPost(postId: String) {
+        //get item
+        val postAndIndex = getIndexAndPostFromAdapter(postId)
+        val index = postAndIndex.first
+        val post = postAndIndex.second
+
+        val menuItems = post.menuItems.toMutableList()
+        val pinPostIndex = menuItems.indexOfFirst {
+            (it.title == PIN_POST_MENU_ITEM)
+        }
+
+        if (pinPostIndex == -1) return
+
+        val pinPostMenuItem = menuItems[pinPostIndex]
+        val newPinPostMenuItem = pinPostMenuItem.toBuilder().title(UNPIN_POST_MENU_ITEM).build()
+        menuItems[pinPostIndex] = newPinPostMenuItem
+
+        //update the post view data
+        val newViewData = post.toBuilder()
+            .isPinned(!post.isPinned)
+            .menuItems(menuItems)
+            .build()
+
+        //call api
+        viewModel.pinPost(postId)
+
+        //update recycler
+        mPostAdapter.update(index, newViewData)
+    }
+
+    private fun unpinPost(postId: String) {
+        //get item
+        val postAndIndex = getIndexAndPostFromAdapter(postId)
+        val index = postAndIndex.first
+        val post = postAndIndex.second
+
+        val menuItems = post.menuItems.toMutableList()
+        val unPinPostIndex = menuItems.indexOfFirst {
+            (it.title == UNPIN_POST_MENU_ITEM)
+        }
+
+        if (unPinPostIndex == -1) return
+
+        val unPinPostMenuItem = menuItems[unPinPostIndex]
+        val newUnPinPostMenuItem = unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
+        menuItems[unPinPostIndex] = newUnPinPostMenuItem
+
+        //update the post view data
+        val newViewData = post.toBuilder()
+            .isPinned(!post.isPinned)
+            .menuItems(menuItems)
+            .build()
+
+        //call api
+        viewModel.pinPost(postId)
+
+        //update recycler
+        mPostAdapter.update(index, newViewData)
+    }
 
     /**
      * Media Block

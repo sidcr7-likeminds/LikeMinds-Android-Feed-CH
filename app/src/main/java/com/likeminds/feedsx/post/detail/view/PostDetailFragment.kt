@@ -235,10 +235,8 @@ class PostDetailFragment :
                 )
                 .menuItems(
                     listOf(
-                        OverflowMenuItemViewData.Builder().title(DELETE_COMMENT_MENU_ITEM)
-                            .entityId("1").build(),
-                        OverflowMenuItemViewData.Builder().title(REPORT_COMMENT_MENU_ITEM)
-                            .entityId("1").build()
+                        OverflowMenuItemViewData.Builder().title(DELETE_COMMENT_MENU_ITEM).build(),
+                        OverflowMenuItemViewData.Builder().title(REPORT_COMMENT_MENU_ITEM).build()
                     )
                 )
                 .likesCount(100)

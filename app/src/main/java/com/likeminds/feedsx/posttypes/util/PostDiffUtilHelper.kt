@@ -51,15 +51,14 @@ object PostDiffUtilHelper {
         return true
     }
 
-    fun overflowMenuItemViewData(
+    private fun overflowMenuItemViewData(
         oldItem: OverflowMenuItemViewData,
         newItem: OverflowMenuItemViewData
     ): Boolean {
         return oldItem.title == newItem.title
-                && oldItem.entityId == newItem.entityId
     }
 
-    fun attachmentViewDataList(
+    private fun attachmentViewDataList(
         oldItem: List<AttachmentViewData>,
         newItem: List<AttachmentViewData>
     ): Boolean {
@@ -71,7 +70,7 @@ object PostDiffUtilHelper {
         return true
     }
 
-    fun attachmentViewData(
+    private fun attachmentViewData(
         oldItem: AttachmentViewData,
         newItem: AttachmentViewData
     ): Boolean {
@@ -80,7 +79,7 @@ object PostDiffUtilHelper {
                 && attachmentMetaViewData(oldItem.attachmentMeta, newItem.attachmentMeta)
     }
 
-    fun attachmentMetaViewData(
+    private fun attachmentMetaViewData(
         oldItem: AttachmentMetaViewData,
         newItem: AttachmentMetaViewData
     ): Boolean {
@@ -91,7 +90,7 @@ object PostDiffUtilHelper {
                 && linkOGTagsViewData(oldItem.ogTags, newItem.ogTags)
     }
 
-    fun linkOGTagsViewData(
+    private fun linkOGTagsViewData(
         oldItem: LinkOGTagsViewData,
         newItem: LinkOGTagsViewData
     ): Boolean {

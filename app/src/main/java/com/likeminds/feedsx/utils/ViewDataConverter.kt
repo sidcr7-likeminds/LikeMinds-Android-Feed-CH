@@ -116,7 +116,7 @@ object ViewDataConverter {
                 .isPinned(post.isPinned)
                 .isSaved(post.isSaved)
                 .isLiked(post.isLiked)
-                .menuItems(convertOverflowMenuItems(post.menuItems, postId))
+                .menuItems(convertOverflowMenuItems(post.menuItems))
                 .attachments(convertAttachments(post.attachments))
                 .userId(postCreator)
                 .likesCount(post.likesCount)
@@ -129,13 +129,11 @@ object ViewDataConverter {
     }
 
     private fun convertOverflowMenuItems(
-        menuItems: List<MenuItem>,
-        entityId: String
+        menuItems: List<MenuItem>
     ): List<OverflowMenuItemViewData> {
         return menuItems.map { menuItem ->
             OverflowMenuItemViewData.Builder()
                 .title(menuItem.title)
-                .entityId(entityId)
                 .build()
         }
     }
