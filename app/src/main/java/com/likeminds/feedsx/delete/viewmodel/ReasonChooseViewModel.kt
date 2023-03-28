@@ -29,8 +29,10 @@ class ReasonChooseViewModel @Inject constructor() : ViewModel() {
         const val REPORT_TAG_TYPE = 1
     }
 
+    // calls api and fetches report tags
     fun getReportTags() {
         viewModelScope.launchIO {
+            // builds report tag request
             val request = GetReportTagsRequest.Builder()
                 .type(REPORT_TAG_TYPE)
                 .build()
@@ -39,6 +41,7 @@ class ReasonChooseViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // processes report tag request and sends response to UI
     private fun reportTagsFetched(response: LMResponse<GetReportTagsResponse>) {
         if (response.success) {
             val data = response.data ?: return

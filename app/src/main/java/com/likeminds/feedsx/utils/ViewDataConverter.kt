@@ -74,6 +74,7 @@ object ViewDataConverter {
             .build()
     }
 
+    //created a deleted user object
     private fun createDeletedUser(): UserViewData {
         val tempUserId = (System.currentTimeMillis() / 1000).toInt()
         return UserViewData.Builder()
@@ -128,6 +129,10 @@ object ViewDataConverter {
         }
     }
 
+    /**
+     * convert list of [MenuItem] to [OverflowMenuItemViewData]
+     * @param menuItems: list of [MenuItem]
+     * */
     private fun convertOverflowMenuItems(
         menuItems: List<MenuItem>
     ): List<OverflowMenuItemViewData> {
@@ -183,7 +188,11 @@ object ViewDataConverter {
             .build()
     }
 
-    // converts Like network model to view data model
+    /**
+     * convert list of [Like] to list of [LikeViewData]
+     * @param likes: list of [Like]
+     * @param users: [Map] of String to User
+     * */
     fun convertLikes(
         likes: List<Like>,
         users: Map<String, User>
@@ -213,6 +222,10 @@ object ViewDataConverter {
         }
     }
 
+    /**
+     * convert list of [ReportTag] to list of [ReportTagViewData]
+     * @param tags: list of [ReportTag]
+     * */
     fun convertReportTag(
         tags: List<ReportTag>
     ): List<ReportTagViewData> {
@@ -225,6 +238,10 @@ object ViewDataConverter {
         }
     }
 
+    /**
+     * convert list of [ReportTag] to list of [ReasonChooseViewData]
+     * @param tags: list of [ReportTag]
+     * */
     fun convertDeleteTag(
         tags: List<ReportTag>
     ): MutableList<ReasonChooseViewData> {

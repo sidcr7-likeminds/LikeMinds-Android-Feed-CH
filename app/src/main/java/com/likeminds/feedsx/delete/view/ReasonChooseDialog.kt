@@ -13,6 +13,7 @@ import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseBottomSheetFragment
 import dagger.hilt.android.AndroidEntryPoint
 
+// bottom sheet dialog to show the reasons list
 @AndroidEntryPoint
 class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
     ReasonChooseAdapterListener {
@@ -41,13 +42,16 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
         initData()
     }
 
+    // observes data
     override fun observeData() {
         super.observeData()
 
+        // observes [listOfTagViewData] and replaces items in sheet
         viewModel.listOfTagViewData.observe(viewLifecycleOwner) { tags ->
             reasonChooseAdapter.replace(tags)
         }
 
+        // observes [errorMessage] and shows error toast
         viewModel.errorMessage.observe(viewLifecycleOwner) { errorMessage ->
             ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             dismiss()
@@ -71,6 +75,7 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
         }
     }
 
+    // fetches report tags
     private fun initData() {
         viewModel.getReportTags()
     }

@@ -10,6 +10,7 @@ import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 
+//when user deletes their own post
 class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBinding>() {
 
     companion object {
@@ -70,9 +71,10 @@ class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBind
         }
     }
 
-    // sets click listeners to select reason and submit request
+    // sets click listeners
     private fun initializeListeners() {
 
+        // submits post delete request and triggers callback
         binding.tvDelete.setOnClickListener {
             deleteAlertDialogListener?.selfDelete(
                 deleteExtras
@@ -80,6 +82,7 @@ class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBind
             dismiss()
         }
 
+        // dismisses the delete dialog
         binding.tvCancel.setOnClickListener {
             dismiss()
         }

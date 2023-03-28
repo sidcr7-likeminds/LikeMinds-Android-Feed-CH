@@ -102,27 +102,7 @@ class FeedFragment :
 
         // observe universal feed
         viewModel.universalFeedResponse.observe(viewLifecycleOwner) { pair ->
-            ProgressHelper.hideProgress(binding.progressBar)
-            //page in api send
-            val page = pair.first
-
-            //list of post
-            val feed = pair.second
-
-            //if pull to refresh is called
-            if (mSwipeRefreshLayout.isRefreshing) {
-                binding.recyclerView.scrollToPosition(0)
-                mPostAdapter.setItemsViaDiffUtilForFeed(feed)
-                mSwipeRefreshLayout.isRefreshing = false
-            }
-
-            //normal adding
-            if (page == 1) {
-                mPostAdapter.setItemsViaDiffUtilForFeed(feed)
-                binding.recyclerView.scrollToPosition(0)
-            } else {
-                mPostAdapter.addAll(feed)
-            }
+            observeFeedUniversal(pair)
         }
 
         viewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
@@ -241,6 +221,30 @@ class FeedFragment :
         }
     }
 
+    //observe feed response
+    private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
+        //hide progress bar
+        ProgressHelper.hideProgress(binding.progressBar)
+        //page in api send
+        val page = pair.first
+
+        //list of post
+        val feed = pair.second
+
+        //if pull to refresh is called
+        if (mSwipeRefreshLayout.isRefreshing) {
+            setFeedAndScrollToTop(feed)
+            mSwipeRefreshLayout.isRefreshing = false
+        }
+
+        //normal adding
+        if (page == 1) {
+            setFeedAndScrollToTop(feed)
+        } else {
+            mPostAdapter.addAll(feed)
+        }
+    }
+
     // shows invalid access error and logs out invalid user
     private fun showInvalidAccess() {
         binding.apply {
@@ -259,6 +263,7 @@ class FeedFragment :
 
     override fun onStop() {
         super.onStop()
+        //release player
         lmExoplayer.release()
     }
 
@@ -301,28 +306,6 @@ class FeedFragment :
         binding.recyclerView.apply {
             layoutManager = linearLayoutManager
             adapter = mPostAdapter
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val isExtended = binding.newPostButton.isExtended
-
-                    // Scroll down
-                    if (dy > 20 && isExtended) {
-                        binding.newPostButton.shrink()
-                    }
-
-                    // Scroll up
-                    if (dy < -20 && !isExtended) {
-                        binding.newPostButton.extend()
-                    }
-
-                    // At the top
-                    if (!recyclerView.canScrollVertically(-1)) {
-                        binding.newPostButton.extend()
-                    }
-                }
-            })
             if (itemAnimator is SimpleItemAnimator)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             show()
@@ -345,6 +328,13 @@ class FeedFragment :
         }
     }
 
+    //set posts through diff utils and scroll to top of the feed
+    private fun setFeedAndScrollToTop(feed: List<PostViewData>) {
+        mPostAdapter.setItemsViaDiffUtilForFeed(feed)
+        binding.recyclerView.scrollToPosition(0)
+    }
+
+    //refresh the whole feed
     private fun refreshFeed() {
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
@@ -362,7 +352,6 @@ class FeedFragment :
                     viewModel.getUniversalFeed(currentPage)
                 }
             }
-
 
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -383,10 +372,6 @@ class FeedFragment :
                 if (!recyclerView.canScrollVertically(-1)) {
                     binding.newPostButton.extend()
                 }
-
-                val firstCompletelyVisibleItem =
-                    layoutManager.findFirstCompletelyVisibleItemPosition()
-                Log.d("PUI", "firstCompletelyVisibleItem: $firstCompletelyVisibleItem")
             }
         }
 
@@ -612,13 +597,16 @@ class FeedFragment :
         val index = postAndIndex.first
         val post = postAndIndex.second
 
+        //get pin menu item
         val menuItems = post.menuItems.toMutableList()
         val pinPostIndex = menuItems.indexOfFirst {
             (it.title == PIN_POST_MENU_ITEM)
         }
 
+        //if pin item doesn't exist
         if (pinPostIndex == -1) return
 
+        //update pin menu item
         val pinPostMenuItem = menuItems[pinPostIndex]
         val newPinPostMenuItem = pinPostMenuItem.toBuilder().title(UNPIN_POST_MENU_ITEM).build()
         menuItems[pinPostIndex] = newPinPostMenuItem
@@ -642,13 +630,16 @@ class FeedFragment :
         val index = postAndIndex.first
         val post = postAndIndex.second
 
+        //get unpin menu item
         val menuItems = post.menuItems.toMutableList()
         val unPinPostIndex = menuItems.indexOfFirst {
             (it.title == UNPIN_POST_MENU_ITEM)
         }
 
+        //if unpin item doesn't exist
         if (unPinPostIndex == -1) return
 
+        //update unpin menu item
         val unPinPostMenuItem = menuItems[unPinPostIndex]
         val newUnPinPostMenuItem = unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
         menuItems[unPinPostIndex] = newUnPinPostMenuItem
@@ -670,6 +661,7 @@ class FeedFragment :
      * Media Block
      **/
 
+    //initialize exo player
     private fun initializeExoplayer() {
         lmExoplayer.initialize(this)
     }
@@ -760,6 +752,7 @@ class FeedFragment :
                 .isExpanded(true)
                 .fromPostSaved(false)
                 .fromPostLiked(false)
+                .fromVideoAction(false)
                 .build()
         )
     }

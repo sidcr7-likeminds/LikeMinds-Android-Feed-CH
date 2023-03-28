@@ -14,6 +14,7 @@ const val REPORT_TYPE_REPLY = 7
 @Retention(AnnotationRetention.SOURCE)
 annotation class ReportType {
     companion object {
+        //return entity type in string for id
         fun getEntityType(@ReportType type: Int): String {
             return when (type) {
                 REPORT_TYPE_COMMENT -> "Comment"

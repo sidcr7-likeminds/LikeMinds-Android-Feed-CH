@@ -167,6 +167,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         }
     }
 
+    //get tags
     private fun getReportTags() {
         viewModel.getReportTags()
     }

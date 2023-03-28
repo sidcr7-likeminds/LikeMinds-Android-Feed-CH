@@ -33,6 +33,7 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         const val REPORT_TAG_TYPE = 0
     }
 
+    //Get report tags for reporting
     fun getReportTags() {
         viewModelScope.launchIO {
             val request = GetReportTagsRequest.Builder()
@@ -43,6 +44,7 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    //to convert to TagViewData
     private fun reportTagsFetched(response: LMResponse<GetReportTagsResponse>) {
         if (response.success) {
             val data = response.data ?: return
@@ -54,6 +56,7 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    //for reporting post/comment/reply
     fun postReport(
         entityId: String,
         entityCreatorId: String,

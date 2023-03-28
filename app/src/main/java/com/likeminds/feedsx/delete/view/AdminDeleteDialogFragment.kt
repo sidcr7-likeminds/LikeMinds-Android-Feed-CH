@@ -15,6 +15,7 @@ import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 
+//when cm deletes others user post
 class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBinding>(),
     ReasonChooseDialog.ReasonChooseDialogListener {
 
@@ -76,12 +77,13 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
         }
     }
 
-    // sets click listeners to select reason and submit request
+    // sets listeners
     private fun initializeListeners() {
         binding.cvReason.setOnClickListener {
             ReasonChooseDialog.newInstance(childFragmentManager)
         }
 
+        // submits post delete request with reason/tag and triggers callback
         binding.tvConfirm.setOnClickListener {
             val data = binding.reasonData ?: return@setOnClickListener
             val tag = data.value
@@ -101,10 +103,12 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
             dismiss()
         }
 
+        // dismisses the delete dialog
         binding.tvCancel.setOnClickListener {
             dismiss()
         }
 
+        // sets listener to the reason edit text
         binding.etOtherReason.doAfterTextChanged {
             val reason = it.toString().trim()
             handleConfirmButton(reason.isNotEmpty())

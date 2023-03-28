@@ -8,6 +8,13 @@ object TimeUtil {
     private const val HOUR_IN_MILLIS = 60 * 60 * 1000
     private const val MINUTE_IN_MILLIS = 60 * 1000
 
+
+    //to get the relative time for post/comment/reply
+    fun getRelativeTimeInString(createdTime: Long): String {
+        val timeDifference = System.currentTimeMillis() - createdTime
+        return getDaysHoursOrMinutes(timeDifference)
+    }
+
     // Sets the time of the post as
     // x min (if days & hours are 0 and min > 0)
     // x h (if days are 0)

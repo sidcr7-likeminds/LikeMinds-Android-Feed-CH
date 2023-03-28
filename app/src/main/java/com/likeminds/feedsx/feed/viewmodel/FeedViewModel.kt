@@ -231,7 +231,7 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    // calls DeletePost API and posts the response/error message in LiveData
+    //for delete post
     fun deletePost(
         postId: String,
         reason: String? = null
@@ -242,7 +242,9 @@ class FeedViewModel @Inject constructor(
                 .deleteReason(reason)
                 .build()
 
+            //call delete post api
             val response = lmFeedClient.deletePost(request)
+
             if (response.success) {
                 _deletePostResponse.postValue(postId)
             } else {
@@ -251,12 +253,14 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    //for pin/unpin post
     fun pinPost(postId: String) {
         viewModelScope.launchIO {
             val request = PinPostRequest.Builder()
                 .postId(postId)
                 .build()
 
+            //call pin api
             val response = lmFeedClient.pinPost(request)
 
             if (response.success) {

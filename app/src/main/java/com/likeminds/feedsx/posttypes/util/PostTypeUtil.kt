@@ -75,10 +75,10 @@ object PostTypeUtil {
 
         binding.viewDotEdited.hide()
         binding.tvEdited.hide()
-        val timeDifference = System.currentTimeMillis() - data.createdAt
-        binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(timeDifference)
+        binding.tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
     }
 
+    //to show overflow menu for post/comment/reply
     private fun showMenu(
         view: View,
         postId: String,
