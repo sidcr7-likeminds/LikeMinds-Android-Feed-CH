@@ -165,9 +165,9 @@ class FeedFragment :
     // initiates SDK
     private fun initiateSDK() {
         viewModel.initiateUser(
-            "6a4cc38e-02c7-4dfa-96b7-68a3078ad922",
-            "10003",
-            "Ishaan",
+            "69edd43f-4a5e-4077-9c50-2b7aa740acce",
+            "ff529daa-5327-4a23-ba3e-5af8f987db5e",
+            "Fasfaas",
             false
         )
     }

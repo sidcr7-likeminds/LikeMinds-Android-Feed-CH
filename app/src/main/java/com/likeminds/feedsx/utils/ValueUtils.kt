@@ -97,5 +97,4 @@ object ValueUtils {
                 uri.host.equals("youtu.be") ||
                 uri.host.equals("www.youtube.com")
     }
-
 }

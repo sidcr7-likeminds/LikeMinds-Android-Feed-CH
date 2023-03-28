@@ -40,7 +40,6 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
@@ -80,6 +79,7 @@ class CreatePostFragment :
         initPostDoneListener()
     }
 
+    // TODO: remove branding
     private fun initMemberTaggingView() {
         memberTagging = binding.memberTaggingView
         memberTagging.initialize(
@@ -93,25 +93,6 @@ class CreatePostFragment :
                 .build()
         )
         memberTagging.addListener(object : MemberTaggingViewListener {
-            override fun onMemberTagged(user: MemberTagViewData) {
-//                viewModel.sendUserTagEvent(
-//                    user,
-//                    communityId
-//                )
-            }
-
-//            override fun onShow() {
-//                binding.inputBox.clChatContainer.setBackgroundResource(R.drawable.background_white_24_bottom_black10_1)
-//            }
-//
-//            override fun onHide() {
-//                if (isReplyViewVisible() || isLinkViewVisible() || isInternalLinkViewVisible()) {
-//                    binding.inputBox.clChatContainer.setBackgroundResource(R.drawable.background_white_12top_24_bottom_black10_1)
-//                } else {
-//                    binding.inputBox.clChatContainer.setBackgroundResource(R.drawable.background_white_24_black10_1)
-//                }
-//            }
-
             override fun callApi(page: Int, searchName: String) {
                 viewModel.getMembersForTagging(page, searchName)
             }

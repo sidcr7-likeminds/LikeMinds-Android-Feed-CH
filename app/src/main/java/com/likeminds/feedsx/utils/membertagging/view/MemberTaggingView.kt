@@ -195,7 +195,8 @@ class MemberTaggingView(
     }
 
     override fun onMemberTagged(user: MemberTagViewData) {
-        val memberName = SpannableString(user.name)
+        val tagSpannableString = "@${user.name}"
+        val memberName = SpannableString(tagSpannableString)
 
         //if id == 0, then it is a group tag
         val regex = if (user.id == 0) {
