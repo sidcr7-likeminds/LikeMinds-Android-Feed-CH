@@ -69,13 +69,81 @@ class PostDetailFragment :
 
     override fun setUpViews() {
         super.setUpViews()
+
+        fetchPostData()
         initRecyclerView()
+        initMemberTaggingView()
         initCommentEditText()
         initSwipeRefreshLayout()
         initListeners()
+    }
 
-        //TODO: testing data
-        updateCommentsCount(10)
+    override fun observeData() {
+        super.observeData()
+
+        observePostData()
+        observeMembersTaggingList()
+        observeErrors()
+    }
+
+    private fun observePostData() {
+        viewModel.postResponse.observe(viewLifecycleOwner) { pair ->
+            val page = pair.first
+            val post = pair.second
+            updateCommentsCount(post.commentsCount)
+        }
+    }
+
+    private fun fetchPostData() {
+        viewModel.getPost(postDetailExtras.postId, 1)
+    }
+
+    /**
+     * Observes for member tagging list, This is a live observer which will update itself on addition of new members
+     * [taggingData] contains first -> page called in api
+     * second -> Community Members and Groups
+     */
+    private fun observeMembersTaggingList() {
+        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
+            MemberTaggingUtil.setMembersInView(memberTagging, result)
+        }
+    }
+
+    // observes error events
+    private fun observeErrors() {
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is PostDetailViewModel.ErrorMessageEvent.GetTaggingList -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is PostDetailViewModel.ErrorMessageEvent.GetPost -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+            }
+        }
+    }
+
+    /**
+     * initializes the [memberTaggingView] with the edit text
+     * also sets listener to the [memberTaggingView]
+     */
+    private fun initMemberTaggingView() {
+        memberTagging = binding.memberTaggingView
+        memberTagging.initialize(
+            MemberTaggingExtras.Builder()
+                .editText(binding.etComment)
+                .maxHeightInPercentage(0.4f)
+                .color(
+                    BrandingData.currentAdvanced?.third
+                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                )
+                .build()
+        )
+        memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun callApi(page: Int, searchName: String) {
+                viewModel.getMembersForTagging(page, searchName)
+            }
+        })
     }
 
     // initializes the post detail screen recycler view
@@ -145,7 +213,6 @@ class PostDetailFragment :
         mSwipeRefreshLayout.isRefreshing = false
     }
 
-    // TODO: call after fetching post
     // updates the comments count on toolbar
     private fun updateCommentsCount(commentsCount: Int) {
         (requireActivity() as PostDetailActivity).binding.tvToolbarSubTitle.text =
@@ -255,46 +322,6 @@ class PostDetailFragment :
                 )
                 .likesCount(10)
                 .text("This is a test comment 2")
-                .build()
-        )
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("3")
-                .user(
-                    UserViewData.Builder()
-                        .name("Natesh Rehlan")
-                        .build()
-                )
-                .likesCount(10)
-                .text("This is a test comment 3")
-                .build()
-        )
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("4")
-                .user(
-                    UserViewData.Builder()
-                        .name("Natesh Rehlan")
-                        .build()
-                )
-                .likesCount(10)
-                .text("This is a test comment 4")
-                .build()
-        )
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("5")
-                .user(
-                    UserViewData.Builder()
-                        .name("Natesh Rehlan")
-                        .build()
-                )
-                .likesCount(100)
-                .repliesCount(10)
-                .text("This is a test comment 5")
                 .build()
         )
     }
@@ -433,31 +460,6 @@ class PostDetailFragment :
                         )
                         .level(1)
                         .text("This is a test reply 1")
-                        .build(),
-                    CommentViewData.Builder()
-                        .isLiked(false)
-                        .id("7")
-                        .user(
-                            UserViewData.Builder()
-                                .name("Natesh Rehlan")
-                                .build()
-                        )
-                        .likesCount(10)
-                        .repliesCount(5)
-                        .level(1)
-                        .text("This is a test reply 2")
-                        .build(),
-                    CommentViewData.Builder()
-                        .isLiked(true)
-                        .id("8")
-                        .user(
-                            UserViewData.Builder()
-                                .name("Natesh Rehlan")
-                                .build()
-                        )
-                        .likesCount(10)
-                        .level(1)
-                        .text("This is a test reply 3")
                         .build()
                 )
             )
@@ -545,31 +547,6 @@ class PostDetailFragment :
                             )
                             .level(1)
                             .text("This is a test reply 1")
-                            .build(),
-                        CommentViewData.Builder()
-                            .isLiked(false)
-                            .id("7")
-                            .user(
-                                UserViewData.Builder()
-                                    .name("Natesh Rehlan")
-                                    .build()
-                            )
-                            .likesCount(10)
-                            .repliesCount(5)
-                            .level(1)
-                            .text("This is a test reply 2")
-                            .build(),
-                        CommentViewData.Builder()
-                            .isLiked(true)
-                            .id("8")
-                            .user(
-                                UserViewData.Builder()
-                                    .name("Natesh Rehlan")
-                                    .build()
-                            )
-                            .likesCount(10)
-                            .level(1)
-                            .text("This is a test reply 3")
                             .build()
                     )
                 )

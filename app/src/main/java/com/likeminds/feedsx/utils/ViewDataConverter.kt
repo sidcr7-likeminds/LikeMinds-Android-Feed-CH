@@ -205,13 +205,25 @@ object ViewDataConverter {
                 .isSaved(post.isSaved)
                 .isLiked(post.isLiked)
                 .menuItems(convertOverflowMenuItems(post.menuItems))
-                .attachments(convertAttachments(post.attachments))
+                .comments(convertComments(post.replies))
+            .attachments(convertAttachments(post.attachments))
                 .userId(postCreator)
                 .likesCount(post.likesCount)
                 .commentsCount(post.commentsCount)
                 .createdAt(post.createdAt)
                 .updatedAt(post.updatedAt)
                 .user(userViewData)
+                .build()
+        }
+    }
+
+    private fun convertComments(
+        comments: List<CommentViewData>
+    ): List<CommentViewData> {
+        return comments.map { comment ->
+            OverflowMenuItemViewData.Builder()
+                .title(menuItem.title)
+                .entityId(comment)
                 .build()
         }
     }
