@@ -14,8 +14,8 @@ import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_COMMENT
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
-import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
-import com.likeminds.feedsx.delete.view.DeleteDialogFragment
+import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
+import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
 import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -30,7 +30,7 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.Post
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
@@ -49,8 +49,8 @@ class PostDetailFragment :
     PostAdapterListener,
     PostDetailAdapterListener,
     PostDetailReplyAdapterListener,
-    DeleteAlertDialogFragment.DeleteAlertDialogListener,
-    DeleteDialogFragment.DeleteDialogListener {
+    SelfDeleteDialogFragment.DeleteAlertDialogListener,
+    AdminDeleteDialogFragment.DeleteDialogListener {
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -235,10 +235,8 @@ class PostDetailFragment :
                 )
                 .menuItems(
                     listOf(
-                        OverflowMenuItemViewData.Builder().title(DELETE_COMMENT_MENU_ITEM)
-                            .entityId("1").build(),
-                        OverflowMenuItemViewData.Builder().title(REPORT_COMMENT_MENU_ITEM)
-                            .entityId("1").build()
+                        OverflowMenuItemViewData.Builder().title(DELETE_COMMENT_MENU_ITEM).build(),
+                        OverflowMenuItemViewData.Builder().title(REPORT_COMMENT_MENU_ITEM).build()
                     )
                 )
                 .likesCount(100)
@@ -320,18 +318,18 @@ class PostDetailFragment :
         //TODO: set isAdmin
         val isAdmin = false
         val deleteExtras = DeleteExtras.Builder()
-            .entityId(entityId)
+            .postId(entityId)
             .entityType(entityType)
             .build()
         if (isAdmin) {
             // when CM deletes other user's post
-            DeleteDialogFragment.showDialog(
+            AdminDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
         } else {
             // when user deletes their own entity
-            DeleteAlertDialogFragment.showDialog(
+            SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
@@ -347,7 +345,7 @@ class PostDetailFragment :
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(entityId)
-            .type(entityType)
+            .entityType(entityType)
             .build()
 
         //get Intent for [ReportActivity]
@@ -596,7 +594,7 @@ class PostDetailFragment :
         }
 
     // callback when self post is deleted by user
-    override fun delete(deleteExtras: DeleteExtras) {
+    override fun selfDelete(deleteExtras: DeleteExtras) {
         // TODO: delete post/comment by user
         Log.d("TAG", "initializeListeners: ${deleteExtras.entityType}")
         when (deleteExtras.entityType) {
@@ -612,7 +610,7 @@ class PostDetailFragment :
     }
 
     // callback when other's post is deleted by CM
-    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
+    override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
         // TODO: delete post/comment by admin
         Log.d("TAG", "initializeListeners by admin: ${deleteExtras.entityType}")
         when (deleteExtras.entityType) {

@@ -19,7 +19,7 @@ import com.likeminds.feedsx.post.util.CreatePostListener
 import com.likeminds.feedsx.post.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.viewmodel.CreatePostViewModel
-import com.likeminds.feedsx.posttypes.model.LinkOGTags
+import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
@@ -222,7 +222,7 @@ class CreatePostFragment :
 //            }
             //TODO: testing data
 
-            val linkData = LinkOGTags.Builder()
+            val linkData = LinkOGTagsViewData.Builder()
                 .title("Youtube video")
                 .image("https://i.ytimg.com/vi/EbyAoYaUcVo/hq720.jpg?sqp=-oaymwEcCNAFEJQDSFXyq4qpAw4IARUAAIhCGAFwAcABBg==&rs=AOn4CLDiI5bXtT71sC4IAnHiDAh52LxbFA")
                 .url("https://www.youtube.com/watch?v=sAuQjwEl-Bo")
@@ -238,7 +238,7 @@ class CreatePostFragment :
     }
 
     // renders data in the link view
-    private fun initLinkView(data: LinkOGTags) {
+    private fun initLinkView(data: LinkOGTagsViewData) {
         binding.linkPreview.apply {
             this.root.show()
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {

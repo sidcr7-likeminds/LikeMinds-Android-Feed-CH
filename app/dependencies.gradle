@@ -18,6 +18,9 @@ dependencies {
     implementation deps.hilt.main
     kapt deps.hilt.compiler
 
+    //exoplayer
+    implementation deps.exo_player.main
+
     //lifecycle and viewmodel
     implementation deps.lifecycle.viewmodel
     implementation deps.lifecycle.livedata
@@ -45,5 +48,5 @@ dependencies {
     kapt deps.room.compiler
 
     // feed-sdk
-    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:c3af87b472"
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:3cfb1e75a3"
 }

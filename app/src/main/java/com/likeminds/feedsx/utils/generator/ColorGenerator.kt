@@ -1,4 +1,4 @@
-package com.likeminds.likemindschat.utils.generator
+package com.likeminds.feedsx.utils.generator
 
 import java.util.*
 import kotlin.math.abs

@@ -19,7 +19,7 @@ class UserRepository @Inject constructor(
         userDao.deleteUser(user)
     }
 
-    suspend fun getUser(id: Int): UserEntity {
+    suspend fun getUser(id: String): UserEntity {
         return userDao.getUser(id)
     }
 }

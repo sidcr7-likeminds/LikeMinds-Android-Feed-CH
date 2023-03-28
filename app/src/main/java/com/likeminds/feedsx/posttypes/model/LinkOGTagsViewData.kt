@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class LinkOGTags private constructor(
+class LinkOGTagsViewData private constructor(
     val title: String?,
     val image: String?,
     val description: String?,
@@ -22,7 +22,7 @@ class LinkOGTags private constructor(
         fun description(description: String?) = apply { this.description = description }
         fun url(url: String?) = apply { this.url = url }
 
-        fun build() = LinkOGTags(
+        fun build() = LinkOGTagsViewData(
             title,
             image,
             description,

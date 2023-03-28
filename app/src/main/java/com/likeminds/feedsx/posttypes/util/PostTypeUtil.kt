@@ -3,25 +3,29 @@ package com.likeminds.feedsx.posttypes.util
 import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
-import android.view.Gravity
+import android.text.util.Linkify
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
-import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
+import com.likeminds.feedsx.utils.LikeMindsBounceInterpolator
+import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.SeeMoreUtil
+import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -33,49 +37,65 @@ import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
 
 object PostTypeUtil {
-
-    private const val TAG = "PostTypeUtil"
     private const val SHOW_MORE_COUNT = 2
 
     // initializes author data frame on the post
-    fun initAuthorFrame(
+    private fun initAuthorFrame(
         binding: LayoutAuthorFrameBinding,
         data: PostViewData,
-        overflowMenu: OverflowMenuPopup
+        listener: PostAdapterListener
     ) {
-        //TODO: Change pin filled drawable
-        if (data.isPinned) binding.ivPin.show()
-        else binding.ivPin.hide()
 
-        binding.ivPostMenu.setOnClickListener {
-            showOverflowMenu(binding.ivPostMenu, overflowMenu)
+        if (data.isPinned) {
+            binding.ivPin.show()
+        } else {
+            binding.ivPin.hide()
+        }
+
+        binding.ivPostMenu.setOnClickListener { view ->
+            showMenu(view, data.id, data.menuItems, listener)
         }
 
         // creator data
         val user = data.user
         binding.tvMemberName.text = user.name
-        binding.tvCustomTitle.text = user.customTitle
+        if (user.customTitle.isNullOrEmpty()) {
+            binding.tvCustomTitle.hide()
+        } else {
+            binding.tvCustomTitle.show()
+            binding.tvCustomTitle.text = user.customTitle
+        }
         MemberImageUtil.setImage(
             user.imageUrl,
             user.name,
-            data.id,
+            user.userUniqueId,
             binding.memberImage,
             showRoundImage = true
         )
 
         binding.viewDotEdited.hide()
         binding.tvEdited.hide()
-        binding.tvTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
+        binding.tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
     }
 
-    //to show the overflow menu
-    fun showOverflowMenu(ivMenu: ImageView, overflowMenu: OverflowMenuPopup) {
-        overflowMenu.showAsDropDown(
-            ivMenu,
-            -ViewUtils.dpToPx(16),
-            -ivMenu.height / 2,
-            Gravity.START
-        )
+    //to show overflow menu for post/comment/reply
+    private fun showMenu(
+        view: View,
+        postId: String,
+        menuItems: List<OverflowMenuItemViewData>,
+        listener: PostAdapterListener
+    ) {
+        val popup = PopupMenu(view.context, view)
+        menuItems.forEach { menuItem ->
+            popup.menu.add(menuItem.title)
+        }
+
+        popup.setOnMenuItemClickListener { menuItem ->
+            listener.onPostMenuItemClicked(postId, menuItem.title.toString())
+            true
+        }
+
+        popup.show()
     }
 
     // initializes the recyclerview with attached documents
@@ -159,8 +179,17 @@ object PostTypeUtil {
             if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_filled)
             else ivLike.setImageResource(R.drawable.ic_like_unfilled)
 
-            if (data.isSaved) ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
-            else ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+            if (data.isLiked) {
+                binding.ivLike.setImageResource(R.drawable.ic_like_filled)
+            } else {
+                binding.ivLike.setImageResource(R.drawable.ic_like_unfilled)
+            }
+
+            if (data.isSaved) {
+                binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+            } else {
+                binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+            }
 
             // bounce animation for like and save button
             val bounceAnim: Animation by lazy {
@@ -244,13 +273,18 @@ object PostTypeUtil {
     }
 
     // handles the text content of each post
-    fun initTextContent(
+    private fun initTextContent(
         tvPostContent: TextView,
         data: PostViewData,
         itemPosition: Int,
         adapterListener: PostAdapterListener
     ) {
         val context = tvPostContent.context
+
+        /**
+         * Text is modified as Linkify doesn't accept texts with these specific unicode characters
+         * @see #Linkify.containsUnsupportedCharacters(String)
+         */
         val textForLinkify = data.text.getValidTextForLinkify()
 
         var alreadySeenFullContent = data.alreadySeenFullContent == true
@@ -371,6 +405,7 @@ object PostTypeUtil {
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
             )
 
+            LinkifyCompat.addLinks(tvPostContent, Linkify.WEB_URLS)
             tvPostContent.movementMethod = CustomLinkMovementMethod {
                 //TODO: Handle links etc.
                 true
@@ -404,7 +439,7 @@ object PostTypeUtil {
     // handles link view in the post
     fun initLinkView(
         binding: ItemPostLinkBinding,
-        data: LinkOGTags
+        data: LinkOGTagsViewData
     ) {
         val isYoutubeLink = data.url?.isValidYoutubeLink() == true
         binding.tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
@@ -438,14 +473,6 @@ object PostTypeUtil {
         binding.tvLinkUrl.text = data.url
     }
 
-    // sets the items in overflow menu
-    fun setOverflowMenuItems(
-        overflowMenu: OverflowMenuPopup,
-        menuItems: List<OverflowMenuItemViewData>
-    ) {
-        overflowMenu.setItems(menuItems)
-    }
-
     // performs action when member tag is clicked
     fun onMemberTagClicked() {
         // TODO: Change Implementation
@@ -454,7 +481,6 @@ object PostTypeUtil {
     // checks if binder is called from liking/saving post or not
     fun initPostTypeBindData(
         authorFrame: LayoutAuthorFrameBinding,
-        overflowMenu: OverflowMenuPopup,
         tvPostContent: TextView,
         data: PostViewData,
         position: Int,
@@ -462,24 +488,18 @@ object PostTypeUtil {
         returnBinder: () -> Unit,
         executeBinder: () -> Unit
     ) {
-        if (data.fromPostLiked || data.fromPostSaved) {
+        if (data.fromPostLiked || data.fromPostSaved || data.fromVideoAction) {
             // update fromLiked/fromSaved variables and return from binder
             listener.updateFromLikedSaved(position)
             returnBinder()
         } else {
             // call all the common functions
 
-            // sets items to overflow menu
-            setOverflowMenuItems(
-                overflowMenu,
-                data.menuItems
-            )
-
             // sets data to the creator frame
             initAuthorFrame(
                 authorFrame,
                 data,
-                overflowMenu
+                listener
             )
 
             // sets the text content of the post

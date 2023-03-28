@@ -11,9 +11,9 @@ import android.util.Log
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.model.SingleUriData
-import com.likeminds.feedsx.utils.file.MemoryUnitFormat
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.file.FileUtil
+import com.likeminds.feedsx.utils.file.MemoryUnitFormat
 import com.likeminds.feedsx.utils.file.isLargeFile
 
 object MediaUtils {
@@ -71,6 +71,25 @@ object MediaUtils {
      * */
     fun getFileSizeText(sizeBytes: Long): String {
         return MemoryUnitFormat.formatBytes(sizeBytes)
+    }
+
+    fun formatSeconds(timeInSeconds: Int): String {
+        val hours = timeInSeconds / 3600
+        val secondsLeft = timeInSeconds - hours * 3600
+        val minutes = secondsLeft / 60
+        val seconds = secondsLeft - minutes * 60
+        var formattedTime = ""
+        if (hours in 1..9) formattedTime += "0"
+        if (hours > 0)
+            formattedTime += "$hours:"
+        if (minutes < 10) formattedTime += "0"
+        formattedTime += "$minutes:"
+        if (seconds < 10) formattedTime += "0"
+        formattedTime += seconds
+        if (formattedTime.startsWith("00")) {
+            return formattedTime.substring(1)
+        }
+        return formattedTime
     }
 
     fun isVideoType(contentType: String?): Boolean {

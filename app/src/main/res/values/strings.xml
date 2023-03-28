@@ -51,7 +51,7 @@
     <string name="large_file_select_error_message">Files below 100 KB and above 100 MB are not allowed</string>
     <string name="all_posts">All Posts</string>
     <string name="following">Following</string>
-    <string name="scalix">SCALIX</string>
+    <string name="scalix">Scalix</string>
     <string name="new_post">New Post</string>
     <string name="placeholder_pages">%d Pages</string>
     <string name="link">Link</string>

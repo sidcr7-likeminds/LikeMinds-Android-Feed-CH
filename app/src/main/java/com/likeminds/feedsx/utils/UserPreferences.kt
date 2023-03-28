@@ -17,11 +17,11 @@ class UserPreferences @Inject constructor(
         const val MEMBER_ID = "member_id"
     }
 
-    fun getMemberId(): Int {
-        return getPreference(MEMBER_ID, -1)
+    fun getMemberId(): String {
+        return getPreference(MEMBER_ID, "") ?: ""
     }
 
-    fun saveMemberId(memberId: Int) {
+    fun saveMemberId(memberId: String) {
         putPreference(MEMBER_ID, memberId)
     }
 

@@ -4,13 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailReplyBinding
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.posttypes.model.CommentViewData
-import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -18,18 +14,14 @@ import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_REPLY
 
 class ItemPostDetailReplyViewDataBinder constructor(
-    val postDetailAdapterListener: PostDetailAdapterListener,
-    val postDetailReplyAdapterListener: PostDetailReplyAdapterListener
-) : ViewDataBinder<ItemPostDetailReplyBinding, CommentViewData>(),
-    OverflowMenuAdapterListener {
+    private val postDetailAdapterListener: PostDetailAdapterListener,
+    private val postDetailReplyAdapterListener: PostDetailReplyAdapterListener
+) : ViewDataBinder<ItemPostDetailReplyBinding, CommentViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_DETAIL_REPLY
 
-    private lateinit var overflowMenu: OverflowMenuPopup
-
     override fun createBinder(parent: ViewGroup): ItemPostDetailReplyBinding {
-        overflowMenu = OverflowMenuPopup.create(parent.context, this)
         return ItemPostDetailReplyBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -88,16 +80,12 @@ class ItemPostDetailReplyViewDataBinder constructor(
             }
 
             ivReplyMenu.setOnClickListener {
-                PostTypeUtil.showOverflowMenu(
-                    ivReplyMenu,
-                    overflowMenu
-                )
+                //todo
+//                PostTypeUtil.showOverflowMenu(
+//                    ivReplyMenu,
+//                    overflowMenu
+//                )
             }
         }
-    }
-
-    override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        //TODO: Can we use postDetailAdapterListener here? As reply is also a comment
-        postDetailReplyAdapterListener.onReplyMenuItemClicked(menu.entityId, menu.title)
     }
 }

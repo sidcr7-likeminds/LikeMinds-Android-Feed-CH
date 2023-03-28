@@ -8,13 +8,15 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
-import com.likeminds.feedsx.databinding.DialogFragmentDeleteBinding
+import com.likeminds.feedsx.databinding.DialogFragmentAdminDeleteBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
+import com.likeminds.feedsx.utils.emptyExtrasException
 
-class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
+//when cm deletes others user post
+class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBinding>(),
     ReasonChooseDialog.ReasonChooseDialogListener {
 
     companion object {
@@ -26,7 +28,7 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
             supportFragmentManager: FragmentManager,
             deleteExtras: DeleteExtras
         ) {
-            DeleteDialogFragment().apply {
+            AdminDeleteDialogFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(ARG_DELETE_EXTRAS, deleteExtras)
                 }
@@ -36,10 +38,10 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
 
     private var deleteDialogListener: DeleteDialogListener? = null
 
-    private var deleteExtras: DeleteExtras? = null
+    private lateinit var deleteExtras: DeleteExtras
 
-    override fun getViewBinding(): DialogFragmentDeleteBinding {
-        return DialogFragmentDeleteBinding.inflate(layoutInflater)
+    override fun getViewBinding(): DialogFragmentAdminDeleteBinding {
+        return DialogFragmentAdminDeleteBinding.inflate(layoutInflater)
     }
 
     override fun onAttach(context: Context) {
@@ -54,7 +56,7 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
     override fun receiveExtras() {
         super.receiveExtras()
         arguments?.let {
-            deleteExtras = it.getParcelable(ARG_DELETE_EXTRAS)
+            deleteExtras = it.getParcelable(ARG_DELETE_EXTRAS) ?: throw emptyExtrasException(TAG)
         }
     }
 
@@ -66,7 +68,7 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
 
     // sets data as per content type [COMMENT/POST]
     private fun initView() {
-        if (deleteExtras?.entityType == DELETE_TYPE_POST) {
+        if (deleteExtras.entityType == DELETE_TYPE_POST) {
             binding.tvTitle.text = getString(R.string.delete_post_question)
             binding.tvDescription.text = getString(R.string.delete_post_message)
         } else {
@@ -75,33 +77,38 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
         }
     }
 
-    // sets click listeners to select reason and submit request
+    // sets listeners
     private fun initializeListeners() {
         binding.cvReason.setOnClickListener {
             ReasonChooseDialog.newInstance(childFragmentManager)
         }
 
+        // submits post delete request with reason/tag and triggers callback
         binding.tvConfirm.setOnClickListener {
             val data = binding.reasonData ?: return@setOnClickListener
-            val reason = binding.etOtherReason.text.toString()
+            val tag = data.value
+            val reason = tag.ifEmpty {
+                binding.etOtherReason.text.toString()
+            }
             if (data.value.isNotEmpty()) {
-                if (data.value == "Others" && reason.isEmpty()) {
+                if (tag == "Others" && reason.isEmpty()) {
                     return@setOnClickListener
                 }
             }
 
-            deleteDialogListener?.delete(
-                deleteExtras!!,
-                data.tagId,
+            deleteDialogListener?.adminDelete(
+                deleteExtras,
                 reason
             )
             dismiss()
         }
 
+        // dismisses the delete dialog
         binding.tvCancel.setOnClickListener {
             dismiss()
         }
 
+        // sets listener to the reason edit text
         binding.etOtherReason.doAfterTextChanged {
             val reason = it.toString().trim()
             handleConfirmButton(reason.isNotEmpty())
@@ -139,9 +146,8 @@ class DeleteDialogFragment : BaseDialogFragment<DialogFragmentDeleteBinding>(),
     }
 
     interface DeleteDialogListener {
-        fun delete(
+        fun adminDelete(
             deleteExtras: DeleteExtras,
-            reportTagId: String,
             reason: String
         )
     }

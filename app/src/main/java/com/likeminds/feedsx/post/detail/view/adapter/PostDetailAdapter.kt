@@ -3,7 +3,7 @@ package com.likeminds.feedsx.post.detail.view.adapter
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentViewDataBinder
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentsCountViewDataBinder
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
 import com.likeminds.feedsx.utils.ValueUtils.getItemInList
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
