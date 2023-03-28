@@ -302,7 +302,7 @@ class FeedViewModel @Inject constructor(
             val uploadData = startMediaUploadWorker(context, postId, attachmentCount)
             postRepository.updateUploadWorkerUUID(postId, uploadData.second)
             uploadData.first.enqueue()
-            checkIfPosting()
+            fetchPendingPostFromDB()
         }
     }
 
@@ -318,8 +318,8 @@ class FeedViewModel @Inject constructor(
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }
 
-    // checks and sends the Post data if there is a post pending in db
-    fun checkIfPosting() {
+    // fetches pending post data from db
+    fun fetchPendingPostFromDB() {
         viewModelScope.launchIO {
             val postWithAttachments = postRepository.getLatestPostWithAttachments()
             if (postWithAttachments == null || postWithAttachments.post.isPosted) {

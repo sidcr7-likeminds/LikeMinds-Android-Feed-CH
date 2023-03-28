@@ -33,7 +33,6 @@ import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -137,8 +136,17 @@ class CreatePostFragment :
         }
 
         // observes addPostResponse, once post is created
-        viewModel.postAdded.observe(viewLifecycleOwner) {
-            requireActivity().finish()
+        viewModel.postAdded.observe(viewLifecycleOwner) { postAdded ->
+            requireActivity().apply {
+                if (postAdded) {
+                    // post is already posted
+                    setResult(Activity.RESULT_OK)
+                } else {
+                    // post is stored in db, now upload it from [FeedFragment]
+                    setResult(CreatePostActivity.RESULT_UPLOAD_POST)
+                }
+                finish()
+            }
         }
     }
 
@@ -155,7 +163,7 @@ class CreatePostFragment :
                 }
                 is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
                     handlePostButton(clickable = true, showProgress = false)
-                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                    showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
         }

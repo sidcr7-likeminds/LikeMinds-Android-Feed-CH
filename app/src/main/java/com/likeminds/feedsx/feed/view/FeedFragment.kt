@@ -53,6 +53,7 @@ import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
+import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -255,18 +256,19 @@ class FeedFragment :
                         tvRetry.hide()
                         observeMediaUpload(post)
                     }
-                    binding.newPostButton.hide()
                 }
                 // when the post data comes from api response
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
                         mPostAdapter.add(0, response.post)
+                        recyclerView.scrollToPosition(0)
                         removePostingView()
                     }
                 }
             }
         }.observeInLifecycle(viewLifecycleOwner)
     }
+
 
     //observe feed response
     private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
@@ -297,7 +299,6 @@ class FeedFragment :
         binding.apply {
             alreadyPosting = false
             layoutPosting.root.hide()
-            newPostButton.show()
         }
     }
 
@@ -385,16 +386,6 @@ class FeedFragment :
         initializeExoplayer()
     }
 
-    override fun onResume() {
-        super.onResume()
-
-        if (!alreadyPosting) {
-            removePostingView()
-            // checks if there is a pending post in db
-            viewModel.checkIfPosting()
-        }
-    }
-
     override fun onStop() {
         super.onStop()
         //release player
@@ -423,15 +414,35 @@ class FeedFragment :
 
         initRecyclerView()
         initSwipeRefreshLayout()
-        initNewPostClick()
+        handleNewPostClick()
     }
 
-    // initializes new post fab click
-    private fun initNewPostClick() {
+    // handles new post fab click
+    private fun handleNewPostClick() {
         binding.newPostButton.setOnClickListener {
-            CreatePostActivity.start(requireContext())
+            if (alreadyPosting) {
+                showShortToast(requireContext(), getString(R.string.a_post_is_already_uploading))
+            } else {
+                val intent = CreatePostActivity.getIntent(requireContext())
+                createPostLauncher.launch(intent)
+            }
         }
     }
+
+    // launcher for [CreatePostActivity]
+    private val createPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    // post of type text/link has been created and posted
+                    refreshFeed()
+                }
+                CreatePostActivity.RESULT_UPLOAD_POST -> {
+                    // post with attachments created, now upload and post it from db
+                    viewModel.fetchPendingPostFromDB()
+                }
+            }
+        }
 
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
@@ -548,7 +559,6 @@ class FeedFragment :
             )
         }
     }
-
 
     /**
      * Post Actions block

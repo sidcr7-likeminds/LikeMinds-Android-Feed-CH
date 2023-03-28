@@ -44,7 +44,6 @@ object ViewDataConverter {
                 ITEM_CREATE_POST_DOCUMENTS_ITEM
             }
         }
-        Log.d("PUI", "convertSingleDataUri: ${singleUriData.pdfPageCount}")
         return AttachmentViewData.Builder()
             .dynamicViewType(viewType)
             .attachmentType(attachmentType)
@@ -57,6 +56,7 @@ object ViewDataConverter {
                     .width(singleUriData.width)
                     .height(singleUriData.height)
                     .size(singleUriData.size)
+                    .uri(singleUriData.uri)
                     .build()
             )
             .build()
@@ -96,7 +96,6 @@ object ViewDataConverter {
     private fun convertAttachmentMeta(
         attachmentMeta: AttachmentMetaViewData
     ): AttachmentMeta {
-        Log.d("PUI", "convertAttachmentMeta-1: ${attachmentMeta.pageCount}")
         return AttachmentMeta.Builder().name(attachmentMeta.name)
             .ogTags(convertOGTags(attachmentMeta.ogTags))
             .url(attachmentMeta.url)

@@ -104,4 +104,5 @@
         <item quantity="one">You can select upto 1 item!</item>
         <item quantity="other">You can select upto %d items!</item>
     </plurals>
+    <string name="a_post_is_already_uploading">A post is already uploading</string>
 </resources>

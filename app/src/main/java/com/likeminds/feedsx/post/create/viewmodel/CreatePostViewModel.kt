@@ -182,7 +182,7 @@ class CreatePostViewModel @Inject constructor(
             }
             // add it to local db
             postRepository.insertPostWithAttachments(postEntity, attachments)
-            _postAdded.postValue(true)
+            _postAdded.postValue(false)
         }
     }
 
