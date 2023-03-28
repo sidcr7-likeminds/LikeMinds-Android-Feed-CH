@@ -30,8 +30,11 @@ import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
+import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -61,8 +64,6 @@ class CreatePostFragment :
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
 
-    private lateinit var memberTagging: MemberTaggingView
-
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
 
@@ -73,10 +74,30 @@ class CreatePostFragment :
     override fun setUpViews() {
         super.setUpViews()
 
+        fetchUserFromDB()
         initMemberTaggingView()
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
+    }
+
+    private fun fetchUserFromDB() {
+        viewModel.fetchUserFromDB()
+    }
+
+    // sets data to the author frame
+    private fun initAuthorFrame(user: UserViewData) {
+        binding.authorFrame.apply {
+            tvCreatorName.text = user.name
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.userUniqueId,
+                creatorImage,
+                showRoundImage = true,
+                objectKey = user.updatedAt
+            )
+        }
     }
 
     // TODO: remove branding
@@ -128,6 +149,11 @@ class CreatePostFragment :
         super.observeData()
 
         observeMembersTaggingList()
+
+        // observes userData and initializes the user view
+        viewModel.userData.observe(viewLifecycleOwner) {
+            initAuthorFrame(it)
+        }
 
         // observes decodeUrlResponse and returns link ogTags
         viewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->

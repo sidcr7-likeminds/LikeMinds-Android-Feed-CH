@@ -9,6 +9,7 @@ import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
+import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -44,40 +45,49 @@ class ItemCreatePostDocumentViewDataBinder constructor(
         document: AttachmentViewData,
         position: Int
     ) {
-        binding.tvMeta1.hide()
-        binding.viewMetaDot1.hide()
-        binding.tvMeta2.hide()
-        binding.viewMetaDot2.hide()
-        binding.tvMeta3.hide()
+        binding.apply {
+            tvMeta1.hide()
+            viewMetaDot1.hide()
+            tvMeta2.hide()
+            viewMetaDot2.hide()
+            tvMeta3.hide()
 
-        val attachmentMeta = document.attachmentMeta
+            val attachmentMeta = document.attachmentMeta
 
-        binding.tvDocumentName.text = attachmentMeta.name ?: "Document"
+            tvDocumentName.text = attachmentMeta.name ?: "Document"
 
-        val noOfPage = attachmentMeta.pageCount ?: 0
-        val mediaType = attachmentMeta.format
-        if (noOfPage > 0) {
-            binding.tvMeta1.show()
-            binding.tvMeta1.text = binding.root.context.getString(
-                R.string.placeholder_pages, noOfPage
-            )
-        }
-        if (attachmentMeta.size != null) {
-            val size = MediaUtils.getFileSizeText(attachmentMeta.size)
-            binding.tvMeta2.show()
-            binding.tvMeta2.text = size
-            if (binding.tvMeta1.isVisible) {
-                binding.viewMetaDot1.show()
+            val noOfPage = attachmentMeta.pageCount ?: 0
+            val mediaType = attachmentMeta.format
+            if (noOfPage > 0) {
+                tvMeta1.show()
+                tvMeta1.text = binding.root.context.getString(
+                    R.string.placeholder_pages, noOfPage
+                )
             }
-        }
-        if (!mediaType.isNullOrEmpty() && (binding.tvMeta1.isVisible || binding.tvMeta2.isVisible)) {
-            binding.tvMeta3.show()
-            binding.tvMeta3.text = mediaType
-            binding.viewMetaDot2.show()
-        }
+            if (attachmentMeta.size != null) {
+                val size = MediaUtils.getFileSizeText(attachmentMeta.size)
+                tvMeta2.show()
+                tvMeta2.text = size
+                if (tvMeta1.isVisible) {
+                    viewMetaDot1.show()
+                }
+            }
+            if (!mediaType.isNullOrEmpty() && (tvMeta1.isVisible || tvMeta2.isVisible)) {
+                tvMeta3.show()
+                tvMeta3.text = mediaType
+                viewMetaDot2.show()
+            }
 
-        binding.ivCross.setOnClickListener {
-            listener.onMediaRemoved(position, PDF)
+            ivCross.setOnClickListener {
+                listener.onMediaRemoved(position, PDF)
+            }
+
+            root.setOnClickListener {
+                val pdfUri = document.attachmentMeta.uri
+                if (pdfUri != null) {
+                    AndroidUtils.startDocumentViewer(root.context, pdfUri)
+                }
+            }
         }
     }
 }
