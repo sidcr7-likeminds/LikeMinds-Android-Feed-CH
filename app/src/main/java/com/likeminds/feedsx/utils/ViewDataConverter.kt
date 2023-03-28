@@ -8,11 +8,12 @@ import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.post.model.*
-import com.likeminds.likemindsfeed.post.model.Like
 import com.likeminds.likemindsfeed.sdk.model.User
 
 object ViewDataConverter {
@@ -197,8 +198,7 @@ object ViewDataConverter {
 
             //convert view data
             val likedByViewData = if (likedBy == null) {
-                //todo create deleted user
-                UserViewData.Builder().build()
+                createDeletedUser()
             } else {
                 convertUser(likedBy)
             }
@@ -210,6 +210,18 @@ object ViewDataConverter {
                 .createdAt(like.createdAt)
                 .updatedAt(like.updatedAt)
                 .user(likedByViewData)
+                .build()
+        }
+    }
+
+    fun convertReportTag(
+        tags: List<ReportTag>
+    ): List<ReportTagViewData> {
+        return tags.map { tag ->
+            ReportTagViewData.Builder()
+                .id(tag.id)
+                .name(tag.name)
+                .isSelected(false)
                 .build()
         }
     }

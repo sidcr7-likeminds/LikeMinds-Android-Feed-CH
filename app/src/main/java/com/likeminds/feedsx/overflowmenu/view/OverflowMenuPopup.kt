@@ -37,6 +37,7 @@ class OverflowMenuPopup(
         val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val binding = PopupOverflowMenuBinding.inflate(inflater, null, false)
         setBackgroundDrawable(null)
+        isOutsideTouchable = true
         binding.rvOverflowMenu.adapter = overflowMenuAdapter
         super.setContentView(binding.root)
 

@@ -347,7 +347,7 @@ class PostDetailFragment :
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(entityId)
-            .type(entityType)
+            .entityType(entityType)
             .build()
 
         //get Intent for [ReportActivity]

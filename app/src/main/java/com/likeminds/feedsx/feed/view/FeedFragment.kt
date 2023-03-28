@@ -20,9 +20,9 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.DeleteAlertDialogFragment
 import com.likeminds.feedsx.delete.view.DeleteDialogFragment
+import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
-import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
@@ -44,6 +44,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.ReportActivity
+import com.likeminds.feedsx.report.view.ReportFragment
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -87,15 +88,6 @@ class FeedFragment :
         // observes userResponse LiveData
         viewModel.userResponse.observe(viewLifecycleOwner) { response ->
             observeUserResponse(response)
-        }
-
-        // observes error events
-        viewModel.errorEventFlow.onEach { response ->
-            when (response) {
-                is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
-                    ViewUtils.showSomethingWentWrongToast(requireContext())
-                }
-            }
         }
 
         // observes logoutResponse LiveData
@@ -189,47 +181,6 @@ class FeedFragment :
         }.observeInLifecycle(viewLifecycleOwner)
     }
 
-    override fun onStart() {
-        super.onStart()
-        initializeExoplayer()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        lmExoplayer.release()
-    }
-
-    private fun initializeExoplayer() {
-        lmExoplayer.initialize(this)
-    }
-
-    override fun videoEnded(positionOfItemInAdapter: Int) {
-        super.videoEnded(positionOfItemInAdapter)
-        if (positionOfItemInAdapter == -1) return
-
-        val post = getPostFromAdapter(positionOfItemInAdapter)
-        val attachment = post.attachments.first()
-        val newAttachments = attachment.toBuilder()
-            .mediaActions(MEDIA_ACTION_NONE)
-            .build()
-        val newPost = post.toBuilder()
-            .attachments(listOf(newAttachments))
-            .fromVideoAction(true)
-            .build()
-        mPostAdapter.update(positionOfItemInAdapter, newPost)
-    }
-
-    // initiates SDK
-    private fun initiateSDK() {
-        ProgressHelper.showProgress(binding.progressBar)
-        viewModel.initiateUser(
-            "69edd43f-4a5e-4077-9c50-2b7aa740acce",
-            "10203",
-            "Ishaan",
-            false
-        )
-    }
-
     // observes user response from InitiateUser
     private fun observeUserResponse(user: UserViewData?) {
         initToolbar()
@@ -246,6 +197,31 @@ class FeedFragment :
             ivNotification.hide()
         }
     }
+
+    override fun onStart() {
+        super.onStart()
+        initializeExoplayer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        lmExoplayer.release()
+    }
+
+    // initiates SDK
+    private fun initiateSDK() {
+        ProgressHelper.showProgress(binding.progressBar)
+        viewModel.initiateUser(
+            "69edd43f-4a5e-4077-9c50-2b7aa740acce",
+            "10203",
+            "Ishaan",
+            false
+        )
+    }
+
+    /**
+     * UI Block
+     **/
 
     // initializes various UI components
     private fun initUI() {
@@ -396,43 +372,10 @@ class FeedFragment :
         }
     }
 
-    // processes delete post request
-    private fun deletePost(postId: String) {
-        //TODO: set isAdmin
-        val isAdmin = false
-        val deleteExtras = DeleteExtras.Builder()
-            .entityId(postId)
-            .entityType(DELETE_TYPE_POST)
-            .build()
-        if (isAdmin) {
-            DeleteDialogFragment.showDialog(
-                childFragmentManager,
-                deleteExtras
-            )
-        } else {
-            // when user deletes their own entity
-            DeleteAlertDialogFragment.showDialog(
-                childFragmentManager,
-                deleteExtras
-            )
-        }
-    }
 
-    // Processes report action on post
-    private fun reportPost(postId: String) {
-        //create extras for [ReportActivity]
-        val reportExtras = ReportExtras.Builder()
-            .entityId(postId)
-            .type(REPORT_TYPE_POST)
-            .build()
-
-        //get Intent for [ReportActivity]
-        val intent = ReportActivity.getIntent(requireContext(), reportExtras)
-
-        //start [ReportActivity] and check for result
-        reportPostLauncher.launch(intent)
-    }
-
+    /**
+     * Post Actions block
+     **/
     override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostAdapter[position]
         if (item is PostViewData) {
@@ -440,6 +383,7 @@ class FeedFragment :
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .fromPostSaved(false)
                 .fromPostLiked(false)
+                .fromVideoAction(false)
                 .build()
             mPostAdapter.update(position, newViewData)
         }
@@ -502,6 +446,138 @@ class FeedFragment :
                 // TODO: unpin post
             }
         }
+    }
+
+    // opens likes screen when likes count is clicked.
+    override fun showLikesScreen(postId: String) {
+        val likesScreenExtras = LikesScreenExtras.Builder()
+            .postId(postId)
+            .entityType(POST)
+            .build()
+        LikesActivity.start(requireContext(), likesScreenExtras)
+    }
+
+    //opens post detail screen when add comment/comments count is clicked
+    override fun comment(postId: String) {
+        val postDetailExtras = PostDetailExtras.Builder()
+            .postId(postId)
+            .isEditTextFocused(true)
+            .build()
+        PostDetailActivity.start(requireContext(), postDetailExtras)
+    }
+
+    //opens post detail screen when post content is clicked
+    override fun postDetail(postData: PostViewData) {
+        val postDetailExtras = PostDetailExtras.Builder()
+            .postId(postData.id)
+            .isEditTextFocused(false)
+            .build()
+        PostDetailActivity.start(requireContext(), postDetailExtras)
+    }
+
+    // callback when self post is deleted by user
+    override fun delete(deleteExtras: DeleteExtras) {
+        // TODO: delete post by user
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
+        )
+    }
+
+    // callback when other's post is deleted by CM
+    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
+        // TODO: delete post by admin
+        ViewUtils.showShortToast(
+            requireContext(),
+            getString(R.string.post_deleted)
+        )
+    }
+
+    // updates the fromPostLiked/fromPostSaved variables and updates the rv list
+    override fun updateFromLikedSaved(position: Int) {
+        var postData = mPostAdapter[position] as PostViewData
+        postData = postData.toBuilder()
+            .fromPostLiked(false)
+            .fromPostSaved(false)
+            .fromVideoAction(false)
+            .build()
+        mPostAdapter.updateWithoutNotifyingRV(position, postData)
+    }
+
+    // processes delete post request
+    private fun deletePost(postId: String) {
+        //TODO: set isAdmin
+        val isAdmin = false
+        val deleteExtras = DeleteExtras.Builder()
+            .entityId(postId)
+            .entityType(DELETE_TYPE_POST)
+            .build()
+        if (isAdmin) {
+            DeleteDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        } else {
+            // when user deletes their own entity
+            DeleteAlertDialogFragment.showDialog(
+                childFragmentManager,
+                deleteExtras
+            )
+        }
+    }
+
+    // Processes report action on post
+    private fun reportPost(postId: String) {
+        val post = getIndexAndPostFromAdapter(postId).second
+
+        //create extras for [ReportActivity]
+        val reportExtras = ReportExtras.Builder()
+            .entityId(postId)
+            .entityCreatorId(post.userId)
+            .entityType(REPORT_TYPE_POST)
+            .build()
+
+        //get Intent for [ReportActivity]
+        val intent = ReportActivity.getIntent(requireContext(), reportExtras)
+
+        //start [ReportActivity] and check for result
+        reportPostLauncher.launch(intent)
+    }
+
+    // launcher to start [Report Activity] and show success dialog for result
+    private val reportPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = result.data?.getStringExtra(ReportFragment.REPORT_RESULT)
+                ReportSuccessDialog(data ?: "").show(
+                    childFragmentManager,
+                    ReportSuccessDialog.TAG
+                )
+            }
+        }
+
+    /**
+     * Media Block
+     **/
+
+    private fun initializeExoplayer() {
+        lmExoplayer.initialize(this)
+    }
+
+    override fun videoEnded(positionOfItemInAdapter: Int) {
+        super.videoEnded(positionOfItemInAdapter)
+//        if (positionOfItemInAdapter == -1) return
+//
+//        val post = getPostFromAdapter(positionOfItemInAdapter)
+//        val attachment = post.attachments.first()
+//        val newAttachments = attachment.toBuilder()
+//            .mediaActions(MEDIA_ACTION_NONE)
+//            .build()
+//        val newPost = post.toBuilder()
+//            .attachments(listOf(newAttachments))
+//            .fromVideoAction(true)
+//            .build()
+//        mPostAdapter.update(positionOfItemInAdapter, newPost)
     }
 
     override fun sendMediaItemToExoPlayer(
@@ -578,31 +654,25 @@ class FeedFragment :
         )
     }
 
-    // opens likes screen when likes count is clicked.
-    override fun showLikesScreen(postId: String) {
-        val likesScreenExtras = LikesScreenExtras.Builder()
-            .postId(postId)
-            .entityType(POST)
-            .build()
-        LikesActivity.start(requireContext(), likesScreenExtras)
+
+    /**
+     * Adapter Util Block
+     **/
+
+    //get index and post from the adapter using postId
+    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
+        val index = mPostAdapter.items().indexOfFirst {
+            (it is PostViewData) && (it.id == postId)
+        }
+
+        val post = getPostFromAdapter(index)
+
+        return Pair(index, post)
     }
 
-    //opens post detail screen when add comment/comments count is clicked
-    override fun comment(postId: String) {
-        val postDetailExtras = PostDetailExtras.Builder()
-            .postId(postId)
-            .isEditTextFocused(true)
-            .build()
-        PostDetailActivity.start(requireContext(), postDetailExtras)
-    }
-
-    //opens post detail screen when post content is clicked
-    override fun postDetail(postData: PostViewData) {
-        val postDetailExtras = PostDetailExtras.Builder()
-            .postId(postData.id)
-            .isEditTextFocused(false)
-            .build()
-        PostDetailActivity.start(requireContext(), postDetailExtras)
+    //get post from the adapter using index
+    private fun getPostFromAdapter(position: Int): PostViewData {
+        return mPostAdapter.items()[position] as PostViewData
     }
 
     /**
@@ -615,60 +685,5 @@ class FeedFragment :
             position,
             px
         )
-    }
-
-    // callback when self post is deleted by user
-    override fun delete(deleteExtras: DeleteExtras) {
-        // TODO: delete post by user
-        ViewUtils.showShortToast(
-            requireContext(),
-            getString(R.string.post_deleted)
-        )
-    }
-
-    // callback when other's post is deleted by CM
-    override fun delete(deleteExtras: DeleteExtras, reportTagId: String, reason: String) {
-        // TODO: delete post by admin
-        ViewUtils.showShortToast(
-            requireContext(),
-            getString(R.string.post_deleted)
-        )
-    }
-
-    // updates the fromPostLiked/fromPostSaved variables and updates the rv list
-    override fun updateFromLikedSaved(position: Int) {
-        var postData = mPostAdapter[position] as PostViewData
-        postData = postData.toBuilder()
-            .fromPostLiked(false)
-            .fromPostSaved(false)
-            .fromVideoAction(false)
-            .build()
-        mPostAdapter.updateWithoutNotifyingRV(position, postData)
-    }
-
-    // launcher to start [Report Activity] and show success dialog for result
-    private val reportPostLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                ReportSuccessDialog("Message").show(
-                    childFragmentManager,
-                    ReportSuccessDialog.TAG
-                )
-            }
-        }
-
-    //get index and post from the adapter using postId
-    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
-        val index = mPostAdapter.items().indexOfFirst {
-            (it as PostViewData).id == postId
-        }
-
-        val post = getPostFromAdapter(index)
-
-        return Pair(index, post)
-    }
-
-    private fun getPostFromAdapter(position: Int): PostViewData {
-        return mPostAdapter.items()[position] as PostViewData
     }
 }

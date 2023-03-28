@@ -3,14 +3,14 @@ package com.likeminds.feedsx.overflowmenu.view.adapter.databinder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemOverflowMenuBinding
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_OVERFLOW_MENU_ITEM
 
 class OverflowMenuItemBinder constructor(
-    val overflowMenuAdapterListener: OverflowMenuAdapterListener
+    private val overflowMenuAdapterListener: OverflowMenuAdapterListener
 ) : ViewDataBinder<ItemOverflowMenuBinding, BaseViewType>() {
 
     override val viewType: Int

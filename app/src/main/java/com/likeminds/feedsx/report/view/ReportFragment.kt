@@ -1,16 +1,17 @@
 package com.likeminds.feedsx.report.view
 
+import android.app.Activity
+import android.content.Intent
+import android.util.Log
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
+import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentReportBinding
-import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
-import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
-import com.likeminds.feedsx.report.model.ReportExtras
-import com.likeminds.feedsx.report.model.ReportTagViewData
+import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
 import com.likeminds.feedsx.report.viewmodel.ReportViewModel
@@ -31,6 +32,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
 
     companion object {
         const val TAG = "ReportFragment"
+        const val REPORT_RESULT = "REPORT_RESULT"
     }
 
     private lateinit var extras: ReportExtras
@@ -64,6 +66,36 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         initRecyclerView()
         initViewAsType()
         initListeners()
+        getReportTags()
+    }
+
+    override fun observeData() {
+        super.observeData()
+
+        viewModel.listOfTagViewData.observe(viewLifecycleOwner) { tags ->
+            mAdapter.replace(tags)
+        }
+
+        viewModel.errorMessage.observe(viewLifecycleOwner) { error ->
+            ViewUtils.showErrorMessageToast(requireContext(), error)
+            requireActivity().setResult(Activity.RESULT_CANCELED)
+            requireActivity().finish()
+        }
+
+        viewModel.postReportResponse.observe(viewLifecycleOwner) { success ->
+            if (success) {
+                Log.d(LOG_TAG, "report send successfully")
+                val intent = Intent().apply {
+                    putExtra(
+                        REPORT_RESULT,
+                        ReportType.getEntityType(this@ReportFragment.extras.entityType)
+                    )
+                }
+                //set result, from where the result is coming.
+                requireActivity().setResult(Activity.RESULT_OK, intent)
+                requireActivity().finish()
+            }
+        }
     }
 
     //setup recycler view
@@ -74,58 +106,26 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         flexboxLayoutManager.justifyContent = JustifyContent.FLEX_START
         binding.rvReport.layoutManager = flexboxLayoutManager
         binding.rvReport.adapter = mAdapter
-
-        //TODO: testing data
-        mAdapter.addAll(
-            listOf(
-                ReportTagViewData.Builder()
-                    .id(1)
-                    .name("Nudity")
-                    .build(),
-
-                ReportTagViewData.Builder()
-                    .id(2)
-                    .name("Hate Speech")
-                    .build(),
-
-                ReportTagViewData.Builder()
-                    .id(3)
-                    .name("Spam")
-                    .build(),
-
-                ReportTagViewData.Builder()
-                    .id(4)
-                    .name("Bad Language")
-                    .build(),
-
-                ReportTagViewData.Builder()
-                    .id(5)
-                    .name("Terrorism")
-                    .build(),
-
-                ReportTagViewData.Builder()
-                    .id(6)
-                    .name("Others")
-                    .build()
-            )
-        )
     }
 
     //set headers and sub header as per report type
     private fun initViewAsType() {
-        when (extras.type) {
+        when (extras.entityType) {
             REPORT_TYPE_POST -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "post")
             }
             REPORT_TYPE_COMMENT -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "comment")
             }
+            REPORT_TYPE_REPLY -> {
+                binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "reply")
+            }
         }
     }
 
     private fun initListeners() {
         binding.ivCross.setOnClickListener {
-            requireActivity().onBackPressed()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.btnPostReport.setOnClickListener {
@@ -155,6 +155,19 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 )
                 return@setOnClickListener
             }
+
+            //call post api
+            viewModel.postReport(
+                extras.entityId,
+                extras.entityCreatorId,
+                extras.entityType,
+                tagSelected?.id,
+                reason
+            )
         }
+    }
+
+    private fun getReportTags() {
+        viewModel.getReportTags()
     }
 }
