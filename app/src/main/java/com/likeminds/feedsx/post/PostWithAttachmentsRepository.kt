@@ -1,24 +1,24 @@
 package com.likeminds.feedsx.post
 
-import com.likeminds.feedsx.db.dao.PostDao
+import com.likeminds.feedsx.db.dao.PostWithAttachmentsDao
 import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.db.models.PostWithAttachments
 import javax.inject.Inject
 
-class PostRepository @Inject constructor(
-    private val postDao: PostDao
+class PostWithAttachmentsRepository @Inject constructor(
+    private val postWithAttachmentsDao: PostWithAttachmentsDao
 ) {
     suspend fun insertPostWithAttachments(post: PostEntity, attachments: List<AttachmentEntity>) {
-        postDao.insertPostWithAttachments(post, attachments)
+        postWithAttachmentsDao.insertPostWithAttachments(post, attachments)
     }
 
     suspend fun updatePost(post: PostEntity) {
-        postDao.updatePost(post)
+        postWithAttachmentsDao.updatePost(post)
     }
 
     suspend fun updatePostIdInAttachments(postId: String, temporaryId: Long) {
-        postDao.updatePostIdInAttachments(postId, temporaryId)
+        postWithAttachmentsDao.updatePostIdInAttachments(postId, temporaryId)
     }
 
     suspend fun updateIsPosted(
@@ -26,7 +26,7 @@ class PostRepository @Inject constructor(
         postId: String,
         isPosted: Boolean
     ) {
-        postDao.updateIsPosted(
+        postWithAttachmentsDao.updateIsPosted(
             temporaryId,
             postId,
             isPosted
@@ -34,18 +34,18 @@ class PostRepository @Inject constructor(
     }
 
     suspend fun updateUploadWorkerUUID(temporaryId: Long, uuid: String) {
-        postDao.updateUploadWorkerUUID(temporaryId, uuid)
+        postWithAttachmentsDao.updateUploadWorkerUUID(temporaryId, uuid)
     }
 
     suspend fun deletePost(post: PostEntity) {
-        postDao.deletePost(post)
+        postWithAttachmentsDao.deletePost(post)
     }
 
     suspend fun getLatestPostWithAttachments(): PostWithAttachments? {
-        return postDao.getLatestPostWithAttachments()
+        return postWithAttachmentsDao.getLatestPostWithAttachments()
     }
 
     suspend fun getPostWithAttachments(temporaryId: Long): PostWithAttachments {
-        return postDao.getPostWithAttachments(temporaryId)
+        return postWithAttachmentsDao.getPostWithAttachments(temporaryId)
     }
 }

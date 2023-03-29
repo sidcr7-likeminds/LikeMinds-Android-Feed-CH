@@ -9,7 +9,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.likeminds.feedsx.feed.UserRepository
-import com.likeminds.feedsx.post.PostRepository
+import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -33,7 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val postRepository: PostRepository,
+    private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val userPreferences: UserPreferences,
     private val postPreferences: PostPreferences
 ) : ViewModel() {
@@ -318,12 +318,12 @@ class FeedViewModel @Inject constructor(
                 // post added successfully update the post in db
                 val temporaryId = postPreferences.getTemporaryId()
                 val postId = data.post.id
-                postRepository.updateIsPosted(
+                postWithAttachmentsRepository.updateIsPosted(
                     temporaryId,
                     postId,
                     true
                 )
-                postRepository.updatePostIdInAttachments(postId, temporaryId)
+                postWithAttachmentsRepository.updatePostIdInAttachments(postId, temporaryId)
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
             }
@@ -334,7 +334,7 @@ class FeedViewModel @Inject constructor(
     // fetches pending post data from db
     fun fetchPendingPostFromDB() {
         viewModelScope.launchIO {
-            val postWithAttachments = postRepository.getLatestPostWithAttachments()
+            val postWithAttachments = postWithAttachmentsRepository.getLatestPostWithAttachments()
             if (postWithAttachments == null || postWithAttachments.post.isPosted) {
                 return@launchIO
             } else {
@@ -368,7 +368,7 @@ class FeedViewModel @Inject constructor(
                 return@launchIO
             }
             val uploadData = startMediaUploadWorker(context, postId, attachmentCount)
-            postRepository.updateUploadWorkerUUID(postId, uploadData.second)
+            postWithAttachmentsRepository.updateUploadWorkerUUID(postId, uploadData.second)
             uploadData.first.enqueue()
             fetchPendingPostFromDB()
         }

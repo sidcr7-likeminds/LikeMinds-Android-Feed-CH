@@ -25,7 +25,7 @@ abstract class MediaUploadWorker(
 ) : CoroutineWorker(appContext, params) {
 
     protected val transferUtility by lazy { (appContext.applicationContext as FeedSXApplication).transferUtility }
-    protected val postRepository by lazy { (appContext.applicationContext as FeedSXApplication).postRepository }
+    protected val postRepository by lazy { (appContext.applicationContext as FeedSXApplication).postWithAttachmentsRepository }
 
     private val progressMap by lazy { HashMap<Int, Pair<Long, Long>>() }
     protected var uploadedCount = 0

@@ -13,7 +13,7 @@ import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
-import com.likeminds.feedsx.post.PostRepository
+import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
@@ -38,7 +38,7 @@ import javax.inject.Inject
 class CreatePostViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val userPreferences: UserPreferences,
-    private val postRepository: PostRepository,
+    private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val postPreferences: PostPreferences,
     private val mediaRepository: MediaRepository
 ) : ViewModel() {
@@ -183,7 +183,7 @@ class CreatePostViewModel @Inject constructor(
                 )
             }
             // add it to local db
-            postRepository.insertPostWithAttachments(postEntity, attachments)
+            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             _postAdded.postValue(false)
         }
     }
