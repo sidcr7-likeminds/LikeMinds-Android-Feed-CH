@@ -268,10 +268,11 @@ class CreatePostViewModel @Inject constructor(
         searchName: String
     ) {
         viewModelScope.launchIO {
+            val updatedSearchName = searchName.ifEmpty { null } ?: searchName
             val request = GetTaggingListRequest.Builder()
                 .page(page)
                 .pageSize(MemberTaggingUtil.PAGE_SIZE)
-                .searchName(searchName)
+                .searchName(updatedSearchName)
                 .build()
 
             val response = lmFeedClient.getTaggingList(request)
