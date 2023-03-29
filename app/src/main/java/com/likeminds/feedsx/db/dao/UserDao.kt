@@ -20,6 +20,6 @@ interface UserDao {
     suspend fun deleteUser(user: UserEntity)
 
     //get user for a particular user.id
-    @Query("SELECT * FROM ${DbConstants.USER_TABLE} WHERE id = :id")
-    suspend fun getUser(id: Int): UserEntity
+    @Query("SELECT * FROM ${DbConstants.USER_TABLE} WHERE user_unique_id = :id")
+    suspend fun getUser(id: String): UserEntity
 }

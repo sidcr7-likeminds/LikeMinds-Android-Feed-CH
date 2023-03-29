@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.notificationfeed.view.adapter.databinder
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -8,10 +7,6 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
-import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.Route
 import com.likeminds.feedsx.utils.TimeUtil.getRelativeTime
@@ -21,16 +16,12 @@ import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 
 class ItemNotificationFeedViewDataBinder constructor(
     val listener: NotificationFeedAdapterListener
-) : ViewDataBinder<ItemNotificationFeedBinding, NotificationFeedViewData>(),
-    OverflowMenuAdapterListener {
-
-    private lateinit var overflowMenu: OverflowMenuPopup
+) : ViewDataBinder<ItemNotificationFeedBinding, NotificationFeedViewData>() {
 
     override val viewType: Int
         get() = ITEM_NOTIFICATION_FEED
 
     override fun createBinder(parent: ViewGroup): ItemNotificationFeedBinding {
-        overflowMenu = OverflowMenuPopup.create(parent.context, this)
         return ItemNotificationFeedBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -45,10 +36,11 @@ class ItemNotificationFeedViewDataBinder constructor(
     ) {
 
         // sets items to overflow menu
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
+        //todo
+//        PostTypeUtil.setOverflowMenuItems(
+//            overflowMenu,
+//            data.menuItems
+//        )
 
         // handles route on notification click
         handleRoute(
@@ -92,10 +84,11 @@ class ItemNotificationFeedViewDataBinder constructor(
             }
 
             ivNotificationMenu.setOnClickListener {
-                PostTypeUtil.showOverflowMenu(
-                    ivNotificationMenu,
-                    overflowMenu
-                )
+                //todo
+//                PostTypeUtil.showOverflowMenu(
+//                    ivNotificationMenu,
+//                    overflowMenu
+//                )
             }
 
             MemberImageUtil.setImage(
@@ -140,10 +133,5 @@ class ItemNotificationFeedViewDataBinder constructor(
                     context.startActivity(routeIntent)
             }
         }
-    }
-
-    // handles the menu item click on the post
-    override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        listener.onPostMenuItemClicked(menu.entityId, menu.title)
     }
 }

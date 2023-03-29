@@ -121,7 +121,6 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         this.dataList = items;
     }
 
-    // TODO: call this while observing feed data
     public void setItemsViaDiffUtilForFeed(List<T> items) {
         FeedDiffUtilCallback feedDiffUtilCallback = new FeedDiffUtilCallback(dataList, items);
         DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(feedDiffUtilCallback);

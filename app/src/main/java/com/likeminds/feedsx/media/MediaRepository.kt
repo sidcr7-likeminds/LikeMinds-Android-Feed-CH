@@ -22,7 +22,6 @@ import com.likeminds.feedsx.utils.ValueUtils.getMimeType
 import com.likeminds.feedsx.utils.ValueUtils.getOrDefault
 import com.likeminds.feedsx.utils.file.isLargeFile
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
-import com.likeminds.likemindschat.utils.*
 import java.util.*
 import javax.inject.Inject
 
@@ -323,7 +322,7 @@ class MediaRepository @Inject constructor() {
                                 null
                             }
                         } else {
-                            0
+                            null
                         }
                         val mediaName =
                             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
@@ -384,7 +383,7 @@ class MediaRepository @Inject constructor() {
                         cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE))
                     var mediaName =
                         cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
-                    if(mediaName == null)
+                    if (mediaName == null)
                         mediaName =
                             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE))
                     if (!size.isLargeFile) {
@@ -436,7 +435,7 @@ class MediaRepository @Inject constructor() {
                             null
                         }
                     } else {
-                        0
+                        null
                     }
 
                 val mediaType = mimetype.getMediaType() ?: contentUri.getMediaType(context)

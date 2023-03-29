@@ -5,15 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.overflowmenu.view.OverflowMenuPopup
-import com.likeminds.feedsx.overflowmenu.view.adapter.OverflowMenuAdapterListener
 import com.likeminds.feedsx.post.detail.model.ViewMoreReplyViewData
 import com.likeminds.feedsx.post.detail.view.PostDetailFragment
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
-import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -21,20 +17,15 @@ import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
 
 class ItemPostDetailCommentViewDataBinder constructor(
-    val postDetailAdapterListener: PostDetailAdapterListener,
-    val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
-) : ViewDataBinder<ItemPostDetailCommentBinding, CommentViewData>(),
-    OverflowMenuAdapterListener {
+    private val postDetailAdapterListener: PostDetailAdapterListener,
+    private val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
+) : ViewDataBinder<ItemPostDetailCommentBinding, CommentViewData>() {
 
     private lateinit var mRepliesAdapter: PostDetailReplyAdapter
-
-    private lateinit var overflowMenu: OverflowMenuPopup
-
     override val viewType: Int
         get() = ITEM_POST_DETAIL_COMMENT
 
     override fun createBinder(parent: ViewGroup): ItemPostDetailCommentBinding {
-        overflowMenu = OverflowMenuPopup.create(parent.context, this)
         return ItemPostDetailCommentBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
@@ -62,10 +53,11 @@ class ItemPostDetailCommentViewDataBinder constructor(
         position: Int
     ) {
 
-        PostTypeUtil.setOverflowMenuItems(
-            overflowMenu,
-            data.menuItems
-        )
+        //todo
+//        PostTypeUtil.setOverflowMenuItems(
+//            overflowMenu,
+//            data.menuItems
+//        )
 
         binding.apply {
             val context = root.context
@@ -138,10 +130,11 @@ class ItemPostDetailCommentViewDataBinder constructor(
             }
 
             ivCommentMenu.setOnClickListener {
-                PostTypeUtil.showOverflowMenu(
-                    ivCommentMenu,
-                    overflowMenu
-                )
+                //todo
+//                PostTypeUtil.showOverflowMenu(
+//                    ivCommentMenu,
+//                    overflowMenu
+//                )
             }
 
             if (data.replies.isNotEmpty()) {
@@ -172,10 +165,5 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     .build()
             )
         }
-    }
-
-    override fun onMenuItemClicked(menu: OverflowMenuItemViewData) {
-        overflowMenu.dismiss()
-        postDetailAdapterListener.onCommentMenuItemClicked(menu.entityId, menu.title)
     }
 }

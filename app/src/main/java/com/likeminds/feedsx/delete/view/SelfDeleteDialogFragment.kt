@@ -4,12 +4,14 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.DialogFragmentDeleteAlertBinding
+import com.likeminds.feedsx.databinding.DialogFragmentSelfDeleteBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
+import com.likeminds.feedsx.utils.emptyExtrasException
 
-class DeleteAlertDialogFragment : BaseDialogFragment<DialogFragmentDeleteAlertBinding>() {
+//when user deletes their own post
+class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBinding>() {
 
     companion object {
         private const val TAG = "DeleteAlertDialogFragment"
@@ -20,7 +22,7 @@ class DeleteAlertDialogFragment : BaseDialogFragment<DialogFragmentDeleteAlertBi
             supportFragmentManager: FragmentManager,
             deleteExtras: DeleteExtras
         ) {
-            DeleteAlertDialogFragment().apply {
+            SelfDeleteDialogFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(ARG_DELETE_EXTRAS, deleteExtras)
                 }
@@ -30,10 +32,10 @@ class DeleteAlertDialogFragment : BaseDialogFragment<DialogFragmentDeleteAlertBi
 
     private var deleteAlertDialogListener: DeleteAlertDialogListener? = null
 
-    private var deleteExtras: DeleteExtras? = null
+    private lateinit var deleteExtras: DeleteExtras
 
-    override fun getViewBinding(): DialogFragmentDeleteAlertBinding {
-        return DialogFragmentDeleteAlertBinding.inflate(layoutInflater)
+    override fun getViewBinding(): DialogFragmentSelfDeleteBinding {
+        return DialogFragmentSelfDeleteBinding.inflate(layoutInflater)
     }
 
     override fun onAttach(context: Context) {
@@ -48,7 +50,7 @@ class DeleteAlertDialogFragment : BaseDialogFragment<DialogFragmentDeleteAlertBi
     override fun receiveExtras() {
         super.receiveExtras()
         arguments?.let {
-            deleteExtras = it.getParcelable(ARG_DELETE_EXTRAS)
+            deleteExtras = it.getParcelable(ARG_DELETE_EXTRAS) ?: throw emptyExtrasException(TAG)
         }
     }
 
@@ -60,7 +62,7 @@ class DeleteAlertDialogFragment : BaseDialogFragment<DialogFragmentDeleteAlertBi
 
     // sets data as per content type [COMMENT/POST]
     private fun initView() {
-        if (deleteExtras?.entityType == DELETE_TYPE_POST) {
+        if (deleteExtras.entityType == DELETE_TYPE_POST) {
             binding.tvTitle.text = getString(R.string.delete_post_question)
             binding.tvDescription.text = getString(R.string.delete_post_message)
         } else {
@@ -69,23 +71,25 @@ class DeleteAlertDialogFragment : BaseDialogFragment<DialogFragmentDeleteAlertBi
         }
     }
 
-    // sets click listeners to select reason and submit request
+    // sets click listeners
     private fun initializeListeners() {
 
+        // submits post delete request and triggers callback
         binding.tvDelete.setOnClickListener {
-            deleteAlertDialogListener?.delete(
-                deleteExtras!!
+            deleteAlertDialogListener?.selfDelete(
+                deleteExtras
             )
             dismiss()
         }
 
+        // dismisses the delete dialog
         binding.tvCancel.setOnClickListener {
             dismiss()
         }
     }
 
     interface DeleteAlertDialogListener {
-        fun delete(
+        fun selfDelete(
             deleteExtras: DeleteExtras
         )
     }

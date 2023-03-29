@@ -9,16 +9,6 @@
         android:layout_marginTop="8dp"
         android:background="@color/cloudy_blue">
 
-        <View
-            android:id="@+id/v_top_background"
-            android:layout_width="0dp"
-            android:layout_height="75dp"
-            android:background="@color/white"
-            android:visibility="visible"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
             android:layout_width="match_parent"
