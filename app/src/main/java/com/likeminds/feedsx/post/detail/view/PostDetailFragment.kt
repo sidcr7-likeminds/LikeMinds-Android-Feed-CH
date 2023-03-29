@@ -40,6 +40,7 @@ import com.likeminds.feedsx.report.model.ReportType
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
+import com.likeminds.feedsx.utils.ViewDataConverter.convertCommentsCount
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -123,6 +124,9 @@ class PostDetailFragment :
     }
 
     private fun setPostDataAndScrollToTop(post: PostViewData) {
+        mPostDetailAdapter.add(0, post)
+        mPostDetailAdapter.add(1, convertCommentsCount(post.commentsCount))
+        mPostDetailAdapter.addAll(post.replies.toList())
         binding.rvPostDetails.scrollToPosition(0)
     }
 
@@ -197,7 +201,6 @@ class PostDetailFragment :
             binding.rvPostDetails,
             linearLayoutManager
         )
-        addTestingData()
     }
 
     // initializes swipe refresh layout and sets refresh listener
