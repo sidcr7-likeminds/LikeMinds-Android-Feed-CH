@@ -389,29 +389,6 @@ object ViewDataConverter {
             .build()
     }
 
-    private fun convertAttachmentMeta(
-        singleUriData: SingleUriData
-    ): AttachmentMetaEntity {
-        val url = String(
-            Base64.decode(
-                AWSKeys.getBucketBaseUrl(),
-                Base64.DEFAULT
-            )
-        ) + singleUriData.awsFolderPath
-        return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
-            .url(url)
-            .uri(singleUriData.uri.toString())
-            .pageCount(singleUriData.pdfPageCount)
-            .size(singleUriData.size)
-            .duration(singleUriData.duration)
-            .format(singleUriData.format)
-            .awsFolderPath(singleUriData.awsFolderPath)
-            .localFilePath(singleUriData.localFilePath)
-            .width(singleUriData.width)
-            .height(singleUriData.height)
-            .build()
-    }
-
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
@@ -526,6 +503,7 @@ object ViewDataConverter {
             .build()
     }
 
+    // converts singleUriData to attachmentMetaEntity
     private fun convertAttachmentMeta(
         singleUriData: SingleUriData
     ): AttachmentMetaEntity {

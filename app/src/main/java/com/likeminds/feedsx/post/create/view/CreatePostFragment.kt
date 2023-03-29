@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
-import com.likeminds.feedsx.databinding.LayoutCreatePostLinkBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
@@ -543,13 +542,16 @@ class CreatePostFragment :
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
         binding.linkPreview.apply {
-            clearPreviewLink()
             if (text.isNullOrEmpty()) {
-                ogTags = null
+                clearPreviewLink()
                 return
             }
 
             val link = text.getUrlIfExist()
+
+            if (ogTags != null && link.equals(ogTags?.url)) {
+                return
+            }
 
             if (!link.isNullOrEmpty()) {
                 if (link == ogTags?.url) {
@@ -557,7 +559,6 @@ class CreatePostFragment :
                 }
                 viewModel.decodeUrl(link)
             } else {
-                ogTags = null
                 clearPreviewLink()
             }
         }
@@ -591,7 +592,8 @@ class CreatePostFragment :
 
             tvLinkUrl.text = data.url
             ivCross.setOnClickListener {
-                this.root.hide()
+                binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
+                clearPreviewLink()
             }
         }
     }
