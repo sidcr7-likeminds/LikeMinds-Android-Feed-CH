@@ -322,7 +322,7 @@ class MediaRepository @Inject constructor() {
                                 null
                             }
                         } else {
-                            0
+                            null
                         }
                         val mediaName =
                             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))

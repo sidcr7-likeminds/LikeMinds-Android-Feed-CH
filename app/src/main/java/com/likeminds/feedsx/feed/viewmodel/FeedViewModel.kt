@@ -298,8 +298,9 @@ class FeedViewModel @Inject constructor(
     // calls AddPost API and posts the response in LiveData
     fun addPost(postingData: PostViewData) {
         viewModelScope.launchIO {
+            val updatedText = postingData.text.ifEmpty { null }
             val request = AddPostRequest.Builder()
-                .text(postingData.text)
+                .text(updatedText)
                 .attachments(createAttachments(postingData.attachments))
                 .build()
 
