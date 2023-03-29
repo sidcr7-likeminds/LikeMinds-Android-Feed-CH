@@ -596,6 +596,7 @@ class FeedFragment :
                 .fromPostSaved(true)
                 .isSaved(!item.isSaved)
                 .build()
+
             //call api
             viewModel.savePost(newViewData.id)
 

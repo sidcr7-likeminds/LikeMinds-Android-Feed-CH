@@ -390,11 +390,7 @@ class PostDetailFragment :
      * @param position Index of the item to scroll to
      */
     private fun scrollToPositionWithOffset(position: Int) {
-        val px = if (binding.vTopBackground.height == 0) {
-            (ViewUtils.dpToPx(75) * 1.5).toInt()
-        } else {
-            (binding.vTopBackground.height * 1.5).toInt()
-        }
+        val px = (ViewUtils.dpToPx(75) * 1.5).toInt()
         (binding.rvPostDetails.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
             position,
             px
