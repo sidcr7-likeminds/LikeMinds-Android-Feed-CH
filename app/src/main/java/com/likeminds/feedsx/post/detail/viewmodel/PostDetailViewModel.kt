@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -37,8 +37,8 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
      * [taggingData] contains first -> page called
      * second -> Community Members and Groups
      * */
-    private val _taggingData = MutableLiveData<Pair<Int, ArrayList<MemberTagViewData>>?>()
-    val taggingData: LiveData<Pair<Int, ArrayList<MemberTagViewData>>?> = _taggingData
+    private val _taggingData = MutableLiveData<Pair<Int, ArrayList<UserTagViewData>>?>()
+    val taggingData: LiveData<Pair<Int, ArrayList<UserTagViewData>>?> = _taggingData
 
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()

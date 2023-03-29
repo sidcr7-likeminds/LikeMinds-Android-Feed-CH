@@ -5,48 +5,53 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.likeminds.feedsx.db.utils.DbConstants
 
-@Entity(tableName = DbConstants.POST_TABLE)
+@Entity(tableName = DbConstants.POST_TABLE, primaryKeys = ["temp_id", "post_id"])
 class PostEntity constructor(
-    @PrimaryKey
-    @ColumnInfo(name = "id")
-    var id: Long,
+    @ColumnInfo(name = "temp_id")
+    var temporaryId: Long,
     @ColumnInfo(name = "text")
     var text: String?,
     @ColumnInfo(name = "thumbnail")
     var thumbnail: String?,
     @ColumnInfo(name = "uuid")
     var uuid: String,
-    @ColumnInfo("is_posted")
-    var isPosted: Boolean
+    @ColumnInfo(name = "is_posted")
+    var isPosted: Boolean,
+    @ColumnInfo(name = "post_id")
+    var postId: String
 ) {
     class Builder {
-        private var id: Long = 0
+        private var temporaryId: Long = -1
         private var text: String? = null
         private var thumbnail: String? = null
         private var uuid: String = ""
         private var isPosted: Boolean = false
+        private var postId: String = temporaryId.toString()
 
-        fun id(id: Long) = apply { this.id = id }
+        fun temporaryId(temporaryId: Long) = apply { this.temporaryId = temporaryId }
         fun text(text: String?) = apply { this.text = text }
         fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
+        fun postId(postId: String) = apply { this.postId = postId }
 
         fun build() =
             PostEntity(
-                id,
+                temporaryId,
                 text,
                 thumbnail,
                 uuid,
-                isPosted
+                isPosted,
+                postId
             )
     }
 
     fun toBuilder(): Builder {
-        return Builder().id(id)
+        return Builder().temporaryId(temporaryId)
             .text(text)
             .thumbnail(thumbnail)
             .uuid(uuid)
             .isPosted(isPosted)
+            .postId(postId)
     }
 }

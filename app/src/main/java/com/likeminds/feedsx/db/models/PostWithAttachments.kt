@@ -7,7 +7,7 @@ data class PostWithAttachments constructor(
     @Embedded
     val post: PostEntity,
     @Relation(
-        parentColumn = "id",
+        parentColumn = "post_id",
         entityColumn = "post_id"
     )
     val attachments: List<AttachmentEntity>

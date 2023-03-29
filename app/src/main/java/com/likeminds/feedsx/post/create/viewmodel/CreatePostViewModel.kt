@@ -13,8 +13,9 @@ import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
-import com.likeminds.feedsx.post.PostRepository
+import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
+import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
@@ -23,7 +24,7 @@ import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
 import com.likeminds.feedsx.utils.ViewDataConverter.convertUser
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -41,7 +42,8 @@ import javax.inject.Inject
 class CreatePostViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val userPreferences: UserPreferences,
-    private val postRepository: PostRepository,
+    private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
+    private val postPreferences: PostPreferences,
     private val mediaRepository: MediaRepository
 ) : ViewModel() {
 
@@ -54,8 +56,8 @@ class CreatePostViewModel @Inject constructor(
      * [taggingData] contains first -> page called
      * second -> Community Members and Groups
      * */
-    private val _taggingData = MutableLiveData<Pair<Int, ArrayList<MemberTagViewData>>?>()
-    val taggingData: LiveData<Pair<Int, ArrayList<MemberTagViewData>>?> = _taggingData
+    private val _taggingData = MutableLiveData<Pair<Int, ArrayList<UserTagViewData>>?>()
+    val taggingData: LiveData<Pair<Int, ArrayList<UserTagViewData>>?> = _taggingData
 
     private val _userData = MutableLiveData<UserViewData>()
     val userData: LiveData<UserViewData> = _userData
@@ -87,7 +89,7 @@ class CreatePostViewModel @Inject constructor(
     // fetches user from DB and posts in the live data
     fun fetchUserFromDB() {
         viewModelScope.launchIO {
-            val userId = userPreferences.getMemberId()
+            val userId = userPreferences.getUserUniqueId()
 
             // fetches user from DB with user.id
             val userEntity = userRepository.getUser(userId)
@@ -179,7 +181,7 @@ class CreatePostViewModel @Inject constructor(
             if (fileUris == null) {
                 return@launchIO
             }
-            val temporaryPostId = temporaryPostId ?: 0
+            val temporaryPostId = temporaryPostId ?: -1
             val thumbnailUri = fileUris.first().thumbnailUri
             val postEntity = ViewDataConverter.convertPost(
                 temporaryPostId,
@@ -194,7 +196,7 @@ class CreatePostViewModel @Inject constructor(
                 )
             }
             // add it to local db
-            postRepository.insertPostWithAttachments(postEntity, attachments)
+            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             _postAdded.postValue(false)
         }
     }
@@ -266,10 +268,11 @@ class CreatePostViewModel @Inject constructor(
         searchName: String
     ) {
         viewModelScope.launchIO {
+            val updatedSearchName = searchName.ifEmpty { null } ?: searchName
             val request = GetTaggingListRequest.Builder()
                 .page(page)
                 .pageSize(MemberTaggingUtil.PAGE_SIZE)
-                .searchName(searchName)
+                .searchName(updatedSearchName)
                 .build()
 
             val response = lmFeedClient.getTaggingList(request)

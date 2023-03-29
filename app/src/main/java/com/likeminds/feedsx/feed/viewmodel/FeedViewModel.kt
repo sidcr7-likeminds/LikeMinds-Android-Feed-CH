@@ -9,8 +9,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.likeminds.feedsx.feed.UserRepository
-import com.likeminds.feedsx.post.PostRepository
+import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
+import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
@@ -32,13 +33,12 @@ import javax.inject.Inject
 @HiltViewModel
 class FeedViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val postRepository: PostRepository,
-    private val userPreferences: UserPreferences
+    private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
+    private val userPreferences: UserPreferences,
+    private val postPreferences: PostPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
-
-    private var temporaryPostId: Long? = null
 
     private val _userResponse = MutableLiveData<UserViewData>()
     val userResponse: LiveData<UserViewData> = _userResponse
@@ -68,14 +68,6 @@ class FeedViewModel @Inject constructor(
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
     }
 
-    companion object {
-        const val PAGE_SIZE = 20
-    }
-
-    fun getUserUniqueId(): String {
-        return userPreferences.getMemberId()
-    }
-
     sealed class PostDataEvent {
         data class PostDbData(val post: PostViewData) : PostDataEvent()
 
@@ -84,6 +76,15 @@ class FeedViewModel @Inject constructor(
 
     private val postDataEventChannel = Channel<PostDataEvent>(Channel.BUFFERED)
     val postDataEventFlow = postDataEventChannel.receiveAsFlow()
+
+    companion object {
+        const val PAGE_SIZE = 20
+    }
+
+    // returns user unique id from user prefs
+    fun getUserUniqueId(): String {
+        return userPreferences.getUserUniqueId()
+    }
 
     /***
      * calls InitiateUser API
@@ -121,7 +122,7 @@ class FeedViewModel @Inject constructor(
                     addUser(user)
 
                     //save user.id in local prefs
-                    userPreferences.saveMemberId(id)
+                    userPreferences.saveUserUniqueId(id)
 
                     getUniversalFeed(1)
 
@@ -289,20 +290,58 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    // starts a media upload worker to retry failed uploads
-    fun createRetryPostMediaWorker(
-        context: Context,
-        postId: Long?,
-        attachmentCount: Int,
-    ) {
+    // fetches posts temporary id from prefs
+    fun getTemporaryId(): Long {
+        return postPreferences.getTemporaryId()
+    }
+
+    // calls AddPost API and posts the response in LiveData
+    fun addPost(postingData: PostViewData) {
         viewModelScope.launchIO {
-            if (postId == null || attachmentCount <= 0) {
-                return@launchIO
+            val updatedText = postingData.text.ifEmpty { null }
+            val request = AddPostRequest.Builder()
+                .text(updatedText)
+                .attachments(createAttachments(postingData.attachments))
+                .build()
+
+            val response = lmFeedClient.addPost(request)
+            if (response.success) {
+                val data = response.data ?: return@launchIO
+                postDataEventChannel.send(
+                    PostDataEvent.PostResponseData(
+                        convertPost(
+                            data.post,
+                            data.users
+                        )
+                    )
+                )
+                // post added successfully update the post in db
+                val temporaryId = postPreferences.getTemporaryId()
+                val postId = data.post.id
+                postWithAttachmentsRepository.updateIsPosted(
+                    temporaryId,
+                    postId,
+                    true
+                )
+                postWithAttachmentsRepository.updatePostIdInAttachments(postId, temporaryId)
+            } else {
+                errorMessageChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
             }
-            val uploadData = startMediaUploadWorker(context, postId, attachmentCount)
-            postRepository.updateUploadWorkerUUID(postId, uploadData.second)
-            uploadData.first.enqueue()
-            fetchPendingPostFromDB()
+            postPreferences.saveTemporaryId(-1)
+        }
+    }
+
+    // fetches pending post data from db
+    fun fetchPendingPostFromDB() {
+        viewModelScope.launchIO {
+            val postWithAttachments = postWithAttachmentsRepository.getLatestPostWithAttachments()
+            if (postWithAttachments == null || postWithAttachments.post.isPosted) {
+                return@launchIO
+            } else {
+                val temporaryId = postWithAttachments.post.temporaryId
+                postPreferences.saveTemporaryId(temporaryId)
+                postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
+            }
         }
     }
 
@@ -318,45 +357,20 @@ class FeedViewModel @Inject constructor(
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
     }
 
-    // fetches pending post data from db
-    fun fetchPendingPostFromDB() {
+    // starts a media upload worker to retry failed uploads
+    fun createRetryPostMediaWorker(
+        context: Context,
+        postId: Long?,
+        attachmentCount: Int,
+    ) {
         viewModelScope.launchIO {
-            val postWithAttachments = postRepository.getLatestPostWithAttachments()
-            if (postWithAttachments == null || postWithAttachments.post.isPosted) {
+            if (postId == null || attachmentCount <= 0) {
                 return@launchIO
-            } else {
-                temporaryPostId = postWithAttachments.post.id
-                postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
             }
-        }
-    }
-
-    // calls AddPost API and posts the response in LiveData
-    fun addPost(postingData: PostViewData) {
-        viewModelScope.launchIO {
-            val request = AddPostRequest.Builder()
-                .text(postingData.text)
-                .attachments(createAttachments(postingData.attachments))
-                .build()
-
-            val response = lmFeedClient.addPost(request)
-            if (response.success) {
-                val data = response.data ?: return@launchIO
-                postDataEventChannel.send(
-                    PostDataEvent.PostResponseData(
-                        convertPost(
-                            data.post,
-                            data.users
-                        )
-                    )
-                )
-            } else {
-                errorMessageChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
-            }
-
-            //set isPosted in db to true
-            val id = temporaryPostId ?: 0
-            postRepository.updateIsPosted(id, true)
+            val uploadData = startMediaUploadWorker(context, postId, attachmentCount)
+            postWithAttachmentsRepository.updateUploadWorkerUUID(postId, uploadData.second)
+            uploadData.first.enqueue()
+            fetchPendingPostFromDB()
         }
     }
 }

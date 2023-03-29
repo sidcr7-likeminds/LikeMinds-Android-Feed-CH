@@ -43,7 +43,6 @@ import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
@@ -472,11 +471,7 @@ class PostDetailFragment :
      * @param position Index of the item to scroll to
      */
     private fun scrollToPositionWithOffset(position: Int) {
-        val px = if (binding.vTopBackground.height == 0) {
-            (ViewUtils.dpToPx(75) * 1.5).toInt()
-        } else {
-            (binding.vTopBackground.height * 1.5).toInt()
-        }
+        val px = (ViewUtils.dpToPx(75) * 1.5).toInt()
         (binding.rvPostDetails.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
             position,
             px
@@ -628,11 +623,11 @@ class PostDetailFragment :
     override fun selfDelete(deleteExtras: DeleteExtras) {
         // TODO: delete post/comment by user
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> showShortToast(
+            DELETE_TYPE_POST -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
             )
-            DELETE_TYPE_COMMENT -> showShortToast(
+            DELETE_TYPE_COMMENT -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.comment_deleted)
             )
@@ -643,11 +638,11 @@ class PostDetailFragment :
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
         // TODO: delete post/comment by admin
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> showShortToast(
+            DELETE_TYPE_POST -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
             )
-            DELETE_TYPE_COMMENT -> showShortToast(
+            DELETE_TYPE_COMMENT -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.comment_deleted)
             )

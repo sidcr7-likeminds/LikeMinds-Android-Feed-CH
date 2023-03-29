@@ -2,7 +2,7 @@ package com.likeminds.feedsx.utils.membertagging.model
 
 import android.graphics.drawable.Drawable
 
-class MemberTagViewData private constructor(
+class UserTagViewData private constructor(
     var name: String,
     var imageUrl: String,
     var id: Int,
@@ -37,7 +37,7 @@ class MemberTagViewData private constructor(
         fun description(description: String) = apply { this.description = description }
         fun isLastItem(isLastItem: Boolean) = apply { this.isLastItem = isLastItem }
 
-        fun build() = MemberTagViewData(
+        fun build() = UserTagViewData(
             name,
             imageUrl,
             id,

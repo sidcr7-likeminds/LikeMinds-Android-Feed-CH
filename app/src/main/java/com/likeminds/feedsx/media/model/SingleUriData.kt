@@ -6,12 +6,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class SingleUriData private constructor(
-    @Transient
     var uri: Uri,
     var fileType: String,
     var width: Int?,
     var height: Int?,
-    @Transient
     var thumbnailUri: Uri?,
     var size: Long,
     var mediaName: String?,

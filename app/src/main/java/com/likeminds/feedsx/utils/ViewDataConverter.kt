@@ -13,7 +13,7 @@ import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
@@ -352,13 +352,13 @@ object ViewDataConverter {
             .build()
     }
 
-    fun convertMemberTag(tagMember: TagMember): MemberTagViewData {
+    fun convertUserTag(tagMember: TagMember): UserTagViewData {
         val nameDrawable = MemberImageUtil.getNameDrawable(
             MemberImageUtil.SIXTY_PX,
             tagMember.id.toString(),
             tagMember.name
         )
-        return MemberTagViewData.Builder()
+        return UserTagViewData.Builder()
             .id(tagMember.id)
             .imageUrl(tagMember.imageUrl)
             .isGuest(tagMember.isGuest)
@@ -469,7 +469,7 @@ object ViewDataConverter {
         val post = postWithAttachments.post
         val attachments = postWithAttachments.attachments
         return PostViewData.Builder()
-            .temporaryId(post.id)
+            .temporaryId(post.temporaryId)
             .thumbnail(post.thumbnail)
             .uuid(post.uuid)
             .isPosted(post.isPosted)
@@ -515,7 +515,8 @@ object ViewDataConverter {
         text: String?
     ): PostEntity {
         return PostEntity.Builder()
-            .id(temporaryId)
+            .temporaryId(temporaryId)
+            .postId(temporaryId.toString())
             .uuid(uuid)
             .thumbnail(thumbnail)
             .text(text)
@@ -523,7 +524,7 @@ object ViewDataConverter {
     }
 
     fun convertAttachment(
-        postId: Long,
+        temporaryId: Long,
         singleUriData: SingleUriData
     ): AttachmentEntity {
         val attachmentType = when (singleUriData.fileType) {
@@ -538,12 +539,14 @@ object ViewDataConverter {
             }
         }
         return AttachmentEntity.Builder()
-            .postId(postId)
+            .temporaryId(temporaryId)
+            .postId(temporaryId.toString())
             .attachmentType(attachmentType)
             .attachmentMeta(convertAttachmentMeta(singleUriData))
             .build()
     }
 
+    // converts singleUriData to attachmentMetaEntity
     private fun convertAttachmentMeta(
         singleUriData: SingleUriData
     ): AttachmentMetaEntity {

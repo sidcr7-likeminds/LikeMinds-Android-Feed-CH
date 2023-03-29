@@ -4,7 +4,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.likeminds.feedsx.databinding.ItemMemberBinding
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 
 internal class MemberViewHolder(
     val binding: ItemMemberBinding,
@@ -20,7 +20,7 @@ internal class MemberViewHolder(
     }
 
     @JvmSynthetic
-    internal fun bind(userAndGroup: MemberTagViewData) {
+    internal fun bind(userAndGroup: UserTagViewData) {
         binding.member = userAndGroup
         binding.hideBottomLine = userAndGroup.isLastItem && !darkMode
         binding.darkMode = darkMode
