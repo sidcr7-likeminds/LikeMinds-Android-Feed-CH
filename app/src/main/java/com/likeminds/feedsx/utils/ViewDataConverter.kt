@@ -1,15 +1,18 @@
 package com.likeminds.feedsx.utils
 
-import com.likeminds.feedsx.db.models.UserEntity
+import android.net.Uri
+import android.util.Base64
+import com.likeminds.feedsx.db.models.*
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
+import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
-import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
+import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
@@ -23,7 +26,7 @@ object ViewDataConverter {
      * Media Model -> View Data Model
     --------------------------------*/
 
-    // Converts the SingleDataUri (contains the data of media) to AttachmentViewData
+    // Converts the SingleUriData (contains the data of media) to AttachmentViewData
     fun convertSingleDataUri(singleUriData: SingleUriData): AttachmentViewData {
         val attachmentType: Int?
         val viewType = when (singleUriData.fileType) {
@@ -46,11 +49,94 @@ object ViewDataConverter {
             .attachmentMeta(
                 AttachmentMetaViewData.Builder()
                     .name(singleUriData.mediaName)
-                    .duration(singleUriData.duration.toString())
+                    .duration(singleUriData.duration)
+                    .format(singleUriData.format)
                     .pageCount(singleUriData.pdfPageCount)
-                    .size(MediaUtils.getFileSizeText(singleUriData.size))
+                    .width(singleUriData.width)
+                    .height(singleUriData.height)
+                    .size(singleUriData.size)
+                    .uri(singleUriData.uri)
                     .build()
             )
+            .build()
+    }
+
+    // converts internal media filetype to FileType
+    fun convertFileType(fileType: String): Int {
+        return when (fileType) {
+            IMAGE -> com.likeminds.feedsx.utils.mediauploader.model.IMAGE
+            PDF -> com.likeminds.feedsx.utils.mediauploader.model.PDF
+            VIDEO -> com.likeminds.feedsx.utils.mediauploader.model.VIDEO
+            else -> com.likeminds.feedsx.utils.mediauploader.model.IMAGE
+        }
+    }
+
+    /**--------------------------------
+     * View Data Model -> Network Model
+    --------------------------------*/
+
+    fun createAttachments(
+        attachments: List<AttachmentViewData>
+    ): List<Attachment> {
+        return attachments.map {
+            convertAttachment(it)
+        }
+    }
+
+    fun convertAttachment(
+        attachment: AttachmentViewData
+    ): Attachment {
+        return Attachment.Builder()
+            .attachmentType(attachment.attachmentType)
+            .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+            .build()
+    }
+
+    private fun convertAttachmentMeta(
+        attachmentMeta: AttachmentMetaViewData
+    ): AttachmentMeta {
+        return AttachmentMeta.Builder().name(attachmentMeta.name)
+            .ogTags(convertOGTags(attachmentMeta.ogTags))
+            .url(attachmentMeta.url)
+            .size(attachmentMeta.size)
+            .duration(attachmentMeta.duration)
+            .pageCount(attachmentMeta.pageCount)
+            .format(attachmentMeta.format)
+            .height(attachmentMeta.height)
+            .width(attachmentMeta.width)
+            .build()
+    }
+
+    // creates attachment list of Network Model for link attachment
+    fun convertAttachments(
+        linkOGTagsViewData: LinkOGTagsViewData
+    ): List<Attachment> {
+        return listOf(
+            Attachment.Builder()
+                .attachmentType(LINK)
+                .attachmentMeta(convertAttachmentMeta(linkOGTagsViewData))
+                .build()
+        )
+    }
+
+    // creates AttachmentMeta Network Model for link attachment meta
+    private fun convertAttachmentMeta(
+        linkOGTagsViewData: LinkOGTagsViewData
+    ): AttachmentMeta {
+        return AttachmentMeta.Builder()
+            .ogTags(convertOGTags(linkOGTagsViewData))
+            .build()
+    }
+
+    // converts LinkOGTags view data model to network model
+    private fun convertOGTags(
+        linkOGTagsViewData: LinkOGTagsViewData
+    ): LinkOGTags {
+        return LinkOGTags.Builder()
+            .title(linkOGTagsViewData.title)
+            .image(linkOGTagsViewData.image)
+            .description(linkOGTagsViewData.description)
+            .url(linkOGTagsViewData.url)
             .build()
     }
 
@@ -166,8 +252,8 @@ object ViewDataConverter {
             .name(attachmentMeta.name)
             .url(attachmentMeta.url)
             .format(attachmentMeta.format)
-            .size(MediaUtils.getFileSizeText(attachmentMeta.size ?: 0L))
-            .duration(MediaUtils.formatSeconds(attachmentMeta.duration ?: 0))
+            .size(attachmentMeta.size)
+            .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
             .width(attachmentMeta.width)
@@ -179,7 +265,7 @@ object ViewDataConverter {
      * convert [LinkOGTags] to [LinkOGTagsViewData]
      * @param linkOGTags: object of [LinkOGTags]
      **/
-    private fun convertLinkOGTags(linkOGTags: LinkOGTags): LinkOGTagsViewData {
+    fun convertLinkOGTags(linkOGTags: LinkOGTags): LinkOGTagsViewData {
         return LinkOGTagsViewData.Builder()
             .url(linkOGTags.url)
             .description(linkOGTags.description)
@@ -252,6 +338,37 @@ object ViewDataConverter {
         }.toMutableList()
     }
 
+    fun convertPost(
+        post: Post,
+        users: Map<String, User>
+    ): PostViewData {
+        val postCreator = post.userId
+        val user = users[postCreator]
+        val postId = post.id
+        val userViewData = if (user == null) {
+            createDeletedUser()
+        } else {
+            convertUser(user)
+        }
+
+        return PostViewData.Builder()
+            .id(post.id)
+            .text(post.text)
+            .communityId(post.communityId)
+            .isPinned(post.isPinned)
+            .isSaved(post.isSaved)
+            .isLiked(post.isLiked)
+            .menuItems(convertOverflowMenuItems(post.menuItems))
+            .attachments(convertAttachments(post.attachments))
+            .userId(postCreator)
+            .likesCount(post.likesCount)
+            .commentsCount(post.commentsCount)
+            .createdAt(post.createdAt)
+            .updatedAt(post.updatedAt)
+            .user(userViewData)
+            .build()
+    }
+
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
@@ -265,6 +382,127 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isDeleted(user.isDeleted)
             .userUniqueId(user.userUniqueId)
+            .build()
+    }
+
+    /**--------------------------------
+     * Db Model -> View Data Model
+    --------------------------------*/
+
+    fun convertUser(user: UserEntity): UserViewData {
+        return UserViewData.Builder()
+            .id(user.id)
+            .imageUrl(user.imageUrl)
+            .isGuest(user.isGuest)
+            .name(user.name)
+            .updatedAt(user.updatedAt)
+            .customTitle(user.customTitle)
+            .isDeleted(user.isDeleted)
+            .userUniqueId(user.userUniqueId)
+            .build()
+    }
+
+    fun convertPost(postWithAttachments: PostWithAttachments): PostViewData {
+        val post = postWithAttachments.post
+        val attachments = postWithAttachments.attachments
+        return PostViewData.Builder()
+            .temporaryId(post.temporaryId)
+            .thumbnail(post.thumbnail)
+            .uuid(post.uuid)
+            .isPosted(post.isPosted)
+            .attachments(convertAttachmentsEntity(attachments))
+            .build()
+    }
+
+    private fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
+        return attachments.map { attachment ->
+            convertAttachment(attachment)
+        }
+    }
+
+    fun convertAttachment(attachment: AttachmentEntity): AttachmentViewData {
+        return AttachmentViewData.Builder()
+            .attachmentType(attachment.attachmentType)
+            .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+            .build()
+    }
+
+    private fun convertAttachmentMeta(attachmentMeta: AttachmentMetaEntity): AttachmentMetaViewData {
+        return AttachmentMetaViewData.Builder()
+            .url(attachmentMeta.url)
+            .name(attachmentMeta.name)
+            .size(attachmentMeta.size)
+            .duration(attachmentMeta.duration)
+            .format(attachmentMeta.format)
+            .pageCount(attachmentMeta.pageCount)
+            .uri(Uri.parse(attachmentMeta.uri))
+            .width(attachmentMeta.width)
+            .height(attachmentMeta.height)
+            .build()
+    }
+
+    /**--------------------------------
+     * View Data -> Db Model
+    --------------------------------*/
+
+    fun convertPost(
+        temporaryId: Long,
+        uuid: String,
+        thumbnail: String,
+        text: String?
+    ): PostEntity {
+        return PostEntity.Builder()
+            .temporaryId(temporaryId)
+            .postId(temporaryId.toString())
+            .uuid(uuid)
+            .thumbnail(thumbnail)
+            .text(text)
+            .build()
+    }
+
+    fun convertAttachment(
+        temporaryId: Long,
+        singleUriData: SingleUriData
+    ): AttachmentEntity {
+        val attachmentType = when (singleUriData.fileType) {
+            IMAGE -> {
+                com.likeminds.feedsx.posttypes.model.IMAGE
+            }
+            VIDEO -> {
+                com.likeminds.feedsx.posttypes.model.VIDEO
+            }
+            else -> {
+                com.likeminds.feedsx.posttypes.model.DOCUMENT
+            }
+        }
+        return AttachmentEntity.Builder()
+            .temporaryId(temporaryId)
+            .postId(temporaryId.toString())
+            .attachmentType(attachmentType)
+            .attachmentMeta(convertAttachmentMeta(singleUriData))
+            .build()
+    }
+
+    private fun convertAttachmentMeta(
+        singleUriData: SingleUriData
+    ): AttachmentMetaEntity {
+        val url = String(
+            Base64.decode(
+                AWSKeys.getBucketBaseUrl(),
+                Base64.DEFAULT
+            )
+        ) + singleUriData.awsFolderPath
+        return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
+            .url(url)
+            .uri(singleUriData.uri.toString())
+            .pageCount(singleUriData.pdfPageCount)
+            .size(singleUriData.size)
+            .duration(singleUriData.duration)
+            .format(singleUriData.format)
+            .awsFolderPath(singleUriData.awsFolderPath)
+            .localFilePath(singleUriData.localFilePath)
+            .width(singleUriData.width)
+            .height(singleUriData.height)
             .build()
     }
 }

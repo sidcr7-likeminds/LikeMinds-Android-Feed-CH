@@ -1,8 +1,8 @@
-package com.likeminds.feedsx.post.view.adapter
+package com.likeminds.feedsx.post.create.view.adapter
 
-import com.likeminds.feedsx.post.util.CreatePostListener
-import com.likeminds.feedsx.post.view.adapter.databinder.createpostmultiplemedia.ItemCreatePostMultipleMediaImageViewDataBinder
-import com.likeminds.feedsx.post.view.adapter.databinder.createpostmultiplemedia.ItemCreatePostMultipleMediaVideoViewDataBinder
+import com.likeminds.feedsx.post.create.util.CreatePostListener
+import com.likeminds.feedsx.post.create.view.adapter.databinder.createpostmultiplemedia.ItemCreatePostMultipleMediaImageViewDataBinder
+import com.likeminds.feedsx.post.create.view.adapter.databinder.createpostmultiplemedia.ItemCreatePostMultipleMediaVideoViewDataBinder
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType

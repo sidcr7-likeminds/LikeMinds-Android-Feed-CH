@@ -73,6 +73,18 @@ object MediaUtils {
         return MemoryUnitFormat.formatBytes(sizeBytes)
     }
 
+    fun isVideoType(contentType: String?): Boolean {
+        return null != contentType && contentType.startsWith("video/")
+    }
+
+    fun isImageType(contentType: String?): Boolean {
+        return null != contentType && contentType.startsWith("image/")
+    }
+
+    fun isPdfType(contentType: String?): Boolean {
+        return null != contentType && contentType == "application/pdf"
+    }
+
     fun formatSeconds(timeInSeconds: Int): String {
         val hours = timeInSeconds / 3600
         val secondsLeft = timeInSeconds - hours * 3600
@@ -90,18 +102,6 @@ object MediaUtils {
             return formattedTime.substring(1)
         }
         return formattedTime
-    }
-
-    fun isVideoType(contentType: String?): Boolean {
-        return null != contentType && contentType.startsWith("video/")
-    }
-
-    fun isImageType(contentType: String?): Boolean {
-        return null != contentType && contentType.startsWith("image/")
-    }
-
-    fun isPdfType(contentType: String?): Boolean {
-        return null != contentType && contentType == "application/pdf"
     }
 
     fun convertMediaViewDataToSingleUriData(

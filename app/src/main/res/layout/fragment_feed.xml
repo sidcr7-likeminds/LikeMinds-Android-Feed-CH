@@ -21,7 +21,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimary"
+            android:background="@color/white"
             android:contentInsetStart="0dp"
             android:contentInsetLeft="0dp"
             android:contentInsetEnd="0dp"
@@ -86,17 +86,17 @@
                     android:id="@+id/tv_notification_count"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
-                    android:translationX="2dp"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/notification_badge"
                     android:gravity="center"
                     android:textAlignment="center"
                     android:textColor="@color/white"
                     android:textSize="12sp"
+                    android:translationX="2dp"
                     app:fontType="medium"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_notification"
                     app:layout_constraintEnd_toEndOf="@id/iv_notification"
                     app:layout_constraintTop_toTopOf="@id/iv_notification"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_notification"
                     tools:text="99" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
@@ -113,6 +113,17 @@
 
         </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
 
+        <include
+            android:id="@+id/layout_posting"
+            layout="@layout/layout_posting"
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
             android:layout_width="match_parent"
@@ -120,8 +131,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar">
+            app:layout_constraintTop_toBottomOf="@id/layout_posting">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_view"

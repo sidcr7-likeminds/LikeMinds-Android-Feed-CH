@@ -37,6 +37,16 @@ dependencies {
     //Stream
     implementation deps.stream.main
 
+    //work manager
+    implementation deps.work_manager.main
+
+    // gson
+    implementation deps.gson.main
+
+    //aws
+    implementation deps.aws.s3
+    implementation(deps.aws.mobile_client) { transitive = true }
+
     //testing
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit
@@ -48,5 +58,5 @@ dependencies {
     kapt deps.room.compiler
 
     // feed-sdk
-    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:3cfb1e75a3"
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:dd778c62ab"
 }

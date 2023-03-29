@@ -15,12 +15,7 @@ import android.util.Log
 import android.util.Size
 import androidx.core.content.FileProvider
 import androidx.exifinterface.media.ExifInterface
-import com.likeminds.feedsx.utils.file.Constants.FileConstants.CLOUD_FILE
-import com.likeminds.feedsx.utils.file.Constants.FileConstants.LOCAL_PROVIDER
-import com.likeminds.feedsx.utils.file.Constants.FileConstants.UNKNOWN_FILE_CHOOSER
-import com.likeminds.feedsx.utils.file.Constants.FileConstants.UNKNOWN_PROVIDER
 import com.likeminds.feedsx.utils.file.PathUtils.getPath
-import com.likeminds.feedsx.utils.model.FileData
 import java.io.*
 
 object FileUtil {
@@ -38,7 +33,7 @@ object FileUtil {
      * Returns sd card path for an Uri
      * @param uri single Uri
      */
-    fun getRealPath(context: Context, uri: Uri): FileData {
+    fun getRealPath(context: Context, uri: Uri): String {
         val contentResolver = context.contentResolver
         val pathTempFile = getFullPathTemp(context, uri)
         val file = File(pathTempFile)
@@ -47,21 +42,21 @@ object FileUtil {
             //Cloud
             uri.isCloudFile -> {
                 downloadFile(contentResolver, file, uri)
-                FileData(CLOUD_FILE, pathTempFile)
+                pathTempFile
             }
             //Third Party App
             returnedPath.isBlank() -> {
                 downloadFile(contentResolver, file, uri)
-                FileData(UNKNOWN_FILE_CHOOSER, pathTempFile)
+                pathTempFile
             }
             //Unknown Provider or unknown mime type
             uri.isUnknownProvider(returnedPath, contentResolver) -> {
                 downloadFile(contentResolver, file, uri)
-                FileData(UNKNOWN_PROVIDER, pathTempFile)
+                pathTempFile
             }
             //LocalFile
             else -> {
-                FileData(LOCAL_PROVIDER, returnedPath)
+                returnedPath
             }
         }
     }
@@ -155,12 +150,12 @@ object FileUtil {
             return null
         }
         return try {
-            val oldExifOrientation = ExifInterface(getRealPath(context, uri).path)
+            val oldExifOrientation = ExifInterface(getRealPath(context, uri))
                 .getAttribute(ExifInterface.TAG_ORIENTATION)
             val bitmap = getBitmapFromUri(uri, context) ?: return null
             val newUri = getUriFromBitmapWithRandomName(context, bitmap) ?: return null
             if (oldExifOrientation != null) {
-                val newExif = ExifInterface(getRealPath(context, newUri).path)
+                val newExif = ExifInterface(getRealPath(context, newUri))
                 newExif.setAttribute(ExifInterface.TAG_ORIENTATION, oldExifOrientation)
                 newExif.saveAttributes()
             }
@@ -185,7 +180,7 @@ object FileUtil {
             mediaMetadataRetriever?.release()
         }
         if (bitmap == null && videoUri != null) {
-            val path = getRealPath(context, videoUri).path
+            val path = getRealPath(context, videoUri)
             if (path.isEmpty()) {
                 return null
             }
@@ -198,6 +193,21 @@ object FileUtil {
             }
         }
         return getUriFromBitmapWithRandomName(context, bitmap)
+    }
+
+    fun getImageDimensions(context: Context, uri: Uri): Pair<Int, Int> {
+        return try {
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uri, "r")!!
+            val fileDescriptor = parcelFileDescriptor.fileDescriptor
+            BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options)
+            parcelFileDescriptor.close()
+            Pair(options.outWidth, options.outHeight)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+            Pair(0, 0)
+        }
     }
 
     fun getSharedPdfUri(context: Context, oldUri: Uri?): Uri? {
@@ -329,6 +339,25 @@ object FileUtil {
             Log.e(TAG, "downloadFile", e)
         }
         return true
+    }
+
+    /**
+     * @param fileName - Name of the file to be uploaded
+     * @return awsFolderPath - Generates and returns AWS folder path where file will be uploaded
+     */
+    fun generateAWSFolderPathFromFileName(
+        fileName: String?,
+        userUniqueId: String?
+    ): String {
+        val fileNameWithoutExtension = fileName?.substringBeforeLast(".")
+        val extension = getFileExtensionFromFileName(fileName)
+        return "post/$userUniqueId/" + fileNameWithoutExtension + "-" + System.currentTimeMillis() + "." + extension
+    }
+
+    fun getFileExtensionFromFileName(
+        fileName: String?
+    ): String? {
+        return fileName?.substringAfterLast(".", "")
     }
 }
 

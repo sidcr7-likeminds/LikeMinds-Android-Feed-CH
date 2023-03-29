@@ -8,7 +8,6 @@ import android.text.style.StyleSpan
 import androidx.annotation.ColorInt
 
 object SearchUtils {
-
     fun getHighlightedText(
         stringToBeMatched: String,
         keywordsMatched: List<String>,
@@ -138,5 +137,4 @@ object SearchUtils {
         }
         return getHighlightedText(trimmedText, keywords, color)
     }
-
 }

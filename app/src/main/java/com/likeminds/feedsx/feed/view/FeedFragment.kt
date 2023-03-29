@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
+import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -10,9 +11,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.google.android.material.snackbar.Snackbar
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -35,9 +37,9 @@ import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
 import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
+import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.view.CreatePostActivity
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
@@ -51,8 +53,10 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -72,6 +76,10 @@ class FeedFragment :
     @Inject
     lateinit var lmExoplayer: LMExoplayer
 
+    // variable to check if there is a post already uploading
+    private var alreadyPosting: Boolean = false
+    private val workersMap by lazy { ArrayList<UUID>() }
+
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
     }
@@ -85,6 +93,7 @@ class FeedFragment :
 
     override fun observeData() {
         super.observeData()
+        observePosting()
 
         // observes userResponse LiveData
         viewModel.userResponse.observe(viewLifecycleOwner) { response ->
@@ -105,6 +114,7 @@ class FeedFragment :
             observeFeedUniversal(pair)
         }
 
+        // observes deletePostResponse LiveData
         viewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId).first
             mPostAdapter.removeIndex(indexToRemove)
@@ -114,16 +124,13 @@ class FeedFragment :
             )
         }
 
+        // observes pinPostResponse LiveData
         viewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
             val post = getIndexAndPostFromAdapter(postId).second
             if (post.isPinned) {
-                Snackbar.make(binding.root, "Post pinned to top!", Snackbar.LENGTH_LONG)
-                    .setAction("Refresh") {
-                        refreshFeed()
-                    }
-                    .show()
+                ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
             } else {
-                ViewUtils.showShortToast(requireContext(), "Post unpinned!")
+                ViewUtils.showShortToast(requireContext(), getString(R.string.post_unpinned))
             }
         }
 
@@ -137,6 +144,134 @@ class FeedFragment :
     private fun observeUserResponse(user: UserViewData?) {
         initToolbar()
         setUserImage(user)
+    }
+
+
+    //observe feed response
+    private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
+        //hide progress bar
+        ProgressHelper.hideProgress(binding.progressBar)
+        //page in api send
+        val page = pair.first
+
+        //list of post
+        val feed = pair.second
+
+        //if pull to refresh is called
+        if (mSwipeRefreshLayout.isRefreshing) {
+            setFeedAndScrollToTop(feed)
+            mSwipeRefreshLayout.isRefreshing = false
+        }
+
+        //normal adding
+        if (page == 1) {
+            setFeedAndScrollToTop(feed)
+        } else {
+            mPostAdapter.addAll(feed)
+        }
+    }
+
+    // observes post live data
+    private fun observePosting() {
+        viewModel.postDataEventFlow.onEach { response ->
+            when (response) {
+                // when the post data comes from local db
+                is FeedViewModel.PostDataEvent.PostDbData -> {
+                    alreadyPosting = true
+                    val post = response.post
+                    binding.layoutPosting.apply {
+                        root.show()
+                        if (post.thumbnail.isNullOrEmpty()) {
+                            ivPostThumbnail.hide()
+                        } else {
+                            ivPostThumbnail.show()
+                            ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
+                        }
+                        postingProgress.progress = 0
+                        postingProgress.show()
+                        ivPosted.hide()
+                        tvRetry.hide()
+                        observeMediaUpload(post)
+                    }
+                }
+                // when the post data comes from api response
+                is FeedViewModel.PostDataEvent.PostResponseData -> {
+                    binding.apply {
+                        ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
+                        refreshFeed()
+                        removePostingView()
+                    }
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
+    }
+
+    // finds the upload worker by UUID and observes the worker
+    private fun observeMediaUpload(postingData: PostViewData) {
+        if (postingData.uuid.isEmpty()) {
+            return
+        }
+        val uuid = UUID.fromString(postingData.uuid)
+        if (!workersMap.contains(uuid)) {
+            workersMap.add(uuid)
+            WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
+                .observe(viewLifecycleOwner) { workInfo ->
+                    observeMediaWorker(workInfo, postingData)
+                }
+        }
+    }
+
+    // observes the media worker through various worker lifecycle
+    private fun observeMediaWorker(
+        workInfo: WorkInfo,
+        postingData: PostViewData
+    ) {
+        when (workInfo.state) {
+            WorkInfo.State.SUCCEEDED -> {
+                // uploading completed, call the add post api
+                binding.layoutPosting.apply {
+                    postingProgress.hide()
+                    tvRetry.hide()
+                    ivPosted.show()
+                }
+                viewModel.addPost(postingData)
+            }
+            WorkInfo.State.FAILED -> {
+                // uploading failed, initiate retry mechanism
+                val indexList = workInfo.outputData.getIntArray(
+                    MediaUploadWorker.ARG_MEDIA_INDEX_LIST
+                ) ?: return
+                initRetryAction(
+                    postingData.temporaryId,
+                    indexList.size
+                )
+            }
+            else -> {
+                // uploading in progress, map the progress to progress bar
+                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
+                binding.layoutPosting.apply {
+                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
+                    val progressValue = percentage.toInt()
+                    postingProgress.progress = progressValue
+                }
+            }
+        }
+    }
+
+    // initializes retry mechanism for attachments uploading
+    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
+        binding.layoutPosting.apply {
+            ivPosted.hide()
+            postingProgress.hide()
+            tvRetry.show()
+            tvRetry.setOnClickListener {
+                viewModel.createRetryPostMediaWorker(
+                    requireContext(),
+                    temporaryId,
+                    attachmentCount
+                )
+            }
+        }
     }
 
     //observe error handling
@@ -218,47 +353,26 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-        }
-    }
-
-    //observe feed response
-    private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
-        //hide progress bar
-        ProgressHelper.hideProgress(binding.progressBar)
-        //page in api send
-        val page = pair.first
-
-        //list of post
-        val feed = pair.second
-
-        //if pull to refresh is called
-        if (mSwipeRefreshLayout.isRefreshing) {
-            setFeedAndScrollToTop(feed)
-            mSwipeRefreshLayout.isRefreshing = false
-        }
-
-        //normal adding
-        if (page == 1) {
-            setFeedAndScrollToTop(feed)
-        } else {
-            mPostAdapter.addAll(feed)
-        }
-    }
-
-    // shows invalid access error and logs out invalid user
-    private fun showInvalidAccess() {
-        binding.apply {
-            recyclerView.hide()
-            layoutAccessRemoved.root.show()
-            memberImage.hide()
-            ivSearch.hide()
-            ivNotification.hide()
+            is FeedViewModel.ErrorMessageEvent.AddPost -> {
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                removePostingView()
+            }
         }
     }
 
     override fun onStart() {
         super.onStart()
         initializeExoplayer()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val temporaryId = viewModel.getTemporaryId()
+        if (temporaryId != -1L && !alreadyPosting) {
+            removePostingView()
+            viewModel.fetchPendingPostFromDB()
+        }
     }
 
     override fun onStop() {
@@ -292,12 +406,35 @@ class FeedFragment :
         initNewPostClick()
     }
 
-    // initializes new post fab click
+    // handles new post fab click
     private fun initNewPostClick() {
         binding.newPostButton.setOnClickListener {
-            CreatePostActivity.start(requireContext())
+            if (alreadyPosting) {
+                ViewUtils.showShortToast(
+                    requireContext(),
+                    getString(R.string.a_post_is_already_uploading)
+                )
+            } else {
+                val intent = CreatePostActivity.getIntent(requireContext())
+                createPostLauncher.launch(intent)
+            }
         }
     }
+
+    // launcher for [CreatePostActivity]
+    private val createPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    // post of type text/link has been created and posted
+                    refreshFeed()
+                }
+                CreatePostActivity.RESULT_UPLOAD_POST -> {
+                    // post with attachments created, now upload and post it from db
+                    viewModel.fetchPendingPostFromDB()
+                }
+            }
+        }
 
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
@@ -330,7 +467,7 @@ class FeedFragment :
 
     //set posts through diff utils and scroll to top of the feed
     private fun setFeedAndScrollToTop(feed: List<PostViewData>) {
-        mPostAdapter.setItemsViaDiffUtilForFeed(feed)
+        mPostAdapter.replace(feed)
         binding.recyclerView.scrollToPosition(0)
     }
 
@@ -398,7 +535,18 @@ class FeedFragment :
         }
 
         //TODO: testing data. add this while observing data
-        binding.tvNotificationCount.text = "10"
+        binding.tvNotificationCount.text = "${10}"
+    }
+
+    // shows invalid access error and logs out invalid user
+    private fun showInvalidAccess() {
+        binding.apply {
+            recyclerView.hide()
+            layoutAccessRemoved.root.show()
+            memberImage.hide()
+            ivSearch.hide()
+            ivNotification.hide()
+        }
     }
 
     // sets user profile image
@@ -415,6 +563,13 @@ class FeedFragment :
         }
     }
 
+    // removes the posting view and shows create post button
+    private fun removePostingView() {
+        binding.apply {
+            alreadyPosting = false
+            layoutPosting.root.hide()
+        }
+    }
 
     /**
      * Post Actions block
@@ -441,6 +596,7 @@ class FeedFragment :
                 .fromPostSaved(true)
                 .isSaved(!item.isSaved)
                 .build()
+
             //call api
             viewModel.savePost(newViewData.id)
 
@@ -579,7 +735,7 @@ class FeedFragment :
         reportPostLauncher.launch(intent)
     }
 
-    // launcher to start [Report Activity] and show success dialog for result
+    // launcher to start [ReportActivity] and show success dialog for result
     private val reportPostLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {

@@ -2,10 +2,11 @@ package com.likeminds.feedsx.utils
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.likeminds.feedsx.media.customviews.WrappedDrawable
-import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.model.LocalAppData
+import com.likeminds.feedsx.media.model.MediaType
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
-import com.likeminds.feedsx.utils.file.FileUtil
 
 object AndroidUtils {
 
@@ -123,5 +124,19 @@ object AndroidUtils {
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultipleSelect)
         intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
         return intent
+    }
+
+    /**
+     * Shows document for the provided uri
+     */
+    fun startDocumentViewer(context: Context, uri: Uri) {
+        val pdfIntent = Intent(Intent.ACTION_VIEW, uri)
+        pdfIntent.flags = Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_GRANT_READ_URI_PERMISSION
+        try {
+            context.startActivity(pdfIntent)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ViewUtils.showShortToast(context, "No application found to open this document")
+        }
     }
 }

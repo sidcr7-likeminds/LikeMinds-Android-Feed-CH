@@ -6,7 +6,7 @@ import android.net.Uri
 import android.util.Log
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.view.CreatePostActivity
+import com.likeminds.feedsx.post.create.view.CreatePostActivity
 
 object Route {
 

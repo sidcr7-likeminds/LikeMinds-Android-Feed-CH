@@ -2,10 +2,10 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemMultipleMediaImageBinding
+import com.likeminds.feedsx.posttypes.model.AttachmentViewData
+import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 
@@ -28,14 +28,12 @@ class ItemMultipleMediaImageViewDataBinder :
         data: BaseViewType,
         position: Int
     ) {
+        val attachment = data as AttachmentViewData
 
-        //TODO: Testing data
-
-        // loads post image inside the post's image view
-        ImageBindingUtil.loadImage(
+        // loads post image inside the multiple media image view
+        PostTypeUtil.initMultipleMediaImage(
             binding.ivPost,
-            "https://picsum.photos/id/237/200/300",
-            placeholder = R.drawable.image_placeholder
+            attachment,
         )
     }
 }

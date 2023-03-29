@@ -85,23 +85,5 @@ annotation class MediaType {
             }
             return initial
         }
-
-        fun getMediaFileExtension(
-            mediaType: String?,
-            file: File,
-            isThumbnail: Boolean = false
-        ): String {
-            var extension = file.extension
-            if (extension.isEmpty()) {
-                extension =
-                    when (mediaType) {
-                        IMAGE -> "jpg"
-                        VIDEO -> "mp4"
-                        PDF -> "pdf"
-                        else -> ""
-                    }
-            }
-            return extension
-        }
     }
 }

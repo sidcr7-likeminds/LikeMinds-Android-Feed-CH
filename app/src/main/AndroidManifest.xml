@@ -4,7 +4,9 @@
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
@@ -27,7 +29,7 @@
             android:name=".report.view.ReportActivity"
             android:exported="false" />
         <activity
-            android:name=".post.view.CreatePostActivity"
+            android:name=".post.create.view.CreatePostActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
         <activity

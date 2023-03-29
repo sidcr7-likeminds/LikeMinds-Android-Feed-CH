@@ -9,16 +9,6 @@
         android:layout_marginTop="8dp"
         android:background="@color/cloudy_blue">
 
-        <View
-            android:id="@+id/v_top_background"
-            android:layout_width="0dp"
-            android:layout_height="75dp"
-            android:background="@color/white"
-            android:visibility="visible"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
             android:layout_width="match_parent"
@@ -37,13 +27,6 @@
                 app:layout_constrainedHeight="true" />
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-            android:background="@color/white"
-            android:clipToPadding="false"
-            android:descendantFocusability="blocksDescendants"
-            android:overScrollMode="never"
-            app:layout_constrainedHeight="true"
-            app:layout_constraintBottom_toTopOf="@id/tv_replying_to"
-            app:layout_constraintTop_toTopOf="parent" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_replying_to"
@@ -58,7 +41,6 @@
             android:visibility="gone"
             app:fontType="regular"
             app:layout_constraintBottom_toTopOf="@id/iv_comment_send"
-            app:layout_constraintTop_toBottomOf="@id/rv_post_details"
             tools:text="Replying to Ronald Richards"
             tools:visibility="visible" />
 

@@ -26,7 +26,11 @@ class PostViewData private constructor(
     var user: UserViewData,
     val fromPostLiked: Boolean,
     val fromPostSaved: Boolean,
-    val fromVideoAction: Boolean
+    val fromVideoAction: Boolean,
+    val thumbnail: String?,
+    val uuid: String,
+    val isPosted: Boolean,
+    val temporaryId: Long?
 ) : Parcelable, BaseViewType {
 
     //TODO: add post id while adding menu item
@@ -73,6 +77,10 @@ class PostViewData private constructor(
         private var user: UserViewData = UserViewData.Builder().build()
         private var fromPostLiked: Boolean = false
         private var fromPostSaved: Boolean = false
+        private var thumbnail: String? = null
+        private var uuid: String = ""
+        private var isPosted: Boolean = false
+        private var temporaryId: Long? = null
         private var fromVideoAction: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
@@ -105,6 +113,10 @@ class PostViewData private constructor(
         fun fromPostSaved(fromPostSaved: Boolean) = apply { this.fromPostSaved = fromPostSaved }
         fun fromVideoAction(fromVideoAction: Boolean) =
             apply { this.fromVideoAction = fromVideoAction }
+        fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
+        fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
+        fun temporaryId(temporaryId: Long?) = apply { this.temporaryId = temporaryId }
 
         fun build() = PostViewData(
             id,
@@ -126,7 +138,11 @@ class PostViewData private constructor(
             user,
             fromPostLiked,
             fromPostSaved,
-            fromVideoAction
+            fromVideoAction,
+            thumbnail,
+            uuid,
+            isPosted,
+            temporaryId
         )
     }
 
@@ -151,5 +167,9 @@ class PostViewData private constructor(
             .fromPostLiked(fromPostLiked)
             .fromPostSaved(fromPostSaved)
             .fromVideoAction(fromVideoAction)
+            .thumbnail(thumbnail)
+            .uuid(uuid)
+            .isPosted(isPosted)
+            .temporaryId(temporaryId)
     }
 }

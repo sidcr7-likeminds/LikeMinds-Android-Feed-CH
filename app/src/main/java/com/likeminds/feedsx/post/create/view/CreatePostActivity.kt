@@ -1,5 +1,6 @@
-package com.likeminds.feedsx.post.view
+package com.likeminds.feedsx.post.create.view
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -20,6 +21,9 @@ class CreatePostActivity : BaseAppCompatActivity() {
     private lateinit var navController: NavController
 
     companion object {
+
+        const val POST_ATTACHMENTS_LIMIT = 10
+        const val RESULT_UPLOAD_POST = Activity.RESULT_FIRST_USER + 1
 
         @JvmStatic
         fun start(context: Context) {
