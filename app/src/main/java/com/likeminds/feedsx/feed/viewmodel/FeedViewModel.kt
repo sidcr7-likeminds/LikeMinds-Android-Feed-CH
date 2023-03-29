@@ -11,6 +11,7 @@ import androidx.work.WorkManager
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
+import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
@@ -33,12 +34,11 @@ import javax.inject.Inject
 class FeedViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val postRepository: PostRepository,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val postPreferences: PostPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
-
-    private var temporaryPostId: Long? = null
 
     private val _userResponse = MutableLiveData<UserViewData>()
     val userResponse: LiveData<UserViewData> = _userResponse
@@ -68,14 +68,6 @@ class FeedViewModel @Inject constructor(
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
     }
 
-    companion object {
-        const val PAGE_SIZE = 20
-    }
-
-    fun getUserUniqueId(): String {
-        return userPreferences.getMemberId()
-    }
-
     sealed class PostDataEvent {
         data class PostDbData(val post: PostViewData) : PostDataEvent()
 
@@ -84,6 +76,15 @@ class FeedViewModel @Inject constructor(
 
     private val postDataEventChannel = Channel<PostDataEvent>(Channel.BUFFERED)
     val postDataEventFlow = postDataEventChannel.receiveAsFlow()
+
+    companion object {
+        const val PAGE_SIZE = 20
+    }
+
+    // returns user unique id from user prefs
+    fun getUserUniqueId(): String {
+        return userPreferences.getUserUniqueId()
+    }
 
     /***
      * calls InitiateUser API
@@ -121,7 +122,7 @@ class FeedViewModel @Inject constructor(
                     addUser(user)
 
                     //save user.id in local prefs
-                    userPreferences.saveMemberId(id)
+                    userPreferences.saveUserUniqueId(id)
 
                     getUniversalFeed(1)
 
@@ -289,46 +290,9 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-    // starts a media upload worker to retry failed uploads
-    fun createRetryPostMediaWorker(
-        context: Context,
-        postId: Long?,
-        attachmentCount: Int,
-    ) {
-        viewModelScope.launchIO {
-            if (postId == null || attachmentCount <= 0) {
-                return@launchIO
-            }
-            val uploadData = startMediaUploadWorker(context, postId, attachmentCount)
-            postRepository.updateUploadWorkerUUID(postId, uploadData.second)
-            uploadData.first.enqueue()
-            fetchPendingPostFromDB()
-        }
-    }
-
-    // creates PostAttachmentUploadWorker to start media upload
-    @SuppressLint("EnqueueWork")
-    private fun startMediaUploadWorker(
-        context: Context,
-        postId: Long,
-        filesCount: Int
-    ): Pair<WorkContinuation, String> {
-        val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
-        val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
-        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
-    }
-
-    // fetches pending post data from db
-    fun fetchPendingPostFromDB() {
-        viewModelScope.launchIO {
-            val postWithAttachments = postRepository.getLatestPostWithAttachments()
-            if (postWithAttachments == null || postWithAttachments.post.isPosted) {
-                return@launchIO
-            } else {
-                temporaryPostId = postWithAttachments.post.id
-                postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
-            }
-        }
+    // fetches posts temporary id from prefs
+    fun getTemporaryId(): Long {
+        return postPreferences.getTemporaryId()
     }
 
     // calls AddPost API and posts the response in LiveData
@@ -350,13 +314,62 @@ class FeedViewModel @Inject constructor(
                         )
                     )
                 )
+                // post added successfully update the post in db
+                val temporaryId = postPreferences.getTemporaryId()
+                val postId = data.post.id
+                postRepository.updateIsPosted(
+                    temporaryId,
+                    postId,
+                    true
+                )
+                postRepository.updatePostIdInAttachments(postId, temporaryId)
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
             }
+            postPreferences.saveTemporaryId(-1)
+        }
+    }
 
-            //set isPosted in db to true
-            val id = temporaryPostId ?: 0
-            postRepository.updateIsPosted(id, true)
+    // fetches pending post data from db
+    fun fetchPendingPostFromDB() {
+        viewModelScope.launchIO {
+            val postWithAttachments = postRepository.getLatestPostWithAttachments()
+            if (postWithAttachments == null || postWithAttachments.post.isPosted) {
+                return@launchIO
+            } else {
+                val temporaryId = postWithAttachments.post.temporaryId
+                postPreferences.saveTemporaryId(temporaryId)
+                postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
+            }
+        }
+    }
+
+    // creates PostAttachmentUploadWorker to start media upload
+    @SuppressLint("EnqueueWork")
+    private fun startMediaUploadWorker(
+        context: Context,
+        postId: Long,
+        filesCount: Int
+    ): Pair<WorkContinuation, String> {
+        val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
+        val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
+        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
+
+    // starts a media upload worker to retry failed uploads
+    fun createRetryPostMediaWorker(
+        context: Context,
+        postId: Long?,
+        attachmentCount: Int,
+    ) {
+        viewModelScope.launchIO {
+            if (postId == null || attachmentCount <= 0) {
+                return@launchIO
+            }
+            val uploadData = startMediaUploadWorker(context, postId, attachmentCount)
+            postRepository.updateUploadWorkerUUID(postId, uploadData.second)
+            uploadData.first.enqueue()
+            fetchPendingPostFromDB()
         }
     }
 }

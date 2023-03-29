@@ -41,7 +41,6 @@ import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
 class PostDetailFragment :
@@ -598,11 +597,11 @@ class PostDetailFragment :
         // TODO: delete post/comment by user
         Log.d("TAG", "initializeListeners: ${deleteExtras.entityType}")
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> showShortToast(
+            DELETE_TYPE_POST -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
             )
-            DELETE_TYPE_COMMENT -> showShortToast(
+            DELETE_TYPE_COMMENT -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.comment_deleted)
             )
@@ -614,11 +613,11 @@ class PostDetailFragment :
         // TODO: delete post/comment by admin
         Log.d("TAG", "initializeListeners by admin: ${deleteExtras.entityType}")
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> showShortToast(
+            DELETE_TYPE_POST -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
             )
-            DELETE_TYPE_COMMENT -> showShortToast(
+            DELETE_TYPE_COMMENT -> ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.comment_deleted)
             )

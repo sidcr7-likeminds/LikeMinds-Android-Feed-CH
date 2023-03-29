@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
-import com.likeminds.feedsx.databinding.LayoutCreatePostLinkBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
@@ -526,7 +525,7 @@ class CreatePostFragment :
 
             val isImageValid = (data.image != null && data.image.isValidUrl())
             ivLink.isVisible = isImageValid
-            handleLinkPreviewConstraints(this, isImageValid)
+            handleLinkPreviewConstraints(isImageValid)
 
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
                 data.title
@@ -582,62 +581,77 @@ class CreatePostFragment :
 
     // if image url is invalid/empty then handle link preview constraints
     private fun handleLinkPreviewConstraints(
-        linkPreview: LayoutCreatePostLinkBinding,
         isImageValid: Boolean
     ) {
-        linkPreview.apply {
+        binding.linkPreview.apply {
             val constraintLayout: ConstraintLayout = clLink
             val constraintSet = ConstraintSet()
             constraintSet.clone(constraintLayout)
             if (isImageValid) {
-                val margin = dpToPx(16)
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.END,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.END,
-                    margin
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.START,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.START,
-                    margin
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.TOP,
-                    ivLink.id,
-                    ConstraintSet.BOTTOM,
-                    margin
-                )
+                // if image is valid then we show link image and set title constraints
+                setValidLinkImageConstraints(constraintSet)
             } else {
-                val margin16 = dpToPx(16)
-                val margin4 = dpToPx(4)
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.TOP,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.TOP,
-                    margin16
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.START,
-                    ConstraintSet.PARENT_ID,
-                    ConstraintSet.START,
-                    margin16
-                )
-                constraintSet.connect(
-                    tvLinkTitle.id,
-                    ConstraintSet.END,
-                    ivCross.id,
-                    ConstraintSet.START,
-                    margin4
-                )
+                // if image is not valid then we don't show image and set title constraints
+                setInvalidLinkImageConstraints(constraintSet)
             }
             constraintSet.applyTo(constraintLayout)
+        }
+    }
+
+    // sets constraints of link preview when image is invalid
+    private fun setInvalidLinkImageConstraints(constraintSet: ConstraintSet) {
+        binding.linkPreview.apply {
+            val margin16 = dpToPx(16)
+            val margin4 = dpToPx(4)
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.TOP,
+                margin16
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.START,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.START,
+                margin16
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.END,
+                ivCross.id,
+                ConstraintSet.START,
+                margin4
+            )
+        }
+    }
+
+    // sets constraints of link preview when image is valid
+    private fun setValidLinkImageConstraints(constraintSet: ConstraintSet) {
+        binding.linkPreview.apply {
+            val margin = dpToPx(16)
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.END,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.END,
+                margin
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.START,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.START,
+                margin
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.TOP,
+                ivLink.id,
+                ConstraintSet.BOTTOM,
+                margin
+            )
         }
     }
 

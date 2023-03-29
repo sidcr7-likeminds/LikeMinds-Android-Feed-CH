@@ -17,12 +17,24 @@ class PostRepository @Inject constructor(
         postDao.updatePost(post)
     }
 
-    suspend fun updateIsPosted(id: Long, isPosted: Boolean) {
-        postDao.updateIsPosted(id, isPosted)
+    suspend fun updatePostIdInAttachments(postId: String, temporaryId: Long) {
+        postDao.updatePostIdInAttachments(postId, temporaryId)
     }
 
-    suspend fun updateUploadWorkerUUID(postId: Long, uuid: String) {
-        postDao.updateUploadWorkerUUID(postId, uuid)
+    suspend fun updateIsPosted(
+        temporaryId: Long,
+        postId: String,
+        isPosted: Boolean
+    ) {
+        postDao.updateIsPosted(
+            temporaryId,
+            postId,
+            isPosted
+        )
+    }
+
+    suspend fun updateUploadWorkerUUID(temporaryId: Long, uuid: String) {
+        postDao.updateUploadWorkerUUID(temporaryId, uuid)
     }
 
     suspend fun deletePost(post: PostEntity) {
@@ -33,7 +45,7 @@ class PostRepository @Inject constructor(
         return postDao.getLatestPostWithAttachments()
     }
 
-    suspend fun getPostWithAttachments(id: Long): PostWithAttachments {
-        return postDao.getPostWithAttachments(id)
+    suspend fun getPostWithAttachments(temporaryId: Long): PostWithAttachments {
+        return postDao.getPostWithAttachments(temporaryId)
     }
 }

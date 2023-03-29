@@ -30,7 +30,7 @@ class ReportViewModel @Inject constructor() : ViewModel() {
     val postReportResponse: LiveData<Boolean> = _postReportResponse
 
     companion object {
-        const val REPORT_TAG_TYPE = 0
+        const val REPORT_TAG_TYPE = 3
     }
 
     //Get report tags for reporting

@@ -26,7 +26,7 @@ class ReasonChooseViewModel @Inject constructor() : ViewModel() {
     val errorMessage: LiveData<String?> = _errorMessage
 
     companion object {
-        const val REPORT_TAG_TYPE = 1
+        const val REPORT_TAG_TYPE = 0
     }
 
     // calls api and fetches report tags

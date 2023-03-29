@@ -15,6 +15,7 @@ import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.PostRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
+import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
@@ -38,6 +39,7 @@ class CreatePostViewModel @Inject constructor(
     private val userRepository: UserRepository,
     private val userPreferences: UserPreferences,
     private val postRepository: PostRepository,
+    private val postPreferences: PostPreferences,
     private val mediaRepository: MediaRepository
 ) : ViewModel() {
 
@@ -74,7 +76,7 @@ class CreatePostViewModel @Inject constructor(
     // fetches user from DB and posts in the live data
     fun fetchUserFromDB() {
         viewModelScope.launchIO {
-            val userId = userPreferences.getMemberId()
+            val userId = userPreferences.getUserUniqueId()
 
             // fetches user from DB with user.id
             val userEntity = userRepository.getUser(userId)
@@ -166,7 +168,7 @@ class CreatePostViewModel @Inject constructor(
             if (fileUris == null) {
                 return@launchIO
             }
-            val temporaryPostId = temporaryPostId ?: 0
+            val temporaryPostId = temporaryPostId ?: -1
             val thumbnailUri = fileUris.first().thumbnailUri
             val postEntity = ViewDataConverter.convertPost(
                 temporaryPostId,

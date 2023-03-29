@@ -15,7 +15,6 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.google.android.material.snackbar.Snackbar
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
@@ -53,7 +52,6 @@ import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.ViewUtils.showShortToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,6 +76,7 @@ class FeedFragment :
     @Inject
     lateinit var lmExoplayer: LMExoplayer
 
+    // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
     private val workersMap by lazy { ArrayList<UUID>() }
 
@@ -115,25 +114,23 @@ class FeedFragment :
             observeFeedUniversal(pair)
         }
 
+        // observes deletePostResponse LiveData
         viewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId).first
             mPostAdapter.removeIndex(indexToRemove)
-            showShortToast(
+            ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
             )
         }
 
+        // observes pinPostResponse LiveData
         viewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
             val post = getIndexAndPostFromAdapter(postId).second
             if (post.isPinned) {
-                Snackbar.make(binding.root, "Post pinned to top!", Snackbar.LENGTH_LONG)
-                    .setAction("Refresh") {
-                        refreshFeed()
-                    }
-                    .show()
+                ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
             } else {
-                showShortToast(requireContext(), "Post unpinned!")
+                ViewUtils.showShortToast(requireContext(), getString(R.string.post_unpinned))
             }
         }
 
@@ -200,8 +197,8 @@ class FeedFragment :
                 // when the post data comes from api response
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
-                        mPostAdapter.add(0, response.post)
-                        recyclerView.scrollToPosition(0)
+                        ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
+                        refreshFeed()
                         removePostingView()
                     }
                 }
@@ -368,6 +365,16 @@ class FeedFragment :
         initializeExoplayer()
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        val temporaryId = viewModel.getTemporaryId()
+        if (temporaryId != -1L && !alreadyPosting) {
+            removePostingView()
+            viewModel.fetchPendingPostFromDB()
+        }
+    }
+
     override fun onStop() {
         super.onStop()
         //release player
@@ -396,14 +403,17 @@ class FeedFragment :
 
         initRecyclerView()
         initSwipeRefreshLayout()
-        handleNewPostClick()
+        initNewPostClick()
     }
 
     // handles new post fab click
-    private fun handleNewPostClick() {
+    private fun initNewPostClick() {
         binding.newPostButton.setOnClickListener {
             if (alreadyPosting) {
-                showShortToast(requireContext(), getString(R.string.a_post_is_already_uploading))
+                ViewUtils.showShortToast(
+                    requireContext(),
+                    getString(R.string.a_post_is_already_uploading)
+                )
             } else {
                 val intent = CreatePostActivity.getIntent(requireContext())
                 createPostLauncher.launch(intent)

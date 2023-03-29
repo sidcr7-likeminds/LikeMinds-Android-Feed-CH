@@ -383,7 +383,7 @@ class MediaRepository @Inject constructor() {
                         cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE))
                     var mediaName =
                         cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
-                    if(mediaName == null)
+                    if (mediaName == null)
                         mediaName =
                             cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE))
                     if (!size.isLargeFile) {
@@ -435,7 +435,7 @@ class MediaRepository @Inject constructor() {
                             null
                         }
                     } else {
-                        0
+                        null
                     }
 
                 val mediaType = mimetype.getMediaType() ?: contentUri.getMediaType(context)

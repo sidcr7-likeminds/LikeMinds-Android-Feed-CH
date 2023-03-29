@@ -18,12 +18,19 @@ interface PostDao {
     suspend fun updatePost(post: PostEntity)
 
     //update post upload uuid in local db
-    @Query("UPDATE ${DbConstants.POST_TABLE} SET uuid = :uuid WHERE id =:id")
-    suspend fun updateUploadWorkerUUID(id: Long, uuid: String)
+    @Query("UPDATE ${DbConstants.POST_TABLE} SET uuid = :uuid WHERE temp_id =:temporaryId")
+    suspend fun updateUploadWorkerUUID(temporaryId: Long, uuid: String)
 
     // updates is_posted key in db
-    @Query("UPDATE ${DbConstants.POST_TABLE} SET is_posted = :isPosted WHERE id =:id")
-    suspend fun updateIsPosted(id: Long, isPosted: Boolean)
+    @Query("UPDATE ${DbConstants.POST_TABLE} SET post_id = :postId, is_posted = :isPosted WHERE temp_id =:temporaryId")
+    suspend fun updateIsPosted(
+        temporaryId: Long,
+        postId: String,
+        isPosted: Boolean
+    )
+
+    @Query("UPDATE ${DbConstants.ATTACHMENT_TABLE} SET post_id = :postId WHERE temp_id =:temporaryId")
+    suspend fun updatePostIdInAttachments(postId: String, temporaryId: Long)
 
     //delete post in local db
     @Delete
@@ -31,11 +38,11 @@ interface PostDao {
 
     //get the latest post in db which is not posted
     @Transaction
-    @Query("SELECT * FROM ${DbConstants.POST_TABLE} WHERE is_posted = 0 ORDER BY id DESC LIMIT 1")
+    @Query("SELECT * FROM ${DbConstants.POST_TABLE} WHERE is_posted = 0 ORDER BY temp_id DESC LIMIT 1")
     suspend fun getLatestPostWithAttachments(): PostWithAttachments?
 
     //get post for a particular post.id (temporaryId)
     @Transaction
-    @Query("SELECT * FROM ${DbConstants.POST_TABLE} WHERE id = :id")
-    suspend fun getPostWithAttachments(id: Long): PostWithAttachments
+    @Query("SELECT * FROM ${DbConstants.POST_TABLE} WHERE temp_id = :temporaryId")
+    suspend fun getPostWithAttachments(temporaryId: Long): PostWithAttachments
 }
