@@ -10,6 +10,7 @@ import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
@@ -288,6 +289,12 @@ object ViewDataConverter {
                 .parentId(comment.parentId)
                 .build()
         }.toMutableList()
+    }
+
+    fun convertCommentsCount(commentsCount: Int): CommentsCountViewData {
+        return CommentsCountViewData.Builder()
+            .commentsCount(commentsCount)
+            .build()
     }
 
     /**
