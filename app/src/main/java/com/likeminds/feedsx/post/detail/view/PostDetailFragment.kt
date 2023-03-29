@@ -92,17 +92,39 @@ class PostDetailFragment :
     override fun observeData() {
         super.observeData()
 
+        observeErrors()
         observePostData()
         observeMembersTaggingList()
-        observeErrors()
     }
 
     private fun observePostData() {
         viewModel.postResponse.observe(viewLifecycleOwner) { pair ->
+            //page in sent in api
             val page = pair.first
+
+            // post data
             val post = pair.second
+
+            // update the comments count
             updateCommentsCount(post.commentsCount)
+
+            //if pull to refresh is called
+            if (mSwipeRefreshLayout.isRefreshing) {
+                setPostDataAndScrollToTop(post)
+                mSwipeRefreshLayout.isRefreshing = false
+            }
+
+            //normal adding
+            if (page == 1) {
+                setPostDataAndScrollToTop(post)
+            } else {
+//                mPostDetailAdapter.addAll(post)
+            }
         }
+    }
+
+    private fun setPostDataAndScrollToTop(post: PostViewData) {
+        binding.rvPostDetails.scrollToPosition(0)
     }
 
     private fun fetchPostData() {
@@ -128,6 +150,9 @@ class PostDetailFragment :
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.GetPost -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is PostDetailViewModel.ErrorMessageEvent.AddComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
@@ -266,22 +291,38 @@ class PostDetailFragment :
     private fun initListeners() {
         binding.apply {
             ivCommentSend.setOnClickListener {
-                val text = binding.etComment.text
+                val text = etComment.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
+                val postId = postDetailExtras.postId
                 if (parentCommentIdToReply != null) {
                     // input text is reply to a comment
-                    // TODO: create a reply to comment
+                    val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
+                    viewModel.replyComment(
+                        postDetailExtras.postId,
+                        parentCommentId,
+                        updatedText
+                    )
+                    hideReplyingToView()
                 } else {
                     // input text is a comment
-                    // TODO: create a new comment
+                    viewModel.addComment(postId, updatedText)
                 }
+                etComment.text = null
+                ivCommentSend.isClickable = false
+                ivCommentSend.setImageResource(R.drawable.ic_comment_send_disable)
             }
 
             ivRemoveReplyingTo.setOnClickListener {
-                parentCommentIdToReply = null
-                tvReplyingTo.hide()
-                ivRemoveReplyingTo.hide()
+                hideReplyingToView()
             }
+        }
+    }
+
+    private fun hideReplyingToView() {
+        binding.apply {
+            parentCommentIdToReply = null
+            tvReplyingTo.hide()
+            ivRemoveReplyingTo.hide()
         }
     }
 
@@ -451,7 +492,7 @@ class PostDetailFragment :
         LikesActivity.start(requireContext(), likesScreenExtras)
     }
 
-    // callback when post is liked
+    // callback when comment/reply is liked
     override fun likeComment(commentId: String) {
         // TODO: likes the comment with comment id
     }

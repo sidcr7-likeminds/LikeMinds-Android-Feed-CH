@@ -17,6 +17,7 @@ import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.helper.model.TagMember
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.post.model.*
@@ -178,7 +179,7 @@ object ViewDataConverter {
 
     /**
      * convert list of [Post] and usersMap [Map] of String to User
-     * to [PostViewData]
+     * to list of [PostViewData]
      *
      * @param posts: list of [Post]
      * @param usersMap: [Map] of String to User
@@ -188,9 +189,75 @@ object ViewDataConverter {
         usersMap: Map<String, User>
     ): List<PostViewData> {
         return posts.map { post ->
-            val postCreator = post.userId
-            val user = usersMap[postCreator]
-            val postId = post.id
+            convertPost(post, usersMap)
+        }
+    }
+
+    /**
+     * converts [Post] and usersMap [Map] of String to User
+     * to [PostViewData]
+     *
+     * @param post: a post [Post]
+     * @param usersMap: [Map] of String to User
+     * */
+    fun convertPost(
+        post: Post,
+        usersMap: Map<String, User>
+    ): PostViewData {
+        val postCreator = post.userId
+        val user = usersMap[postCreator]
+        val postId = post.id
+        val replies = post.replies?.toMutableList()
+
+        val userViewData = if (user == null) {
+            createDeletedUser()
+        } else {
+            convertUser(user)
+        }
+
+        return PostViewData.Builder()
+            .id(postId)
+            .text(post.text)
+            .communityId(post.communityId)
+            .isPinned(post.isPinned)
+            .isSaved(post.isSaved)
+            .isLiked(post.isLiked)
+            .menuItems(convertOverflowMenuItems(post.menuItems))
+            .replies(
+                convertComments(
+                    replies,
+                    usersMap,
+                    postId
+                )
+            )
+            .attachments(convertAttachments(post.attachments))
+            .userId(postCreator)
+            .likesCount(post.likesCount)
+            .commentsCount(post.commentsCount)
+            .createdAt(post.createdAt)
+            .updatedAt(post.updatedAt)
+            .user(userViewData)
+            .build()
+    }
+
+    /**
+     * convert list of [Comment] and usersMap [Map] of String to User
+     * to list of [CommentViewData]
+     *
+     * @param comments: list of [Comment]
+     * @param usersMap: [Map] of String to User
+     * @param postId: postId of post
+     * */
+    private fun convertComments(
+        comments: MutableList<Comment>?,
+        usersMap: Map<String, User>,
+        postId: String
+    ): MutableList<CommentViewData> {
+        if (comments == null) return mutableListOf()
+        return comments.map { comment ->
+            val userId = comment.userId
+            val user = usersMap[userId]
+            val replies = comment.replies?.toMutableList()
 
             val userViewData = if (user == null) {
                 createDeletedUser()
@@ -198,32 +265,29 @@ object ViewDataConverter {
                 convertUser(user)
             }
 
-            PostViewData.Builder()
-                .id(postId)
-                .text(post.text)
-                .communityId(post.communityId)
-                .isPinned(post.isPinned)
-                .isSaved(post.isSaved)
-                .isLiked(post.isLiked)
-                .menuItems(convertOverflowMenuItems(post.menuItems))
-//                .comments(convertComments(post.replies))
-                .attachments(convertAttachments(post.attachments))
-                .userId(postCreator)
-                .likesCount(post.likesCount)
-                .commentsCount(post.commentsCount)
-                .createdAt(post.createdAt)
-                .updatedAt(post.updatedAt)
+            CommentViewData.Builder()
+                .id(comment.id)
+                .postId(postId)
+                .isLiked(comment.isLiked)
+                .userId(userId)
+                .text(comment.text)
+                .level(comment.level)
+                .likesCount(comment.likesCount)
+                .repliesCount(comment.commentsCount)
                 .user(userViewData)
+                .createdAt(comment.createdAt)
+                .updatedAt(comment.updatedAt)
+                .menuItems(convertOverflowMenuItems(comment.menuItems))
+                .replies(
+                    convertComments(
+                        replies,
+                        usersMap,
+                        postId
+                    )
+                )
+                .parentId(comment.parentId)
                 .build()
-        }
-    }
-
-    private fun convertComments(
-        comments: List<CommentViewData>
-    ): List<CommentViewData> {
-        return comments.map { comment ->
-            comment
-        }
+        }.toMutableList()
     }
 
     /**
@@ -366,37 +430,6 @@ object ViewDataConverter {
                 .value(tag.name)
                 .build()
         }.toMutableList()
-    }
-
-    fun convertPost(
-        post: Post,
-        users: Map<String, User>
-    ): PostViewData {
-        val postCreator = post.userId
-        val user = users[postCreator]
-        val postId = post.id
-        val userViewData = if (user == null) {
-            createDeletedUser()
-        } else {
-            convertUser(user)
-        }
-
-        return PostViewData.Builder()
-            .id(post.id)
-            .text(post.text)
-            .communityId(post.communityId)
-            .isPinned(post.isPinned)
-            .isSaved(post.isSaved)
-            .isLiked(post.isLiked)
-            .menuItems(convertOverflowMenuItems(post.menuItems))
-            .attachments(convertAttachments(post.attachments))
-            .userId(postCreator)
-            .likesCount(post.likesCount)
-            .commentsCount(post.commentsCount)
-            .createdAt(post.createdAt)
-            .updatedAt(post.updatedAt)
-            .user(userViewData)
-            .build()
     }
 
     /**--------------------------------

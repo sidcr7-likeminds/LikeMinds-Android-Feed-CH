@@ -75,7 +75,7 @@
             android:elevation="4dp"
             android:ellipsize="end"
             android:hint="@string/write_a_comment"
-            android:inputType="textMultiLine"
+            android:inputType="textCapSentences|textMultiLine"
             android:maxHeight="100dp"
             android:minHeight="48dp"
             android:paddingStart="16dp"
@@ -112,6 +112,14 @@
             app:layout_constraintTop_toTopOf="@id/et_comment"
             app:srcCompat="@drawable/ic_comment_send_disable"
             tools:ignore="ContentDescription" />
+
+        <include
+            android:id="@+id/progress_bar"
+            layout="@layout/progress_bar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

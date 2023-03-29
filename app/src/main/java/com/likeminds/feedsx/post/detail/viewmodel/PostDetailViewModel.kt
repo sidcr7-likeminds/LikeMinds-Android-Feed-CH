@@ -11,6 +11,8 @@ import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
+import com.likeminds.likemindsfeed.comment.model.AddCommentRequest
+import com.likeminds.likemindsfeed.comment.model.ReplyCommentRequest
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
 import com.likeminds.likemindsfeed.post.model.GetPostRequest
@@ -41,6 +43,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()
         data class GetTaggingList(val errorMessage: String?) : ErrorMessageEvent()
+        data class AddComment(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
@@ -60,14 +63,53 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
-//                _postResponse.postValue(
-//                    Pair(
-//                        page,
-//                        ViewDataConverter.convertPost(post, users)
-//                    )
-//                )
+                _postResponse.postValue(
+                    Pair(
+                        page,
+                        ViewDataConverter.convertPost(post, users)
+                    )
+                )
             } else {
                 errorEventChannel.send(ErrorMessageEvent.GetPost(response.errorMessage))
+            }
+        }
+    }
+
+    fun addComment(postId: String, text: String) {
+        viewModelScope.launchIO {
+            // builds api request
+            val request = AddCommentRequest.Builder()
+                .postId(postId)
+                .text(text)
+                .build()
+
+            val response = lmFeedClient.addComment(request)
+            if (response.success) {
+
+            } else {
+                errorEventChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
+            }
+        }
+    }
+
+    fun replyComment(
+        postId: String,
+        commentId: String,
+        text: String
+    ) {
+        viewModelScope.launchIO {
+            // builds api request
+            val request = ReplyCommentRequest.Builder()
+                .postId(postId)
+                .commentId(commentId)
+                .text(text)
+                .build()
+
+            val response = lmFeedClient.addReplyOnComment(request)
+            if (response.success) {
+
+            } else {
+                errorEventChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
         }
     }
