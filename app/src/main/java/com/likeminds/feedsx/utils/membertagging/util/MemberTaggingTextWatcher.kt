@@ -6,7 +6,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.widget.EditText
 
-internal class MemberTaggingTextWatcher(
+class MemberTaggingTextWatcher(
     var taggingEnabled: Boolean,
     val editText: EditText
 ) : TextWatcher {
@@ -18,17 +18,17 @@ internal class MemberTaggingTextWatcher(
     private var spanToRemove: MemberTaggingClickableSpan? = null
 
     @JvmSynthetic
-    internal fun startObserving() {
+    fun startObserving() {
         editText.addTextChangedListener(this)
     }
 
     @JvmSynthetic
-    internal fun stopObserving() {
+    fun stopObserving() {
         editText.removeTextChangedListener(this)
     }
 
     @JvmSynthetic
-    internal fun addTextWatcherListener(textWatcherListener: TextWatcherListener) {
+    fun addTextWatcherListener(textWatcherListener: TextWatcherListener) {
         this.textWatcherListener = textWatcherListener
     }
 
@@ -42,7 +42,7 @@ internal class MemberTaggingTextWatcher(
                 val spans = message.getSpans(0, position, MemberTaggingClickableSpan::class.java)
                 val spanLength = spans.size
                 if (spanLength > 0) {
-                    val lastSpan = Util.getLastSpan(message, spans)
+                    val lastSpan = MemberTaggingUtil.getLastSpan(message, spans)
                     val spanEnd = message.getSpanEnd(lastSpan)
                     if (position == spanEnd - 1) {
                         spanToRemove = lastSpan
@@ -159,7 +159,7 @@ internal class MemberTaggingTextWatcher(
     }
 
     @JvmSynthetic
-    internal fun replaceEditText(spannableUserName: SpannableString) {
+    fun replaceEditText(spannableUserName: SpannableString) {
         try {
             if (globalPosition >= 0 && editText.selectionStart >= 0) {
                 if (editText.selectionStart > globalPosition) {
@@ -179,7 +179,7 @@ internal class MemberTaggingTextWatcher(
     }
 
     @JvmSynthetic
-    internal fun hitUserTaggingApi() {
+    fun hitUserTaggingApi() {
         if (globalPosition >= 0 && editText.selectionStart > globalPosition) {
             val text = editText.text.toString().substring(globalPosition, editText.selectionStart)
             textWatcherListener?.onHitTaggingApi(text)

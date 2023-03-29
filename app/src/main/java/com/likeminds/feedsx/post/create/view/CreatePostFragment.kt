@@ -1,11 +1,14 @@
 package com.likeminds.feedsx.post.create.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
@@ -197,9 +200,22 @@ class CreatePostFragment :
     }
 
     // adds text watcher on post content edit text
+    @SuppressLint("ClickableViewAccessibility")
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun initPostContentTextListener() {
         binding.etPostContent.apply {
+            setOnTouchListener(OnTouchListener { v, event ->
+                if (hasFocus()) {
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                    when (event.action and MotionEvent.ACTION_MASK) {
+                        MotionEvent.ACTION_SCROLL -> {
+                            v.parent.requestDisallowInterceptTouchEvent(false)
+                            return@OnTouchListener true
+                        }
+                    }
+                }
+                false
+            })
             textChanges()
                 .debounce(500)
                 .distinctUntilChanged()

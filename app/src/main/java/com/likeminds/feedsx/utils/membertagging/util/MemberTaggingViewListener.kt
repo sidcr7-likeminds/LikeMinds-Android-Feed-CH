@@ -1,12 +1,12 @@
 package com.likeminds.feedsx.utils.membertagging.util
 
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 
 interface MemberTaggingViewListener {
 
-    fun onMemberTagged(user: MemberTagViewData) {}
+    fun onMemberTagged(user: UserTagViewData) {}
 
-    fun onMemberRemoved(user: MemberTagViewData) {}
+    fun onMemberRemoved(user: UserTagViewData) {}
 
     fun onShow() {}
 

@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.ItemMemberBinding
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 
 internal class MemberAdapter(
     private val darkMode: Boolean,
@@ -13,7 +13,7 @@ internal class MemberAdapter(
 
     // TODO: Base adapter?
 
-    private val members = ArrayList<MemberTagViewData>()
+    private val members = ArrayList<UserTagViewData>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemberViewHolder {
         val binding = ItemMemberBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -30,14 +30,14 @@ internal class MemberAdapter(
      * Updates the member list in the recyclerview adapter
      */
     @JvmSynthetic
-    internal fun setMembers(users: List<MemberTagViewData>) {
+    internal fun setMembers(users: List<UserTagViewData>) {
         this.members.clear()
         this.members.addAll(users)
         notifyDataSetChanged()
     }
 
     @JvmSynthetic
-    internal fun allMembers(users: List<MemberTagViewData>) {
+    internal fun allMembers(users: List<UserTagViewData>) {
         this.members.addAll(users)
         notifyDataSetChanged()
     }

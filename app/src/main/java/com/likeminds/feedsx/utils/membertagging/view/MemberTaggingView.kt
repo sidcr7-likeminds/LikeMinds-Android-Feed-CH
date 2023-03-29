@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.LayoutMemberTaggingBinding
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.membertagging.model.MemberTagViewData
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapter
 import com.likeminds.feedsx.utils.membertagging.view.adapter.MemberAdapterClickListener
@@ -44,13 +44,13 @@ class MemberTaggingView(
     private lateinit var scrollListener: EndlessRecyclerScrollListener
 
     //Community Members and groups to search
-    private val communityMembersAndGroups = mutableListOf<MemberTagViewData>()
+    private val communityMembersAndGroups = mutableListOf<UserTagViewData>()
 
     //contains searched text
     private var searchText: String = ""
 
     //Contains selected members
-    private val selectedMembers by lazy { mutableListOf<MemberTagViewData>() }
+    private val selectedMembers by lazy { mutableListOf<UserTagViewData>() }
 
     private lateinit var extras: MemberTaggingExtras
 
@@ -72,7 +72,7 @@ class MemberTaggingView(
 
     private fun configureView() {
         //Set max height
-        val heightInPx = Util.getMaxHeight(context, extras.maxHeightInPercentage)
+        val heightInPx = MemberTaggingUtil.getMaxHeight(context, extras.maxHeightInPercentage)
         maxHeight = heightInPx
         val lp = binding.recyclerView.layoutParams as LayoutParams
         lp.matchConstraintMaxHeight = heightInPx
@@ -145,15 +145,15 @@ class MemberTaggingView(
         }
     }
 
-    private fun getMemberFromSelectedList(id: Int): MemberTagViewData? {
+    private fun getMemberFromSelectedList(id: Int): UserTagViewData? {
         return selectedMembers.firstOrNull { member ->
             member.id == id
         }
     }
 
-    private fun getMember(id: Int): MemberTagViewData? {
-        return communityMembersAndGroups.firstOrNull { member ->
-            member.id == id
+    private fun getMember(id: Int): UserTagViewData? {
+        return communityMembersAndGroups.firstOrNull { user ->
+            user.id == id
         }
     }
 
@@ -194,7 +194,7 @@ class MemberTaggingView(
         hide()
     }
 
-    override fun onMemberTagged(user: MemberTagViewData) {
+    override fun onMemberTagged(user: UserTagViewData) {
         val tagSpannableString = "@${user.name}"
         val memberName = SpannableString(tagSpannableString)
 
@@ -243,7 +243,7 @@ class MemberTaggingView(
         if (editable == null) {
             return ""
         }
-        val spans = Util.getSortedSpan(editable)
+        val spans = MemberTaggingUtil.getSortedSpan(editable)
         val stringBuilder = StringBuilder()
         var lastIndex = 0
         spans.forEach { span ->
@@ -261,13 +261,13 @@ class MemberTaggingView(
         return stringBuilder.toString()
     }
 
-    fun setMembersAndGroup(usersAndGroups: ArrayList<MemberTagViewData>) {
+    fun setMembersAndGroup(usersAndGroups: ArrayList<UserTagViewData>) {
         communityMembersAndGroups.clear()
         communityMembersAndGroups.addAll(usersAndGroups)
         showMemberTaggingList()
     }
 
-    fun addMembers(usersAndGroups: ArrayList<MemberTagViewData>) {
+    fun addMembers(usersAndGroups: ArrayList<UserTagViewData>) {
         communityMembersAndGroups.addAll(usersAndGroups)
         if (isShowing) {
             mAdapter.allMembers(usersAndGroups)
