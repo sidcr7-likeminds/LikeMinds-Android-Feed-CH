@@ -301,29 +301,6 @@ class CreatePostFragment :
         }.onStart { emit(text) }
     }
 
-
-    // adds text watcher on post content edit text
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    private fun initPostContentTextListener() {
-        binding.etPostContent.apply {
-            textChanges()
-                .debounce(500)
-                .distinctUntilChanged()
-                .onEach {
-                    val text = it?.toString()?.trim()
-                    if (text.isNullOrEmpty()) {
-                        clearPreviewLink()
-                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                        else handlePostButton(true)
-                    } else {
-                        showPostMedia()
-                        handlePostButton(true)
-                    }
-                }
-                .launchIn(lifecycleScope)
-        }
-    }
-
     // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
     private fun initiateMediaPicker(list: List<String>) {
         val extras = MediaPickerExtras.Builder()
