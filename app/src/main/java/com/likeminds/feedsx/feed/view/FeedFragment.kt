@@ -401,7 +401,7 @@ class FeedFragment :
         viewModel.initiateUser(
             "69edd43f-4a5e-4077-9c50-2b7aa740acce",
             "029f66a8-264b-413f-a9df-3ae2f4166486",
-            "Ishaan",
+            "D",
             false
         )
     }
@@ -644,14 +644,17 @@ class FeedFragment :
         }
     }
 
-    override fun onPostMenuItemClicked(postId: String, title: String) {
-        Log.d("PUI", "postId menu: $postId")
+    override fun onPostMenuItemClicked(
+        postId: String,
+        creatorId: String,
+        title: String
+    ) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
-                deletePost(postId)
+                deletePost(postId, creatorId)
             }
             REPORT_POST_MENU_ITEM -> {
-                reportPost(postId)
+                reportPost(postId, creatorId)
             }
             PIN_POST_MENU_ITEM -> {
                 pinPost(postId)
@@ -711,14 +714,13 @@ class FeedFragment :
     }
 
     // processes delete post request
-    private fun deletePost(postId: String) {
-        val post = getIndexAndPostFromAdapter(postId).second
+    private fun deletePost(postId: String, creatorId: String) {
         val deleteExtras = DeleteExtras.Builder()
             .postId(postId)
             .entityType(DELETE_TYPE_POST)
             .build()
 
-        if (post.userId == viewModel.getUserUniqueId()) {
+        if (creatorId == postSharedViewModel.getUserUniqueId()) {
             SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
@@ -732,13 +734,11 @@ class FeedFragment :
     }
 
     // Processes report action on post
-    private fun reportPost(postId: String) {
-        val post = getIndexAndPostFromAdapter(postId).second
-
+    private fun reportPost(postId: String, creatorId: String) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
-            .entityCreatorId(post.userId)
+            .entityCreatorId(creatorId)
             .entityType(REPORT_TYPE_POST)
             .build()
 

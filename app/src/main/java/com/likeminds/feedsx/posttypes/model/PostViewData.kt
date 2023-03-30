@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class PostViewData private constructor(
     var id: String,
-    var text: String,
+    var text: String?,
     val alreadySeenFullContent: Boolean?,
     val isExpanded: Boolean,
     var attachments: List<AttachmentViewData>,
@@ -59,7 +59,7 @@ class PostViewData private constructor(
 
     class Builder {
         private var id: String = ""
-        private var text: String = ""
+        private var text: String? = null
         private var alreadySeenFullContent: Boolean? = null
         private var isExpanded: Boolean = false
         private var attachments: List<AttachmentViewData> = listOf()
@@ -84,7 +84,7 @@ class PostViewData private constructor(
         private var fromVideoAction: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
-        fun text(text: String) = apply { this.text = text }
+        fun text(text: String?) = apply { this.text = text }
 
         fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) =
             apply { this.alreadySeenFullContent = alreadySeenFullContent }

@@ -16,6 +16,7 @@ import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_COMMENT
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.model.DeleteType
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
 import com.likeminds.feedsx.likes.model.COMMENT
@@ -34,10 +35,7 @@ import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
-import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
-import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
-import com.likeminds.feedsx.report.model.ReportExtras
-import com.likeminds.feedsx.report.model.ReportType
+import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
@@ -50,8 +48,10 @@ import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 
+@AndroidEntryPoint
 class PostDetailFragment :
     BaseFragment<FragmentPostDetailBinding>(),
     PostAdapterListener,
@@ -157,6 +157,28 @@ class PostDetailFragment :
                 }
                 is PostDetailViewModel.ErrorMessageEvent.GetPost -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is PostDetailViewModel.ErrorMessageEvent.LikeComment -> {
+                    val commentId = response.commentId
+
+                    //get comment and index
+                    val pair = getIndexAndCommentFromAdapter(commentId)
+                    val comment = pair.second
+                    val index = pair.first
+
+                    //update comment view data
+                    val updatedComment = comment.toBuilder()
+                        .isLiked(false)
+                        .fromCommentLiked(true)
+                        .likesCount(comment.likesCount - 1)
+                        .build()
+
+                    //update recycler view
+                    mPostDetailAdapter.update(index, updatedComment)
+
+                    //show error message
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.AddComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
@@ -416,24 +438,23 @@ class PostDetailFragment :
     // processes delete entity request
     private fun deleteEntity(
         entityId: String,
-        @ReportType
+        creatorId: String,
+        @DeleteType
         entityType: Int
     ) {
-        //TODO: set isAdmin
-        val isAdmin = false
         val deleteExtras = DeleteExtras.Builder()
             .postId(entityId)
             .entityType(entityType)
             .build()
-        if (isAdmin) {
-            // when CM deletes other user's post
-            AdminDeleteDialogFragment.showDialog(
+        if (creatorId == postSharedViewModel.getUserUniqueId()) {
+            // when user deletes their own entity
+            SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
         } else {
-            // when user deletes their own entity
-            SelfDeleteDialogFragment.showDialog(
+            // when CM deletes other user's entity
+            AdminDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
@@ -443,12 +464,14 @@ class PostDetailFragment :
     // Processes report action on entity
     private fun reportEntity(
         entityId: String,
+        creatorId: String,
         @ReportType
         entityType: Int
     ) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(entityId)
+            .entityCreatorId(creatorId)
             .entityType(entityType)
             .build()
 
@@ -477,8 +500,8 @@ class PostDetailFragment :
         if (item is CommentViewData) {
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
-//                .fromPostSaved(false)
-//                .fromPostLiked(false)
+                .fromCommentLiked(false)
+                .fromCommentSaved(false)
                 .build()
             mPostDetailAdapter.update(position, newViewData)
         }
@@ -585,7 +608,42 @@ class PostDetailFragment :
 
     // callback when comment/reply is liked
     override fun likeComment(commentId: String) {
-        // TODO: likes the comment with comment id
+        val indexAndComment = getIndexAndCommentFromAdapter(commentId)
+        val position = indexAndComment.first
+        val comment = indexAndComment.second
+        //new like count
+        val newLikesCount = if (comment.isLiked) {
+            comment.likesCount - 1
+        } else {
+            comment.likesCount + 1
+        }
+
+        //update comment view data
+        val newViewData = comment.toBuilder()
+            .fromCommentLiked(true)
+            .isLiked(!comment.isLiked)
+            .likesCount(newLikesCount)
+            .build()
+
+        //call api
+        viewModel.likeComment(newViewData.postId, newViewData.id)
+        //update recycler
+        mPostDetailAdapter.update(position, newViewData)
+    }
+
+    //get index and post from the adapter using postId
+    private fun getIndexAndCommentFromAdapter(commentId: String): Pair<Int, CommentViewData> {
+        val index = mPostDetailAdapter.items().indexOfFirst {
+            (it is CommentViewData) && (it.id == commentId)
+        }
+
+        val comment = getCommentFromAdapter(index)
+
+        return Pair(index, comment)
+    }
+
+    private fun getCommentFromAdapter(position: Int): CommentViewData {
+        return mPostDetailAdapter.items()[position] as CommentViewData
     }
 
     // callback when replies count is clicked - fetches replies for the comment
@@ -640,31 +698,111 @@ class PostDetailFragment :
         }
     }
 
-    override fun onPostMenuItemClicked(postId: String, title: String) {
+    override fun onPostMenuItemClicked(
+        postId: String,
+        creatorId: String,
+        title: String
+    ) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
-                deleteEntity(postId, REPORT_TYPE_POST)
+                deleteEntity(postId, creatorId, DELETE_TYPE_POST)
             }
             REPORT_POST_MENU_ITEM -> {
-                reportEntity(postId, REPORT_TYPE_POST)
+                reportEntity(postId, creatorId, REPORT_TYPE_POST)
             }
             PIN_POST_MENU_ITEM -> {
-                // TODO: pin post
+                pinPost(postId)
             }
             UNPIN_POST_MENU_ITEM -> {
-                // TODO: unpin post
+                unpinPost(postId)
             }
         }
     }
 
+    private fun pinPost(postId: String) {
+        //get item
+        val index = 0
+        val post = mPostDetailAdapter[0] as PostViewData
+
+        //get pin menu item
+        val menuItems = post.menuItems.toMutableList()
+        val pinPostIndex = menuItems.indexOfFirst {
+            (it.title == PIN_POST_MENU_ITEM)
+        }
+
+        //if pin item doesn't exist
+        if (pinPostIndex == -1) return
+
+        //update pin menu item
+        val pinPostMenuItem = menuItems[pinPostIndex]
+        val newPinPostMenuItem = pinPostMenuItem.toBuilder().title(UNPIN_POST_MENU_ITEM).build()
+        menuItems[pinPostIndex] = newPinPostMenuItem
+
+        //update the post view data
+        val newViewData = post.toBuilder()
+            .isPinned(!post.isPinned)
+            .menuItems(menuItems)
+            .build()
+
+        //call api
+        postSharedViewModel.pinPost(postId)
+
+        //update recycler
+        mPostDetailAdapter.update(index, newViewData)
+    }
+
+    private fun unpinPost(postId: String) {
+        //get item
+        val index = 0
+        val post = mPostDetailAdapter[index] as PostViewData
+
+        //get unpin menu item
+        val menuItems = post.menuItems.toMutableList()
+        val unPinPostIndex = menuItems.indexOfFirst {
+            (it.title == UNPIN_POST_MENU_ITEM)
+        }
+
+        //if unpin item doesn't exist
+        if (unPinPostIndex == -1) return
+
+        //update unpin menu item
+        val unPinPostMenuItem = menuItems[unPinPostIndex]
+        val newUnPinPostMenuItem = unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
+        menuItems[unPinPostIndex] = newUnPinPostMenuItem
+
+        //update the post view data
+        val newViewData = post.toBuilder()
+            .isPinned(!post.isPinned)
+            .menuItems(menuItems)
+            .build()
+
+        //call api
+        postSharedViewModel.pinPost(postId)
+
+        //update recycler
+        mPostDetailAdapter.update(index, newViewData)
+    }
+
     // callback for comment's menu is item
-    override fun onCommentMenuItemClicked(commentId: String, title: String) {
+    override fun onCommentMenuItemClicked(
+        commentId: String,
+        creatorId: String,
+        title: String
+    ) {
         when (title) {
             DELETE_COMMENT_MENU_ITEM -> {
-                deleteEntity(commentId, REPORT_TYPE_COMMENT)
+                deleteEntity(
+                    commentId,
+                    creatorId,
+                    DELETE_TYPE_COMMENT
+                )
             }
             REPORT_COMMENT_MENU_ITEM -> {
-                reportEntity(commentId, REPORT_TYPE_COMMENT)
+                reportEntity(
+                    commentId,
+                    creatorId,
+                    REPORT_TYPE_COMMENT
+                )
             }
         }
     }
@@ -701,8 +839,29 @@ class PostDetailFragment :
     }
 
     // callback when the item of reply menu is clicked
-    override fun onReplyMenuItemClicked(replyId: String, title: String) {
-        //TODO: handle menu item click for replies.
+    override fun onReplyMenuItemClicked(
+        parentCommentId: String,
+        replyId: String,
+        creatorId: String,
+        title: String
+    ) {
+        when (title) {
+            DELETE_COMMENT_MENU_ITEM -> {
+                // todo
+                deleteEntity(
+                    replyId,
+                    creatorId,
+                    DELETE_TYPE_COMMENT
+                )
+            }
+            REPORT_COMMENT_MENU_ITEM -> {
+                reportEntity(
+                    replyId,
+                    creatorId,
+                    REPORT_TYPE_REPLY
+                )
+            }
+        }
     }
 
     private val reportPostLauncher =
@@ -717,32 +876,38 @@ class PostDetailFragment :
 
     // callback when self post is deleted by user
     override fun selfDelete(deleteExtras: DeleteExtras) {
-        // TODO: delete post/comment by user
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> ViewUtils.showShortToast(
-                requireContext(),
-                getString(R.string.post_deleted)
-            )
-            DELETE_TYPE_COMMENT -> ViewUtils.showShortToast(
-                requireContext(),
-                getString(R.string.comment_deleted)
-            )
+            DELETE_TYPE_POST -> {
+                postSharedViewModel.deletePost(deleteExtras.postId)
+            }
+
+            DELETE_TYPE_COMMENT -> {
+                viewModel.deleteComment(
+                    deleteExtras.postId,
+                    deleteExtras.commentId
+                )
+            }
         }
     }
 
     // callback when other's post is deleted by CM
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
-        // TODO: delete post/comment by admin
         when (deleteExtras.entityType) {
-            DELETE_TYPE_POST -> ViewUtils.showShortToast(
-                requireContext(),
-                getString(R.string.post_deleted)
-            )
-            DELETE_TYPE_COMMENT -> ViewUtils.showShortToast(
-                requireContext(),
-                getString(R.string.comment_deleted)
-            )
+            DELETE_TYPE_POST -> {
+                postSharedViewModel.deletePost(deleteExtras.postId, reason)
+            }
+            DELETE_TYPE_COMMENT -> {
+                viewModel.deleteComment(
+                    deleteExtras.postId,
+                    deleteExtras.commentId,
+                    reason
+                )
+            }
         }
+    }
+
+    override fun deleteReply(parentCommentId: String, replyId: String) {
+
     }
 
     // callback when likes count of a comment is clicked - opens likes screen

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.DeletePostRequest
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PostViewModel @Inject constructor(
-
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -36,6 +37,11 @@ class PostViewModel @Inject constructor(
         data class SavePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
         data class DeletePost(val errorMessage: String?) : ErrorMessageEvent()
         data class PinPost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
+    }
+
+    // returns user unique id from user prefs
+    fun getUserUniqueId(): String {
+        return userPreferences.getUserUniqueId()
     }
 
     //for like/unlike a post

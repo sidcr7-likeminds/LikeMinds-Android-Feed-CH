@@ -1,13 +1,17 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailReplyBinding
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -34,7 +38,6 @@ class ItemPostDetailReplyViewDataBinder constructor(
         data: CommentViewData,
         position: Int
     ) {
-
         initReplyView(
             binding,
             data
@@ -45,7 +48,6 @@ class ItemPostDetailReplyViewDataBinder constructor(
         binding: ItemPostDetailReplyBinding,
         data: CommentViewData
     ) {
-
         binding.apply {
             val context = root.context
 
@@ -75,17 +77,47 @@ class ItemPostDetailReplyViewDataBinder constructor(
                 )
             }
 
-            ivLike.setOnClickListener {
+            ivLike.setOnClickListener { view ->
+                // bounce animation for like button
+                ViewUtils.showBounceAnim(context, view)
                 postDetailAdapterListener.likeComment(data.id)
             }
 
-            ivReplyMenu.setOnClickListener {
-                //todo
-//                PostTypeUtil.showOverflowMenu(
-//                    ivReplyMenu,
-//                    overflowMenu
-//                )
+            ivReplyMenu.setOnClickListener { view ->
+                showMenu(
+                    view,
+                    data.parentId,
+                    data.id,
+                    data.userId,
+                    data.menuItems
+                )
             }
         }
+    }
+
+    //to show overflow menu for reply
+    private fun showMenu(
+        view: View,
+        parentCommentId: String?,
+        commentId: String,
+        creatorId: String,
+        menuItems: List<OverflowMenuItemViewData>
+    ) {
+        val popup = PopupMenu(view.context, view)
+        menuItems.forEach { menuItem ->
+            popup.menu.add(menuItem.title)
+        }
+
+        val updatedParentId = parentCommentId ?: ""
+        popup.setOnMenuItemClickListener { menuItem ->
+            postDetailReplyAdapterListener.onReplyMenuItemClicked(
+                updatedParentId,
+                commentId,
+                creatorId,
+                menuItem.title.toString()
+            )
+            true
+        }
+        popup.show()
     }
 }

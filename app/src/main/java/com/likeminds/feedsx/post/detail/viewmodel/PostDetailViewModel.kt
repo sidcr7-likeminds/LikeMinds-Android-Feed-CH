@@ -12,6 +12,8 @@ import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.comment.model.AddCommentRequest
+import com.likeminds.likemindsfeed.comment.model.DeleteCommentRequest
+import com.likeminds.likemindsfeed.comment.model.LikeCommentRequest
 import com.likeminds.likemindsfeed.comment.model.ReplyCommentRequest
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
@@ -26,9 +28,8 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    companion object {
-        const val PAGE_SIZE = 10
-    }
+    private val _deleteCommentResponse = MutableLiveData<String>()
+    val deleteCommentResponse: LiveData<String> = _deleteCommentResponse
 
     private val _postResponse = MutableLiveData<Pair<Int, PostViewData>>()
     val postResponse: LiveData<Pair<Int, PostViewData>> = _postResponse
@@ -43,11 +44,21 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()
         data class GetTaggingList(val errorMessage: String?) : ErrorMessageEvent()
+        data class LikeComment(
+            val commentId: String,
+            val errorMessage: String?
+        ) : ErrorMessageEvent()
+
         data class AddComment(val errorMessage: String?) : ErrorMessageEvent()
+        data class DeleteComment(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
+
+    companion object {
+        const val PAGE_SIZE = 10
+    }
 
     fun getPost(postId: String, page: Int) {
         viewModelScope.launchIO {
@@ -71,6 +82,29 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 )
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.GetPost(response.errorMessage))
+            }
+        }
+    }
+
+    //for like/unlike a comment
+    fun likeComment(postId: String, commentId: String) {
+        viewModelScope.launchIO {
+            val request = LikeCommentRequest.Builder()
+                .postId(postId)
+                .commentId(commentId)
+                .build()
+
+            //call like post api
+            val response = lmFeedClient.likeComment(request)
+
+            //check for error
+            if (!response.success) {
+                errorMessageChannel.send(
+                    ErrorMessageEvent.LikeComment(
+                        commentId,
+                        response.errorMessage
+                    )
+                )
             }
         }
     }
@@ -110,6 +144,33 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
+            }
+        }
+    }
+
+    fun deleteComment(
+        postId: String,
+        commentId: String?,
+        reason: String? = null
+    ) {
+        viewModelScope.launchIO {
+            if (commentId == null) {
+                return@launchIO
+            }
+            val request = DeleteCommentRequest.Builder()
+                .postId(postId)
+                .commentId(commentId)
+                .reason(reason)
+                .build()
+
+            //call delete post api
+            val response = lmFeedClient.deleteComment(request)
+
+            if (response.success) {
+                // todo
+                _deleteCommentResponse.postValue(postId)
+            } else {
+                errorMessageChannel.send(ErrorMessageEvent.DeleteComment(response.errorMessage))
             }
         }
     }

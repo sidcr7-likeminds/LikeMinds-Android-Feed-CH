@@ -6,8 +6,6 @@ import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
@@ -44,43 +42,51 @@ object PostTypeUtil {
         data: PostViewData,
         listener: PostAdapterListener
     ) {
+        binding.apply {
+            if (data.isPinned) {
+                ivPin.show()
+            } else {
+                ivPin.hide()
+            }
 
-        if (data.isPinned) {
-            binding.ivPin.show()
-        } else {
-            binding.ivPin.hide()
+            ivPostMenu.setOnClickListener { view ->
+                showMenu(
+                    view,
+                    data.id,
+                    data.userId,
+                    data.menuItems,
+                    listener
+                )
+            }
+
+            // creator data
+            val user = data.user
+            tvMemberName.text = user.name
+            if (user.customTitle.isNullOrEmpty()) {
+                tvCustomTitle.hide()
+            } else {
+                tvCustomTitle.show()
+                tvCustomTitle.text = user.customTitle
+            }
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.userUniqueId,
+                memberImage,
+                showRoundImage = true
+            )
+
+            viewDotEdited.hide()
+            tvEdited.hide()
+            tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
         }
-
-        binding.ivPostMenu.setOnClickListener { view ->
-            showMenu(view, data.id, data.menuItems, listener)
-        }
-
-        // creator data
-        val user = data.user
-        binding.tvMemberName.text = user.name
-        if (user.customTitle.isNullOrEmpty()) {
-            binding.tvCustomTitle.hide()
-        } else {
-            binding.tvCustomTitle.show()
-            binding.tvCustomTitle.text = user.customTitle
-        }
-        MemberImageUtil.setImage(
-            user.imageUrl,
-            user.name,
-            user.userUniqueId,
-            binding.memberImage,
-            showRoundImage = true
-        )
-
-        binding.viewDotEdited.hide()
-        binding.tvEdited.hide()
-        binding.tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
     }
 
-    //to show overflow menu for post/comment/reply
+    //to show overflow menu for post
     private fun showMenu(
         view: View,
         postId: String,
+        creatorId: String,
         menuItems: List<OverflowMenuItemViewData>,
         listener: PostAdapterListener
     ) {
@@ -90,7 +96,11 @@ object PostTypeUtil {
         }
 
         popup.setOnMenuItemClickListener { menuItem ->
-            listener.onPostMenuItemClicked(postId, menuItem.title.toString())
+            listener.onPostMenuItemClicked(
+                postId,
+                creatorId,
+                menuItem.title.toString()
+            )
             true
         }
 
@@ -221,31 +231,15 @@ object PostTypeUtil {
                         data.commentsCount
                     )
 
-            ivLike.setOnClickListener {
+            ivLike.setOnClickListener { view ->
                 // bounce animation for like button
-                val likeBounceAnim: Animation by lazy {
-                    AnimationUtils.loadAnimation(
-                        context,
-                        R.anim.bounce
-                    )
-                }
-
-                likeBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
-                it.startAnimation(likeBounceAnim)
+                ViewUtils.showBounceAnim(context, view)
                 listener.likePost(position)
             }
 
-            ivBookmark.setOnClickListener {
+            ivBookmark.setOnClickListener { view ->
                 // bounce animation for save button
-                val saveBounceAnim: Animation by lazy {
-                    AnimationUtils.loadAnimation(
-                        context,
-                        R.anim.bounce
-                    )
-                }
-
-                saveBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
-                it.startAnimation(saveBounceAnim)
+                ViewUtils.showBounceAnim(context, view)
                 listener.savePost(position)
             }
 
@@ -292,13 +286,14 @@ object PostTypeUtil {
         itemPosition: Int,
         adapterListener: PostAdapterListener
     ) {
+        val text = data.text ?: return
         val context = tvPostContent.context
 
         /**
          * Text is modified as Linkify doesn't accept texts with these specific unicode characters
          * @see #Linkify.containsUnsupportedCharacters(String)
          */
-        val textForLinkify = data.text.getValidTextForLinkify()
+        val textForLinkify = text.getValidTextForLinkify()
 
         var alreadySeenFullContent = data.alreadySeenFullContent == true
 

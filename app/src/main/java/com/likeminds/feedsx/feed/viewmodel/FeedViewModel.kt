@@ -71,11 +71,6 @@ class FeedViewModel @Inject constructor(
         const val PAGE_SIZE = 20
     }
 
-    // returns user unique id from user prefs
-    fun getUserUniqueId(): String {
-        return userPreferences.getUserUniqueId()
-    }
-
     /***
      * calls InitiateUser API
      * store user:{} in db
@@ -214,7 +209,12 @@ class FeedViewModel @Inject constructor(
     // calls AddPost API and posts the response in LiveData
     fun addPost(postingData: PostViewData) {
         viewModelScope.launchIO {
-            val updatedText = postingData.text.ifEmpty { null }
+            val updatedText =
+                if (postingData.text.isNullOrEmpty()) {
+                    null
+                } else {
+                    postingData.text
+                }
             val request = AddPostRequest.Builder()
                 .text(updatedText)
                 .attachments(createAttachments(postingData.attachments))

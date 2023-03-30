@@ -7,6 +7,7 @@ import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.ViewMoreReplyViewData
 import com.likeminds.feedsx.post.detail.view.PostDetailFragment
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
@@ -22,6 +24,7 @@ import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.SeeMoreUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -137,7 +140,9 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 )
             }
 
-            ivLike.setOnClickListener {
+            ivLike.setOnClickListener { view ->
+                // bounce animation for like button
+                ViewUtils.showBounceAnim(context, view)
                 postDetailAdapterListener.likeComment(data.id)
             }
 
@@ -145,12 +150,13 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 postDetailAdapterListener.fetchReplies(data.id, position)
             }
 
-            ivCommentMenu.setOnClickListener {
-                //todo
-//                PostTypeUtil.showOverflowMenu(
-//                    ivCommentMenu,
-//                    overflowMenu
-//                )
+            ivCommentMenu.setOnClickListener { view ->
+                showMenu(
+                    view,
+                    data.id,
+                    data.userId,
+                    data.menuItems
+                )
             }
 
             if (data.replies.isNotEmpty()) {
@@ -262,6 +268,29 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 seeMoreSpannableStringBuilder
             )
         }
+    }
+
+    //to show overflow menu for comment
+    private fun showMenu(
+        view: View,
+        commentId: String,
+        creatorId: String,
+        menuItems: List<OverflowMenuItemViewData>
+    ) {
+        val popup = PopupMenu(view.context, view)
+        menuItems.forEach { menuItem ->
+            popup.menu.add(menuItem.title)
+        }
+
+        popup.setOnMenuItemClickListener { menuItem ->
+            postDetailAdapterListener.onCommentMenuItemClicked(
+                commentId,
+                creatorId,
+                menuItem.title.toString()
+            )
+            true
+        }
+        popup.show()
     }
 
     // adds ViewMoreReply view when required
