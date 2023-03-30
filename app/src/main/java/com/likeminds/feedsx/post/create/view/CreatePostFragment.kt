@@ -1,16 +1,20 @@
 package com.likeminds.feedsx.post.create.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -32,6 +36,7 @@ import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -40,6 +45,10 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
+import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -60,6 +69,10 @@ class CreatePostFragment :
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
 
+    private lateinit var etPostTextChangeListener: TextWatcher
+
+    private lateinit var memberTagging: MemberTaggingView
+
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
     }
@@ -68,9 +81,29 @@ class CreatePostFragment :
         super.setUpViews()
 
         fetchUserFromDB()
+        initMemberTaggingView()
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
+    }
+
+    private fun initMemberTaggingView() {
+        memberTagging = binding.memberTaggingView
+        memberTagging.initialize(
+            MemberTaggingExtras.Builder()
+                .editText(binding.etPostContent)
+                .maxHeightInPercentage(0.4f)
+                .color(
+                    BrandingData.currentAdvanced?.third
+                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                )
+                .build()
+        )
+        memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun callApi(page: Int, searchName: String) {
+                viewModel.getMembersForTagging(page, searchName)
+            }
+        })
     }
 
     // observes data
@@ -79,6 +112,7 @@ class CreatePostFragment :
 
         // observes error message
         observeErrors()
+        observeMembersTaggingList()
 
         // observes userData and initializes the user view
         viewModel.userData.observe(viewLifecycleOwner) {
@@ -106,6 +140,17 @@ class CreatePostFragment :
         }
     }
 
+    /**
+     * Observes for member tagging list, This is a live observer which will update itself on addition of new members
+     * [taggingData] contains first -> page called in api
+     * second -> Community Members and Groups
+     */
+    private fun observeMembersTaggingList() {
+        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
+            MemberTaggingUtil.setMembersInView(memberTagging, result)
+        }
+    }
+
     // observes error events
     private fun observeErrors() {
         viewModel.errorEventFlow.onEach { response ->
@@ -119,7 +164,10 @@ class CreatePostFragment :
                 }
                 is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
                     handlePostButton(clickable = true, showProgress = false)
-                    showErrorMessageToast(requireContext(), response.errorMessage)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is CreatePostViewModel.ErrorMessageEvent.GetTaggingList -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
         }
@@ -152,9 +200,27 @@ class CreatePostFragment :
     }
 
     // adds text watcher on post content edit text
+    @SuppressLint("ClickableViewAccessibility")
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun initPostContentTextListener() {
         binding.etPostContent.apply {
+            /**
+             * As the scrollable edit text is inside a scroll view,
+             * this touch listener handles the scrolling of the edit text.
+             * When the edit text is touched and has focus then it disables scroll of scroll-view.
+             */
+            setOnTouchListener(OnTouchListener { v, event ->
+                if (hasFocus()) {
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                    when (event.action and MotionEvent.ACTION_MASK) {
+                        MotionEvent.ACTION_SCROLL -> {
+                            v.parent.requestDisallowInterceptTouchEvent(false)
+                            return@OnTouchListener true
+                        }
+                    }
+                }
+                false
+            })
             textChanges()
                 .debounce(500)
                 .distinctUntilChanged()
@@ -178,21 +244,20 @@ class CreatePostFragment :
         val createPostActivity = requireActivity() as CreatePostActivity
         createPostActivity.binding.apply {
             tvPostDone.setOnClickListener {
-                val text = binding.etPostContent.text.toString()
+                val text = binding.etPostContent.text
+                val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 if (selectedMediaUris.isNotEmpty()) {
-                    // when user has selected some medias to upload
                     viewModel.addPost(
                         requireContext(),
-                        text,
+                        updatedText,
                         selectedMediaUris,
                         ogTags
                     )
                 } else {
-                    // when user didn't select any media while creating post
                     handlePostButton(clickable = true, showProgress = false)
                     viewModel.addPost(
                         requireContext(),
-                        text,
+                        updatedText,
                         ogTags = ogTags
                     )
                 }
@@ -230,7 +295,7 @@ class CreatePostFragment :
     @CheckResult
     fun EditText.textChanges(): Flow<CharSequence?> {
         return callbackFlow<CharSequence?> {
-            val listener = object : TextWatcher {
+            etPostTextChangeListener = object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) = Unit
                 override fun beforeTextChanged(
                     s: CharSequence?,
@@ -243,8 +308,8 @@ class CreatePostFragment :
                     (this@callbackFlow).trySend(s.toString())
                 }
             }
-            addTextChangedListener(listener)
-            awaitClose { removeTextChangedListener(listener) }
+            addTextChangedListener(etPostTextChangeListener)
+            awaitClose { removeTextChangedListener(etPostTextChangeListener) }
         }.onStart { emit(text) }
     }
 
@@ -498,13 +563,16 @@ class CreatePostFragment :
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
         binding.linkPreview.apply {
-            clearPreviewLink()
             if (text.isNullOrEmpty()) {
-                ogTags = null
+                clearPreviewLink()
                 return
             }
 
             val link = text.getUrlIfExist()
+
+            if (ogTags != null && link.equals(ogTags?.url)) {
+                return
+            }
 
             if (!link.isNullOrEmpty()) {
                 if (link == ogTags?.url) {
@@ -512,7 +580,6 @@ class CreatePostFragment :
                 }
                 viewModel.decodeUrl(link)
             } else {
-                ogTags = null
                 clearPreviewLink()
             }
         }
@@ -546,7 +613,8 @@ class CreatePostFragment :
 
             tvLinkUrl.text = data.url
             ivCross.setOnClickListener {
-                this.root.hide()
+                binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
+                clearPreviewLink()
             }
         }
     }

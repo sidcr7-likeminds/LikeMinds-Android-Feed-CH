@@ -78,6 +78,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+
+        <com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+            android:id="@+id/member_tagging_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:translationZ="5dp"
+            app:layout_constraintBottom_toTopOf="@id/tv_replying_to"
+            app:layout_constraintEnd_toEndOf="@+id/et_comment"
+            app:layout_constraintStart_toStartOf="@+id/et_comment"
+            tools:visibility="gone" />
+
         <ImageView
             android:id="@+id/iv_comment_send"
             android:layout_width="wrap_content"
