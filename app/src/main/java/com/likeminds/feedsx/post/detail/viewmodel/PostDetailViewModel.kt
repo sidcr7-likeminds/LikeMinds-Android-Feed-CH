@@ -46,8 +46,8 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         data class AddComment(val errorMessage: String?) : ErrorMessageEvent()
     }
 
-    private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
-    val errorEventFlow = errorEventChannel.receiveAsFlow()
+    private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
+    val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
 
     fun getPost(postId: String, page: Int) {
         viewModelScope.launchIO {
@@ -70,7 +70,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                     )
                 )
             } else {
-                errorEventChannel.send(ErrorMessageEvent.GetPost(response.errorMessage))
+                errorMessageChannel.send(ErrorMessageEvent.GetPost(response.errorMessage))
             }
         }
     }
@@ -87,7 +87,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             if (response.success) {
 
             } else {
-                errorEventChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
+                errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
         }
     }
@@ -109,7 +109,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             if (response.success) {
 
             } else {
-                errorEventChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
+                errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
         }
     }
@@ -147,7 +147,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                     )
                 )
             } else {
-                errorEventChannel.send(ErrorMessageEvent.GetTaggingList(response.errorMessage))
+                errorMessageChannel.send(ErrorMessageEvent.GetTaggingList(response.errorMessage))
             }
         }
     }

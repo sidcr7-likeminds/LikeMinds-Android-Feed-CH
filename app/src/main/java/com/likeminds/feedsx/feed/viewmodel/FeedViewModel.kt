@@ -49,22 +49,12 @@ class FeedViewModel @Inject constructor(
     private val _universalFeedResponse = MutableLiveData<Pair<Int, List<PostViewData>>>()
     val universalFeedResponse: LiveData<Pair<Int, List<PostViewData>>> = _universalFeedResponse
 
-    private val _deletePostResponse = MutableLiveData<String>()
-    val deletePostResponse: LiveData<String> = _deletePostResponse
-
-    private val _pinPostResponse = MutableLiveData<String>()
-    val pinPostResponse: LiveData<String> = _pinPostResponse
-
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
 
     sealed class ErrorMessageEvent {
         data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
         data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
-        data class LikePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
-        data class SavePost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
-        data class DeletePost(val errorMessage: String?) : ErrorMessageEvent()
-        data class PinPost(val postId: String, val errorMessage: String?) : ErrorMessageEvent()
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
     }
 
@@ -212,80 +202,6 @@ class FeedViewModel @Inject constructor(
             } else {
                 //for error
                 errorMessageChannel.send(ErrorMessageEvent.UniversalFeed(response.errorMessage))
-            }
-        }
-    }
-
-    //for like/unlike a post
-    fun likePost(postId: String) {
-        viewModelScope.launchIO {
-            val request = LikePostRequest.Builder()
-                .postId(postId)
-                .build()
-
-            //call like post api
-            val response = lmFeedClient.likePost(request)
-
-            //check for error
-            if (!response.success) {
-                errorMessageChannel.send(ErrorMessageEvent.LikePost(postId, response.errorMessage))
-            }
-        }
-    }
-
-    //for save/un-save a post
-    fun savePost(postId: String) {
-        viewModelScope.launchIO {
-            val request = SavePostRequest.Builder()
-                .postId(postId)
-                .build()
-
-            //call save post api
-            val response = lmFeedClient.savePost(request)
-
-            //check for error
-            if (!response.success) {
-                errorMessageChannel.send(ErrorMessageEvent.SavePost(postId, response.errorMessage))
-            }
-        }
-    }
-
-    //for delete post
-    fun deletePost(
-        postId: String,
-        reason: String? = null
-    ) {
-        viewModelScope.launchIO {
-            val request = DeletePostRequest.Builder()
-                .postId(postId)
-                .deleteReason(reason)
-                .build()
-
-            //call delete post api
-            val response = lmFeedClient.deletePost(request)
-
-            if (response.success) {
-                _deletePostResponse.postValue(postId)
-            } else {
-                errorMessageChannel.send(ErrorMessageEvent.DeletePost(response.errorMessage))
-            }
-        }
-    }
-
-    //for pin/unpin post
-    fun pinPost(postId: String) {
-        viewModelScope.launchIO {
-            val request = PinPostRequest.Builder()
-                .postId(postId)
-                .build()
-
-            //call pin api
-            val response = lmFeedClient.pinPost(request)
-
-            if (response.success) {
-                _pinPostResponse.postValue(postId)
-            } else {
-                errorMessageChannel.send(ErrorMessageEvent.PinPost(postId, response.errorMessage))
             }
         }
     }

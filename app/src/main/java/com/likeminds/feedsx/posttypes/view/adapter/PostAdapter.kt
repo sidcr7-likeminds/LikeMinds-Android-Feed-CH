@@ -48,9 +48,9 @@ class PostAdapter constructor(
 
 interface PostAdapterListener {
     //TODO: add compulsory methods
-    fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
-    fun savePost(position: Int) {}
-    fun likePost(position: Int) {}
+    fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
+    fun savePost(position: Int)
+    fun likePost(position: Int)
     fun sharePost() {}
     fun comment(postId: String)
     fun onPostMenuItemClicked(postId: String, title: String)

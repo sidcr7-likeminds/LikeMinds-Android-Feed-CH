@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -22,13 +23,13 @@ import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.overflowmenu.model.*
-import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
+import com.likeminds.feedsx.post.viewmodel.PostViewModel
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -60,6 +61,8 @@ class PostDetailFragment :
     AdminDeleteDialogFragment.DeleteDialogListener {
 
     private val viewModel: PostDetailViewModel by viewModels()
+
+    private val postSharedViewModel: PostViewModel by activityViewModels()
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -147,7 +150,7 @@ class PostDetailFragment :
 
     // observes error events
     private fun observeErrors() {
-        viewModel.errorEventFlow.onEach { response ->
+        viewModel.errorMessageEventFlow.onEach { response ->
             when (response) {
                 is PostDetailViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
@@ -157,6 +160,78 @@ class PostDetailFragment :
                 }
                 is PostDetailViewModel.ErrorMessageEvent.AddComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+            }
+        }
+
+        postSharedViewModel.errorMessageEventFlow.onEach { response ->
+            when (response) {
+                is PostViewModel.ErrorMessageEvent.LikePost -> {
+                    val postId = response.postId
+
+                    //get post and index
+                    val pair = getIndexAndPostFromAdapter(postId)
+                    val post = pair.second
+                    val index = pair.first
+
+                    //update post view data
+                    val updatedPost = post.toBuilder()
+                        .isLiked(false)
+                        .fromPostLiked(true)
+                        .likesCount(post.likesCount - 1)
+                        .build()
+
+                    //update recycler view
+                    mPostDetailAdapter.update(index, updatedPost)
+
+                    //show error message
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                }
+                is PostViewModel.ErrorMessageEvent.SavePost -> {
+                    val postId = response.postId
+
+                    //get post and index
+                    val pair = getIndexAndPostFromAdapter(postId)
+                    val post = pair.second
+                    val index = pair.first
+
+                    //update post view data
+                    val updatedPost = post.toBuilder()
+                        .isSaved(false)
+                        .fromPostSaved(true)
+                        .build()
+
+                    //update recycler view
+                    mPostDetailAdapter.update(index, updatedPost)
+
+                    //show error message
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                }
+                is PostViewModel.ErrorMessageEvent.DeletePost -> {
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                }
+                is PostViewModel.ErrorMessageEvent.PinPost -> {
+                    val postId = response.postId
+
+                    //get post and index
+                    val pair = getIndexAndPostFromAdapter(postId)
+                    val post = pair.second
+                    val index = pair.first
+
+                    //update post view data
+                    val updatedPost = post.toBuilder()
+                        .isPinned(!post.isPinned)
+                        .build()
+
+                    //update recycler view
+                    mPostDetailAdapter.update(index, updatedPost)
+
+                    //show error message
+                    val errorMessage = response.errorMessage
+                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
             }
         }
@@ -328,60 +403,6 @@ class PostDetailFragment :
         }
     }
 
-    // TODO: testing data
-    private fun addTestingData() {
-        val text =
-            "My name is Siddharth Dubey ajksfbajshdbfjakshdfvajhskdfv kahsgdv hsdafkgv ahskdfgv b "
-        mPostDetailAdapter.add(
-            PostViewData.Builder()
-                .id("63f4caadc52f148210f7496a")
-                .user(UserViewData.Builder().name("Ishaan").customTitle("Admin").build())
-                .text(text)
-                .build()
-        )
-
-        mPostDetailAdapter.add(
-            CommentsCountViewData.Builder()
-                .commentsCount(3)
-                .build()
-        )
-
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("6412b3b39b922f785f94da50")
-                .postId("63f4caadc52f148210f7496a")
-                .user(
-                    UserViewData.Builder()
-                        .name("Siddharth Dubey")
-                        .build()
-                )
-                .menuItems(
-                    listOf(
-                        OverflowMenuItemViewData.Builder().title(DELETE_COMMENT_MENU_ITEM).build(),
-                        OverflowMenuItemViewData.Builder().title(REPORT_COMMENT_MENU_ITEM).build()
-                    )
-                )
-                .likesCount(100)
-                .text("This is a test comment 1")
-                .build()
-        )
-
-        mPostDetailAdapter.add(
-            CommentViewData.Builder()
-                .isLiked(true)
-                .id("2")
-                .user(
-                    UserViewData.Builder()
-                        .name("Ishaan Jain")
-                        .build()
-                )
-                .likesCount(10)
-                .text("This is a test comment 2")
-                .build()
-        )
-    }
-
     override fun receiveExtras() {
         // TODO: handle when opened from route
         super.receiveExtras()
@@ -438,13 +459,70 @@ class PostDetailFragment :
         reportPostLauncher.launch(intent)
     }
 
-    // updates post view data when see more/see less is clicked
-    override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
+    // updates post view data when see more is clicked
+    override fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostDetailAdapter[position]
         if (item is PostViewData) {
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .build()
+            mPostDetailAdapter.update(position, newViewData)
+        }
+    }
+
+    // updates post view data when see more is clicked
+    override fun updateCommentSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
+//        todo
+        val item = mPostDetailAdapter[position]
+        if (item is CommentViewData) {
+            val newViewData = item.toBuilder()
+                .alreadySeenFullContent(alreadySeenFullContent)
+//                .fromPostSaved(false)
+//                .fromPostLiked(false)
+                .build()
+            mPostDetailAdapter.update(position, newViewData)
+        }
+    }
+
+    override fun likePost(position: Int) {
+        //get item
+        val item = mPostDetailAdapter[position]
+        if (item is PostViewData) {
+            //new like count
+            val newLikesCount = if (item.isLiked) {
+                item.likesCount - 1
+            } else {
+                item.likesCount + 1
+            }
+
+            //update post view data
+            val newViewData = item.toBuilder()
+                .fromPostLiked(true)
+                .isLiked(!item.isLiked)
+                .likesCount(newLikesCount)
+                .build()
+
+            //call api
+            postSharedViewModel.likePost(newViewData.id)
+            //update recycler
+            mPostDetailAdapter.update(position, newViewData)
+        }
+    }
+
+    override fun savePost(position: Int) {
+        //get item
+        val item = mPostDetailAdapter[position]
+        if (item is PostViewData) {
+            //update the post view data
+            val newViewData = item.toBuilder()
+                .fromPostSaved(true)
+                .isSaved(!item.isSaved)
+                .build()
+
+            //call api
+            postSharedViewModel.savePost(newViewData.id)
+
+            //update recycler
             mPostDetailAdapter.update(position, newViewData)
         }
     }
@@ -468,6 +546,21 @@ class PostDetailFragment :
         )
     }
 
+    //get index and post from the adapter using postId
+    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
+        val index = mPostDetailAdapter.items().indexOfFirst {
+            (it is PostViewData) && (it.id == postId)
+        }
+
+        val post = getPostFromAdapter(index)
+
+        return Pair(index, post)
+    }
+
+    //get post from the adapter using index
+    private fun getPostFromAdapter(position: Int): PostViewData {
+        return mPostDetailAdapter.items()[position] as PostViewData
+    }
 
     /**
      * Scroll to a position with offset from the top header

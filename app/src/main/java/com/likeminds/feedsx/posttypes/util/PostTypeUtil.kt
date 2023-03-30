@@ -196,14 +196,6 @@ object PostTypeUtil {
                 binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
             }
 
-            // bounce animation for like and save button
-            val bounceAnim: Animation by lazy {
-                AnimationUtils.loadAnimation(
-                    context,
-                    R.anim.bounce
-                )
-            }
-
             likesCount.text =
                 if (data.likesCount == 0) context.getString(R.string.like)
                 else
@@ -230,14 +222,30 @@ object PostTypeUtil {
                     )
 
             ivLike.setOnClickListener {
-                bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
-                it.startAnimation(bounceAnim)
+                // bounce animation for like button
+                val likeBounceAnim: Animation by lazy {
+                    AnimationUtils.loadAnimation(
+                        context,
+                        R.anim.bounce
+                    )
+                }
+
+                likeBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+                it.startAnimation(likeBounceAnim)
                 listener.likePost(position)
             }
 
             ivBookmark.setOnClickListener {
-                bounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
-                it.startAnimation(bounceAnim)
+                // bounce animation for save button
+                val saveBounceAnim: Animation by lazy {
+                    AnimationUtils.loadAnimation(
+                        context,
+                        R.anim.bounce
+                    )
+                }
+
+                saveBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+                it.startAnimation(saveBounceAnim)
                 listener.savePost(position)
             }
 
@@ -301,7 +309,7 @@ object PostTypeUtil {
             tvPostContent.show()
         }
 
-        val seeMoreColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
+        val seeMoreColor = ContextCompat.getColor(context, R.color.brown_grey)
         val seeMore = SpannableStringBuilder(context.getString(R.string.see_more))
         seeMore.setSpan(
             ForegroundColorSpan(seeMoreColor),
@@ -312,26 +320,7 @@ object PostTypeUtil {
         val seeMoreClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 alreadySeenFullContent = true
-                adapterListener.updateSeenFullContent(itemPosition, true)
-            }
-
-            override fun updateDrawState(textPaint: TextPaint) {
-                textPaint.isUnderlineText = false
-            }
-        }
-
-        val seeLessColor = ContextCompat.getColor(tvPostContent.context, R.color.brown_grey)
-        val seeLess = SpannableStringBuilder(context.getString(R.string.see_less))
-        seeLess.setSpan(
-            ForegroundColorSpan(seeLessColor),
-            0,
-            seeLess.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        val seeLessClickableSpan = object : ClickableSpan() {
-            override fun onClick(view: View) {
-                alreadySeenFullContent = false
-                adapterListener.updateSeenFullContent(itemPosition, false)
+                adapterListener.updatePostSeenFullContent(itemPosition, true)
             }
 
             override fun updateDrawState(textPaint: TextPaint) {
@@ -390,17 +379,6 @@ object PostTypeUtil {
                 )
             }
 
-            val seeLessSpannableStringBuilder = SpannableStringBuilder()
-            if (alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                seeLessSpannableStringBuilder.append(seeLess)
-                seeLessSpannableStringBuilder.setSpan(
-                    seeLessClickableSpan,
-                    0,
-                    seeLess.length,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
-            }
-
             val postTextSpannableStringBuilder = SpannableStringBuilder()
             postTextSpannableStringBuilder.append(trimmedText)
             postTextSpannableStringBuilder.setSpan(
@@ -418,8 +396,7 @@ object PostTypeUtil {
 
             tvPostContent.text = TextUtils.concat(
                 tvPostContent.text,
-                seeMoreSpannableStringBuilder,
-                seeLessSpannableStringBuilder
+                seeMoreSpannableStringBuilder
             )
         }
     }

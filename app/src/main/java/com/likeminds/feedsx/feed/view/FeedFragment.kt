@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +41,7 @@ import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
+import com.likeminds.feedsx.post.viewmodel.PostViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
@@ -68,6 +70,8 @@ class FeedFragment :
     LMExoplayerListener {
 
     private val viewModel: FeedViewModel by viewModels()
+
+    private val postSharedViewModel: PostViewModel by activityViewModels()
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
@@ -115,7 +119,7 @@ class FeedFragment :
         }
 
         // observes deletePostResponse LiveData
-        viewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
+        postSharedViewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId).first
             mPostAdapter.removeIndex(indexToRemove)
             ViewUtils.showShortToast(
@@ -125,7 +129,7 @@ class FeedFragment :
         }
 
         // observes pinPostResponse LiveData
-        viewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
+        postSharedViewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
             val post = getIndexAndPostFromAdapter(postId).second
             if (post.isPinned) {
                 ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
@@ -137,6 +141,11 @@ class FeedFragment :
         //observes errorMessage for the apis
         viewModel.errorMessageEventFlow.onEach { response ->
             observeErrorMessage(response)
+        }.observeInLifecycle(viewLifecycleOwner)
+
+        //observes errorMessage for the apis in shared view model
+        postSharedViewModel.errorMessageEventFlow.onEach { response ->
+            observeSharedErrorMessage(response)
         }.observeInLifecycle(viewLifecycleOwner)
     }
 
@@ -286,7 +295,16 @@ class FeedFragment :
                 mSwipeRefreshLayout.isRefreshing = false
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.LikePost -> {
+            is FeedViewModel.ErrorMessageEvent.AddPost -> {
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                removePostingView()
+            }
+        }
+    }
+
+    private fun observeSharedErrorMessage(response: PostViewModel.ErrorMessageEvent) {
+        when (response) {
+            is PostViewModel.ErrorMessageEvent.LikePost -> {
                 val postId = response.postId
 
                 //get post and index
@@ -308,7 +326,7 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.SavePost -> {
+            is PostViewModel.ErrorMessageEvent.SavePost -> {
                 val postId = response.postId
 
                 //get post and index
@@ -329,11 +347,11 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.DeletePost -> {
+            is PostViewModel.ErrorMessageEvent.DeletePost -> {
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.PinPost -> {
+            is PostViewModel.ErrorMessageEvent.PinPost -> {
                 val postId = response.postId
 
                 //get post and index
@@ -352,10 +370,6 @@ class FeedFragment :
                 //show error message
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
-            }
-            is FeedViewModel.ErrorMessageEvent.AddPost -> {
-                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
-                removePostingView()
             }
         }
     }
@@ -574,7 +588,7 @@ class FeedFragment :
     /**
      * Post Actions block
      **/
-    override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
+    override fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         val item = mPostAdapter[position]
         if (item is PostViewData) {
             val newViewData = item.toBuilder()
@@ -598,7 +612,7 @@ class FeedFragment :
                 .build()
 
             //call api
-            viewModel.savePost(newViewData.id)
+            postSharedViewModel.savePost(newViewData.id)
 
             //update recycler
             mPostAdapter.update(position, newViewData)
@@ -624,7 +638,7 @@ class FeedFragment :
                 .build()
 
             //call api
-            viewModel.likePost(newViewData.id)
+            postSharedViewModel.likePost(newViewData.id)
             //update recycler
             mPostAdapter.update(position, newViewData)
         }
@@ -677,12 +691,12 @@ class FeedFragment :
 
     // callback when self post is deleted by user
     override fun selfDelete(deleteExtras: DeleteExtras) {
-        viewModel.deletePost(deleteExtras.postId)
+        postSharedViewModel.deletePost(deleteExtras.postId)
     }
 
     // callback when other's post is deleted by CM
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
-        viewModel.deletePost(deleteExtras.postId, reason)
+        postSharedViewModel.deletePost(deleteExtras.postId, reason)
     }
 
     // updates the fromPostLiked/fromPostSaved variables and updates the rv list
@@ -774,7 +788,7 @@ class FeedFragment :
             .build()
 
         //call api
-        viewModel.pinPost(postId)
+        postSharedViewModel.pinPost(postId)
 
         //update recycler
         mPostAdapter.update(index, newViewData)
@@ -807,7 +821,7 @@ class FeedFragment :
             .build()
 
         //call api
-        viewModel.pinPost(postId)
+        postSharedViewModel.pinPost(postId)
 
         //update recycler
         mPostAdapter.update(index, newViewData)
