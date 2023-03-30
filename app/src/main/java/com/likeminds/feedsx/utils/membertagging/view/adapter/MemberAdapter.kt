@@ -11,8 +11,6 @@ internal class MemberAdapter(
     private val memberAdapterClickListener: MemberAdapterClickListener
 ) : RecyclerView.Adapter<MemberViewHolder>() {
 
-    // TODO: Base adapter?
-
     private val members = ArrayList<UserTagViewData>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemberViewHolder {

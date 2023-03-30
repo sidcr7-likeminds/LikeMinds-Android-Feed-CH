@@ -183,6 +183,11 @@ class CreatePostFragment :
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun initPostContentTextListener() {
         binding.etPostContent.apply {
+            /**
+             * As the scrollable edit text is inside a scroll view,
+             * this touch listener handles the scrolling of the edit text.
+             * When the edit text is touched and has focus then it disables scroll of scroll-view.
+             */
             setOnTouchListener(OnTouchListener { v, event ->
                 if (hasFocus()) {
                     v.parent.requestDisallowInterceptTouchEvent(true)
