@@ -141,17 +141,38 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_posting"
-            tools:visibility="gone">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:clipToPadding="false"
-                android:descendantFocusability="blocksDescendants"
-                android:overScrollMode="never"
-                android:visibility="visible" />
+                android:layout_height="match_parent">
+
+                <include
+                    android:id="@+id/layout_no_post"
+                    layout="@layout/layout_no_post"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:descendantFocusability="blocksDescendants"
+                    android:overScrollMode="never"
+                    android:visibility="visible"
+                    tools:itemCount="10"
+                    tools:listitem="@layout/item_post_text_only" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

@@ -118,6 +118,7 @@ class FeedFragment :
         viewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId).first
             mPostAdapter.removeIndex(indexToRemove)
+            checkForNoPost(mPostAdapter.items() as List<PostViewData>)
             ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
@@ -176,11 +177,14 @@ class FeedFragment :
 
     private fun checkForNoPost(feed: List<PostViewData>) {
         if (feed.isNotEmpty()) {
-            return
+            binding.apply {
+                layoutNoPost.root.hide()
+                newPostButton.show()
+                recyclerView.show()
+            }
         } else {
             binding.apply {
                 layoutNoPost.root.show()
-                swipeRefreshLayout.hide()
                 newPostButton.hide()
                 recyclerView.hide()
             }
