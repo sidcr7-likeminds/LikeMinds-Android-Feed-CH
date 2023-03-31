@@ -159,15 +159,31 @@ class FeedFragment :
 
         //if pull to refresh is called
         if (mSwipeRefreshLayout.isRefreshing) {
+            checkForNoPost(feed)
             setFeedAndScrollToTop(feed)
             mSwipeRefreshLayout.isRefreshing = false
+            return
         }
 
         //normal adding
         if (page == 1) {
+            checkForNoPost(feed)
             setFeedAndScrollToTop(feed)
         } else {
             mPostAdapter.addAll(feed)
+        }
+    }
+
+    private fun checkForNoPost(feed: List<PostViewData>) {
+        if (feed.isNotEmpty()) {
+            return
+        } else {
+            binding.apply {
+                layoutNoPost.root.show()
+                swipeRefreshLayout.hide()
+                newPostButton.hide()
+                recyclerView.hide()
+            }
         }
     }
 
@@ -385,7 +401,7 @@ class FeedFragment :
     private fun initiateSDK() {
         ProgressHelper.showProgress(binding.progressBar)
         viewModel.initiateUser(
-            "69edd43f-4a5e-4077-9c50-2b7aa740acce",
+            "6b11d5f6-19fc-48aa-9140-0f59c88b0d0a",
             "029f66a8-264b-413f-a9df-3ae2f4166486",
             "Ishaan",
             false
@@ -418,6 +434,11 @@ class FeedFragment :
                 val intent = CreatePostActivity.getIntent(requireContext())
                 createPostLauncher.launch(intent)
             }
+        }
+
+        binding.layoutNoPost.fabNewPost.setOnClickListener {
+            val intent = CreatePostActivity.getIntent(requireContext())
+            createPostLauncher.launch(intent)
         }
     }
 
