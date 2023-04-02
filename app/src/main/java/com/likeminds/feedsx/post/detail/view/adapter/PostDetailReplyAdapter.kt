@@ -40,11 +40,11 @@ class PostDetailReplyAdapter constructor(
         fun likeReply(replyId: String) {}
         fun viewMoreReplies(
             parentCommentId: String,
-            parentCommentPosition: Int,
-            currentVisibleReplies: Int
+            page: Int
         )
 
         fun onReplyMenuItemClicked(
+            postId: String,
             parentCommentId: String,
             replyId: String,
             creatorId: String,

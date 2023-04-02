@@ -10,7 +10,8 @@ class ViewMoreReplyViewData private constructor(
     var currentCount: Int,
     var totalCommentsCount: Int,
     var parentCommentId: String,
-    var parentCommentPosition: Int
+    var parentCommentPosition: Int,
+    var page: Int
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -21,6 +22,7 @@ class ViewMoreReplyViewData private constructor(
         private var totalCommentsCount: Int = 0
         private var parentCommentId: String = ""
         private var parentCommentPosition: Int = 0
+        private var page: Int = 0
 
         fun currentCount(currentCount: Int) = apply { this.currentCount = currentCount }
         fun totalCommentsCount(totalCommentsCount: Int) =
@@ -32,11 +34,14 @@ class ViewMoreReplyViewData private constructor(
         fun parentCommentPosition(parentCommentPosition: Int) =
             apply { this.parentCommentPosition = parentCommentPosition }
 
+        fun page(page: Int) = apply { this.page = page }
+
         fun build() = ViewMoreReplyViewData(
             currentCount,
             totalCommentsCount,
             parentCommentId,
-            parentCommentPosition
+            parentCommentPosition,
+            page
         )
     }
 
@@ -45,5 +50,6 @@ class ViewMoreReplyViewData private constructor(
             .totalCommentsCount(totalCommentsCount)
             .parentCommentId(parentCommentId)
             .parentCommentPosition(parentCommentPosition)
+            .page(page)
     }
 }

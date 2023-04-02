@@ -256,39 +256,51 @@ object ViewDataConverter {
     ): MutableList<CommentViewData> {
         if (comments == null) return mutableListOf()
         return comments.map { comment ->
-            val userId = comment.userId
-            val user = usersMap[userId]
-            val replies = comment.replies?.toMutableList()
-
-            val userViewData = if (user == null) {
-                createDeletedUser()
-            } else {
-                convertUser(user)
-            }
-
-            CommentViewData.Builder()
-                .id(comment.id)
-                .postId(postId)
-                .isLiked(comment.isLiked)
-                .userId(userId)
-                .text(comment.text)
-                .level(comment.level)
-                .likesCount(comment.likesCount)
-                .repliesCount(comment.commentsCount)
-                .user(userViewData)
-                .createdAt(comment.createdAt)
-                .updatedAt(comment.updatedAt)
-                .menuItems(convertOverflowMenuItems(comment.menuItems))
-                .replies(
-                    convertComments(
-                        replies,
-                        usersMap,
-                        postId
-                    )
-                )
-                .parentId(comment.parentId)
-                .build()
+            convertComment(
+                comment,
+                usersMap,
+                postId
+            )
         }.toMutableList()
+    }
+
+    fun convertComment(
+        comment: Comment,
+        usersMap: Map<String, User>,
+        postId: String
+    ): CommentViewData {
+        val userId = comment.userId
+        val user = usersMap[userId]
+        val replies = comment.replies?.toMutableList()
+
+        val userViewData = if (user == null) {
+            createDeletedUser()
+        } else {
+            convertUser(user)
+        }
+
+        return CommentViewData.Builder()
+            .id(comment.id)
+            .postId(postId)
+            .isLiked(comment.isLiked)
+            .userId(userId)
+            .text(comment.text)
+            .level(comment.level)
+            .likesCount(comment.likesCount)
+            .repliesCount(comment.commentsCount)
+            .user(userViewData)
+            .createdAt(comment.createdAt)
+            .updatedAt(comment.updatedAt)
+            .menuItems(convertOverflowMenuItems(comment.menuItems))
+            .replies(
+                convertComments(
+                    replies,
+                    usersMap,
+                    postId
+                )
+            )
+            .parentId(comment.parentId)
+            .build()
     }
 
     fun convertCommentsCount(commentsCount: Int): CommentsCountViewData {

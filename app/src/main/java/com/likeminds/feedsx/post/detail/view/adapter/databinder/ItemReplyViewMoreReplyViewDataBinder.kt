@@ -48,8 +48,7 @@ class ItemReplyViewMoreReplyViewDataBinder constructor(
             tvViewMoreReplies.setOnClickListener {
                 listener.viewMoreReplies(
                     data.parentCommentId,
-                    data.parentCommentPosition,
-                    data.currentCount
+                    data.page
                 )
             }
         }

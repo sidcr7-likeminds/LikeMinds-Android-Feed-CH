@@ -30,6 +30,7 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
+import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
 
 class ItemPostDetailCommentViewDataBinder constructor(
@@ -67,12 +68,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
         data: CommentViewData,
         position: Int
     ) {
-        //todo
-//        PostTypeUtil.setOverflowMenuItems(
-//            overflowMenu,
-//            data.menuItems
-//        )
-
         binding.apply {
             val context = root.context
 
@@ -147,12 +142,15 @@ class ItemPostDetailCommentViewDataBinder constructor(
             }
 
             tvReplyCount.setOnClickListener {
-                postDetailAdapterListener.fetchReplies(data.id, position)
+                postDetailAdapterListener.fetchReplies(
+                    data.id
+                )
             }
 
             ivCommentMenu.setOnClickListener { view ->
                 showMenu(
                     view,
+                    data.postId,
                     data.id,
                     data.userId,
                     data.menuItems
@@ -161,7 +159,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
             if (data.replies.isNotEmpty()) {
                 rvReplies.show()
-                mRepliesAdapter.replace(data.replies.toList())
                 commentSeparator.hide()
                 replyCommentSeparator.show()
                 tvReplyCount.isClickable = false
@@ -273,6 +270,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
     //to show overflow menu for comment
     private fun showMenu(
         view: View,
+        postId: String,
         commentId: String,
         creatorId: String,
         menuItems: List<OverflowMenuItemViewData>
@@ -284,6 +282,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
         popup.setOnMenuItemClickListener { menuItem ->
             postDetailAdapterListener.onCommentMenuItemClicked(
+                postId,
                 commentId,
                 creatorId,
                 menuItem.title.toString()
@@ -295,15 +294,20 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
     // adds ViewMoreReply view when required
     private fun handleViewMore(data: CommentViewData, position: Int) {
-        if (data.repliesCount > PostDetailFragment.REPLIES_THRESHOLD && data.replies.size < data.repliesCount) {
-            mRepliesAdapter.add(
-                ViewMoreReplyViewData.Builder()
-                    .totalCommentsCount(data.repliesCount)
-                    .currentCount(data.replies.size)
-                    .parentCommentId(data.id)
-                    .parentCommentPosition(position)
-                    .build()
-            )
+        val repliesList = data.replies as MutableList<BaseViewType>
+        if (repliesList.size >= data.repliesCount) {
+            mRepliesAdapter.replace(repliesList)
+        } else {
+            val nextPage = (repliesList.size / PostDetailFragment.REPLIES_THRESHOLD) + 1
+            val viewMoreReply = ViewMoreReplyViewData.Builder()
+                .totalCommentsCount(data.repliesCount)
+                .currentCount(data.replies.size)
+                .parentCommentId(data.id)
+                .page(nextPage)
+                .parentCommentPosition(position)
+                .build()
+            repliesList.add(viewMoreReply)
+            mRepliesAdapter.replace(repliesList)
         }
     }
 

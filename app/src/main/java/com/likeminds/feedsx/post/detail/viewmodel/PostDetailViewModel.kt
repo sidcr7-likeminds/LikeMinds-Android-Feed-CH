@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -11,10 +12,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
-import com.likeminds.likemindsfeed.comment.model.AddCommentRequest
-import com.likeminds.likemindsfeed.comment.model.DeleteCommentRequest
-import com.likeminds.likemindsfeed.comment.model.LikeCommentRequest
-import com.likeminds.likemindsfeed.comment.model.ReplyCommentRequest
+import com.likeminds.likemindsfeed.comment.model.*
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
 import com.likeminds.likemindsfeed.post.model.GetPostRequest
@@ -34,6 +32,9 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
     private val _postResponse = MutableLiveData<Pair<Int, PostViewData>>()
     val postResponse: LiveData<Pair<Int, PostViewData>> = _postResponse
 
+    private val _getCommentResponse = MutableLiveData<Pair<Int, CommentViewData>>()
+    val getCommentResponse: LiveData<Pair<Int, CommentViewData>> = _getCommentResponse
+
     /**
      * [taggingData] contains first -> page called
      * second -> Community Members and Groups
@@ -51,6 +52,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
         data class AddComment(val errorMessage: String?) : ErrorMessageEvent()
         data class DeleteComment(val errorMessage: String?) : ErrorMessageEvent()
+        data class GetComment(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
@@ -58,6 +60,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
     companion object {
         const val PAGE_SIZE = 10
+        const val REPLIES_PAGE_SIZE = 5
     }
 
     fun getPost(postId: String, page: Int) {
@@ -93,6 +96,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 .postId(postId)
                 .commentId(commentId)
                 .build()
+
 
             //call like post api
             val response = lmFeedClient.likeComment(request)
@@ -148,15 +152,47 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    fun getComment(
+        postId: String,
+        commentId: String,
+        page: Int
+    ) {
+        viewModelScope.launchIO {
+            // builds api request
+            val request = GetCommentRequest.Builder()
+                .postId(postId)
+                .commentId(commentId)
+                .page(page)
+                .pageSize(REPLIES_PAGE_SIZE)
+                .build()
+
+            val response = lmFeedClient.getComment(request)
+            if (response.success) {
+                val data = response.data ?: return@launchIO
+                val comment = data.comment
+                val users = data.users
+                _getCommentResponse.postValue(
+                    Pair(
+                        page,
+                        ViewDataConverter.convertComment(
+                            comment,
+                            users,
+                            postId
+                        )
+                    )
+                )
+            } else {
+                errorMessageChannel.send(ErrorMessageEvent.GetComment(response.errorMessage))
+            }
+        }
+    }
+
     fun deleteComment(
         postId: String,
-        commentId: String?,
+        commentId: String,
         reason: String? = null
     ) {
         viewModelScope.launchIO {
-            if (commentId == null) {
-                return@launchIO
-            }
             val request = DeleteCommentRequest.Builder()
                 .postId(postId)
                 .commentId(commentId)
@@ -167,8 +203,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             val response = lmFeedClient.deleteComment(request)
 
             if (response.success) {
-                // todo
-                _deleteCommentResponse.postValue(postId)
+                _deleteCommentResponse.postValue(commentId)
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.DeleteComment(response.errorMessage))
             }

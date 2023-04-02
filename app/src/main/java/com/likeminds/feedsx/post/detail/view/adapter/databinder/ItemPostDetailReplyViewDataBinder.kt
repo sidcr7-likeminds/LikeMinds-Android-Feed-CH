@@ -57,7 +57,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
             if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_comment_filled)
             else ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
 
-            tvCommentTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
+            tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
             if (data.likesCount == 0) likesCount.hide()
             else {
@@ -86,6 +86,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
             ivReplyMenu.setOnClickListener { view ->
                 showMenu(
                     view,
+                    data.postId,
                     data.parentId,
                     data.id,
                     data.userId,
@@ -98,6 +99,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
     //to show overflow menu for reply
     private fun showMenu(
         view: View,
+        postId: String,
         parentCommentId: String?,
         commentId: String,
         creatorId: String,
@@ -111,6 +113,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
         val updatedParentId = parentCommentId ?: ""
         popup.setOnMenuItemClickListener { menuItem ->
             postDetailReplyAdapterListener.onReplyMenuItemClicked(
+                postId,
                 updatedParentId,
                 commentId,
                 creatorId,
