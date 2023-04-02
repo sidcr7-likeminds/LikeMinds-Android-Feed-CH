@@ -32,11 +32,6 @@ class PostDetailReplyAdapter constructor(
     }
 
     interface PostDetailReplyAdapterListener {
-        fun deleteReply(
-            parentCommentId: String,
-            replyId: String
-        )
-
         fun likeReply(parentCommentId: String, replyId: String)
         fun viewMoreReplies(
             parentCommentId: String,

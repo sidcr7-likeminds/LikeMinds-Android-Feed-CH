@@ -298,21 +298,20 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
     // adds ViewMoreReply view when required
     private fun handleViewMore(data: CommentViewData, position: Int) {
-        val repliesList = data.replies as MutableList<BaseViewType>
+        val repliesList = data.replies.toMutableList() as MutableList<BaseViewType>
         if (repliesList.size >= data.repliesCount) {
             mRepliesAdapter.replace(repliesList)
         } else {
-            if (repliesList.last() !is ViewMoreReplyViewData) {
-                val nextPage = (repliesList.size / PostDetailFragment.REPLIES_THRESHOLD) + 1
-                val viewMoreReply = ViewMoreReplyViewData.Builder()
-                    .totalCommentsCount(data.repliesCount)
-                    .currentCount(data.replies.size)
-                    .parentCommentId(data.id)
-                    .page(nextPage)
-                    .parentCommentPosition(position)
-                    .build()
-                repliesList.add(viewMoreReply)
-            }
+            val nextPage = (repliesList.size / PostDetailFragment.REPLIES_THRESHOLD) + 1
+            val viewMoreReply = ViewMoreReplyViewData.Builder()
+                .totalCommentsCount(data.repliesCount)
+                .currentCount(data.replies.size)
+                .parentCommentId(data.id)
+                .page(nextPage)
+                .parentCommentPosition(position)
+                .build()
+            repliesList.add(viewMoreReply)
+
             mRepliesAdapter.replace(repliesList)
         }
     }

@@ -56,8 +56,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
 
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_comment_filled)
-            }
-            else {
+            } else {
                 ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
             }
 

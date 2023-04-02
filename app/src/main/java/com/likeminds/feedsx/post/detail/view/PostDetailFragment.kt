@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.post.detail.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
@@ -14,9 +15,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
-import com.likeminds.feedsx.delete.model.DELETE_TYPE_COMMENT
-import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
-import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
 import com.likeminds.feedsx.likes.model.COMMENT
@@ -24,6 +23,7 @@ import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.overflowmenu.model.*
+import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
@@ -73,6 +73,9 @@ class PostDetailFragment :
 
     private lateinit var memberTagging: MemberTaggingView
 
+    private val commentsCountPosition = 1
+    private val commentsStartPosition = 2
+
     companion object {
         const val REPLIES_THRESHOLD = 5
     }
@@ -102,14 +105,65 @@ class PostDetailFragment :
     }
 
     private fun observeCommentData() {
+        // observes addCommentResponse LiveData
+        viewModel.addCommentResponse.observe(viewLifecycleOwner) {
+            // gets old [CommentsCountViewData] from adapter
+            val oldCommentsCountViewData =
+                (mPostDetailAdapter[commentsCountPosition] as CommentsCountViewData)
+
+            // creates new [CommentsCountViewData] by adding to [commentsCount]
+            val newCommentsCountViewData = oldCommentsCountViewData.toBuilder()
+                .commentsCount(oldCommentsCountViewData.commentsCount + 1)
+                .build()
+
+            // updates [CommentsCountViewData]
+            mPostDetailAdapter.update(commentsCountPosition, newCommentsCountViewData)
+
+            // adds new comment to adapter
+            mPostDetailAdapter.add(commentsStartPosition, it)
+        }
+
+        // observes addReplyResponse LiveData
+        viewModel.addReplyResponse.observe(viewLifecycleOwner) { pair ->
+            // [parentCommentId] for the reply
+            val parentCommentId = pair.first
+
+            // view data of comment with level-1
+            val replyViewData = pair.second
+
+            addReplyToAdapter(parentCommentId, replyViewData)
+        }
+
         // observes deleteCommentResponse LiveData
-        viewModel.deleteCommentResponse.observe(viewLifecycleOwner) { commentId ->
-            val indexToRemove = getIndexAndCommentFromAdapter(commentId).first
-            mPostDetailAdapter.removeIndex(indexToRemove)
-            ViewUtils.showShortToast(
-                requireContext(),
-                getString(R.string.comment_deleted)
-            )
+        viewModel.deleteCommentResponse.observe(viewLifecycleOwner) { pair ->
+            val commentId = pair.first
+            val parentCommentId = pair.second
+            if (parentCommentId == null) {
+                // level-0 comment
+
+                // gets old [CommentsCountViewData] from adapter
+                val oldCommentsCountViewData =
+                    (mPostDetailAdapter[commentsCountPosition] as CommentsCountViewData)
+
+                // todo make a fun
+                // creates new [CommentsCountViewData] by adding to [commentsCount]
+                val newCommentsCountViewData = oldCommentsCountViewData.toBuilder()
+                    .commentsCount(oldCommentsCountViewData.commentsCount - 1)
+                    .build()
+
+                // updates [CommentsCountViewData]
+                mPostDetailAdapter.update(commentsCountPosition, newCommentsCountViewData)
+
+                val indexToRemove = getIndexAndCommentFromAdapter(commentId).first
+                mPostDetailAdapter.removeIndex(indexToRemove)
+                ViewUtils.showShortToast(
+                    requireContext(),
+                    getString(R.string.comment_deleted)
+                )
+            } else {
+                // level-1 comment
+                removeDeletedReply(parentCommentId, commentId)
+            }
         }
 
         viewModel.getCommentResponse.observe(viewLifecycleOwner) { pair ->
@@ -121,6 +175,38 @@ class PostDetailFragment :
 
             updateComment(comment, page)
         }
+    }
+
+
+    private fun addReplyToAdapter(parentCommentId: String, reply: CommentViewData) {
+        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)
+        val parentIndex = parentComment.first
+        val parentCommentViewData = parentComment.second
+
+        parentCommentViewData.replies.add(0, reply)
+
+        val newCommentViewData = parentCommentViewData.toBuilder()
+            .repliesCount(parentCommentViewData.repliesCount + 1)
+            .build()
+
+        mPostDetailAdapter.update(parentIndex, newCommentViewData)
+    }
+
+    @SuppressLint("NewApi")
+    private fun removeDeletedReply(parentCommentId: String, replyId: String) {
+        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)
+        val parentIndex = parentComment.first
+        val parentCommentViewData = parentComment.second
+
+        parentCommentViewData.replies.removeIf {
+            it.id == replyId
+        }
+
+        val newCommentViewData = parentCommentViewData.toBuilder()
+            .repliesCount(parentCommentViewData.repliesCount - 1)
+            .build()
+
+        mPostDetailAdapter.update(parentIndex, newCommentViewData)
     }
 
     private fun updateComment(comment: CommentViewData, page: Int) {
@@ -169,13 +255,13 @@ class PostDetailFragment :
         }
 
         // observes deletePostResponse LiveData
-        postSharedViewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
-            val indexToRemove = getIndexAndPostFromAdapter(postId).first
-            mPostDetailAdapter.removeIndex(indexToRemove)
+        postSharedViewModel.deletePostResponse.observe(viewLifecycleOwner) {
+            // todo pass the data to feed
             ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
             )
+            requireActivity().finish()
         }
 
         // observes pinPostResponse LiveData
@@ -485,6 +571,14 @@ class PostDetailFragment :
         }
     }
 
+    private fun addCommentToAdapter() {
+
+    }
+
+    private fun addReplyToAdapter() {
+
+    }
+
     private fun hideReplyingToView() {
         binding.apply {
             parentCommentIdToReply = null
@@ -520,12 +614,15 @@ class PostDetailFragment :
     private fun deleteComment(
         postId: String,
         commentId: String,
-        creatorId: String
+        creatorId: String,
+        parentCommentId: String? = null,
     ) {
+        Log.d("PUI", "deleteComment: $parentCommentId")
         val deleteExtras = DeleteExtras.Builder()
             .postId(postId)
             .commentId(commentId)
             .entityType(DELETE_TYPE_COMMENT)
+            .parentCommentId(parentCommentId)
             .build()
 
         showDeleteDialog(creatorId, deleteExtras)
@@ -978,11 +1075,11 @@ class PostDetailFragment :
     ) {
         when (title) {
             DELETE_COMMENT_MENU_ITEM -> {
-                // todo
                 deleteComment(
                     postId,
                     replyId,
-                    creatorId
+                    creatorId,
+                    parentCommentId
                 )
             }
             REPORT_COMMENT_MENU_ITEM -> {
@@ -1011,12 +1108,12 @@ class PostDetailFragment :
             DELETE_TYPE_POST -> {
                 postSharedViewModel.deletePost(deleteExtras.postId)
             }
-
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
                 viewModel.deleteComment(
                     deleteExtras.postId,
-                    commentId
+                    commentId,
+                    parentCommentId = deleteExtras.parentCommentId
                 )
             }
         }
@@ -1033,14 +1130,11 @@ class PostDetailFragment :
                 viewModel.deleteComment(
                     deleteExtras.postId,
                     commentId,
-                    reason
+                    parentCommentId = deleteExtras.parentCommentId,
+                    reason = reason
                 )
             }
         }
-    }
-
-    override fun deleteReply(parentCommentId: String, replyId: String) {
-
     }
 
     // callback when likes count of a comment is clicked - opens likes screen

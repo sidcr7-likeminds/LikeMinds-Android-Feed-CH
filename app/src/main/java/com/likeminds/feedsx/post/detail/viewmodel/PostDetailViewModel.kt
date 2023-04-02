@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.post.detail.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -26,8 +27,20 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    private val _deleteCommentResponse = MutableLiveData<String>()
-    val deleteCommentResponse: LiveData<String> = _deleteCommentResponse
+    private val _addCommentResponse = MutableLiveData<CommentViewData>()
+    val addCommentResponse: LiveData<CommentViewData> = _addCommentResponse
+
+    // it holds pair of [parentCommentId] and [replyComment]
+    private val _addReplyResponse = MutableLiveData<Pair<String, CommentViewData>>()
+    val addReplyResponse: LiveData<Pair<String, CommentViewData>> = _addReplyResponse
+
+    /**
+     * it holds the Pair of [commentId] and [parentCommentId]
+     * if comment level is 0 then [parentCommentId] is null
+     * if comment level is 1 then [parentCommentId] is non null
+     */
+    private val _deleteCommentResponse = MutableLiveData<Pair<String, String?>>()
+    val deleteCommentResponse: LiveData<Pair<String, String?>> = _deleteCommentResponse
 
     private val _postResponse = MutableLiveData<Pair<Int, PostViewData>>()
     val postResponse: LiveData<Pair<Int, PostViewData>> = _postResponse
@@ -123,7 +136,16 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
             val response = lmFeedClient.addComment(request)
             if (response.success) {
-
+                val data = response.data ?: return@launchIO
+                val comment = data.comment
+                val users = data.users
+                _addCommentResponse.postValue(
+                    ViewDataConverter.convertComment(
+                        comment,
+                        users,
+                        postId
+                    )
+                )
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
@@ -132,20 +154,33 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
     fun replyComment(
         postId: String,
-        commentId: String,
+        parentCommentId: String,
         text: String
     ) {
         viewModelScope.launchIO {
             // builds api request
             val request = ReplyCommentRequest.Builder()
                 .postId(postId)
-                .commentId(commentId)
+                .commentId(parentCommentId)
                 .text(text)
                 .build()
 
-            val response = lmFeedClient.addReplyOnComment(request)
+            val response = lmFeedClient.replyComment(request)
             if (response.success) {
-
+                val data = response.data ?: return@launchIO
+                val comment = data.comment
+                val users = data.users
+                _addReplyResponse.postValue(
+                    Pair(
+                        parentCommentId,
+                        ViewDataConverter.convertComment(
+                            comment,
+                            users,
+                            postId,
+                            parentCommentId
+                        )
+                    )
+                )
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
@@ -190,6 +225,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
     fun deleteComment(
         postId: String,
         commentId: String,
+        parentCommentId: String? = null,
         reason: String? = null
     ) {
         viewModelScope.launchIO {
@@ -201,9 +237,10 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
             //call delete post api
             val response = lmFeedClient.deleteComment(request)
+            Log.d("PUI", "deleteComment: $parentCommentId")
 
             if (response.success) {
-                _deleteCommentResponse.postValue(commentId)
+                _deleteCommentResponse.postValue(Pair(commentId, parentCommentId))
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.DeleteComment(response.errorMessage))
             }
