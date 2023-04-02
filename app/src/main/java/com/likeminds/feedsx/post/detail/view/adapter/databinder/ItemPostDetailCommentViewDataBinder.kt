@@ -79,6 +79,8 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 position
             )
 
+            tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
+
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_comment_filled)
             } else {
@@ -104,70 +106,72 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 )
             }
 
-            tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
-
-            if (data.repliesCount == 0) {
-                groupReplies.hide()
-            } else {
-                groupReplies.show()
-                tvReplyCount.text = context.resources.getQuantityString(
-                    R.plurals.replies,
-                    data.repliesCount,
-                    data.repliesCount
-                )
-            }
-
-            mRepliesAdapter = PostDetailReplyAdapter(
-                postDetailAdapterListener,
-                postDetailReplyAdapterListener
-            )
-
-            rvReplies.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = mRepliesAdapter
-            }
-
-            tvReply.setOnClickListener {
-                postDetailAdapterListener.replyOnComment(
-                    data.id,
-                    position,
-                    data.user
-                )
-            }
-
             ivLike.setOnClickListener { view ->
                 // bounce animation for like button
                 ViewUtils.showBounceAnim(context, view)
                 postDetailAdapterListener.likeComment(data.id)
             }
 
-            tvReplyCount.setOnClickListener {
-                postDetailAdapterListener.fetchReplies(
-                    data.id
-                )
-            }
-
-            ivCommentMenu.setOnClickListener { view ->
-                showMenu(
-                    view,
-                    data.postId,
-                    data.id,
-                    data.userId,
-                    data.menuItems
-                )
-            }
-
-            if (data.replies.isNotEmpty()) {
-                rvReplies.show()
-                commentSeparator.hide()
-                replyCommentSeparator.show()
-                tvReplyCount.isClickable = false
-                handleViewMore(data, position)
+            if (data.fromCommentLiked) {
+                return
             } else {
-                rvReplies.hide()
-                commentSeparator.show()
-                replyCommentSeparator.hide()
-                tvReplyCount.isClickable = true
+                if (data.repliesCount == 0) {
+                    groupReplies.hide()
+                } else {
+                    groupReplies.show()
+                    tvReplyCount.text = context.resources.getQuantityString(
+                        R.plurals.replies,
+                        data.repliesCount,
+                        data.repliesCount
+                    )
+                }
+
+                mRepliesAdapter = PostDetailReplyAdapter(
+                    postDetailAdapterListener,
+                    postDetailReplyAdapterListener
+                )
+
+                rvReplies.apply {
+                    layoutManager = LinearLayoutManager(context)
+                    adapter = mRepliesAdapter
+                }
+
+                tvReply.setOnClickListener {
+                    postDetailAdapterListener.replyOnComment(
+                        data.id,
+                        position,
+                        data.user
+                    )
+                }
+
+                tvReplyCount.setOnClickListener {
+                    postDetailAdapterListener.fetchReplies(
+                        data.id
+                    )
+                }
+
+                ivCommentMenu.setOnClickListener { view ->
+                    showMenu(
+                        view,
+                        data.postId,
+                        data.id,
+                        data.userId,
+                        data.menuItems
+                    )
+                }
+
+                if (data.replies.isNotEmpty()) {
+                    rvReplies.show()
+                    commentSeparator.hide()
+                    replyCommentSeparator.show()
+                    tvReplyCount.isClickable = false
+                    handleViewMore(data, position)
+                } else {
+                    rvReplies.hide()
+                    commentSeparator.show()
+                    replyCommentSeparator.hide()
+                    tvReplyCount.isClickable = true
+                }
             }
         }
     }
@@ -298,15 +302,17 @@ class ItemPostDetailCommentViewDataBinder constructor(
         if (repliesList.size >= data.repliesCount) {
             mRepliesAdapter.replace(repliesList)
         } else {
-            val nextPage = (repliesList.size / PostDetailFragment.REPLIES_THRESHOLD) + 1
-            val viewMoreReply = ViewMoreReplyViewData.Builder()
-                .totalCommentsCount(data.repliesCount)
-                .currentCount(data.replies.size)
-                .parentCommentId(data.id)
-                .page(nextPage)
-                .parentCommentPosition(position)
-                .build()
-            repliesList.add(viewMoreReply)
+            if (repliesList.last() !is ViewMoreReplyViewData) {
+                val nextPage = (repliesList.size / PostDetailFragment.REPLIES_THRESHOLD) + 1
+                val viewMoreReply = ViewMoreReplyViewData.Builder()
+                    .totalCommentsCount(data.repliesCount)
+                    .currentCount(data.replies.size)
+                    .parentCommentId(data.id)
+                    .page(nextPage)
+                    .parentCommentPosition(position)
+                    .build()
+                repliesList.add(viewMoreReply)
+            }
             mRepliesAdapter.replace(repliesList)
         }
     }

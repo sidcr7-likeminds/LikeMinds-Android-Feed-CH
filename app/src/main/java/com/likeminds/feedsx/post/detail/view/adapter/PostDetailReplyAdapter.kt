@@ -37,7 +37,7 @@ class PostDetailReplyAdapter constructor(
             replyId: String
         )
 
-        fun likeReply(replyId: String) {}
+        fun likeReply(parentCommentId: String, replyId: String)
         fun viewMoreReplies(
             parentCommentId: String,
             page: Int

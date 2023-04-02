@@ -587,7 +587,6 @@ class PostDetailFragment :
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .fromCommentLiked(false)
-                .fromCommentSaved(false)
                 .build()
             mPostDetailAdapter.update(position, newViewData)
         }
@@ -716,6 +715,54 @@ class PostDetailFragment :
         viewModel.likeComment(newViewData.postId, newViewData.id)
         //update recycler
         mPostDetailAdapter.update(position, newViewData)
+    }
+
+    override fun likeReply(parentCommentId: String, replyId: String) {
+        val parentIndexAndComment = getIndexAndCommentFromAdapter(parentCommentId)
+        val position = parentIndexAndComment.first
+        val parentComment = parentIndexAndComment.second
+
+        val reply = getIndexAndReplyFromComment(parentComment, replyId)
+        val replyIndex = reply.first
+        val replyViewData = reply.second
+
+        //new like count
+        val newLikesCount = if (replyViewData.isLiked) {
+            replyViewData.likesCount - 1
+        } else {
+            replyViewData.likesCount + 1
+        }
+
+        val updatedReply = parentComment.replies[replyIndex]
+            .toBuilder()
+            .isLiked(!replyViewData.isLiked)
+            .likesCount(newLikesCount)
+            .build()
+
+        parentComment.replies[replyIndex] = updatedReply
+
+        //update comment view data
+        val newViewData = parentComment.toBuilder()
+            .replies(parentComment.replies)
+            .build()
+
+        //call api
+        viewModel.likeComment(newViewData.postId, updatedReply.id)
+        //update recycler
+        mPostDetailAdapter.update(position, newViewData)
+    }
+
+    private fun getIndexAndReplyFromComment(
+        parentComment: CommentViewData,
+        replyId: String
+    ): Pair<Int, CommentViewData> {
+        val index = parentComment.replies.indexOfFirst {
+            it.id == replyId
+        }
+
+        val reply = parentComment.replies[index]
+
+        return Pair(index, reply)
     }
 
     //get index and post from the adapter using postId
@@ -866,7 +913,8 @@ class PostDetailFragment :
 
         //update unpin menu item
         val unPinPostMenuItem = menuItems[unPinPostIndex]
-        val newUnPinPostMenuItem = unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
+        val newUnPinPostMenuItem =
+            unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
         menuItems[unPinPostIndex] = newUnPinPostMenuItem
 
         //update the post view data

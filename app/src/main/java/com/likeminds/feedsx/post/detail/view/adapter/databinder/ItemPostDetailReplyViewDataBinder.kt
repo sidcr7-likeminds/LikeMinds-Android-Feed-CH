@@ -54,8 +54,12 @@ class ItemPostDetailReplyViewDataBinder constructor(
             tvCommenterName.text = data.user.name
             tvCommentContent.text = data.text
 
-            if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_comment_filled)
-            else ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
+            if (data.isLiked) {
+                ivLike.setImageResource(R.drawable.ic_like_comment_filled)
+            }
+            else {
+                ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
+            }
 
             tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
@@ -80,7 +84,8 @@ class ItemPostDetailReplyViewDataBinder constructor(
             ivLike.setOnClickListener { view ->
                 // bounce animation for like button
                 ViewUtils.showBounceAnim(context, view)
-                postDetailAdapterListener.likeComment(data.id)
+                val parentCommentId = data.parentId ?: ""
+                postDetailReplyAdapterListener.likeReply(parentCommentId, data.id)
             }
 
             ivReplyMenu.setOnClickListener { view ->

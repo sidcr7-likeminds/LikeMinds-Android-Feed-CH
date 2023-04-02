@@ -252,14 +252,16 @@ object ViewDataConverter {
     private fun convertComments(
         comments: MutableList<Comment>?,
         usersMap: Map<String, User>,
-        postId: String
+        postId: String,
+        parentCommentId: String? = null
     ): MutableList<CommentViewData> {
         if (comments == null) return mutableListOf()
         return comments.map { comment ->
             convertComment(
                 comment,
                 usersMap,
-                postId
+                postId,
+                parentCommentId
             )
         }.toMutableList()
     }
@@ -267,7 +269,8 @@ object ViewDataConverter {
     fun convertComment(
         comment: Comment,
         usersMap: Map<String, User>,
-        postId: String
+        postId: String,
+        parentCommentId: String? = null
     ): CommentViewData {
         val userId = comment.userId
         val user = usersMap[userId]
@@ -296,10 +299,11 @@ object ViewDataConverter {
                 convertComments(
                     replies,
                     usersMap,
-                    postId
+                    postId,
+                    comment.id
                 )
             )
-            .parentId(comment.parentId)
+            .parentId(parentCommentId)
             .build()
     }
 
