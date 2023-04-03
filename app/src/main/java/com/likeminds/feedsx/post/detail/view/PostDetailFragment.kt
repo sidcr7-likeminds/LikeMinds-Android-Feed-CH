@@ -5,6 +5,7 @@ import android.app.Activity
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -277,9 +278,22 @@ class PostDetailFragment :
 
     private fun setPostDataAndScrollToTop(post: PostViewData) {
         mPostDetailAdapter.add(0, post)
-        mPostDetailAdapter.add(1, convertCommentsCount(post.commentsCount))
+        handleCommentsCountView(post.commentsCount)
         mPostDetailAdapter.addAll(post.replies.toList())
         binding.rvPostDetails.scrollToPosition(0)
+    }
+
+    private fun handleCommentsCountView(commentsCount: Int) {
+        binding.apply {
+            if (commentsCount == 0) {
+                tvNoComment.isVisible = true
+                tvBeFirst.isVisible = true
+            } else {
+                tvNoComment.isVisible = false
+                tvBeFirst.isVisible = false
+                mPostDetailAdapter.add(1, convertCommentsCount(commentsCount))
+            }
+        }
     }
 
     private fun fetchPostData() {
@@ -326,15 +340,16 @@ class PostDetailFragment :
                     mPostDetailAdapter.update(index, updatedComment)
 
                     //show error message
-                    val errorMessage = response.errorMessage
-                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.AddComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.DeleteComment -> {
-                    val errorMessage = response.errorMessage
-                    ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is PostDetailViewModel.ErrorMessageEvent.GetComment -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
         }
@@ -468,36 +483,6 @@ class PostDetailFragment :
 
     //TODO: Call api and refresh the post data
     private fun fetchRefreshedData() {
-        //TODO: testing data
-        mPostDetailAdapter.add(
-            2,
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("6")
-                .user(
-                    UserViewData.Builder()
-                        .name("Sid")
-                        .build()
-                )
-                .likesCount(140)
-                .text("This is a test comment 6")
-                .build()
-        )
-        mPostDetailAdapter.add(
-            3,
-            CommentViewData.Builder()
-                .isLiked(false)
-                .id("7")
-                .user(
-                    UserViewData.Builder()
-                        .name("Siddharth")
-                        .build()
-                )
-                .likesCount(100)
-                .isLiked(true)
-                .text("This is a test comment 7")
-                .build()
-        )
         mSwipeRefreshLayout.isRefreshing = false
     }
 
