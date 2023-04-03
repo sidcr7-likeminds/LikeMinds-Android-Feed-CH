@@ -965,6 +965,11 @@ class FeedFragment :
         )
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        PostObserver.getPublisher().unsubscribe(this)
+    }
+
     override fun update(postData: Pair<String, PostViewData?>) {
         val postId = postData.first
         val postIndex = getIndexAndPostFromAdapter(postId).first
