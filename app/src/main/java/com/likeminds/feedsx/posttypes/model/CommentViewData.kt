@@ -25,7 +25,6 @@ class CommentViewData private constructor(
     var parentId: String?,
     val alreadySeenFullContent: Boolean?,
     val fromCommentLiked: Boolean,
-    val fromViewMoreReplies: Boolean
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = when (level) {
@@ -50,7 +49,6 @@ class CommentViewData private constructor(
         private var parentId: String? = null
         private var alreadySeenFullContent: Boolean? = null
         private var fromCommentLiked: Boolean = false
-        private var fromViewMoreReplies: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
         fun postId(postId: String) = apply { this.postId = postId }
@@ -77,9 +75,6 @@ class CommentViewData private constructor(
         fun fromCommentLiked(fromCommentLiked: Boolean) =
             apply { this.fromCommentLiked = fromCommentLiked }
 
-        fun fromViewMoreReplies(fromViewMoreReplies: Boolean) =
-            apply { this.fromViewMoreReplies = fromViewMoreReplies }
-
         fun build() = CommentViewData(
             id,
             postId,
@@ -96,8 +91,7 @@ class CommentViewData private constructor(
             replies,
             parentId,
             alreadySeenFullContent,
-            fromCommentLiked,
-            fromViewMoreReplies
+            fromCommentLiked
         )
     }
 
@@ -118,6 +112,5 @@ class CommentViewData private constructor(
             .parentId(parentId)
             .alreadySeenFullContent(alreadySeenFullContent)
             .fromCommentLiked(fromCommentLiked)
-            .fromViewMoreReplies(fromViewMoreReplies)
     }
 }

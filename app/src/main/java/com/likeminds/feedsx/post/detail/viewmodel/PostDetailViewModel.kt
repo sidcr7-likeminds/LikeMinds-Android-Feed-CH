@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.post.detail.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -237,7 +236,6 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
             //call delete post api
             val response = lmFeedClient.deleteComment(request)
-            Log.d("PUI", "deleteComment: $parentCommentId")
 
             if (response.success) {
                 _deleteCommentResponse.postValue(Pair(commentId, parentCommentId))

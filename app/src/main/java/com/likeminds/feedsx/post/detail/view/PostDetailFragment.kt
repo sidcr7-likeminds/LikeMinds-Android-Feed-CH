@@ -2,7 +2,6 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -273,8 +272,8 @@ class PostDetailFragment :
         }
 
         // observes pinPostResponse LiveData
-        postSharedViewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
-            val post = mPostDetailAdapter[0] as PostViewData
+        postSharedViewModel.pinPostResponse.observe(viewLifecycleOwner) {
+            val post = mPostDetailAdapter[postDataPosition] as PostViewData
             if (post.isPinned) {
                 ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
             } else {
@@ -627,7 +626,6 @@ class PostDetailFragment :
         creatorId: String,
         parentCommentId: String? = null,
     ) {
-        Log.d("PUI", "deleteComment: $parentCommentId")
         val deleteExtras = DeleteExtras.Builder()
             .postId(postId)
             .commentId(commentId)
@@ -686,10 +684,20 @@ class PostDetailFragment :
         }
     }
 
-    // updates post view data when see more is clicked
-    override fun updateCommentSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
-//        todo
-        val item = mPostDetailAdapter[position]
+    // updates comment view data when see more is clicked
+    override fun updateCommentSeenFullContent(
+        position: Int,
+        alreadySeenFullContent: Boolean,
+        parentCommentId: String?
+    ) {
+        val item =
+            if (parentCommentId == null) {
+                mPostDetailAdapter[position]
+            } else {
+                val indexAndComment = getIndexAndCommentFromAdapter(parentCommentId)
+                val comment = indexAndComment.second
+                comment.replies[position]
+            }
         if (item is CommentViewData) {
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
@@ -877,7 +885,6 @@ class PostDetailFragment :
         val index = mPostDetailAdapter.items().indexOfFirst {
             (it is CommentViewData) && (it.id == commentId)
         }
-        Log.d("PUI", "getIndexAndCommentFromAdapter: $index")
 
         val comment = getCommentFromAdapter(index)
 
@@ -889,39 +896,13 @@ class PostDetailFragment :
     }
 
     override fun fetchReplies(commentId: String) {
-        val indexAndComment = getIndexAndCommentFromAdapter(commentId)
-        val index = indexAndComment.first
-        val comment = indexAndComment.second
-        Log.d("PUI", "fetchReplies: $index")
+        val comment = getIndexAndCommentFromAdapter(commentId).second
 
         viewModel.getComment(
             comment.postId,
             comment.id,
             1
         )
-
-//        if (mPostDetailAdapter[index] is CommentViewData) {
-//            val comment = mPostDetailAdapter[index] as CommentViewData
-//            comment.replies.addAll(
-//                mutableListOf(
-//                    CommentViewData.Builder()
-//                        .isLiked(false)
-//                        .id("6")
-//                        .user(
-//                            UserViewData.Builder()
-//                                .name("Natesh Rehlan")
-//                                .build()
-//                        )
-//                        .level(1)
-//                        .text("This is a test reply 1")
-//                        .build()
-//                )
-//            )
-//            mPostDetailAdapter.update(index, comment)
-//            binding.rvPostDetails.smoothScrollToPosition(
-//                mPostDetailAdapter.itemCount
-//            )
-//        }
     }
 
     // callback when replying on a comment
@@ -974,8 +955,7 @@ class PostDetailFragment :
 
     private fun pinPost(postId: String) {
         //get item
-        val index = 0
-        val post = mPostDetailAdapter[0] as PostViewData
+        val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
         //get pin menu item
         val menuItems = post.menuItems.toMutableList()
@@ -1001,13 +981,12 @@ class PostDetailFragment :
         postSharedViewModel.pinPost(postId)
 
         //update recycler
-        mPostDetailAdapter.update(index, newViewData)
+        mPostDetailAdapter.update(postDataPosition, newViewData)
     }
 
     private fun unpinPost(postId: String) {
         //get item
-        val index = 0
-        val post = mPostDetailAdapter[index] as PostViewData
+        val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
         //get unpin menu item
         val menuItems = post.menuItems.toMutableList()
@@ -1034,7 +1013,7 @@ class PostDetailFragment :
         postSharedViewModel.pinPost(postId)
 
         //update recycler
-        mPostDetailAdapter.update(index, newViewData)
+        mPostDetailAdapter.update(postDataPosition, newViewData)
     }
 
     // callback for comment's menu is item

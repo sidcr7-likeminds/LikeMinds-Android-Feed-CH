@@ -62,7 +62,12 @@ class PostDetailAdapter constructor(
     }
 
     interface PostDetailAdapterListener {
-        fun updateCommentSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
+        fun updateCommentSeenFullContent(
+            position: Int,
+            alreadySeenFullContent: Boolean,
+            parentCommentId: String?
+        )
+
         fun likeComment(commentId: String)
         fun fetchReplies(commentId: String)
         fun replyOnComment(commentId: String, commentPosition: Int, parentCommenter: UserViewData)
@@ -74,6 +79,5 @@ class PostDetailAdapter constructor(
         )
 
         fun showLikesScreen(postId: String, commentId: String)
-        fun updateFromViewMoreReplies(position: Int) {}
     }
 }

@@ -7,6 +7,7 @@ import android.widget.PopupMenu
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailReplyBinding
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.post.detail.util.PostDetailUtil
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.posttypes.model.CommentViewData
@@ -40,19 +41,28 @@ class ItemPostDetailReplyViewDataBinder constructor(
     ) {
         initReplyView(
             binding,
-            data
+            data,
+            position
         )
     }
 
     private fun initReplyView(
         binding: ItemPostDetailReplyBinding,
-        data: CommentViewData
+        data: CommentViewData,
+        position: Int
     ) {
         binding.apply {
             val context = root.context
 
             tvCommenterName.text = data.user.name
-            tvCommentContent.text = data.text
+
+            PostDetailUtil.initTextContent(
+                tvCommentContent,
+                data,
+                position,
+                postDetailAdapterListener,
+                data.parentId
+            )
 
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_comment_filled)
