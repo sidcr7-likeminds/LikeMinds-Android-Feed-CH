@@ -20,6 +20,7 @@ import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 
 object PostDetailUtil {
+    // initialized text content in comment with level-0,1
     fun initTextContent(
         tvCommentContent: TextView,
         data: CommentViewData,
@@ -44,6 +45,7 @@ object PostDetailUtil {
             tvCommentContent.show()
         }
 
+        // span for seeMore feature
         val seeMoreColor = ContextCompat.getColor(context, R.color.brown_grey)
         val seeMore = SpannableStringBuilder(context.getString(R.string.see_more))
         seeMore.setSpan(
@@ -69,6 +71,7 @@ object PostDetailUtil {
 
         // post is used here to get lines count in the text view
         tvCommentContent.post {
+            // gets short text to set with seeMore
             val shortText: String? = SeeMoreUtil.getShortContent(
                 data.text,
                 tvCommentContent,
@@ -84,6 +87,7 @@ object PostDetailUtil {
                 }
 
             // TODO: remove branding
+            // decodes tags in text and creates span around those tags
             MemberTaggingDecoder.decode(
                 tvCommentContent,
                 trimmedText,
@@ -114,6 +118,7 @@ object PostDetailUtil {
                 true
             }
 
+            // appends see more text at last
             tvCommentContent.text = TextUtils.concat(
                 tvCommentContent.text,
                 seeMoreSpannableStringBuilder

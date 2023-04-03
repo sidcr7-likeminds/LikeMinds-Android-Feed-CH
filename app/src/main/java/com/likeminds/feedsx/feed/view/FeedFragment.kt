@@ -74,6 +74,7 @@ class FeedFragment :
 
     private val viewModel: FeedViewModel by viewModels()
 
+    // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
     private val postActionsViewModel: PostActionsViewModel by activityViewModels()
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
@@ -398,6 +399,12 @@ class FeedFragment :
         lmExoplayer.release()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // unsubscribes itself from the [PostPublisher]
+        PostPublisher.getPublisher().unsubscribe(this)
+    }
+
     // initiates SDK
     private fun initiateSDK() {
         ProgressHelper.showProgress(binding.progressBar)
@@ -591,9 +598,13 @@ class FeedFragment :
     /**
      * Post Actions block
      **/
+
+    // updates [alreadySeenFullContent] for the post
     override fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
+        // get item from adapter
         val item = mPostAdapter[position]
         if (item is PostViewData) {
+            // update the post view data
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .fromPostSaved(false)
@@ -604,6 +615,7 @@ class FeedFragment :
         }
     }
 
+    // calls the savePost api and updates the post in adapter
     override fun savePost(position: Int) {
         //get item
         val item = mPostAdapter[position]
@@ -622,6 +634,7 @@ class FeedFragment :
         }
     }
 
+    // calls the likePost api and updates the post in adapter
     override fun likePost(position: Int) {
         //get item
         val item = mPostAdapter[position]
@@ -647,6 +660,7 @@ class FeedFragment :
         }
     }
 
+    // callback when post menu items are clicked
     override fun onPostMenuItemClicked(
         postId: String,
         creatorId: String,
@@ -726,11 +740,13 @@ class FeedFragment :
             .build()
 
         if (creatorId == postActionsViewModel.getUserUniqueId()) {
+            // if the post was created by current user
             SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
         } else {
+            // if the post was not created by current user and they are admin
             AdminDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
@@ -766,6 +782,7 @@ class FeedFragment :
             }
         }
 
+    // calls the pinPost api and updates pins the post in adapter
     private fun pinPost(postId: String) {
         //get item
         val postAndIndex = getIndexAndPostFromAdapter(postId)
@@ -799,6 +816,7 @@ class FeedFragment :
         mPostAdapter.update(index, newViewData)
     }
 
+    // calls the pinPost api and updates unpins the post in adapter
     private fun unpinPost(postId: String) {
         //get item
         val postAndIndex = getIndexAndPostFromAdapter(postId)
@@ -914,6 +932,7 @@ class FeedFragment :
         }
     }
 
+    // shows all attachment documents in list view and updates [isExpanded]
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostAdapter.items().size - 1) {
             binding.recyclerView.post {
@@ -932,6 +951,23 @@ class FeedFragment :
         )
     }
 
+    // callback when publisher publishes any updated postData
+    override fun update(postData: Pair<String, PostViewData?>) {
+        val postId = postData.first
+        // fetches post from adapter
+        val postIndex = getIndexAndPostFromAdapter(postId).first
+
+        val updatedPost = postData.second
+
+        // updates the item in adapter
+        if (updatedPost == null) {
+            // Post was deleted!
+            mPostAdapter.removeIndex(postIndex)
+        } else {
+            // Post was updated
+            mPostAdapter.update(postIndex, updatedPost)
+        }
+    }
 
     /**
      * Adapter Util Block
@@ -963,25 +999,5 @@ class FeedFragment :
             position,
             px
         )
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        PostPublisher.getPublisher().unsubscribe(this)
-    }
-
-    override fun update(postData: Pair<String, PostViewData?>) {
-        val postId = postData.first
-        val postIndex = getIndexAndPostFromAdapter(postId).first
-
-        val updatedPost = postData.second
-
-        if (updatedPost == null) {
-            // Post was deleted!
-            mPostAdapter.removeIndex(postIndex)
-        } else {
-            // Post was updated
-            mPostAdapter.update(postIndex, updatedPost)
-        }
     }
 }

@@ -2,6 +2,7 @@ package com.likeminds.feedsx.feed.util
 
 import com.likeminds.feedsx.posttypes.model.PostViewData
 
+// publisher to publish post data and notify observers
 class PostPublisher {
     companion object {
         private var postPublisher: PostPublisher? = null

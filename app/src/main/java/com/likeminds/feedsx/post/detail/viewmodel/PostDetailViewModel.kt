@@ -41,9 +41,11 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
     private val _deleteCommentResponse = MutableLiveData<Pair<String, String?>>()
     val deleteCommentResponse: LiveData<Pair<String, String?>> = _deleteCommentResponse
 
+    // it holds the Pair of [page] and [postViewData]
     private val _postResponse = MutableLiveData<Pair<Int, PostViewData>>()
     val postResponse: LiveData<Pair<Int, PostViewData>> = _postResponse
 
+    // it holds the Pair of [page] and [commentViewData]
     private val _getCommentResponse = MutableLiveData<Pair<Int, CommentViewData>>()
     val getCommentResponse: LiveData<Pair<Int, CommentViewData>> = _getCommentResponse
 
@@ -75,6 +77,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         const val REPLIES_PAGE_SIZE = 5
     }
 
+    // to getPost and paginated comments
     fun getPost(postId: String, page: Int) {
         viewModelScope.launchIO {
             // builds api request
@@ -84,6 +87,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 .pageSize(PAGE_SIZE)
                 .build()
 
+            // calls api
             val response = lmFeedClient.getPost(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
@@ -125,6 +129,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // for adding comment on post
     fun addComment(postId: String, text: String) {
         viewModelScope.launchIO {
             // builds api request
@@ -133,6 +138,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 .text(text)
                 .build()
 
+            // calls api
             val response = lmFeedClient.addComment(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
@@ -151,6 +157,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // for replying on a comment on the post
     fun replyComment(
         postId: String,
         parentCommentId: String,
@@ -164,6 +171,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 .text(text)
                 .build()
 
+            // calls api
             val response = lmFeedClient.replyComment(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
@@ -186,6 +194,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // to get comment with paginated replies
     fun getComment(
         postId: String,
         commentId: String,
@@ -200,6 +209,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 .pageSize(REPLIES_PAGE_SIZE)
                 .build()
 
+            // calls api
             val response = lmFeedClient.getComment(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
@@ -221,6 +231,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // for deleting comment/reply
     fun deleteComment(
         postId: String,
         commentId: String,
@@ -234,7 +245,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 .reason(reason)
                 .build()
 
-            //call delete post api
+            //call delete comment api
             val response = lmFeedClient.deleteComment(request)
 
             if (response.success) {

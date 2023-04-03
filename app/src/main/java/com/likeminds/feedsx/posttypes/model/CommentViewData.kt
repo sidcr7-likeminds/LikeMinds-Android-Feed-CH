@@ -23,8 +23,8 @@ class CommentViewData private constructor(
     var menuItems: List<OverflowMenuItemViewData>,
     var replies: MutableList<CommentViewData>,
     var parentId: String?,
-    val alreadySeenFullContent: Boolean?,
-    val fromCommentLiked: Boolean,
+    var alreadySeenFullContent: Boolean?,
+    var fromCommentLiked: Boolean,
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = when (level) {

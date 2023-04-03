@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
-import android.text.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -156,7 +155,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     commentSeparator.hide()
                     replyCommentSeparator.show()
                     tvReplyCount.isClickable = false
-                    handleViewMore(data, position)
+                    handleViewMore(data)
                 } else {
                     rvReplies.hide()
                     commentSeparator.show()
@@ -193,18 +192,19 @@ class ItemPostDetailCommentViewDataBinder constructor(
     }
 
     // adds ViewMoreReply view when required
-    private fun handleViewMore(data: CommentViewData, position: Int) {
+    private fun handleViewMore(data: CommentViewData) {
         val repliesList = data.replies.toMutableList() as MutableList<BaseViewType>
         if (repliesList.size >= data.repliesCount) {
+            // if all replies are fetched then only replace the data
             mRepliesAdapter.replace(repliesList)
         } else {
+            // if a subset of replies are fetched then also add [ViewMoreReplyViewData]
             val nextPage = (repliesList.size / PostDetailFragment.REPLIES_THRESHOLD) + 1
             val viewMoreReply = ViewMoreReplyViewData.Builder()
                 .totalCommentsCount(data.repliesCount)
                 .currentCount(data.replies.size)
                 .parentCommentId(data.id)
                 .page(nextPage)
-                .parentCommentPosition(position)
                 .build()
             repliesList.add(viewMoreReply)
 

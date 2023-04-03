@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -87,6 +88,7 @@ class CreatePostFragment :
         initPostDoneListener()
     }
 
+    // fetches user data from local db
     private fun fetchUserFromDB() {
         viewModel.fetchUserFromDB()
     }
@@ -159,6 +161,10 @@ class CreatePostFragment :
     }
 
     // TODO: remove branding
+    /**
+     * initializes the [memberTaggingView] with the edit text
+     * also sets listener to the [memberTaggingView]
+     */
     private fun initMemberTaggingView() {
         memberTagging = binding.memberTaggingView
         memberTagging.initialize(
@@ -200,21 +206,30 @@ class CreatePostFragment :
                 }
                 false
             })
+
+            // text watcher with debounce to add delay in api calls for ogTags
             textChanges()
                 .debounce(500)
                 .distinctUntilChanged()
                 .onEach {
                     val text = it?.toString()?.trim()
-                    if (text.isNullOrEmpty()) {
-                        clearPreviewLink()
-                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                        else handlePostButton(true)
-                    } else {
+                    if (!text.isNullOrEmpty()) {
                         showPostMedia()
-                        handlePostButton(true)
                     }
                 }
                 .launchIn(lifecycleScope)
+
+            // text watcher to handlePostButton click-ability
+            addTextChangedListener {
+                val text = it?.toString()?.trim()
+                if (text.isNullOrEmpty()) {
+                    clearPreviewLink()
+                    if (selectedMediaUris.isEmpty()) handlePostButton(false)
+                    else handlePostButton(true)
+                } else {
+                    handlePostButton(true)
+                }
+            }
         }
     }
 
