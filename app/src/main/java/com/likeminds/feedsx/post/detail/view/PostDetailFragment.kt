@@ -74,6 +74,7 @@ class PostDetailFragment :
 
     private lateinit var memberTagging: MemberTaggingView
 
+    private val postDataPosition = 0
     private val commentsCountPosition = 1
     private val commentsStartPosition = 2
 
@@ -251,7 +252,7 @@ class PostDetailFragment :
             if (page == 1) {
                 setPostDataAndScrollToTop(post)
             } else {
-//                mPostDetailAdapter.addAll(post)
+                updatePostAndAddComments(post)
             }
         }
 
@@ -277,10 +278,15 @@ class PostDetailFragment :
     }
 
     private fun setPostDataAndScrollToTop(post: PostViewData) {
-        mPostDetailAdapter.add(0, post)
+        mPostDetailAdapter.add(postDataPosition, post)
         handleCommentsCountView(post.commentsCount)
         mPostDetailAdapter.addAll(post.replies.toList())
-        binding.rvPostDetails.scrollToPosition(0)
+        binding.rvPostDetails.scrollToPosition(postDataPosition)
+    }
+
+    private fun updatePostAndAddComments(post: PostViewData) {
+        mPostDetailAdapter.update(postDataPosition, post)
+        mPostDetailAdapter.addAll(post.replies.toList())
     }
 
     private fun handleCommentsCountView(commentsCount: Int) {
@@ -291,7 +297,7 @@ class PostDetailFragment :
             } else {
                 tvNoComment.isVisible = false
                 tvBeFirst.isVisible = false
-                mPostDetailAdapter.add(1, convertCommentsCount(commentsCount))
+                mPostDetailAdapter.add(commentsCountPosition, convertCommentsCount(commentsCount))
             }
         }
     }
@@ -503,7 +509,9 @@ class PostDetailFragment :
     ) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
-                // TODO: add logic
+                if (currentPage > 0) {
+                    viewModel.getPost(postDetailExtras.postId, currentPage)
+                }
             }
         })
     }
