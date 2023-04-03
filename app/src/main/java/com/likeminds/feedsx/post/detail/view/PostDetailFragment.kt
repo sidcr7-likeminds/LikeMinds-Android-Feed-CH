@@ -18,6 +18,7 @@ import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
+import com.likeminds.feedsx.feed.util.PostObserver
 import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -80,6 +81,8 @@ class PostDetailFragment :
     private val commentsCountPosition = 1
     private val commentsStartPosition = 2
 
+    private val postPublisher = PostObserver.getPublisher()
+
     companion object {
         const val REPLIES_THRESHOLD = 5
     }
@@ -110,21 +113,36 @@ class PostDetailFragment :
 
     private fun observeCommentData() {
         // observes addCommentResponse LiveData
-        viewModel.addCommentResponse.observe(viewLifecycleOwner) {
+        viewModel.addCommentResponse.observe(viewLifecycleOwner) { comment ->
             // gets old [CommentsCountViewData] from adapter
-            val oldCommentsCountViewData =
-                (mPostDetailAdapter[commentsCountPosition] as CommentsCountViewData)
+            if (mPostDetailAdapter[commentsCountPosition] != null) {
+                val oldCommentsCountViewData =
+                    (mPostDetailAdapter[commentsCountPosition] as CommentsCountViewData)
 
-            // creates new [CommentsCountViewData] by adding to [commentsCount]
-            val newCommentsCountViewData = oldCommentsCountViewData.toBuilder()
-                .commentsCount(oldCommentsCountViewData.commentsCount + 1)
+                // updates old [CommentsCountViewData] by adding to [commentsCount]
+                val updatedCommentsCountViewData = oldCommentsCountViewData.toBuilder()
+                    .commentsCount(oldCommentsCountViewData.commentsCount + 1)
+                    .build()
+
+                // updates [CommentsCountViewData]
+                mPostDetailAdapter.update(commentsCountPosition, updatedCommentsCountViewData)
+            } else {
+                // creates new [CommentsCountViewData] when the added comment is first
+                val newCommentsCountViewData = CommentsCountViewData.Builder()
+                    .commentsCount(1)
+                    .build()
+                mPostDetailAdapter.add(commentsCountPosition, newCommentsCountViewData)
+            }
+
+            // publishes the post with updated commentsCount
+            var post = getIndexAndPostFromAdapter(comment.postId).second
+            post = post.toBuilder()
+                .commentsCount(post.commentsCount + 1)
                 .build()
-
-            // updates [CommentsCountViewData]
-            mPostDetailAdapter.update(commentsCountPosition, newCommentsCountViewData)
+            postPublisher.notify(Pair(post.id, post))
 
             // adds new comment to adapter
-            mPostDetailAdapter.add(commentsStartPosition, it)
+            mPostDetailAdapter.add(commentsStartPosition, comment)
         }
 
         // observes addReplyResponse LiveData
@@ -243,6 +261,8 @@ class PostDetailFragment :
             // post data
             val post = pair.second
 
+            postPublisher.notify(Pair(post.id, post))
+
             // update the comments count
             updateCommentsCount(post.commentsCount)
 
@@ -263,7 +283,7 @@ class PostDetailFragment :
 
         // observes deletePostResponse LiveData
         postSharedViewModel.deletePostResponse.observe(viewLifecycleOwner) {
-            // todo pass the data to feed
+            publishPostDeleted()
             ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
@@ -274,12 +294,17 @@ class PostDetailFragment :
         // observes pinPostResponse LiveData
         postSharedViewModel.pinPostResponse.observe(viewLifecycleOwner) {
             val post = mPostDetailAdapter[postDataPosition] as PostViewData
+            postPublisher.notify(Pair(post.id, post))
             if (post.isPinned) {
                 ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
             } else {
                 ViewUtils.showShortToast(requireContext(), getString(R.string.post_unpinned))
             }
         }
+    }
+
+    private fun publishPostDeleted() {
+        postPublisher.notify(Pair(postDetailExtras.postId, null))
     }
 
     private fun setPostDataAndScrollToTop(post: PostViewData) {
@@ -302,6 +327,7 @@ class PostDetailFragment :
     }
 
     private fun updatePostAndAddComments(post: PostViewData) {
+        postPublisher.notify(Pair(post.id, post))
         mPostDetailAdapter.update(postDataPosition, post)
         mPostDetailAdapter.addAll(post.replies.toList())
     }
@@ -391,6 +417,8 @@ class PostDetailFragment :
                         .likesCount(post.likesCount - 1)
                         .build()
 
+                    postPublisher.notify(Pair(updatedPost.id, updatedPost))
+
                     //update recycler view
                     mPostDetailAdapter.update(index, updatedPost)
 
@@ -411,6 +439,8 @@ class PostDetailFragment :
                         .isSaved(false)
                         .fromPostSaved(true)
                         .build()
+
+                    postPublisher.notify(Pair(updatedPost.id, updatedPost))
 
                     //update recycler view
                     mPostDetailAdapter.update(index, updatedPost)
@@ -580,14 +610,6 @@ class PostDetailFragment :
         }
     }
 
-    private fun addCommentToAdapter() {
-
-    }
-
-    private fun addReplyToAdapter() {
-
-    }
-
     private fun hideReplyingToView() {
         binding.apply {
             parentCommentIdToReply = null
@@ -725,6 +747,8 @@ class PostDetailFragment :
                 .likesCount(newLikesCount)
                 .build()
 
+            postPublisher.notify(Pair(newViewData.id, newViewData))
+
             //call api
             postSharedViewModel.likePost(newViewData.id)
             //update recycler
@@ -741,6 +765,8 @@ class PostDetailFragment :
                 .fromPostSaved(true)
                 .isSaved(!item.isSaved)
                 .build()
+
+            postPublisher.notify(Pair(newViewData.id, newViewData))
 
             //call api
             postSharedViewModel.savePost(newViewData.id)

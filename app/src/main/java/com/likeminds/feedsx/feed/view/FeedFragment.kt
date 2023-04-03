@@ -24,6 +24,8 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
+import com.likeminds.feedsx.feed.util.PostChangesListener
+import com.likeminds.feedsx.feed.util.PostObserver
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -67,7 +69,8 @@ class FeedFragment :
     PostAdapterListener,
     AdminDeleteDialogFragment.DeleteDialogListener,
     SelfDeleteDialogFragment.DeleteAlertDialogListener,
-    LMExoplayerListener {
+    LMExoplayerListener,
+    PostChangesListener {
 
     private val viewModel: FeedViewModel by viewModels()
 
@@ -676,6 +679,7 @@ class FeedFragment :
 
     //opens post detail screen when add comment/comments count is clicked
     override fun comment(postId: String) {
+        PostObserver.getPublisher().subscribe(this)
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postId)
             .isEditTextFocused(true)
@@ -685,6 +689,7 @@ class FeedFragment :
 
     //opens post detail screen when post content is clicked
     override fun postDetail(postData: PostViewData) {
+        PostObserver.getPublisher().subscribe(this)
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
@@ -958,5 +963,20 @@ class FeedFragment :
             position,
             px
         )
+    }
+
+    override fun update(postData: Pair<String, PostViewData?>) {
+        val postId = postData.first
+        val postIndex = getIndexAndPostFromAdapter(postId).first
+
+        val updatedPost = postData.second
+
+        if (updatedPost == null) {
+            // Post was deleted!
+            mPostAdapter.removeIndex(postIndex)
+        } else {
+            // Post was updated
+            mPostAdapter.update(postIndex, updatedPost)
+        }
     }
 }
