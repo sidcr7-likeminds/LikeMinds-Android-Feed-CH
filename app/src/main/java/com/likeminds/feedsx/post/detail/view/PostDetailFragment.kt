@@ -40,7 +40,8 @@ import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.ViewDataConverter.convertCommentsCount
+import com.likeminds.feedsx.utils.ProgressHelper
+import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -49,6 +50,7 @@ import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 
@@ -68,6 +70,7 @@ class PostDetailFragment :
     private lateinit var postDetailExtras: PostDetailExtras
 
     private lateinit var mPostDetailAdapter: PostDetailAdapter
+    private lateinit var mScrollListener: EndlessRecyclerScrollListener
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     private var parentCommentIdToReply: String? = null
@@ -233,6 +236,8 @@ class PostDetailFragment :
 
     private fun observePostData() {
         viewModel.postResponse.observe(viewLifecycleOwner) { pair ->
+            //hide progress bar
+            ProgressHelper.hideProgress(binding.progressBar)
             //page in sent in api
             val page = pair.first
 
@@ -246,6 +251,7 @@ class PostDetailFragment :
             if (mSwipeRefreshLayout.isRefreshing) {
                 setPostDataAndScrollToTop(post)
                 mSwipeRefreshLayout.isRefreshing = false
+                return@observe
             }
 
             //normal adding
@@ -278,9 +284,21 @@ class PostDetailFragment :
     }
 
     private fun setPostDataAndScrollToTop(post: PostViewData) {
-        mPostDetailAdapter.add(postDataPosition, post)
-        handleCommentsCountView(post.commentsCount)
-        mPostDetailAdapter.addAll(post.replies.toList())
+        val postDetailList = ArrayList<BaseViewType>()
+        postDetailList.add(postDataPosition, post)
+
+        if (post.commentsCount == 0) {
+            handleNoCommentsView(true)
+        } else {
+            handleNoCommentsView(false)
+            postDetailList.add(
+                commentsCountPosition,
+                ViewDataConverter.convertCommentsCount(post.commentsCount)
+            )
+        }
+
+        postDetailList.addAll(post.replies.toList())
+        mPostDetailAdapter.replace(postDetailList)
         binding.rvPostDetails.scrollToPosition(postDataPosition)
     }
 
@@ -289,20 +307,16 @@ class PostDetailFragment :
         mPostDetailAdapter.addAll(post.replies.toList())
     }
 
-    private fun handleCommentsCountView(commentsCount: Int) {
+    private fun handleNoCommentsView(isVisible: Boolean) {
         binding.apply {
-            if (commentsCount == 0) {
-                tvNoComment.isVisible = true
-                tvBeFirst.isVisible = true
-            } else {
-                tvNoComment.isVisible = false
-                tvBeFirst.isVisible = false
-                mPostDetailAdapter.add(commentsCountPosition, convertCommentsCount(commentsCount))
-            }
+            tvNoComment.isVisible = isVisible
+            tvBeFirst.isVisible = isVisible
         }
     }
 
     private fun fetchPostData() {
+        // show progress bar
+        ProgressHelper.showProgress(binding.progressBar)
         viewModel.getPost(postDetailExtras.postId, 1)
     }
 
@@ -325,6 +339,7 @@ class PostDetailFragment :
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.GetPost -> {
+                    mSwipeRefreshLayout.isRefreshing = false
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.LikeComment -> {
@@ -482,14 +497,15 @@ class PostDetailFragment :
         )
 
         mSwipeRefreshLayout.setOnRefreshListener {
-            mSwipeRefreshLayout.isRefreshing = true
-            fetchRefreshedData()
+            refreshPostData()
         }
     }
 
-    //TODO: Call api and refresh the post data
-    private fun fetchRefreshedData() {
-        mSwipeRefreshLayout.isRefreshing = false
+    // refreshes the whole post detail screen
+    private fun refreshPostData() {
+        mSwipeRefreshLayout.isRefreshing = true
+        mScrollListener.resetData()
+        viewModel.getPost(postDetailExtras.postId, 1)
     }
 
     // updates the comments count on toolbar
@@ -507,13 +523,14 @@ class PostDetailFragment :
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager
     ) {
-        recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
+        mScrollListener = object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 if (currentPage > 0) {
                     viewModel.getPost(postDetailExtras.postId, currentPage)
                 }
             }
-        })
+        }
+        recyclerView.addOnScrollListener(mScrollListener)
     }
 
     // initializes comment edittext with TextWatcher and focuses the keyboard
