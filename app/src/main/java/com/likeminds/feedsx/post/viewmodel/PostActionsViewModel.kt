@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class PostViewModel @Inject constructor(
+class PostActionsViewModel @Inject constructor(
     private val userPreferences: UserPreferences
 ) : ViewModel() {
 

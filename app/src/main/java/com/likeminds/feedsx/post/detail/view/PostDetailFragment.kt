@@ -18,7 +18,7 @@ import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
-import com.likeminds.feedsx.feed.util.PostObserver
+import com.likeminds.feedsx.feed.util.PostPublisher
 import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -31,7 +31,7 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
-import com.likeminds.feedsx.post.viewmodel.PostViewModel
+import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -65,7 +65,7 @@ class PostDetailFragment :
 
     private val viewModel: PostDetailViewModel by viewModels()
 
-    private val postSharedViewModel: PostViewModel by activityViewModels()
+    private val postActionsViewModel: PostActionsViewModel by activityViewModels()
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -81,7 +81,7 @@ class PostDetailFragment :
     private val commentsCountPosition = 1
     private val commentsStartPosition = 2
 
-    private val postPublisher = PostObserver.getPublisher()
+    private val postPublisher = PostPublisher.getPublisher()
 
     companion object {
         const val REPLIES_THRESHOLD = 5
@@ -282,7 +282,7 @@ class PostDetailFragment :
         }
 
         // observes deletePostResponse LiveData
-        postSharedViewModel.deletePostResponse.observe(viewLifecycleOwner) {
+        postActionsViewModel.deletePostResponse.observe(viewLifecycleOwner) {
             publishPostDeleted()
             ViewUtils.showShortToast(
                 requireContext(),
@@ -292,7 +292,7 @@ class PostDetailFragment :
         }
 
         // observes pinPostResponse LiveData
-        postSharedViewModel.pinPostResponse.observe(viewLifecycleOwner) {
+        postActionsViewModel.pinPostResponse.observe(viewLifecycleOwner) {
             val post = mPostDetailAdapter[postDataPosition] as PostViewData
             postPublisher.notify(Pair(post.id, post))
             if (post.isPinned) {
@@ -400,9 +400,9 @@ class PostDetailFragment :
             }
         }
 
-        postSharedViewModel.errorMessageEventFlow.onEach { response ->
+        postActionsViewModel.errorMessageEventFlow.onEach { response ->
             when (response) {
-                is PostViewModel.ErrorMessageEvent.LikePost -> {
+                is PostActionsViewModel.ErrorMessageEvent.LikePost -> {
                     val postId = response.postId
 
                     //get post and index
@@ -426,7 +426,7 @@ class PostDetailFragment :
                     val errorMessage = response.errorMessage
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
-                is PostViewModel.ErrorMessageEvent.SavePost -> {
+                is PostActionsViewModel.ErrorMessageEvent.SavePost -> {
                     val postId = response.postId
 
                     //get post and index
@@ -449,11 +449,11 @@ class PostDetailFragment :
                     val errorMessage = response.errorMessage
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
-                is PostViewModel.ErrorMessageEvent.DeletePost -> {
+                is PostActionsViewModel.ErrorMessageEvent.DeletePost -> {
                     val errorMessage = response.errorMessage
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
-                is PostViewModel.ErrorMessageEvent.PinPost -> {
+                is PostActionsViewModel.ErrorMessageEvent.PinPost -> {
                     val postId = response.postId
 
                     //get post and index
@@ -659,7 +659,7 @@ class PostDetailFragment :
     }
 
     private fun showDeleteDialog(creatorId: String, deleteExtras: DeleteExtras) {
-        if (creatorId == postSharedViewModel.getUserUniqueId()) {
+        if (creatorId == postActionsViewModel.getUserUniqueId()) {
             // when user deletes their own entity
             SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
@@ -750,7 +750,7 @@ class PostDetailFragment :
             postPublisher.notify(Pair(newViewData.id, newViewData))
 
             //call api
-            postSharedViewModel.likePost(newViewData.id)
+            postActionsViewModel.likePost(newViewData.id)
             //update recycler
             mPostDetailAdapter.update(position, newViewData)
         }
@@ -769,7 +769,7 @@ class PostDetailFragment :
             postPublisher.notify(Pair(newViewData.id, newViewData))
 
             //call api
-            postSharedViewModel.savePost(newViewData.id)
+            postActionsViewModel.savePost(newViewData.id)
 
             //update recycler
             mPostDetailAdapter.update(position, newViewData)
@@ -1004,7 +1004,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        postSharedViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(postId)
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
@@ -1036,7 +1036,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        postSharedViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(postId)
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
@@ -1121,7 +1121,7 @@ class PostDetailFragment :
     override fun selfDelete(deleteExtras: DeleteExtras) {
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> {
-                postSharedViewModel.deletePost(deleteExtras.postId)
+                postActionsViewModel.deletePost(deleteExtras.postId)
             }
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
@@ -1138,7 +1138,7 @@ class PostDetailFragment :
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> {
-                postSharedViewModel.deletePost(deleteExtras.postId, reason)
+                postActionsViewModel.deletePost(deleteExtras.postId, reason)
             }
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
