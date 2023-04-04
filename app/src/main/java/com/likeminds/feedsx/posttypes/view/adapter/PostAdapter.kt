@@ -62,7 +62,7 @@ interface PostAdapterListener {
     fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
     fun showLikesScreen(postId: String)
     fun postDetail(postData: PostViewData) {}
-    fun updateFromLikedSaved(position: Int) {}
+    fun updateFromLikedSaved(position: Int)
     fun sendMediaItemToExoPlayer(
         position: Int,
         playerView: StyledPlayerView,

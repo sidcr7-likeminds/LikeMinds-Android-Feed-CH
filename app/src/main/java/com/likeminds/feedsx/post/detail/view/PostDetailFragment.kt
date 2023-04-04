@@ -170,9 +170,6 @@ class PostDetailFragment :
         postActionsViewModel.pinPostResponse.observe(viewLifecycleOwner) {
             val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
-            // notifies the subscribers about the change in post data
-            postPublisher.notify(Pair(post.id, post))
-
             if (post.isPinned) {
                 ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
             } else {
@@ -244,6 +241,7 @@ class PostDetailFragment :
                 val newCommentsCountViewData = CommentsCountViewData.Builder()
                     .commentsCount(1)
                     .build()
+                handleNoCommentsView(false)
                 mPostDetailAdapter.add(commentsCountPosition, newCommentsCountViewData)
             }
 
@@ -258,6 +256,9 @@ class PostDetailFragment :
 
             // adds new comment to adapter
             mPostDetailAdapter.add(commentsStartPosition, comment)
+
+            // updates comment data in post
+            mPostDetailAdapter.update(postDataPosition, post)
         }
 
         // observes addReplyResponse LiveData
@@ -1048,6 +1049,9 @@ class PostDetailFragment :
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
+
+        // notifies the subscribers about the change in post data
+        postPublisher.notify(Pair(newViewData.id, newViewData))
     }
 
     private fun unpinPost(postId: String) {
@@ -1080,6 +1084,9 @@ class PostDetailFragment :
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
+
+        // notifies the subscribers about the change in post data
+        postPublisher.notify(Pair(newViewData.id, newViewData))
     }
 
     // callback for comment's menu is item
@@ -1201,5 +1208,16 @@ class PostDetailFragment :
             .entityType(COMMENT)
             .build()
         LikesActivity.start(requireContext(), likesScreenExtras)
+    }
+
+    // updates the fromPostLiked/fromPostSaved variables and updates the rv list
+    override fun updateFromLikedSaved(position: Int) {
+        var postData = mPostDetailAdapter[postDataPosition] as PostViewData
+        postData = postData.toBuilder()
+            .fromPostLiked(false)
+            .fromPostSaved(false)
+            .fromVideoAction(false)
+            .build()
+        mPostDetailAdapter.updateWithoutNotifyingRV(position, postData)
     }
 }
