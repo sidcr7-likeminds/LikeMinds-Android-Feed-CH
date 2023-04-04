@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
@@ -249,11 +250,28 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             val response = lmFeedClient.deleteComment(request)
 
             if (response.success) {
+                sendCommentReplyDeletedEvent(postId, commentId)
                 _deleteCommentResponse.postValue(Pair(commentId, parentCommentId))
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.DeleteComment(response.errorMessage))
             }
         }
+    }
+
+    private fun sendCommentReplyDeletedEvent(
+        postId: String,
+        commentId: String,
+        parentCommentId: String?
+    ) {
+        if (parentCommentId == null) {
+            LMAnalytics.track()
+        } else {
+            LMAnalytics.track()
+        }
+    }
+
+    private fun sendReplyDeletedEvent() {
+
     }
 
     // calls api to get members for tagging
