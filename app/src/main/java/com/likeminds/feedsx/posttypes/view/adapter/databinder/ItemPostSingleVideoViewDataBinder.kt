@@ -1,9 +1,7 @@
 package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.google.android.exoplayer2.MediaItem
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
@@ -75,15 +73,7 @@ class ItemPostSingleVideoViewDataBinder constructor(
             returnBinder = {
                 return@initPostTypeBindData
             }, executeBinder = {
-                val videoUri = Uri.parse(data.attachments.first().attachmentMeta.url)
-                val mediaItem = MediaItem.fromUri(videoUri)
-                listener.sendMediaItemToExoPlayer(position, binding.videoPost, mediaItem)
-//                binding.videoPost.setVideoURI(video)
-//                binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
-//                    mp.isLooping = true
-//                    binding.iconVideoPlay.hide()
-//                    binding.videoPost.start()
-//                })
+
             })
     }
 }

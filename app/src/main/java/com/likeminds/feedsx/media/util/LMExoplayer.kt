@@ -38,9 +38,8 @@ class LMExoplayer @Inject constructor(@ApplicationContext private val context: C
         exoplayer.addListener(this)
     }
 
-    fun setMediaItem(position: Int, mediaItem: MediaItem) {
+    fun setMediaItem(mediaItem: MediaItem) {
         Log.d("PUI", "setting item")
-        positionOfItemInAdapter = position
         clear()
         exoplayer.addMediaItem(mediaItem)
         Log.d("PUI", "prepare exo")
