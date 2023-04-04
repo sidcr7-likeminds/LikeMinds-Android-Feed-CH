@@ -145,6 +145,8 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val comment = data.comment
                 val users = data.users
+                sendCommentPostedEvent(postId, comment.id)
+
                 _addCommentResponse.postValue(
                     ViewDataConverter.convertComment(
                         comment,
@@ -156,6 +158,16 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
         }
+    }
+
+    private fun sendCommentPostedEvent(postId: String, commentId: String) {
+        LMAnalytics.track(
+            LMAnalytics.COMMENT_POSTED,
+            mapOf(
+                LMAnalytics.POST_ID to postId,
+                LMAnalytics.COMMENT_ID to commentId
+            )
+        )
     }
 
     // for replying on a comment on the post
@@ -178,6 +190,14 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val comment = data.comment
                 val users = data.users
+                // todo: add user id
+                sendReplyPostedEvent(
+                    "user_id",
+                    postId,
+                    parentCommentId,
+                    comment.id
+                )
+
                 _addReplyResponse.postValue(
                     Pair(
                         parentCommentId,
@@ -193,6 +213,23 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
         }
+    }
+
+    private fun sendReplyPostedEvent(
+        userId: String,
+        postId: String,
+        parentCommentId: String,
+        commentId: String,
+    ) {
+        LMAnalytics.track(
+            LMAnalytics.COMMENT_POSTED,
+            mapOf(
+                LMAnalytics.USER_ID to userId,
+                LMAnalytics.POST_ID to postId,
+                LMAnalytics.COMMENT_ID to parentCommentId,
+                LMAnalytics.COMMENT_REPLY_ID to commentId
+            )
+        )
     }
 
     // to get comment with paginated replies
@@ -250,7 +287,11 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             val response = lmFeedClient.deleteComment(request)
 
             if (response.success) {
-                sendCommentReplyDeletedEvent(postId, commentId)
+                sendCommentReplyDeletedEvent(
+                    postId,
+                    commentId,
+                    parentCommentId
+                )
                 _deleteCommentResponse.postValue(Pair(commentId, parentCommentId))
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.DeleteComment(response.errorMessage))
@@ -264,14 +305,25 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         parentCommentId: String?
     ) {
         if (parentCommentId == null) {
-            LMAnalytics.track()
+            // comment deleted event
+            LMAnalytics.track(
+                LMAnalytics.COMMENT_DELETED,
+                mapOf(
+                    LMAnalytics.POST_ID to postId,
+                    LMAnalytics.COMMENT_ID to commentId
+                )
+            )
         } else {
-            LMAnalytics.track()
+            // reply deleted event
+            LMAnalytics.track(
+                LMAnalytics.REPLY_DELETED,
+                mapOf(
+                    LMAnalytics.POST_ID to postId,
+                    LMAnalytics.COMMENT_ID to parentCommentId,
+                    LMAnalytics.COMMENT_REPLY_ID to commentId,
+                )
+            )
         }
-    }
-
-    private fun sendReplyDeletedEvent() {
-
     }
 
     // calls api to get members for tagging

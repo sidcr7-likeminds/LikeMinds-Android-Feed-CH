@@ -439,6 +439,8 @@ class FeedFragment :
                     getString(R.string.a_post_is_already_uploading)
                 )
             } else {
+                viewModel.sendPostCreationStartedEvent()
+
                 val intent = CreatePostActivity.getIntent(requireContext())
                 createPostLauncher.launch(intent)
             }
@@ -517,21 +519,23 @@ class FeedFragment :
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                val isExtended = binding.newPostButton.isExtended
+                binding.apply {
+                    val isExtended = newPostButton.isExtended
 
-                // Scroll down
-                if (dy > 20 && isExtended) {
-                    binding.newPostButton.shrink()
-                }
+                    // Scroll down
+                    if (dy > 20 && isExtended) {
+                        newPostButton.shrink()
+                    }
 
-                // Scroll up
-                if (dy < -20 && !isExtended) {
-                    binding.newPostButton.extend()
-                }
+                    // Scroll up
+                    if (dy < -20 && !isExtended) {
+                        newPostButton.extend()
+                    }
 
-                // At the top
-                if (!recyclerView.canScrollVertically(-1)) {
-                    binding.newPostButton.extend()
+                    // At the top
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        newPostButton.extend()
+                    }
                 }
             }
         }
@@ -694,6 +698,7 @@ class FeedFragment :
     //opens post detail screen when add comment/comments count is clicked
     override fun comment(postId: String) {
         PostPublisher.getPublisher().subscribe(this)
+        viewModel.sendCommentListOpenEvent()
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postId)
             .isEditTextFocused(true)
@@ -704,6 +709,8 @@ class FeedFragment :
     //opens post detail screen when post content is clicked
     override fun postDetail(postData: PostViewData) {
         PostPublisher.getPublisher().subscribe(this)
+        // todo: ask
+        viewModel.sendCommentListOpenEvent()
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)

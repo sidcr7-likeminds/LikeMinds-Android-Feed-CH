@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
@@ -288,5 +289,16 @@ class FeedViewModel @Inject constructor(
             uploadData.first.enqueue()
             fetchPendingPostFromDB()
         }
+    }
+
+    /**
+     * Triggers when the user clicks on New Post button
+     **/
+    fun sendPostCreationStartedEvent() {
+        LMAnalytics.track(LMAnalytics.POST_CREATION_STARTED)
+    }
+
+    fun sendCommentListOpenEvent() {
+        LMAnalytics.track(LMAnalytics.COMMENT_LIST_OPEN)
     }
 }
