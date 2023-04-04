@@ -6,6 +6,8 @@ import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
 import android.webkit.URLUtil
 import android.widget.FrameLayout
@@ -35,6 +37,20 @@ object ViewUtils {
         val imm =
             view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    // shoes bounce animation on the provided view
+    fun showBounceAnim(context: Context, view: View) {
+        // bounce animation for save button
+        val saveBounceAnim: Animation by lazy {
+            AnimationUtils.loadAnimation(
+                context,
+                R.anim.bounce
+            )
+        }
+
+        saveBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+        view.startAnimation(saveBounceAnim)
     }
 
     fun View.hide() {
