@@ -86,6 +86,9 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Triggers when the user reports a post
+     **/
     fun sendPostReportedEvent(
         postId: String,
         creatorId: String,
@@ -103,6 +106,9 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         )
     }
 
+    /**
+     * Triggers when the user reports a comment
+     **/
     fun sendCommentReportedEvent(
         postId: String,
         creatorId: String,
@@ -120,6 +126,9 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         )
     }
 
+    /**
+     * Triggers when the user reports a reply
+     **/
     fun sendReplyReportedEvent(
         postId: String,
         creatorId: String,

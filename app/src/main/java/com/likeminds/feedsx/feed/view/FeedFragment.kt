@@ -385,7 +385,10 @@ class FeedFragment :
 
     override fun onResume() {
         super.onResume()
+
+        // sends feed opened event
         viewModel.sendFeedOpenedEvent()
+
         val temporaryId = viewModel.getTemporaryId()
         if (temporaryId != -1L && !alreadyPosting) {
             removePostingView()
@@ -410,7 +413,7 @@ class FeedFragment :
         ProgressHelper.showProgress(binding.progressBar)
         viewModel.initiateUser(
             "69edd43f-4a5e-4077-9c50-2b7aa740acce",
-            "fcdaa5bc-0836-4c7e-a783-6d3fe634129c",
+            "029f66a8-264b-413f-a9df-3ae2f4166486",
             "D",
             false
         )
@@ -439,6 +442,7 @@ class FeedFragment :
                     getString(R.string.a_post_is_already_uploading)
                 )
             } else {
+                // sends post creation started event
                 viewModel.sendPostCreationStartedEvent()
 
                 val intent = CreatePostActivity.getIntent(requireContext())
@@ -698,7 +702,10 @@ class FeedFragment :
     //opens post detail screen when add comment/comments count is clicked
     override fun comment(postId: String) {
         PostEvent.getPublisher().subscribe(this)
+
+        // sends comment list open event
         viewModel.sendCommentListOpenEvent()
+
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postId)
             .isEditTextFocused(true)
@@ -709,7 +716,10 @@ class FeedFragment :
     //opens post detail screen when post content is clicked
     override fun postDetail(postData: PostViewData) {
         PostEvent.getPublisher().subscribe(this)
+
+        // sends comment list open event
         viewModel.sendCommentListOpenEvent()
+
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)

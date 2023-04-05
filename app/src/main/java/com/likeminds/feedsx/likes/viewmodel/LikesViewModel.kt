@@ -101,6 +101,9 @@ class LikesViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Triggers when the user opens likes screen for post/comment
+     **/
     fun sendLikeListOpenEvent(
         postId: String,
         commentId: String?

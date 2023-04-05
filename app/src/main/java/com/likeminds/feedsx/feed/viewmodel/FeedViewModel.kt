@@ -235,7 +235,10 @@ class FeedViewModel @Inject constructor(
                     data.post,
                     data.users
                 )
+
+                // sends post creation completed event
                 sendPostCreationCompletedEvent(postViewData)
+
                 postDataEventChannel.send(
                     PostDataEvent.PostResponseData(postViewData)
                 )
@@ -298,6 +301,9 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Triggers when the user opens feed fragment
+     **/
     fun sendFeedOpenedEvent() {
         LMAnalytics.track(
             LMAnalytics.Events.FEED_OPENED,
@@ -314,15 +320,24 @@ class FeedViewModel @Inject constructor(
         LMAnalytics.track(LMAnalytics.Events.POST_CREATION_STARTED)
     }
 
+    /**
+     * Triggers when the user opens post detail screen
+     **/
     fun sendCommentListOpenEvent() {
         LMAnalytics.track(LMAnalytics.Events.COMMENT_LIST_OPEN)
     }
 
+    /**
+     * Triggers when the user opens post is created successfully
+     **/
     private fun sendPostCreationCompletedEvent(
         post: PostViewData
     ) {
         val map = hashMapOf<String, String>()
+        // fetches list of tagged users
         val taggedUsers = MemberTaggingDecoder.decodeAndReturnAllTaggedMembers(post.text)
+
+        // adds tagged user count and their ids in the map
         if (taggedUsers.isNotEmpty()) {
             map["user_tagged"] = "yes"
             map["tagged_users_count"] = taggedUsers.size.toString()
@@ -334,6 +349,8 @@ class FeedViewModel @Inject constructor(
         } else {
             map["user_tagged"] = "no"
         }
+
+        // gets event property key and corresponding value for post attachments
         val attachmentInfo = getEventAttachmentInfo(post)
         attachmentInfo.forEach {
             map[it.first] = it.second
@@ -344,6 +361,10 @@ class FeedViewModel @Inject constructor(
         )
     }
 
+    /**
+     * @param post - view data of post
+     * @return - a list of pair of event key and value
+     * */
     private fun getEventAttachmentInfo(post: PostViewData): List<Pair<String, String>> {
         return when (post.viewType) {
             ITEM_POST_SINGLE_IMAGE -> {

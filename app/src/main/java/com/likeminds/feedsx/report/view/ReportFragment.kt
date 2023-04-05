@@ -107,6 +107,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
     private fun sendReportEvent() {
         when (extras.entityType) {
             REPORT_TYPE_POST -> {
+                // sends post reported event
                 viewModel.sendPostReportedEvent(
                     extras.entityId,
                     extras.entityCreatorId,
@@ -115,6 +116,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 )
             }
             REPORT_TYPE_COMMENT -> {
+                // sends comment reported event
                 viewModel.sendCommentReportedEvent(
                     extras.postId,
                     extras.entityCreatorId,
@@ -123,6 +125,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 )
             }
             REPORT_TYPE_REPLY -> {
+                // sends reply reported event
                 viewModel.sendReplyReportedEvent(
                     extras.postId,
                     extras.entityCreatorId,

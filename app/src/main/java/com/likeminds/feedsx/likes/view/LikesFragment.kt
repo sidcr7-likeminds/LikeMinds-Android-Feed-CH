@@ -42,10 +42,13 @@ class LikesFragment : BaseFragment<FragmentLikesBinding>() {
 
     override fun setUpViews() {
         super.setUpViews()
+
+        // sends like list open event
         viewModel.sendLikeListOpenEvent(
             likesScreenExtras.postId,
             likesScreenExtras.commentId
         )
+
         initData()
         initRecyclerView()
     }

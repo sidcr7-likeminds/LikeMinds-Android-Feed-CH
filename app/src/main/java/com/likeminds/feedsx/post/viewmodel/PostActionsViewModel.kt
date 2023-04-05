@@ -106,6 +106,7 @@ class PostActionsViewModel @Inject constructor(
             val response = lmFeedClient.deletePost(request)
 
             if (response.success) {
+                // sends post deleted event
                 sendPostDeletedEvent(post, reason)
                 _deletePostResponse.postValue(post.id)
             } else {
@@ -114,6 +115,9 @@ class PostActionsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Triggers when a post is deleted
+     **/
     private fun sendPostDeletedEvent(
         post: PostViewData,
         reason: String? = null
@@ -159,6 +163,9 @@ class PostActionsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Triggers when a post is pinned/unpinned
+     **/
     private fun sendPinUnpinPostEvent(post: PostViewData) {
         val map = mapOf(
             "created_by_id" to post.userId,

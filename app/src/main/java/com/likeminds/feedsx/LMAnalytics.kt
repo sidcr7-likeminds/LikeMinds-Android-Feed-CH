@@ -46,6 +46,11 @@ object LMAnalytics {
         const val POST_TYPE_LINK = "link"
     }
 
+    /**
+     * called to trigger events
+     * @param eventName - name of the event to trigger
+     * @param eventProperties - {key: value} pair for properties related to event
+     * */
     fun track(eventName: String, eventProperties: Map<String, String> = mapOf()) {
         Log.d(
             "LMAnalytics", """

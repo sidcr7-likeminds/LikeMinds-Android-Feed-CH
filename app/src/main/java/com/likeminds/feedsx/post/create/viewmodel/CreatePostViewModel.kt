@@ -162,6 +162,7 @@ class CreatePostViewModel @Inject constructor(
                 val request = requestBuilder.build()
                 val response = lmFeedClient.addPost(request)
                 if (response.success) {
+                    // sends post creation completed event
                     sendPostCreationCompletedEvent(
                         updatedText,
                         ogTags
@@ -303,6 +304,10 @@ class CreatePostViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Triggers event when the user clicks on add attachment
+     * @param type - type of attachment
+     */
     fun sendClickedOnAttachmentEvent(type: String) {
         LMAnalytics.track(
             LMAnalytics.Events.CLICKED_ON_ATTACHMENT,
@@ -341,17 +346,24 @@ class CreatePostViewModel @Inject constructor(
             it.fileType == PDF
         }
 
+        // sends image attached event if imageCount > 0
         if (imageCount > 0) {
             sendImageAttachedEvent(imageCount)
         }
+        // sends image attached event if videoCount > 0
         if (videoCount > 0) {
             sendVideoAttachedEvent(videoCount)
         }
+        // sends image attached event if docsCount > 0
         if (docsCount > 0) {
             sendDocumentAttachedEvent(docsCount)
         }
     }
 
+    /**
+     * Triggers when the user attaches link
+     * @param link - url of the link
+     **/
     fun sendLinkAttachedEvent(link: String) {
         LMAnalytics.track(
             LMAnalytics.Events.LINK_ATTACHED_IN_POST,
@@ -361,6 +373,10 @@ class CreatePostViewModel @Inject constructor(
         )
     }
 
+    /**
+     * Triggers when the user attaches image
+     * @param imageCount - number of attached images
+     **/
     private fun sendImageAttachedEvent(imageCount: Int) {
         LMAnalytics.track(
             LMAnalytics.Events.IMAGE_ATTACHED_TO_POST,
@@ -370,6 +386,10 @@ class CreatePostViewModel @Inject constructor(
         )
     }
 
+    /**
+     * Triggers when the user attaches video
+     * @param videoCount - number of attached videos
+     **/
     private fun sendVideoAttachedEvent(videoCount: Int) {
         LMAnalytics.track(
             LMAnalytics.Events.VIDEO_ATTACHED_TO_POST,
@@ -379,6 +399,10 @@ class CreatePostViewModel @Inject constructor(
         )
     }
 
+    /**
+     * Triggers when the user attaches document
+     * @param documentCount - number of attached documents
+     **/
     private fun sendDocumentAttachedEvent(documentCount: Int) {
         LMAnalytics.track(
             LMAnalytics.Events.DOCUMENT_ATTACHED_TO_POST,
@@ -388,6 +412,9 @@ class CreatePostViewModel @Inject constructor(
         )
     }
 
+    /**
+     * Triggers when the user opens post is created successfully
+     **/
     private fun sendPostCreationCompletedEvent(
         postText: String?,
         ogTags: LinkOGTagsViewData?

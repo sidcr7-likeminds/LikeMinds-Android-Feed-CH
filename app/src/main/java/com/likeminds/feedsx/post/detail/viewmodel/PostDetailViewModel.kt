@@ -160,6 +160,9 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Triggers when a comment is posted on a post
+     **/
     private fun sendCommentPostedEvent(postId: String, commentId: String) {
         LMAnalytics.track(
             LMAnalytics.Events.COMMENT_POSTED,
@@ -215,6 +218,9 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Triggers when the reply is posted on a comment
+     **/
     private fun sendReplyPostedEvent(
         userId: String,
         postId: String,
@@ -299,6 +305,9 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Triggers when a comment/reply is deleted
+     **/
     private fun sendCommentReplyDeletedEvent(
         postId: String,
         commentId: String,

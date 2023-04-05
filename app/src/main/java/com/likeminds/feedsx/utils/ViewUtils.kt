@@ -123,6 +123,7 @@ object ViewUtils {
         snackBar.show()
     }
 
+    // returns type of post for analytics from the viewType of post
     fun getPostTypeFromViewType(postViewType: Int?): String {
         return when (postViewType) {
             ITEM_POST_TEXT_ONLY -> {

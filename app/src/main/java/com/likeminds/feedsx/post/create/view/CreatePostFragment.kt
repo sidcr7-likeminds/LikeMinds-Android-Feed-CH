@@ -180,6 +180,7 @@ class CreatePostFragment :
         )
         memberTagging.addListener(object : MemberTaggingViewListener {
             override fun onMemberTagged(user: UserTagViewData) {
+                // sends user tagged event
                 viewModel.sendUserTagEvent(
                     user.userUniqueId,
                     memberTagging.getTaggedMemberCount()
@@ -271,6 +272,7 @@ class CreatePostFragment :
     private fun initAddAttachmentsView() {
         binding.apply {
             layoutAttachFiles.setOnClickListener {
+                // sends clicked on attachment event for file
                 viewModel.sendClickedOnAttachmentEvent("file")
                 val extra = MediaPickerExtras.Builder()
                     .mediaTypes(listOf(PDF))
@@ -281,11 +283,13 @@ class CreatePostFragment :
             }
 
             layoutAddImage.setOnClickListener {
+                // sends clicked on attachment event for photo
                 viewModel.sendClickedOnAttachmentEvent("photo")
                 initiateMediaPicker(listOf(IMAGE))
             }
 
             layoutAddVideo.setOnClickListener {
+                // sends clicked on attachment event for video
                 viewModel.sendClickedOnAttachmentEvent("video")
                 initiateMediaPicker(listOf(VIDEO))
             }
@@ -374,6 +378,7 @@ class CreatePostFragment :
     private fun onMediaPicked(result: MediaPickerResult) {
         val data =
             MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        // sends media attached event with media type and count
         viewModel.sendMediaAttachedEvent(data)
         selectedMediaUris.addAll(data)
         showPostMedia()
@@ -385,6 +390,7 @@ class CreatePostFragment :
             val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
                 requireContext(), it
             )
+            // sends media attached event with media type and count
             viewModel.sendMediaAttachedEvent(mediaUris)
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
@@ -399,6 +405,7 @@ class CreatePostFragment :
             val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
                 requireContext(), it
             )
+            // sends media attached event with media type and count
             viewModel.sendMediaAttachedEvent(mediaUris)
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
@@ -452,6 +459,7 @@ class CreatePostFragment :
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
             singleVideoAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
@@ -481,6 +489,7 @@ class CreatePostFragment :
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
             singleImageAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
@@ -517,6 +526,7 @@ class CreatePostFragment :
                     View.VISIBLE
                 }
             multipleMediaAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
@@ -552,6 +562,7 @@ class CreatePostFragment :
                     View.VISIBLE
                 }
             documentsAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for file
                 viewModel.sendClickedOnAttachmentEvent("file")
                 initiateMediaPicker(listOf(PDF))
             }
@@ -597,6 +608,7 @@ class CreatePostFragment :
     // renders data in the link view
     private fun initLinkView(data: LinkOGTagsViewData) {
         val link = data.url ?: ""
+        // sends link attached event with the link
         viewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
