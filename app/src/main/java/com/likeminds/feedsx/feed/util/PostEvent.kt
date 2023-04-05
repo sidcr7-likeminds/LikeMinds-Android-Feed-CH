@@ -2,17 +2,17 @@ package com.likeminds.feedsx.feed.util
 
 import com.likeminds.feedsx.posttypes.model.PostViewData
 
-// publisher to publish post data and notify observers
-class PostPublisher {
+// to trigger post change events and notify observers
+class PostEvent {
     companion object {
-        private var postPublisher: PostPublisher? = null
+        private var postEvent: PostEvent? = null
 
         @JvmStatic
-        fun getPublisher(): PostPublisher {
-            if (postPublisher == null) {
-                postPublisher = PostPublisher()
+        fun getPublisher(): PostEvent {
+            if (postEvent == null) {
+                postEvent = PostEvent()
             }
-            return postPublisher!!
+            return postEvent!!
         }
     }
 
@@ -37,7 +37,10 @@ class PostPublisher {
     }
 
     interface PostObserver {
-        // called whenever publisher notify the observer
+        /*
+        * called whenever post changes are notified the observer
+        * postData - Pair of postId and Post data
+        * */
         fun update(postData: Pair<String, PostViewData?>)
     }
 }

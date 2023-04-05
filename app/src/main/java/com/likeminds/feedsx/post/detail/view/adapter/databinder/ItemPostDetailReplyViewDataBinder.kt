@@ -72,7 +72,9 @@ class ItemPostDetailReplyViewDataBinder constructor(
 
             tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
-            if (data.likesCount == 0) likesCount.hide()
+            if (data.likesCount == 0) {
+                likesCount.hide()
+            }
             else {
                 likesCount.text =
                     context.resources.getQuantityString(
