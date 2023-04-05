@@ -124,8 +124,8 @@ class PostActionsViewModel @Inject constructor(
             "CM"
         }
         val map = mapOf(
-            "user_state" to post.userId,
-            LMAnalytics.Keys.USER_ID to userStateString,
+            "user_state" to userStateString,
+            LMAnalytics.Keys.USER_ID to post.userId,
             LMAnalytics.Keys.POST_ID to post.id,
             "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
         )

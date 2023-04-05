@@ -25,7 +25,7 @@ object LMAnalytics {
         const val COMMENT_DELETED = "Comment deleted"
         const val COMMENT_REPORTED = "Comment reported"
         const val COMMENT_POSTED = "Comment posted"
-        const val REPLY_POSTED = " "
+        const val REPLY_POSTED = "Reply posted"
         const val REPLY_DELETED = "Reply deleted"
         const val REPLY_REPORTED = "Reply reported"
     }

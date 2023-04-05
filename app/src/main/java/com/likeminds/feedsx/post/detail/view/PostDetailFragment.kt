@@ -717,7 +717,8 @@ class PostDetailFragment :
         @ReportType
         entityType: Int,
         postId: String,
-        postViewType: Int? = null
+        postViewType: Int? = null,
+        parentCommentId: String? = null
     ) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
@@ -726,6 +727,7 @@ class PostDetailFragment :
             .entityType(entityType)
             .postId(postId)
             .postViewType(postViewType)
+            .parentCommentId(parentCommentId)
             .build()
 
         //get Intent for [ReportActivity]
@@ -1022,7 +1024,7 @@ class PostDetailFragment :
                     creatorId,
                     REPORT_TYPE_POST,
                     postId,
-                    postViewType
+                    postViewType = postViewType
                 )
             }
             PIN_POST_MENU_ITEM -> {
@@ -1164,7 +1166,8 @@ class PostDetailFragment :
                     replyId,
                     creatorId,
                     REPORT_TYPE_REPLY,
-                    postId
+                    postId,
+                    parentCommentId = parentCommentId
                 )
             }
         }

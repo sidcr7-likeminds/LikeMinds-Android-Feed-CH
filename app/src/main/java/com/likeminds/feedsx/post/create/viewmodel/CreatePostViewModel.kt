@@ -328,23 +328,27 @@ class CreatePostViewModel @Inject constructor(
     }
 
     fun sendMediaAttachedEvent(data: ArrayList<SingleUriData>) {
+        // counts number of images in attachments
         val imageCount = data.count {
             it.fileType == IMAGE
         }
+        // counts number of videos in attachments
         val videoCount = data.count {
             it.fileType == VIDEO
         }
+        // counts number of documents in attachments
         val docsCount = data.count {
             it.fileType == PDF
         }
+
         if (imageCount > 0) {
             sendImageAttachedEvent(imageCount)
         }
         if (videoCount > 0) {
-            sendVideoAttachedEvent(imageCount)
+            sendVideoAttachedEvent(videoCount)
         }
         if (docsCount > 0) {
-            sendDocumentAttachedEvent(imageCount)
+            sendDocumentAttachedEvent(docsCount)
         }
     }
 
@@ -366,20 +370,20 @@ class CreatePostViewModel @Inject constructor(
         )
     }
 
-    private fun sendVideoAttachedEvent(imageCount: Int) {
+    private fun sendVideoAttachedEvent(videoCount: Int) {
         LMAnalytics.track(
             LMAnalytics.Events.VIDEO_ATTACHED_TO_POST,
             mapOf(
-                "video_count" to imageCount.toString()
+                "video_count" to videoCount.toString()
             )
         )
     }
 
-    private fun sendDocumentAttachedEvent(imageCount: Int) {
+    private fun sendDocumentAttachedEvent(documentCount: Int) {
         LMAnalytics.track(
             LMAnalytics.Events.DOCUMENT_ATTACHED_TO_POST,
             mapOf(
-                "document_count" to imageCount.toString()
+                "document_count" to documentCount.toString()
             )
         )
     }
@@ -407,6 +411,9 @@ class CreatePostViewModel @Inject constructor(
         } else {
             map["link_attached"] = "no"
         }
+        map["image_attached"] = "no"
+        map["video_attached"] = "no"
+        map["document_attached"] = "no"
         LMAnalytics.track(
             LMAnalytics.Events.POST_CREATION_COMPLETED,
             map

@@ -336,7 +336,7 @@ class FeedViewModel @Inject constructor(
         }
         val attachmentInfo = getEventAttachmentInfo(post)
         attachmentInfo.forEach {
-            map[it.first] = it.second.toString()
+            map[it.first] = it.second
         }
         LMAnalytics.track(
             LMAnalytics.Events.POST_CREATION_COMPLETED,
@@ -344,27 +344,60 @@ class FeedViewModel @Inject constructor(
         )
     }
 
-    private fun getEventAttachmentInfo(post: PostViewData): List<Pair<String, Int>> {
+    private fun getEventAttachmentInfo(post: PostViewData): List<Pair<String, String>> {
         return when (post.viewType) {
             ITEM_POST_SINGLE_IMAGE -> {
-                listOf(Pair("image_attached", 1))
+                listOf(
+                    Pair("image_attached", "1"),
+                    Pair("video_attached", "no"),
+                    Pair("document_attached", "no"),
+                    Pair("link_attached", "no")
+                )
             }
             ITEM_POST_SINGLE_VIDEO -> {
-                listOf(Pair("video_attached", 1))
+                listOf(
+                    Pair("video_attached", "1"),
+                    Pair("image_attached", "no"),
+                    Pair("document_attached", "no"),
+                    Pair("link_attached", "no")
+                )
             }
             ITEM_POST_DOCUMENTS -> {
-                listOf(Pair("document_attached", post.attachments.size))
+                listOf(
+                    Pair("video_attached", "no"),
+                    Pair("image_attached", "no"),
+                    Pair("document_attached", post.attachments.size.toString()),
+                    Pair("link_attached", "no")
+                )
             }
             ITEM_POST_MULTIPLE_MEDIA -> {
+                val imageCount = post.attachments.count {
+                    it.attachmentType == IMAGE
+                }
+                val imageCountString = if (imageCount == 0) {
+                    "no"
+                } else {
+                    imageCount.toString()
+                }
+                val videCount = post.attachments.count {
+                    it.attachmentType == VIDEO
+                }
+                val videoCountString = if (videCount == 0) {
+                    "no"
+                } else {
+                    videCount.toString()
+                }
                 listOf(
                     Pair(
                         "image_attached",
-                        post.attachments.filter { it.attachmentType == IMAGE }.size
+                        imageCountString
                     ),
                     Pair(
                         "video_attached",
-                        post.attachments.filter { it.attachmentType == VIDEO }.size
-                    )
+                        videoCountString
+                    ),
+                    Pair("document_attached", "no"),
+                    Pair("link_attached", "no")
                 )
             }
             else -> {

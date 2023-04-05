@@ -25,7 +25,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
     ReportAdapterListener {
 
     private val viewModel: ReportViewModel by viewModels()
-    private lateinit var reason: String
+    private lateinit var reasonOrTag: String
 
     override fun getViewBinding(): FragmentReportBinding {
         return FragmentReportBinding.inflate(layoutInflater)
@@ -111,7 +111,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                     extras.entityId,
                     extras.entityCreatorId,
                     ViewUtils.getPostTypeFromViewType(extras.postViewType),
-                    reason
+                    reasonOrTag
                 )
             }
             REPORT_TYPE_COMMENT -> {
@@ -119,7 +119,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                     extras.postId,
                     extras.entityCreatorId,
                     extras.entityId,
-                    reason
+                    reasonOrTag
                 )
             }
             REPORT_TYPE_REPLY -> {
@@ -128,7 +128,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                     extras.entityCreatorId,
                     extras.parentCommentId,
                     extras.entityId,
-                    reason
+                    reasonOrTag
                 )
             }
         }
@@ -171,7 +171,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 .find { it.isSelected }
 
             //get reason for [edittext]
-            reason = binding.etOthers.text?.trim().toString()
+            val reason = binding.etOthers.text?.trim().toString()
             val isOthersSelected = tagSelected?.name?.contains("Others", true)
 
             //if no tag is selected
@@ -190,6 +190,13 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                     "Please enter a reason."
                 )
                 return@setOnClickListener
+            }
+
+            // update [reasonOrTag] with tag value or reason
+            reasonOrTag = if (isOthersSelected == true) {
+                reason
+            } else {
+                tagSelected?.name ?: reason
             }
 
             //call post api
