@@ -290,50 +290,6 @@ class PostDetailFragment :
         }
     }
 
-    // observes live data related to comments
-    // sets page-1 data of post and scrolls to top
-    private fun setPostDataAndScrollToTop(post: PostViewData) {
-        // [ArrayList] to add all the items to adapter
-        val postDetailList = ArrayList<BaseViewType>()
-        // adds the post data at [postDataPosition]
-        postDetailList.add(postDataPosition, post)
-
-        if (post.commentsCount == 0) {
-            handleNoCommentsView(true)
-        } else {
-            handleNoCommentsView(false)
-            // adds commentsCountViewData if comments are present
-            postDetailList.add(
-                commentsCountPosition,
-                ViewDataConverter.convertCommentsCount(post.commentsCount)
-            )
-        }
-
-        // adds all the comments to the [postDetailList]
-        postDetailList.addAll(post.replies.toList())
-        mPostDetailAdapter.replace(postDetailList)
-        binding.rvPostDetails.scrollToPosition(postDataPosition)
-    }
-
-    // updates the post and add comments to adapter
-    private fun updatePostAndAddComments(post: PostViewData) {
-        // notifies the subscribers about the change in post data
-        postEvent.notify(Pair(post.id, post))
-
-        // updates the post
-        mPostDetailAdapter.update(postDataPosition, post)
-        // adds the paginated comments
-        mPostDetailAdapter.addAll(post.replies.toList())
-    }
-
-    // handles visibility of no comments view
-    private fun handleNoCommentsView(isVisible: Boolean) {
-        binding.apply {
-            tvNoComment.isVisible = isVisible
-            tvBeFirst.isVisible = isVisible
-        }
-    }
-
     private fun observeCommentData() {
         // observes addCommentResponse LiveData
         viewModel.addCommentResponse.observe(viewLifecycleOwner) { comment ->
@@ -412,24 +368,6 @@ class PostDetailFragment :
         }
     }
 
-    // adds the reply to its parentComment
-    private fun addReplyToAdapter(parentCommentId: String, reply: CommentViewData) {
-        // gets the parentComment from adapter
-        val parentComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return
-        val parentIndex = parentComment.first
-        val parentCommentViewData = parentComment.second
-
-        // adds the reply at first
-        parentCommentViewData.replies.add(0, reply)
-
-        val newCommentViewData = parentCommentViewData.toBuilder()
-            .repliesCount(parentCommentViewData.repliesCount + 1)
-            .build()
-
-        // updates the parentComment with added reply
-        mPostDetailAdapter.update(parentIndex, newCommentViewData)
-    }
-
     private fun removeDeletedComment(commentId: String) {
         // gets old [CommentsCountViewData] from adapter
         val oldCommentsCountViewData =
@@ -452,54 +390,6 @@ class PostDetailFragment :
             requireContext(),
             getString(R.string.comment_deleted)
         )
-    }
-
-    // removes the reply from its parentComment
-    private fun removeDeletedReply(parentCommentId: String, replyId: String) {
-        // gets the parentComment from adapter
-        val parentComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return
-        val parentIndex = parentComment.first
-        val parentCommentViewData = parentComment.second
-
-        // removes the reply with specified replyId
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            parentCommentViewData.replies.removeIf {
-                it.id == replyId
-            }
-        } else {
-            val index = parentCommentViewData.replies.indexOfFirst {
-                it.id == replyId
-            }
-            parentCommentViewData.replies.removeAt(index)
-        }
-
-        val newCommentViewData = parentCommentViewData.toBuilder()
-            .repliesCount(parentCommentViewData.repliesCount - 1)
-            .build()
-
-        // updates the parentComment with removed reply
-        mPostDetailAdapter.update(parentIndex, newCommentViewData)
-    }
-
-    // adds paginated replies to comment
-    private fun addReplies(comment: CommentViewData, page: Int) {
-        // gets comment from adapter
-        val indexAndComment = getIndexAndCommentFromAdapter(comment.id) ?: return
-        val index = indexAndComment.first
-        val adapterComment = indexAndComment.second
-        if (page == 1) {
-            // updates the comment with page-1 replies
-            mPostDetailAdapter.update(index, comment)
-            scrollToPositionWithOffset(index, 75)
-        } else {
-            // adds replies in adapter and fetched replies
-            comment.replies.addAll(
-                0,
-                adapterComment.replies
-            )
-            mPostDetailAdapter.update(index, comment)
-            scrollToPositionWithOffset(index + 1, 100)
-        }
     }
 
     /**
@@ -658,30 +548,6 @@ class PostDetailFragment :
         binding.etComment.focusAndShowKeyboard()
     }
 
-    // callback when replying on a comment
-    override fun replyOnComment(
-        commentId: String,
-        commentPosition: Int,
-        parentCommenter: UserViewData
-    ) {
-        parentCommentIdToReply = commentId
-        binding.apply {
-            tvReplyingTo.show()
-            ivRemoveReplyingTo.show()
-
-            tvReplyingTo.text = String.format(
-                getString(R.string.replying_to_s),
-                parentCommenter.name
-            )
-
-            etComment.focusAndShowKeyboard()
-
-            rvPostDetails.smoothScrollToPosition(
-                commentPosition
-            )
-        }
-    }
-
     // processes delete post request
     private fun deletePost(
         postId: String,
@@ -835,33 +701,12 @@ class PostDetailFragment :
     // updates the post and add comments to adapter
     private fun updatePostAndAddComments(post: PostViewData) {
         // notifies the subscribers about the change in post data
-        postPublisher.notify(Pair(post.id, post))
+        postEvent.notify(Pair(post.id, post))
 
         // updates the post
         mPostDetailAdapter.update(postDataPosition, post)
         // adds the paginated comments
         mPostDetailAdapter.addAll(post.replies.toList())
-    // updates comment view data when see more is clicked
-    override fun updateCommentSeenFullContent(
-        position: Int,
-        alreadySeenFullContent: Boolean,
-        parentCommentId: String?
-    ) {
-        val item =
-            if (parentCommentId == null) {
-                mPostDetailAdapter[position]
-            } else {
-                val indexAndComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return
-                val comment = indexAndComment.second
-                comment.replies[position]
-            }
-        if (item is CommentViewData) {
-            val newViewData = item.toBuilder()
-                .alreadySeenFullContent(alreadySeenFullContent)
-                .fromCommentLiked(false)
-                .build()
-            mPostDetailAdapter.update(position, newViewData)
-        }
     }
 
     // refreshes the whole post detail screen
@@ -940,7 +785,7 @@ class PostDetailFragment :
             if (parentCommentId == null) {
                 mPostDetailAdapter[position]
             } else {
-                val indexAndComment = getIndexAndCommentFromAdapter(parentCommentId)
+                val indexAndComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return
                 val comment = indexAndComment.second
                 comment.replies[position]
             }
@@ -956,7 +801,7 @@ class PostDetailFragment :
     // adds the reply to its parentComment
     private fun addReplyToAdapter(parentCommentId: String, reply: CommentViewData) {
         // gets the parentComment from adapter
-        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)
+        val parentComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return
         val parentIndex = parentComment.first
         val parentCommentViewData = parentComment.second
 
@@ -972,16 +817,22 @@ class PostDetailFragment :
     }
 
     // removes the reply from its parentComment
-    @SuppressLint("NewApi")
     private fun removeDeletedReply(parentCommentId: String, replyId: String) {
         // gets the parentComment from adapter
-        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)
+        val parentComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return
         val parentIndex = parentComment.first
         val parentCommentViewData = parentComment.second
 
         // removes the reply with specified replyId
-        parentCommentViewData.replies.removeIf {
-            it.id == replyId
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            parentCommentViewData.replies.removeIf {
+                it.id == replyId
+            }
+        } else {
+            val index = parentCommentViewData.replies.indexOfFirst {
+                it.id == replyId
+            }
+            parentCommentViewData.replies.removeAt(index)
         }
 
         val newCommentViewData = parentCommentViewData.toBuilder()
@@ -995,7 +846,7 @@ class PostDetailFragment :
     // adds paginated replies to comment
     private fun addReplies(comment: CommentViewData, page: Int) {
         // gets comment from adapter
-        val indexAndComment = getIndexAndCommentFromAdapter(comment.id)
+        val indexAndComment = getIndexAndCommentFromAdapter(comment.id) ?: return
         val index = indexAndComment.first
         val adapterComment = indexAndComment.second
         if (page == 1) {
@@ -1076,51 +927,6 @@ class PostDetailFragment :
         mPostDetailAdapter.update(position, newViewData)
     }
 
-    //get index and reply from the parentComment using replyId
-    private fun getIndexAndReplyFromComment(
-        parentComment: CommentViewData,
-        replyId: String
-    ): Pair<Int, CommentViewData> {
-        val index = parentComment.replies.indexOfFirst {
-            it.id == replyId
-        }
-
-        val reply = parentComment.replies[index]
-
-        return Pair(index, reply)
-    }
-
-    //get index and post from the adapter using postId
-    private fun getIndexAndCommentFromAdapter(commentId: String): Pair<Int, CommentViewData>? {
-        val index = mPostDetailAdapter.items().indexOfFirst {
-            (it is CommentViewData) && (it.id == commentId)
-        }
-
-        if (index == -1) {
-            return null
-        }
-
-        val comment = getCommentFromAdapter(index)
-
-        return Pair(index, comment)
-    }
-
-    private fun getCommentFromAdapter(position: Int): CommentViewData {
-        return mPostDetailAdapter.items()[position] as CommentViewData
-    }
-
-    // callback when replyCount is clicked to view replies
-    override fun fetchReplies(commentId: String) {
-        val comment = getIndexAndCommentFromAdapter(commentId)?.second ?: return
-
-        // gets page-1 replies
-        viewModel.getComment(
-            comment.postId,
-            comment.id,
-            1
-        )
-    }
-
     // callback when replying on a comment
     override fun replyOnComment(
         commentId: String,
@@ -1142,31 +948,6 @@ class PostDetailFragment :
             rvPostDetails.smoothScrollToPosition(
                 commentPosition
             )
-        }
-    }
-
-    // callback when post menu items are clicked
-    override fun onPostMenuItemClicked(
-        postId: String,
-        creatorId: String,
-        title: String
-    ) {
-        when (title) {
-            DELETE_POST_MENU_ITEM -> {
-                deletePost(
-                    postId,
-                    creatorId
-                )
-            }
-            REPORT_POST_MENU_ITEM -> {
-                reportEntity(postId, creatorId, REPORT_TYPE_POST)
-            }
-            PIN_POST_MENU_ITEM -> {
-                pinPost(postId)
-            }
-            UNPIN_POST_MENU_ITEM -> {
-                unpinPost(postId)
-            }
         }
     }
 
@@ -1241,26 +1022,13 @@ class PostDetailFragment :
 
     // callback when replyCount is clicked to view replies
     override fun fetchReplies(commentId: String) {
-        val comment = getIndexAndCommentFromAdapter(commentId).second
+        val comment = getIndexAndCommentFromAdapter(commentId)?.second ?: return
 
         // gets page-1 replies
         viewModel.getComment(
             comment.postId,
             comment.id,
             1
-        )
-    }
-
-    // callback when view more replies is clicked
-    override fun viewMoreReplies(
-        parentCommentId: String,
-        page: Int
-    ) {
-        val comment = getIndexAndCommentFromAdapter(parentCommentId).second
-        viewModel.getComment(
-            comment.postId,
-            parentCommentId,
-            page
         )
     }
 
@@ -1415,9 +1183,13 @@ class PostDetailFragment :
     }
 
     //get index and post from the adapter using postId
-    private fun getIndexAndCommentFromAdapter(commentId: String): Pair<Int, CommentViewData> {
+    private fun getIndexAndCommentFromAdapter(commentId: String): Pair<Int, CommentViewData>? {
         val index = mPostDetailAdapter.items().indexOfFirst {
             (it is CommentViewData) && (it.id == commentId)
+        }
+
+        if (index == -1) {
+            return null
         }
 
         val comment = getCommentFromAdapter(index)
