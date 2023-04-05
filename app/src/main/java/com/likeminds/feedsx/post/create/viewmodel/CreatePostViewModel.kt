@@ -6,6 +6,7 @@ import android.net.Uri
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.IMAGE
@@ -25,6 +26,7 @@ import com.likeminds.feedsx.utils.ViewDataConverter.convertUser
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
@@ -163,6 +165,10 @@ class CreatePostViewModel @Inject constructor(
                 val request = requestBuilder.build()
                 val response = lmFeedClient.addPost(request)
                 if (response.success) {
+                    sendPostCreationCompletedEvent(
+                        updatedText,
+                        ogTags
+                    )
                     _postAdded.postValue(true)
                 } else {
                     errorEventChannel.send(ErrorMessageEvent.AddPost(response.errorMessage))
@@ -298,5 +304,94 @@ class CreatePostViewModel @Inject constructor(
                 errorEventChannel.send(ErrorMessageEvent.GetTaggingList(response.errorMessage))
             }
         }
+    }
+
+    fun sendClickedOnAttachmentEvent(type: String) {
+        LMAnalytics.track(
+            LMAnalytics.Events.CLICKED_ON_ATTACHMENT,
+            mapOf(
+                "type" to type
+            )
+        )
+    }
+
+    /**
+     * Triggers event when the user tags someone
+     * @param userId user-unique-id
+     * @param userCount count of tagged users
+     */
+    fun sendUserTagEvent(userId: String, userCount: Int) {
+        LMAnalytics.track(
+            LMAnalytics.Events.USER_TAGGED_IN_POST,
+            mapOf(
+                "tagged_user_id" to userId,
+                "tagged_user_count" to userCount.toString()
+            )
+        )
+    }
+
+    fun sendLinkAttachedEvent(link: String) {
+        LMAnalytics.track(
+            LMAnalytics.Events.LINK_ATTACHED_IN_POST,
+            mapOf(
+                "link" to link
+            )
+        )
+    }
+
+    fun sendImageAttachedEvent(imageCount: Int) {
+        LMAnalytics.track(
+            LMAnalytics.Events.IMAGE_ATTACHED_TO_POST,
+            mapOf(
+                "image_count" to imageCount.toString()
+            )
+        )
+    }
+
+    fun sendVideoAttachedEvent(imageCount: Int) {
+        LMAnalytics.track(
+            LMAnalytics.Events.VIDEO_ATTACHED_TO_POST,
+            mapOf(
+                "video_count" to imageCount.toString()
+            )
+        )
+    }
+
+    fun sendDocumentAttachedEvent(imageCount: Int) {
+        LMAnalytics.track(
+            LMAnalytics.Events.IMAGE_ATTACHED_TO_POST,
+            mapOf(
+                "document_count" to imageCount.toString()
+            )
+        )
+    }
+
+    private fun sendPostCreationCompletedEvent(
+        postText: String?,
+        ogTags: LinkOGTagsViewData?
+    ) {
+        val map = hashMapOf<String, String>()
+        val taggedUsers = MemberTaggingDecoder.decodeAndReturnAllTaggedMembers(postText)
+        if (taggedUsers.isNotEmpty()) {
+            map["user_tagged"] = "yes"
+            map["tagged_users_count"] = taggedUsers.size.toString()
+            val taggedUserIds =
+                taggedUsers.joinToString {
+                    it.first
+                }
+            map["tagged_users_id"] = taggedUserIds
+        } else {
+            map["user_tagged"] = "no"
+        }
+        if (ogTags != null) {
+            map["link_attached"] = "yes"
+            map["link"] = ogTags.url ?: ""
+        } else {
+            map["link_attached"] = "no"
+        }
+        LMAnalytics.track(
+            LMAnalytics.Events.POST_CREATION_COMPLETED,
+            map
+        )
     }
 }

@@ -47,6 +47,7 @@ import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
@@ -178,6 +179,13 @@ class CreatePostFragment :
                 .build()
         )
         memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun onMemberTagged(user: UserTagViewData) {
+                viewModel.sendUserTagEvent(
+                    user.userUniqueId,
+                    memberTagging.getTaggedMemberCount()
+                )
+            }
+
             override fun callApi(page: Int, searchName: String) {
                 viewModel.getMembersForTagging(page, searchName)
             }
@@ -263,6 +271,7 @@ class CreatePostFragment :
     private fun initAddAttachmentsView() {
         binding.apply {
             layoutAttachFiles.setOnClickListener {
+                viewModel.sendClickedOnAttachmentEvent("file")
                 val extra = MediaPickerExtras.Builder()
                     .mediaTypes(listOf(PDF))
                     .allowMultipleSelect(true)
@@ -272,10 +281,12 @@ class CreatePostFragment :
             }
 
             layoutAddImage.setOnClickListener {
+                viewModel.sendClickedOnAttachmentEvent("photo")
                 initiateMediaPicker(listOf(IMAGE))
             }
 
             layoutAddVideo.setOnClickListener {
+                viewModel.sendClickedOnAttachmentEvent("video")
                 initiateMediaPicker(listOf(VIDEO))
             }
         }
@@ -438,6 +449,7 @@ class CreatePostFragment :
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
             singleVideoAttachment.btnAddMore.setOnClickListener {
+                viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
             singleVideoAttachment.layoutSingleVideoPost.ivCross.setOnClickListener {
@@ -466,6 +478,7 @@ class CreatePostFragment :
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
             singleImageAttachment.btnAddMore.setOnClickListener {
+                viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
             singleImageAttachment.layoutSingleImagePost.ivCross.setOnClickListener {
@@ -501,6 +514,7 @@ class CreatePostFragment :
                     View.VISIBLE
                 }
             multipleMediaAttachment.btnAddMore.setOnClickListener {
+                viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
 
@@ -535,6 +549,7 @@ class CreatePostFragment :
                     View.VISIBLE
                 }
             documentsAttachment.btnAddMore.setOnClickListener {
+                viewModel.sendClickedOnAttachmentEvent("file")
                 initiateMediaPicker(listOf(PDF))
             }
 
@@ -578,6 +593,8 @@ class CreatePostFragment :
 
     // renders data in the link view
     private fun initLinkView(data: LinkOGTagsViewData) {
+        val link = data.url ?: ""
+        viewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
 

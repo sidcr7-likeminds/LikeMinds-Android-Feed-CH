@@ -410,7 +410,7 @@ class FeedFragment :
         ProgressHelper.showProgress(binding.progressBar)
         viewModel.initiateUser(
             "69edd43f-4a5e-4077-9c50-2b7aa740acce",
-            "029f66a8-264b-413f-a9df-3ae2f4166486",
+            "fcdaa5bc-0836-4c7e-a783-6d3fe634129c",
             "D",
             false
         )
