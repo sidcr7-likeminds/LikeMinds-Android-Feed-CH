@@ -47,7 +47,6 @@ import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
@@ -99,25 +98,6 @@ class CreatePostFragment :
         lmExoplayer?.release()
     }
 
-    private fun initMemberTaggingView() {
-        memberTagging = binding.memberTaggingView
-        memberTagging.initialize(
-            MemberTaggingExtras.Builder()
-                .editText(binding.etPostContent)
-                .maxHeightInPercentage(0.4f)
-                .color(
-                    BrandingData.currentAdvanced?.third
-                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
-                )
-                .build()
-        )
-        memberTagging.addListener(object : MemberTaggingViewListener {
-            override fun callApi(page: Int, searchName: String) {
-                viewModel.getMembersForTagging(page, searchName)
-            }
-        })
-    }
-
     // observes data
     override fun observeData() {
         super.observeData()
@@ -150,6 +130,10 @@ class CreatePostFragment :
                 finish()
             }
         }
+    }
+
+    private fun fetchUserFromDB() {
+        viewModel.fetchUserFromDB()
     }
 
     /**
@@ -775,7 +759,7 @@ class CreatePostFragment :
     // shows toast and removes extra items if attachments limit is exceeded
     private fun attachmentsLimitExceeded() {
         if (selectedMediaUris.size > 10) {
-            showErrorMessageToast(
+            ViewUtils.showErrorMessageToast(
                 requireContext(), requireContext().resources.getQuantityString(
                     R.plurals.you_can_select_upto_x_items,
                     POST_ATTACHMENTS_LIMIT,
