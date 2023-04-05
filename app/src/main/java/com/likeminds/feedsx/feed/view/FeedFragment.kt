@@ -24,8 +24,8 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
-import com.likeminds.feedsx.feed.util.PostPublisher
-import com.likeminds.feedsx.feed.util.PostPublisher.PostObserver
+import com.likeminds.feedsx.feed.util.PostEvent
+import com.likeminds.feedsx.feed.util.PostEvent.PostObserver
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -124,7 +124,7 @@ class FeedFragment :
 
         // observes deletePostResponse LiveData
         postActionsViewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
-            val indexToRemove = getIndexAndPostFromAdapter(postId).first
+            val indexToRemove = getIndexAndPostFromAdapter(postId)?.first ?: return@observe
             mPostAdapter.removeIndex(indexToRemove)
             ViewUtils.showShortToast(
                 requireContext(),
@@ -134,7 +134,7 @@ class FeedFragment :
 
         // observes pinPostResponse LiveData
         postActionsViewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
-            val post = getIndexAndPostFromAdapter(postId).second
+            val post = getIndexAndPostFromAdapter(postId)?.second ?: return@observe
             if (post.isPinned) {
                 ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
             } else {
@@ -312,7 +312,7 @@ class FeedFragment :
                 val postId = response.postId
 
                 //get post and index
-                val pair = getIndexAndPostFromAdapter(postId)
+                val pair = getIndexAndPostFromAdapter(postId) ?: return
                 val post = pair.second
                 val index = pair.first
 
@@ -334,7 +334,7 @@ class FeedFragment :
                 val postId = response.postId
 
                 //get post and index
-                val pair = getIndexAndPostFromAdapter(postId)
+                val pair = getIndexAndPostFromAdapter(postId) ?: return
                 val post = pair.second
                 val index = pair.first
 
@@ -359,7 +359,7 @@ class FeedFragment :
                 val postId = response.postId
 
                 //get post and index
-                val pair = getIndexAndPostFromAdapter(postId)
+                val pair = getIndexAndPostFromAdapter(postId) ?: return
                 val post = pair.second
                 val index = pair.first
 
@@ -402,7 +402,7 @@ class FeedFragment :
     override fun onDestroy() {
         super.onDestroy()
         // unsubscribes itself from the [PostPublisher]
-        PostPublisher.getPublisher().unsubscribe(this)
+        PostEvent.getPublisher().unsubscribe(this)
     }
 
     // initiates SDK
@@ -693,7 +693,7 @@ class FeedFragment :
 
     //opens post detail screen when add comment/comments count is clicked
     override fun comment(postId: String) {
-        PostPublisher.getPublisher().subscribe(this)
+        PostEvent.getPublisher().subscribe(this)
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postId)
             .isEditTextFocused(true)
@@ -703,7 +703,7 @@ class FeedFragment :
 
     //opens post detail screen when post content is clicked
     override fun postDetail(postData: PostViewData) {
-        PostPublisher.getPublisher().subscribe(this)
+        PostEvent.getPublisher().subscribe(this)
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
@@ -785,7 +785,7 @@ class FeedFragment :
     // calls the pinPost api and updates pins the post in adapter
     private fun pinPost(postId: String) {
         //get item
-        val postAndIndex = getIndexAndPostFromAdapter(postId)
+        val postAndIndex = getIndexAndPostFromAdapter(postId) ?: return
         val index = postAndIndex.first
         val post = postAndIndex.second
 
@@ -819,7 +819,7 @@ class FeedFragment :
     // calls the pinPost api and updates unpins the post in adapter
     private fun unpinPost(postId: String) {
         //get item
-        val postAndIndex = getIndexAndPostFromAdapter(postId)
+        val postAndIndex = getIndexAndPostFromAdapter(postId) ?: return
         val index = postAndIndex.first
         val post = postAndIndex.second
 
@@ -955,7 +955,7 @@ class FeedFragment :
     override fun update(postData: Pair<String, PostViewData?>) {
         val postId = postData.first
         // fetches post from adapter
-        val postIndex = getIndexAndPostFromAdapter(postId).first
+        val postIndex = getIndexAndPostFromAdapter(postId)?.first ?: return
 
         val updatedPost = postData.second
 
@@ -974,9 +974,13 @@ class FeedFragment :
      **/
 
     //get index and post from the adapter using postId
-    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
+    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData>? {
         val index = mPostAdapter.items().indexOfFirst {
             (it is PostViewData) && (it.id == postId)
+        }
+
+        if (index == -1) {
+            return null
         }
 
         val post = getPostFromAdapter(index)
