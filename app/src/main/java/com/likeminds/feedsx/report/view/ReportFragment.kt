@@ -12,7 +12,6 @@ import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentReportBinding
-import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
@@ -113,13 +112,13 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 viewModel.sendPostReportedEvent(
                     extras.entityId,
                     extras.entityCreatorId,
-                    getPostType(extras.post),
+                    getPostType(extras.postViewType),
                     reason
                 )
             }
             REPORT_TYPE_COMMENT -> {
                 viewModel.sendCommentReportedEvent(
-                    extras.post.id,
+                    extras.postId,
                     extras.entityCreatorId,
                     extras.entityId,
                     reason
@@ -127,7 +126,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
             }
             REPORT_TYPE_REPLY -> {
                 viewModel.sendReplyReportedEvent(
-                    extras.post.id,
+                    extras.postId,
                     extras.entityCreatorId,
                     extras.parentCommentId,
                     extras.entityId,
@@ -137,8 +136,8 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         }
     }
 
-    private fun getPostType(post: PostViewData): String {
-        return when (post.viewType) {
+    private fun getPostType(postViewType: Int?): String {
+        return when (postViewType) {
             ITEM_POST_TEXT_ONLY -> {
                 LMAnalytics.Keys.POST_TYPE_TEXT
             }

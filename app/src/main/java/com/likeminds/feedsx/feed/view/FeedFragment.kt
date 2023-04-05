@@ -763,11 +763,13 @@ class FeedFragment :
 
     // Processes report action on post
     private fun reportPost(postId: String, creatorId: String) {
+        val post = getIndexAndPostFromAdapter(postId).second
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
             .entityCreatorId(creatorId)
             .entityType(REPORT_TYPE_POST)
+            .postViewType(post.viewType)
             .build()
 
         //get Intent for [ReportActivity]

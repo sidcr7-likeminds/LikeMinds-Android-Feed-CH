@@ -1,10 +1,8 @@
 package com.likeminds.feedsx.report.model
 
 import android.os.Parcelable
-import com.likeminds.feedsx.posttypes.model.PostViewData
 import kotlinx.parcelize.Parcelize
 
-// todo: pass post
 @Parcelize
 class ReportExtras private constructor(
     @ReportType
@@ -12,7 +10,8 @@ class ReportExtras private constructor(
     var entityCreatorId: String,
     var entityId: String,
     val parentCommentId: String?,
-    var post: PostViewData
+    var postId: String,
+    var postViewType: Int?,
 ) : Parcelable {
     class Builder {
         @ReportType
@@ -20,7 +19,8 @@ class ReportExtras private constructor(
         private var entityCreatorId: String = ""
         private var entityId: String = ""
         private var parentCommentId: String? = null
-        private var post: PostViewData = PostViewData.Builder().build()
+        private var postId: String = ""
+        private var postViewType: Int? = null
 
         fun entityType(@ReportType entityType: Int) = apply { this.entityType = entityType }
         fun entityCreatorId(entityCreatorId: String) =
@@ -30,14 +30,16 @@ class ReportExtras private constructor(
         fun parentCommentId(parentCommentId: String?) =
             apply { this.parentCommentId = parentCommentId }
 
-        fun post(post: PostViewData) = apply { this.post = post }
+        fun postId(postId: String) = apply { this.postId = postId }
+        fun postViewType(postViewType: Int?) = apply { this.postViewType = postViewType }
 
         fun build() = ReportExtras(
             entityType,
             entityCreatorId,
             entityId,
             parentCommentId,
-            post
+            postId,
+            postViewType
         )
     }
 
@@ -46,6 +48,7 @@ class ReportExtras private constructor(
             .entityType(entityType)
             .entityId(entityId)
             .parentCommentId(parentCommentId)
-            .post(post)
+            .postId(postId)
+            .postViewType(postViewType)
     }
 }
