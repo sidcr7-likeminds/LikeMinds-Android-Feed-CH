@@ -6,12 +6,13 @@ import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
+import com.likeminds.likemindsfeed.LMCallback
 import com.likeminds.likemindsfeed.LMFeedClient
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class FeedSXApplication @Inject constructor() : Application() {
+class FeedSXApplication @Inject constructor() : Application(), LMCallback {
 
     @Inject
     lateinit var transferUtility: TransferUtility
@@ -39,6 +40,7 @@ class FeedSXApplication @Inject constructor() : Application() {
 
         // extras to instantiate LMFeedClient
         val extra = LMFeedClient.Builder(this)
+            .lmCallback(this)
             .build()
     }
 
@@ -51,5 +53,9 @@ class FeedSXApplication @Inject constructor() : Application() {
                 override fun onError(e: java.lang.Exception?) {
                 }
             })
+    }
+
+    override fun login() {
+        super.login()
     }
 }
