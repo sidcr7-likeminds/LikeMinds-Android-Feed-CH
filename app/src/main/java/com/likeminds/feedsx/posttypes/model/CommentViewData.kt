@@ -22,7 +22,9 @@ class CommentViewData private constructor(
     var updatedAt: Long,
     var menuItems: List<OverflowMenuItemViewData>,
     var replies: MutableList<CommentViewData>,
-    var parentId: String?
+    var parentId: String?,
+    var alreadySeenFullContent: Boolean?,
+    var fromCommentLiked: Boolean,
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = when (level) {
@@ -45,6 +47,8 @@ class CommentViewData private constructor(
         private var menuItems: List<OverflowMenuItemViewData> = listOf()
         private var replies: MutableList<CommentViewData> = mutableListOf()
         private var parentId: String? = null
+        private var alreadySeenFullContent: Boolean? = null
+        private var fromCommentLiked: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
         fun postId(postId: String) = apply { this.postId = postId }
@@ -65,6 +69,12 @@ class CommentViewData private constructor(
         fun replies(replies: MutableList<CommentViewData>) =
             apply { this.replies = replies }
 
+        fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) =
+            apply { this.alreadySeenFullContent = alreadySeenFullContent }
+
+        fun fromCommentLiked(fromCommentLiked: Boolean) =
+            apply { this.fromCommentLiked = fromCommentLiked }
+
         fun build() = CommentViewData(
             id,
             postId,
@@ -79,7 +89,9 @@ class CommentViewData private constructor(
             updatedAt,
             menuItems,
             replies,
-            parentId
+            parentId,
+            alreadySeenFullContent,
+            fromCommentLiked
         )
     }
 
@@ -98,6 +110,7 @@ class CommentViewData private constructor(
             .menuItems(menuItems)
             .replies(replies)
             .parentId(parentId)
+            .alreadySeenFullContent(alreadySeenFullContent)
+            .fromCommentLiked(fromCommentLiked)
     }
-
 }

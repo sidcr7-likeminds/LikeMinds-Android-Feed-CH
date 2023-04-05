@@ -1,19 +1,25 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.ViewMoreReplyViewData
+import com.likeminds.feedsx.post.detail.util.PostDetailUtil
 import com.likeminds.feedsx.post.detail.view.PostDetailFragment
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
+import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
 
 class ItemPostDetailCommentViewDataBinder constructor(
@@ -38,7 +44,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
         data: CommentViewData,
         position: Int
     ) {
-
         initCommentsView(
             binding,
             data,
@@ -52,18 +57,19 @@ class ItemPostDetailCommentViewDataBinder constructor(
         data: CommentViewData,
         position: Int
     ) {
-
-        //todo
-//        PostTypeUtil.setOverflowMenuItems(
-//            overflowMenu,
-//            data.menuItems
-//        )
-
         binding.apply {
             val context = root.context
 
             tvCommenterName.text = data.user.name
-            tvCommentContent.text = data.text
+
+            PostDetailUtil.initTextContent(
+                tvCommentContent,
+                data,
+                position,
+                postDetailAdapterListener
+            )
+
+            tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_comment_filled)
@@ -90,80 +96,119 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 )
             }
 
-            tvCommentTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
-
-            if (data.repliesCount == 0) {
-                groupReplies.hide()
-            } else {
-                groupReplies.show()
-                tvReplyCount.text = context.resources.getQuantityString(
-                    R.plurals.replies,
-                    data.repliesCount,
-                    data.repliesCount
-                )
-            }
-
-            mRepliesAdapter = PostDetailReplyAdapter(
-                postDetailAdapterListener,
-                postDetailReplyAdapterListener
-            )
-
-            rvReplies.apply {
-                layoutManager = LinearLayoutManager(context)
-                adapter = mRepliesAdapter
-            }
-
-            tvReply.setOnClickListener {
-                postDetailAdapterListener.replyOnComment(
-                    data.id,
-                    position,
-                    data.user
-                )
-            }
-
-            ivLike.setOnClickListener {
+            ivLike.setOnClickListener { view ->
+                // bounce animation for like button
+                ViewUtils.showBounceAnim(context, view)
                 postDetailAdapterListener.likeComment(data.id)
             }
 
-            tvReplyCount.setOnClickListener {
-                postDetailAdapterListener.fetchReplies(data.id, position)
-            }
-
-            ivCommentMenu.setOnClickListener {
-                //todo
-//                PostTypeUtil.showOverflowMenu(
-//                    ivCommentMenu,
-//                    overflowMenu
-//                )
-            }
-
-            if (data.replies.isNotEmpty()) {
-                rvReplies.show()
-                mRepliesAdapter.replace(data.replies.toList())
-                commentSeparator.hide()
-                replyCommentSeparator.show()
-                tvReplyCount.isClickable = false
-                handleViewMore(data, position)
+            if (data.fromCommentLiked) {
+                return
             } else {
-                rvReplies.hide()
-                commentSeparator.show()
-                replyCommentSeparator.hide()
-                tvReplyCount.isClickable = true
+                if (data.repliesCount == 0) {
+                    groupReplies.hide()
+                } else {
+                    groupReplies.show()
+                    tvReplyCount.text = context.resources.getQuantityString(
+                        R.plurals.replies,
+                        data.repliesCount,
+                        data.repliesCount
+                    )
+                }
+
+                mRepliesAdapter = PostDetailReplyAdapter(
+                    postDetailAdapterListener,
+                    postDetailReplyAdapterListener
+                )
+
+                rvReplies.apply {
+                    layoutManager = LinearLayoutManager(context)
+                    adapter = mRepliesAdapter
+                }
+
+                tvReply.setOnClickListener {
+                    postDetailAdapterListener.replyOnComment(
+                        data.id,
+                        position,
+                        data.user
+                    )
+                }
+
+                tvReplyCount.setOnClickListener {
+                    postDetailAdapterListener.fetchReplies(
+                        data.id
+                    )
+                }
+
+                ivCommentMenu.setOnClickListener { view ->
+                    showMenu(
+                        view,
+                        data.postId,
+                        data.id,
+                        data.userId,
+                        data.menuItems
+                    )
+                }
+
+                if (data.replies.isNotEmpty()) {
+                    rvReplies.show()
+                    commentSeparator.hide()
+                    replyCommentSeparator.show()
+                    tvReplyCount.isClickable = false
+                    handleViewMore(data)
+                } else {
+                    rvReplies.hide()
+                    commentSeparator.show()
+                    replyCommentSeparator.hide()
+                    tvReplyCount.isClickable = true
+                }
             }
         }
     }
 
-    // adds ViewMoreReply view when required
-    private fun handleViewMore(data: CommentViewData, position: Int) {
-        if (data.repliesCount > PostDetailFragment.REPLIES_THRESHOLD && data.replies.size < data.repliesCount) {
-            mRepliesAdapter.add(
-                ViewMoreReplyViewData.Builder()
-                    .totalCommentsCount(data.repliesCount)
-                    .currentCount(data.replies.size)
-                    .parentCommentId(data.id)
-                    .parentCommentPosition(position)
-                    .build()
+    //to show overflow menu for comment
+    private fun showMenu(
+        view: View,
+        postId: String,
+        commentId: String,
+        creatorId: String,
+        menuItems: List<OverflowMenuItemViewData>
+    ) {
+        val popup = PopupMenu(view.context, view)
+        menuItems.forEach { menuItem ->
+            popup.menu.add(menuItem.title)
+        }
+
+        popup.setOnMenuItemClickListener { menuItem ->
+            postDetailAdapterListener.onCommentMenuItemClicked(
+                postId,
+                commentId,
+                creatorId,
+                menuItem.title.toString()
             )
+            true
+        }
+        popup.show()
+    }
+
+    // adds ViewMoreReply view when required
+    private fun handleViewMore(data: CommentViewData) {
+        val repliesList = data.replies.toMutableList() as MutableList<BaseViewType>
+        if (repliesList.size >= data.repliesCount) {
+            // if all replies are fetched then only replace the data
+            mRepliesAdapter.replace(repliesList)
+        } else {
+            // if a subset of replies are fetched then also add [ViewMoreReplyViewData]
+            val nextPage = (repliesList.size / PostDetailFragment.REPLIES_THRESHOLD) + 1
+            val viewMoreReply = ViewMoreReplyViewData.Builder()
+                .totalCommentsCount(data.repliesCount)
+                .currentCount(data.replies.size)
+                .parentCommentId(data.id)
+                .page(nextPage)
+                .build()
+            repliesList.add(viewMoreReply)
+
+            mRepliesAdapter.replace(repliesList)
         }
     }
 }

@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class PostViewData private constructor(
     var id: String,
-    var text: String,
+    var text: String?,
     val alreadySeenFullContent: Boolean?,
     val isExpanded: Boolean,
     var attachments: List<AttachmentViewData>,
@@ -20,7 +20,7 @@ class PostViewData private constructor(
     var likesCount: Int,
     var commentsCount: Int,
     var menuItems: List<OverflowMenuItemViewData>,
-    var comments: List<CommentViewData>,
+    var replies: MutableList<CommentViewData>,
     var createdAt: Long,
     var updatedAt: Long,
     var user: UserViewData,
@@ -59,7 +59,7 @@ class PostViewData private constructor(
 
     class Builder {
         private var id: String = ""
-        private var text: String = ""
+        private var text: String? = null
         private var alreadySeenFullContent: Boolean? = null
         private var isExpanded: Boolean = false
         private var attachments: List<AttachmentViewData> = listOf()
@@ -71,7 +71,7 @@ class PostViewData private constructor(
         private var likesCount: Int = 0
         private var commentsCount: Int = 0
         private var menuItems: List<OverflowMenuItemViewData> = listOf()
-        private var comments: List<CommentViewData> = listOf()
+        private var replies: MutableList<CommentViewData> = mutableListOf()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
         private var user: UserViewData = UserViewData.Builder().build()
@@ -84,7 +84,7 @@ class PostViewData private constructor(
         private var fromVideoAction: Boolean = false
 
         fun id(id: String) = apply { this.id = id }
-        fun text(text: String) = apply { this.text = text }
+        fun text(text: String?) = apply { this.text = text }
 
         fun alreadySeenFullContent(alreadySeenFullContent: Boolean?) =
             apply { this.alreadySeenFullContent = alreadySeenFullContent }
@@ -105,7 +105,7 @@ class PostViewData private constructor(
         fun menuItems(menuItems: List<OverflowMenuItemViewData>) =
             apply { this.menuItems = menuItems }
 
-        fun comments(comments: List<CommentViewData>) = apply { this.comments = comments }
+        fun replies(replies: MutableList<CommentViewData>) = apply { this.replies = replies }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
         fun user(user: UserViewData) = apply { this.user = user }
@@ -113,6 +113,7 @@ class PostViewData private constructor(
         fun fromPostSaved(fromPostSaved: Boolean) = apply { this.fromPostSaved = fromPostSaved }
         fun fromVideoAction(fromVideoAction: Boolean) =
             apply { this.fromVideoAction = fromVideoAction }
+
         fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
@@ -132,7 +133,7 @@ class PostViewData private constructor(
             likesCount,
             commentsCount,
             menuItems,
-            comments,
+            replies,
             createdAt,
             updatedAt,
             user,
@@ -160,7 +161,7 @@ class PostViewData private constructor(
             .likesCount(likesCount)
             .commentsCount(commentsCount)
             .menuItems(menuItems)
-            .comments(comments)
+            .replies(replies)
             .createdAt(createdAt)
             .updatedAt(updatedAt)
             .user(user)

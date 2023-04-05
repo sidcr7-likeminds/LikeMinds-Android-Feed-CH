@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,6 +24,8 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
+import com.likeminds.feedsx.feed.util.PostEvent
+import com.likeminds.feedsx.feed.util.PostEvent.PostObserver
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -40,6 +43,7 @@ import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
+import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
@@ -65,9 +69,13 @@ class FeedFragment :
     PostAdapterListener,
     AdminDeleteDialogFragment.DeleteDialogListener,
     SelfDeleteDialogFragment.DeleteAlertDialogListener,
-    LMExoplayerListener {
+    LMExoplayerListener,
+    PostObserver {
 
     private val viewModel: FeedViewModel by viewModels()
+
+    // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
+    private val postActionsViewModel: PostActionsViewModel by activityViewModels()
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
@@ -115,8 +123,8 @@ class FeedFragment :
         }
 
         // observes deletePostResponse LiveData
-        viewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
-            val indexToRemove = getIndexAndPostFromAdapter(postId).first
+        postActionsViewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
+            val indexToRemove = getIndexAndPostFromAdapter(postId)?.first ?: return@observe
             mPostAdapter.removeIndex(indexToRemove)
             ViewUtils.showShortToast(
                 requireContext(),
@@ -125,8 +133,8 @@ class FeedFragment :
         }
 
         // observes pinPostResponse LiveData
-        viewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
-            val post = getIndexAndPostFromAdapter(postId).second
+        postActionsViewModel.pinPostResponse.observe(viewLifecycleOwner) { postId ->
+            val post = getIndexAndPostFromAdapter(postId)?.second ?: return@observe
             if (post.isPinned) {
                 ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
             } else {
@@ -137,6 +145,11 @@ class FeedFragment :
         //observes errorMessage for the apis
         viewModel.errorMessageEventFlow.onEach { response ->
             observeErrorMessage(response)
+        }.observeInLifecycle(viewLifecycleOwner)
+
+        //observes errorMessage for the apis in shared view model
+        postActionsViewModel.errorMessageEventFlow.onEach { response ->
+            observeSharedErrorMessage(response)
         }.observeInLifecycle(viewLifecycleOwner)
     }
 
@@ -286,11 +299,20 @@ class FeedFragment :
                 mSwipeRefreshLayout.isRefreshing = false
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.LikePost -> {
+            is FeedViewModel.ErrorMessageEvent.AddPost -> {
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                removePostingView()
+            }
+        }
+    }
+
+    private fun observeSharedErrorMessage(response: PostActionsViewModel.ErrorMessageEvent) {
+        when (response) {
+            is PostActionsViewModel.ErrorMessageEvent.LikePost -> {
                 val postId = response.postId
 
                 //get post and index
-                val pair = getIndexAndPostFromAdapter(postId)
+                val pair = getIndexAndPostFromAdapter(postId) ?: return
                 val post = pair.second
                 val index = pair.first
 
@@ -308,11 +330,11 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.SavePost -> {
+            is PostActionsViewModel.ErrorMessageEvent.SavePost -> {
                 val postId = response.postId
 
                 //get post and index
-                val pair = getIndexAndPostFromAdapter(postId)
+                val pair = getIndexAndPostFromAdapter(postId) ?: return
                 val post = pair.second
                 val index = pair.first
 
@@ -329,15 +351,15 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.DeletePost -> {
+            is PostActionsViewModel.ErrorMessageEvent.DeletePost -> {
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
-            is FeedViewModel.ErrorMessageEvent.PinPost -> {
+            is PostActionsViewModel.ErrorMessageEvent.PinPost -> {
                 val postId = response.postId
 
                 //get post and index
-                val pair = getIndexAndPostFromAdapter(postId)
+                val pair = getIndexAndPostFromAdapter(postId) ?: return
                 val post = pair.second
                 val index = pair.first
 
@@ -352,10 +374,6 @@ class FeedFragment :
                 //show error message
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
-            }
-            is FeedViewModel.ErrorMessageEvent.AddPost -> {
-                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
-                removePostingView()
             }
         }
     }
@@ -381,13 +399,19 @@ class FeedFragment :
         lmExoplayer.release()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        // unsubscribes itself from the [PostPublisher]
+        PostEvent.getPublisher().unsubscribe(this)
+    }
+
     // initiates SDK
     private fun initiateSDK() {
         ProgressHelper.showProgress(binding.progressBar)
         viewModel.initiateUser(
             "69edd43f-4a5e-4077-9c50-2b7aa740acce",
             "029f66a8-264b-413f-a9df-3ae2f4166486",
-            "Ishaan",
+            "D",
             false
         )
     }
@@ -574,9 +598,13 @@ class FeedFragment :
     /**
      * Post Actions block
      **/
-    override fun updateSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
+
+    // updates [alreadySeenFullContent] for the post
+    override fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
+        // get item from adapter
         val item = mPostAdapter[position]
         if (item is PostViewData) {
+            // update the post view data
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .fromPostSaved(false)
@@ -587,6 +615,7 @@ class FeedFragment :
         }
     }
 
+    // calls the savePost api and updates the post in adapter
     override fun savePost(position: Int) {
         //get item
         val item = mPostAdapter[position]
@@ -598,13 +627,14 @@ class FeedFragment :
                 .build()
 
             //call api
-            viewModel.savePost(newViewData.id)
+            postActionsViewModel.savePost(newViewData.id)
 
             //update recycler
             mPostAdapter.update(position, newViewData)
         }
     }
 
+    // calls the likePost api and updates the post in adapter
     override fun likePost(position: Int) {
         //get item
         val item = mPostAdapter[position]
@@ -624,20 +654,24 @@ class FeedFragment :
                 .build()
 
             //call api
-            viewModel.likePost(newViewData.id)
+            postActionsViewModel.likePost(newViewData.id)
             //update recycler
             mPostAdapter.update(position, newViewData)
         }
     }
 
-    override fun onPostMenuItemClicked(postId: String, title: String) {
-        Log.d("PUI", "postId menu: $postId")
+    // callback when post menu items are clicked
+    override fun onPostMenuItemClicked(
+        postId: String,
+        creatorId: String,
+        title: String
+    ) {
         when (title) {
             DELETE_POST_MENU_ITEM -> {
-                deletePost(postId)
+                deletePost(postId, creatorId)
             }
             REPORT_POST_MENU_ITEM -> {
-                reportPost(postId)
+                reportPost(postId, creatorId)
             }
             PIN_POST_MENU_ITEM -> {
                 pinPost(postId)
@@ -659,6 +693,7 @@ class FeedFragment :
 
     //opens post detail screen when add comment/comments count is clicked
     override fun comment(postId: String) {
+        PostEvent.getPublisher().subscribe(this)
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postId)
             .isEditTextFocused(true)
@@ -668,6 +703,7 @@ class FeedFragment :
 
     //opens post detail screen when post content is clicked
     override fun postDetail(postData: PostViewData) {
+        PostEvent.getPublisher().subscribe(this)
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
@@ -677,12 +713,12 @@ class FeedFragment :
 
     // callback when self post is deleted by user
     override fun selfDelete(deleteExtras: DeleteExtras) {
-        viewModel.deletePost(deleteExtras.postId)
+        postActionsViewModel.deletePost(deleteExtras.postId)
     }
 
     // callback when other's post is deleted by CM
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
-        viewModel.deletePost(deleteExtras.postId, reason)
+        postActionsViewModel.deletePost(deleteExtras.postId, reason)
     }
 
     // updates the fromPostLiked/fromPostSaved variables and updates the rv list
@@ -697,19 +733,20 @@ class FeedFragment :
     }
 
     // processes delete post request
-    private fun deletePost(postId: String) {
-        val post = getIndexAndPostFromAdapter(postId).second
+    private fun deletePost(postId: String, creatorId: String) {
         val deleteExtras = DeleteExtras.Builder()
             .postId(postId)
             .entityType(DELETE_TYPE_POST)
             .build()
 
-        if (post.userId == viewModel.getUserUniqueId()) {
+        if (creatorId == postActionsViewModel.getUserUniqueId()) {
+            // if the post was created by current user
             SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
         } else {
+            // if the post was not created by current user and they are admin
             AdminDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
@@ -718,13 +755,11 @@ class FeedFragment :
     }
 
     // Processes report action on post
-    private fun reportPost(postId: String) {
-        val post = getIndexAndPostFromAdapter(postId).second
-
+    private fun reportPost(postId: String, creatorId: String) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
-            .entityCreatorId(post.userId)
+            .entityCreatorId(creatorId)
             .entityType(REPORT_TYPE_POST)
             .build()
 
@@ -747,9 +782,10 @@ class FeedFragment :
             }
         }
 
+    // calls the pinPost api and updates pins the post in adapter
     private fun pinPost(postId: String) {
         //get item
-        val postAndIndex = getIndexAndPostFromAdapter(postId)
+        val postAndIndex = getIndexAndPostFromAdapter(postId) ?: return
         val index = postAndIndex.first
         val post = postAndIndex.second
 
@@ -774,15 +810,16 @@ class FeedFragment :
             .build()
 
         //call api
-        viewModel.pinPost(postId)
+        postActionsViewModel.pinPost(postId)
 
         //update recycler
         mPostAdapter.update(index, newViewData)
     }
 
+    // calls the pinPost api and updates unpins the post in adapter
     private fun unpinPost(postId: String) {
         //get item
-        val postAndIndex = getIndexAndPostFromAdapter(postId)
+        val postAndIndex = getIndexAndPostFromAdapter(postId) ?: return
         val index = postAndIndex.first
         val post = postAndIndex.second
 
@@ -807,7 +844,7 @@ class FeedFragment :
             .build()
 
         //call api
-        viewModel.pinPost(postId)
+        postActionsViewModel.pinPost(postId)
 
         //update recycler
         mPostAdapter.update(index, newViewData)
@@ -895,6 +932,7 @@ class FeedFragment :
         }
     }
 
+    // shows all attachment documents in list view and updates [isExpanded]
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostAdapter.items().size - 1) {
             binding.recyclerView.post {
@@ -913,15 +951,36 @@ class FeedFragment :
         )
     }
 
+    // callback when publisher publishes any updated postData
+    override fun update(postData: Pair<String, PostViewData?>) {
+        val postId = postData.first
+        // fetches post from adapter
+        val postIndex = getIndexAndPostFromAdapter(postId)?.first ?: return
+
+        val updatedPost = postData.second
+
+        // updates the item in adapter
+        if (updatedPost == null) {
+            // Post was deleted!
+            mPostAdapter.removeIndex(postIndex)
+        } else {
+            // Post was updated
+            mPostAdapter.update(postIndex, updatedPost)
+        }
+    }
 
     /**
      * Adapter Util Block
      **/
 
     //get index and post from the adapter using postId
-    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData> {
+    private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData>? {
         val index = mPostAdapter.items().indexOfFirst {
             (it is PostViewData) && (it.id == postId)
+        }
+
+        if (index == -1) {
+            return null
         }
 
         val post = getPostFromAdapter(index)
