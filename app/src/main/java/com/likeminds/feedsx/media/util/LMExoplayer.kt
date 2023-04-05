@@ -21,7 +21,7 @@ class LMExoplayer @Inject constructor(@ApplicationContext private val context: C
         const val TAG = "PUI"
     }
 
-    fun initialize(listener: LMExoplayerListener) {
+    fun initialize(listener: LMExoplayerListener, repeatMode: Int, playWhenReady: Boolean) {
         Log.d(TAG, "initialize ${LMExoplayer::class.java.name}")
 
         val defaultLoadControl = DefaultLoadControl.Builder()
@@ -34,7 +34,8 @@ class LMExoplayer @Inject constructor(@ApplicationContext private val context: C
 
         exoplayerListener = listener
 
-        exoplayer.repeatMode = Player.REPEAT_MODE_ONE
+        exoplayer.repeatMode = repeatMode
+        exoplayer.playWhenReady = playWhenReady
         exoplayer.addListener(this)
     }
 

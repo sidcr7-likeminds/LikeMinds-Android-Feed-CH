@@ -19,14 +19,19 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.post.create.util.CreatePostListener
+import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeCallback
 import com.likeminds.feedsx.post.create.view.CreatePostActivity.Companion.POST_ATTACHMENTS_LIMIT
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
@@ -59,19 +64,22 @@ import kotlinx.coroutines.flow.*
 @AndroidEntryPoint
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding>(),
-    CreatePostListener {
+    CreatePostListener,
+    LMExoplayerListener {
 
     private val viewModel: CreatePostViewModel by viewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
 
-    private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
-    private var documentsAdapter: CreatePostDocumentsAdapter? = null
+    private lateinit var multiMediaAdapter: CreatePostMultipleMediaAdapter
+    private lateinit var documentsAdapter: CreatePostDocumentsAdapter
 
     private lateinit var etPostTextChangeListener: TextWatcher
 
     private lateinit var memberTagging: MemberTaggingView
+
+    private var exoPlayer: ExoPlayer? = null
 
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
@@ -85,6 +93,11 @@ class CreatePostFragment :
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
+    }
+
+    override fun doCleanup() {
+        super.doCleanup()
+        exoPlayer?.release()
     }
 
     private fun initMemberTaggingView() {
@@ -439,26 +452,48 @@ class CreatePostFragment :
         handleAddAttachmentLayouts(false)
         handlePostButton(true)
         binding.apply {
+            //handle other views
             singleVideoAttachment.root.show()
             singleImageAttachment.root.hide()
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
-            singleVideoAttachment.btnAddMore.setOnClickListener {
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
-            singleVideoAttachment.layoutSingleVideoPost.ivCross.setOnClickListener {
-                selectedMediaUris.clear()
-                singleVideoAttachment.root.hide()
-                handleAddAttachmentLayouts(true)
-                val text = etPostContent.text?.trim()
-                handlePostButton(!text.isNullOrEmpty())
-            }
 
-            //TODO: Use exo player
-            singleVideoAttachment.layoutSingleVideoPost.vvSingleVideoPost.setVideoURI(
-                selectedMediaUris.first().uri
-            )
+            singleVideoAttachment.apply {
+
+                //add more click listener
+                btnAddMore.setOnClickListener {
+                    initiateMediaPicker(listOf(IMAGE, VIDEO))
+                }
+
+                val selectedMediaUri = selectedMediaUris.first()
+
+                layoutSingleVideoPost.apply {
+                    //cross click listener
+                    ivCross.setOnClickListener {
+                        selectedMediaUris.clear()
+                        singleVideoAttachment.root.hide()
+                        handleAddAttachmentLayouts(true)
+                        val text = etPostContent.text?.trim()
+                        handlePostButton(!text.isNullOrEmpty())
+
+                        exoPlayer?.stop()
+                        exoPlayer?.release()
+                        exoPlayer = null
+                    }
+
+                    exoPlayer = ExoPlayer.Builder(requireContext()).build()
+                    vvSingleVideoPost.player = exoPlayer
+                    exoPlayer?.repeatMode = Player.REPEAT_MODE_OFF
+                    exoPlayer?.playWhenReady = false
+                }
+
+                val uri = selectedMediaUri.uri
+                val mediaItem = MediaItem.fromUri(uri)
+                exoPlayer?.clearMediaItems()
+                exoPlayer?.setMediaItem(mediaItem)
+                exoPlayer?.prepare()
+            }
         }
     }
 
@@ -496,6 +531,7 @@ class CreatePostFragment :
         handleAddAttachmentLayouts(false)
         handlePostButton(true)
         binding.apply {
+
             singleImageAttachment.root.hide()
             singleVideoAttachment.root.hide()
             linkPreview.root.hide()
@@ -507,6 +543,8 @@ class CreatePostFragment :
                 } else {
                     View.VISIBLE
                 }
+
+
             multipleMediaAttachment.btnAddMore.setOnClickListener {
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
@@ -515,13 +553,21 @@ class CreatePostFragment :
                 convertSingleDataUri(it)
             }
 
-            if (multiMediaAdapter == null) {
-                multipleMediaAttachment.viewpagerMultipleMedia.isSaveEnabled = false
-                multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
-                multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
-                multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+            multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
+            multipleMediaAttachment.viewpagerMultipleMedia.apply {
+                adapter = multiMediaAdapter
+                registerOnPageChangeCallback(
+                    VideoPlayerPageChangeCallback(
+                        selectedMediaUris,
+                        this,
+                        exoPlayer
+                    )
+                )
             }
-            multiMediaAdapter!!.replace(attachments)
+            multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+            multiMediaAdapter.replace(attachments)
+
+
         }
     }
 
@@ -549,14 +595,13 @@ class CreatePostFragment :
                 convertSingleDataUri(it)
             }
 
-            if (documentsAdapter == null) {
-                documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
-                documentsAttachment.rvDocuments.apply {
-                    adapter = documentsAdapter
-                    layoutManager = LinearLayoutManager(context)
-                }
+            documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
+            documentsAttachment.rvDocuments.apply {
+                adapter = documentsAdapter
+                layoutManager = LinearLayoutManager(context)
             }
-            documentsAdapter!!.replace(attachments)
+
+            documentsAdapter.replace(attachments)
         }
     }
 
@@ -727,9 +772,13 @@ class CreatePostFragment :
     override fun onMediaRemoved(position: Int, mediaType: String) {
         selectedMediaUris.removeAt(position)
         if (mediaType == PDF) {
-            documentsAdapter?.removeIndex(position)
-            if (documentsAdapter?.itemCount == 0) binding.documentsAttachment.root.hide()
-        } else multiMediaAdapter?.removeIndex(position)
+            documentsAdapter.removeIndex(position)
+            if (documentsAdapter.itemCount == 0) {
+                binding.documentsAttachment.root.hide()
+            }
+        } else {
+            multiMediaAdapter.removeIndex(position)
+        }
         showPostMedia()
     }
 

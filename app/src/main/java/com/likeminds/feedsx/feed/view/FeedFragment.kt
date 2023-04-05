@@ -15,6 +15,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
@@ -904,7 +905,7 @@ class FeedFragment :
 
     //initialize exo player
     private fun initializeExoplayer() {
-        lmExoplayer.initialize(this)
+        lmExoplayer.initialize(this, Player.REPEAT_MODE_ONE, false)
     }
 
     override fun videoEnded(positionOfItemInAdapter: Int) {
