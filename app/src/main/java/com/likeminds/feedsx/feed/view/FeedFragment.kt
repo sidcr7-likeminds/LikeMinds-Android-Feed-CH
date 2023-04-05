@@ -15,7 +15,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
@@ -35,7 +34,6 @@ import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
-import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
@@ -65,7 +63,6 @@ import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FeedFragment :
@@ -81,8 +78,8 @@ class FeedFragment :
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
 
-    @Inject
-    lateinit var lmExoplayer: LMExoplayer
+//    @Inject
+//    lateinit var lmExoplayer: LMExoplayer
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -409,7 +406,7 @@ class FeedFragment :
     override fun onStop() {
         super.onStop()
         //release player
-        lmExoplayer.release()
+//        lmExoplayer.release()
     }
 
     // initiates SDK
@@ -885,7 +882,7 @@ class FeedFragment :
                     itemVisible
                 ) as? DataBoundViewHolder<*>)?.binding as? ItemPostSingleVideoBinding
                     ?: return
-            binding.videoPost.player = lmExoplayer.exoplayer
+//            binding.videoPost.player = lmExoplayer.exoplayer
         } else {
             Log.d("PUI", "multiple video")
             val postBinding =
@@ -897,15 +894,15 @@ class FeedFragment :
                     0
                 ) as? DataBoundViewHolder<*>)?.binding as? ItemMultipleMediaVideoBinding ?: return
             Log.d("PUI", "video binding")
-            videoBinding.videoPost.player = lmExoplayer.exoplayer
+//            videoBinding.videoPost.player = lmExoplayer.exoplayer
         }
-        lmExoplayer.stop()
-        lmExoplayer.setMediaItem(mediaItem)
+//        lmExoplayer.stop()
+//        lmExoplayer.setMediaItem(mediaItem)
     }
 
     //initialize exo player
     private fun initializeExoplayer() {
-        lmExoplayer.initialize(this, Player.REPEAT_MODE_ONE, false)
+//        lmExoplayer.initialize(this, Player.REPEAT_MODE_ONE, false)
     }
 
     override fun videoEnded(positionOfItemInAdapter: Int) {
@@ -941,7 +938,7 @@ class FeedFragment :
         when (attachment.mediaActions) {
             MEDIA_ACTION_PLAY -> {
                 Log.d("PUI", "state play")
-                lmExoplayer.pause()
+//                lmExoplayer.pause()
                 val newAttachments = attachment.toBuilder()
                     .mediaActions(MEDIA_ACTION_PAUSE)
                     .build()
@@ -961,7 +958,7 @@ class FeedFragment :
                     .fromVideoAction(true)
                     .build()
                 Log.d("PUI", "play")
-                lmExoplayer.play()
+//                lmExoplayer.play()
                 Log.d("PUI", "update rv")
                 mPostAdapter.update(position, newPost)
             }
@@ -975,7 +972,7 @@ class FeedFragment :
                     .fromVideoAction(true)
                     .build()
                 mPostAdapter.update(position, newPost)
-                lmExoplayer.play()
+//                lmExoplayer.play()
             }
         }
     }

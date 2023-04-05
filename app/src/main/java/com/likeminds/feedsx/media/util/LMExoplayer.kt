@@ -1,81 +1,52 @@
 package com.likeminds.feedsx.media.util
 
 import android.content.Context
-import android.util.Log
+import android.net.Uri
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 
-class LMExoplayer @Inject constructor(@ApplicationContext private val context: Context) :
-    Player.Listener {
+class LMExoplayer(
+    private val context: Context,
+    private val playWhenReady: Boolean,
+    private val repeatMode: Int
+) {
 
-    lateinit var exoplayer: ExoPlayer
+    lateinit var exoPlayer: ExoPlayer
 
-    private lateinit var exoplayerListener: LMExoplayerListener
-    private var positionOfItemInAdapter: Int = -1
-
-    companion object {
-        const val TAG = "PUI"
+    init {
+        initializeMediaPlayer()
     }
 
-    fun initialize(listener: LMExoplayerListener, repeatMode: Int, playWhenReady: Boolean) {
-        Log.d(TAG, "initialize ${LMExoplayer::class.java.name}")
-
-        val defaultLoadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(32 * 1024, 64 * 1024, 32 * 1024, 1024)
-            .build()
-
-        exoplayer = ExoPlayer.Builder(context)
-            .setLoadControl(defaultLoadControl)
-            .build()
-
-        exoplayerListener = listener
-
-        exoplayer.repeatMode = repeatMode
-        exoplayer.playWhenReady = playWhenReady
-        exoplayer.addListener(this)
+    private fun initializeMediaPlayer() {
+        exoPlayer = ExoPlayer.Builder(context).setLoadControl(
+            DefaultLoadControl.Builder()
+                .setBufferDurationsMs(32 * 1024, 64 * 1024, 32 * 1024, 1024)
+                .build()
+        ).build()
+        exoPlayer.playWhenReady = playWhenReady
+        exoPlayer.repeatMode = repeatMode
     }
 
-    fun setMediaItem(mediaItem: MediaItem) {
-        Log.d("PUI", "setting item")
+
+    fun start() = exoPlayer.play()
+
+    fun pause() = exoPlayer.pause()
+
+    fun stop() = exoPlayer.stop()
+
+    fun release() = exoPlayer.release()
+
+    fun seekTo(whereTo: Long) = exoPlayer.seekTo(whereTo)
+
+    fun isPlaying() = exoPlayer.isPlaying
+
+    fun clear() = exoPlayer.clearMediaItems()
+
+    fun setMediaItem(uri: Uri) {
+        val item = MediaItem.fromUri(uri)
         clear()
-        exoplayer.addMediaItem(mediaItem)
-        Log.d("PUI", "prepare exo")
-        exoplayer.prepare()
-    }
-
-    fun play() = exoplayer.play()
-
-    fun pause() = exoplayer.pause()
-
-    fun stop() = exoplayer.stop()
-
-    fun release() = exoplayer.release()
-
-    fun seekTo(whereTo: Long) = exoplayer.seekTo(whereTo)
-
-    fun isPlaying() = exoplayer.isPlaying
-
-    fun clear() = exoplayer.clearMediaItems()
-
-    override fun onPlaybackStateChanged(playbackState: Int) {
-        when (playbackState) {
-            Player.STATE_BUFFERING -> {
-                Log.d(TAG, "buffer state")
-            }
-            Player.STATE_ENDED -> {
-                Log.d(TAG, "ended state")
-                exoplayerListener.videoEnded(positionOfItemInAdapter)
-            }
-            Player.STATE_IDLE -> {
-                Log.d(TAG, "idle state")
-            }
-            Player.STATE_READY -> {
-                Log.d(TAG, "ready state")
-            }
-        }
+        exoPlayer.addMediaItem(item)
+        exoPlayer.prepare()
     }
 }

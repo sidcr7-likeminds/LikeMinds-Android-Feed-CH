@@ -3,17 +3,16 @@ package com.likeminds.feedsx.post.create.util
 import android.net.Uri
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.model.SingleUriData
+import com.likeminds.feedsx.media.util.LMExoplayer
 
 class VideoPlayerPageChangeCallback(
     private val selectedMediaUri: List<SingleUriData>,
     private val viewPager2: ViewPager2,
-    private var exoPlayer: ExoPlayer?
+    private var lmExoplayer: LMExoplayer?
 ) :
     ViewPager2.OnPageChangeCallback() {
 
@@ -31,18 +30,15 @@ class VideoPlayerPageChangeCallback(
     }
 
     private fun initializePlayer(playerView: StyledPlayerView, uri: Uri) {
-        if (exoPlayer == null) {
-            exoPlayer = ExoPlayer.Builder(playerView.context).build()
-            playerView.player = exoPlayer
-            exoPlayer?.repeatMode = Player.REPEAT_MODE_OFF
-            exoPlayer?.playWhenReady = false
+        if (lmExoplayer == null) {
+            lmExoplayer = LMExoplayer(playerView.context, false, Player.REPEAT_MODE_OFF)
+            playerView.player = lmExoplayer?.exoPlayer
         }
-        exoPlayer?.setMediaItem(MediaItem.fromUri(uri))
-        exoPlayer?.prepare()
+        lmExoplayer?.setMediaItem(uri)
     }
 
     private fun releasePlayer() {
-        exoPlayer?.release()
-        exoPlayer = null
+        lmExoplayer?.release()
+        lmExoplayer = null
     }
 }

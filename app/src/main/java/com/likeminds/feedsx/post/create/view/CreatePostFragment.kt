@@ -19,13 +19,12 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
@@ -60,7 +59,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
-
 @AndroidEntryPoint
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding>(),
@@ -79,7 +77,7 @@ class CreatePostFragment :
 
     private lateinit var memberTagging: MemberTaggingView
 
-    private var exoPlayer: ExoPlayer? = null
+    private var lmExoplayer: LMExoplayer? = null
 
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
@@ -97,7 +95,7 @@ class CreatePostFragment :
 
     override fun doCleanup() {
         super.doCleanup()
-        exoPlayer?.release()
+        lmExoplayer?.release()
     }
 
     private fun initMemberTaggingView() {
@@ -477,22 +475,17 @@ class CreatePostFragment :
                         val text = etPostContent.text?.trim()
                         handlePostButton(!text.isNullOrEmpty())
 
-                        exoPlayer?.stop()
-                        exoPlayer?.release()
-                        exoPlayer = null
+                        lmExoplayer?.stop()
+                        lmExoplayer?.release()
+                        lmExoplayer = null
                     }
 
-                    exoPlayer = ExoPlayer.Builder(requireContext()).build()
-                    vvSingleVideoPost.player = exoPlayer
-                    exoPlayer?.repeatMode = Player.REPEAT_MODE_OFF
-                    exoPlayer?.playWhenReady = false
+                    lmExoplayer = LMExoplayer(requireContext(), false, Player.REPEAT_MODE_OFF)
+                    vvSingleVideoPost.player = lmExoplayer?.exoPlayer
                 }
 
                 val uri = selectedMediaUri.uri
-                val mediaItem = MediaItem.fromUri(uri)
-                exoPlayer?.clearMediaItems()
-                exoPlayer?.setMediaItem(mediaItem)
-                exoPlayer?.prepare()
+                lmExoplayer?.setMediaItem(uri)
             }
         }
     }
@@ -560,14 +553,12 @@ class CreatePostFragment :
                     VideoPlayerPageChangeCallback(
                         selectedMediaUris,
                         this,
-                        exoPlayer
+                        lmExoplayer
                     )
                 )
             }
             multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
             multiMediaAdapter.replace(attachments)
-
-
         }
     }
 
