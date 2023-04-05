@@ -1,13 +1,18 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailReplyBinding
+import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.post.detail.util.PostDetailUtil
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -34,30 +39,42 @@ class ItemPostDetailReplyViewDataBinder constructor(
         data: CommentViewData,
         position: Int
     ) {
-
         initReplyView(
             binding,
-            data
+            data,
+            position
         )
     }
 
     private fun initReplyView(
         binding: ItemPostDetailReplyBinding,
-        data: CommentViewData
+        data: CommentViewData,
+        position: Int
     ) {
-
         binding.apply {
             val context = root.context
 
             tvCommenterName.text = data.user.name
-            tvCommentContent.text = data.text
 
-            if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_comment_filled)
-            else ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
+            PostDetailUtil.initTextContent(
+                tvCommentContent,
+                data,
+                position,
+                postDetailAdapterListener,
+                data.parentId
+            )
 
-            tvCommentTime.text = TimeUtil.getDaysHoursOrMinutes(data.createdAt)
+            if (data.isLiked) {
+                ivLike.setImageResource(R.drawable.ic_like_comment_filled)
+            } else {
+                ivLike.setImageResource(R.drawable.ic_like_comment_unfilled)
+            }
 
-            if (data.likesCount == 0) likesCount.hide()
+            tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
+
+            if (data.likesCount == 0) {
+                likesCount.hide()
+            }
             else {
                 likesCount.text =
                     context.resources.getQuantityString(
@@ -75,17 +92,51 @@ class ItemPostDetailReplyViewDataBinder constructor(
                 )
             }
 
-            ivLike.setOnClickListener {
-                postDetailAdapterListener.likeComment(data.id)
+            ivLike.setOnClickListener { view ->
+                // bounce animation for like button
+                ViewUtils.showBounceAnim(context, view)
+                val parentCommentId = data.parentId ?: ""
+                postDetailReplyAdapterListener.likeReply(parentCommentId, data.id)
             }
 
-            ivReplyMenu.setOnClickListener {
-                //todo
-//                PostTypeUtil.showOverflowMenu(
-//                    ivReplyMenu,
-//                    overflowMenu
-//                )
+            ivReplyMenu.setOnClickListener { view ->
+                showMenu(
+                    view,
+                    data.postId,
+                    data.parentId,
+                    data.id,
+                    data.userId,
+                    data.menuItems
+                )
             }
         }
+    }
+
+    //to show overflow menu for reply
+    private fun showMenu(
+        view: View,
+        postId: String,
+        parentCommentId: String?,
+        commentId: String,
+        creatorId: String,
+        menuItems: List<OverflowMenuItemViewData>
+    ) {
+        val popup = PopupMenu(view.context, view)
+        menuItems.forEach { menuItem ->
+            popup.menu.add(menuItem.title)
+        }
+
+        val updatedParentId = parentCommentId ?: ""
+        popup.setOnMenuItemClickListener { menuItem ->
+            postDetailReplyAdapterListener.onReplyMenuItemClicked(
+                postId,
+                updatedParentId,
+                commentId,
+                creatorId,
+                menuItem.title.toString()
+            )
+            true
+        }
+        popup.show()
     }
 }

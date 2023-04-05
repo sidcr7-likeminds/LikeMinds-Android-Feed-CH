@@ -32,13 +32,18 @@ class PostDetailReplyAdapter constructor(
     }
 
     interface PostDetailReplyAdapterListener {
-
+        fun likeReply(parentCommentId: String, replyId: String)
         fun viewMoreReplies(
             parentCommentId: String,
-            parentCommentPosition: Int,
-            currentVisibleReplies: Int
+            page: Int
         )
 
-        fun onReplyMenuItemClicked(replyId: String, title: String) {}
+        fun onReplyMenuItemClicked(
+            postId: String,
+            parentCommentId: String,
+            replyId: String,
+            creatorId: String,
+            title: String
+        )
     }
 }

@@ -58,5 +58,5 @@ dependencies {
     kapt deps.room.compiler
 
     // feed-sdk
-    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:a2da001a86"
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:70447bbd8e"
 }

@@ -16,15 +16,51 @@
             app:layout_constraintBottom_toTopOf="@id/et_comment"
             app:layout_constraintTop_toTopOf="parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_post_details"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/white"
-                android:clipToPadding="false"
-                android:descendantFocusability="blocksDescendants"
-                android:overScrollMode="never"
-                app:layout_constrainedHeight="true" />
+                android:layout_height="wrap_content">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rv_post_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:clipToPadding="false"
+                    android:descendantFocusability="blocksDescendants"
+                    android:overScrollMode="never"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:listitem="@layout/item_post_single_image" />
+
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    android:id="@+id/tv_no_comment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/no_comment_found"
+                    android:textColor="@color/dark_grey"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    app:fontType="regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/rv_post_details" />
+
+                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    android:id="@+id/tv_be_first"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/be_the_first_one_to_comment"
+                    android:textColor="@color/grey"
+                    android:textSize="14sp"
+                    android:visibility="gone"
+                    app:fontType="regular"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_no_comment" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -65,7 +101,7 @@
             android:elevation="4dp"
             android:ellipsize="end"
             android:hint="@string/write_a_comment"
-            android:inputType="textMultiLine"
+            android:inputType="textCapSentences|textMultiLine"
             android:maxHeight="100dp"
             android:minHeight="48dp"
             android:paddingStart="16dp"
@@ -102,6 +138,14 @@
             app:layout_constraintTop_toTopOf="@id/et_comment"
             app:srcCompat="@drawable/ic_comment_send_disable"
             tools:ignore="ContentDescription" />
+
+        <include
+            android:id="@+id/progress_bar"
+            layout="@layout/progress_bar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -16,6 +16,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -184,30 +185,28 @@ class CreatePostFragment :
         }
     }
 
-    private fun fetchUserFromDB() {
-        viewModel.fetchUserFromDB()
-    }
-
-    // initializes click listeners on add attachment layouts
-    private fun initAddAttachmentsView() {
-        binding.apply {
-            layoutAttachFiles.setOnClickListener {
-                val extra = MediaPickerExtras.Builder()
-                    .mediaTypes(listOf(PDF))
-                    .allowMultipleSelect(true)
-                    .build()
-                val intent = MediaPickerActivity.getIntent(requireContext(), extra)
-                documentLauncher.launch(intent)
+    // TODO: remove branding
+    /**
+     * initializes the [memberTaggingView] with the edit text
+     * also sets listener to the [memberTaggingView]
+     */
+    private fun initMemberTaggingView() {
+        memberTagging = binding.memberTaggingView
+        memberTagging.initialize(
+            MemberTaggingExtras.Builder()
+                .editText(binding.etPostContent)
+                .maxHeightInPercentage(0.4f)
+                .color(
+                    BrandingData.currentAdvanced?.third
+                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                )
+                .build()
+        )
+        memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun callApi(page: Int, searchName: String) {
+                viewModel.getMembersForTagging(page, searchName)
             }
-
-            layoutAddImage.setOnClickListener {
-                initiateMediaPicker(listOf(IMAGE))
-            }
-
-            layoutAddVideo.setOnClickListener {
-                initiateMediaPicker(listOf(VIDEO))
-            }
-        }
+        })
     }
 
     // adds text watcher on post content edit text
@@ -232,21 +231,30 @@ class CreatePostFragment :
                 }
                 false
             })
+
+            // text watcher with debounce to add delay in api calls for ogTags
             textChanges()
                 .debounce(500)
                 .distinctUntilChanged()
                 .onEach {
                     val text = it?.toString()?.trim()
-                    if (text.isNullOrEmpty()) {
-                        clearPreviewLink()
-                        if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                        else handlePostButton(true)
-                    } else {
+                    if (!text.isNullOrEmpty()) {
                         showPostMedia()
-                        handlePostButton(true)
                     }
                 }
                 .launchIn(lifecycleScope)
+
+            // text watcher to handlePostButton click-ability
+            addTextChangedListener {
+                val text = it?.toString()?.trim()
+                if (text.isNullOrEmpty()) {
+                    clearPreviewLink()
+                    if (selectedMediaUris.isEmpty()) handlePostButton(false)
+                    else handlePostButton(true)
+                } else {
+                    handlePostButton(true)
+                }
+            }
         }
     }
 
@@ -276,6 +284,28 @@ class CreatePostFragment :
         }
     }
 
+    // initializes click listeners on add attachment layouts
+    private fun initAddAttachmentsView() {
+        binding.apply {
+            layoutAttachFiles.setOnClickListener {
+                val extra = MediaPickerExtras.Builder()
+                    .mediaTypes(listOf(PDF))
+                    .allowMultipleSelect(true)
+                    .build()
+                val intent = MediaPickerActivity.getIntent(requireContext(), extra)
+                documentLauncher.launch(intent)
+            }
+
+            layoutAddImage.setOnClickListener {
+                initiateMediaPicker(listOf(IMAGE))
+            }
+
+            layoutAddVideo.setOnClickListener {
+                initiateMediaPicker(listOf(VIDEO))
+            }
+        }
+    }
+
     // sets data to the author frame
     private fun initAuthorFrame(user: UserViewData) {
         binding.authorFrame.apply {
@@ -288,14 +318,6 @@ class CreatePostFragment :
                 showRoundImage = true,
                 objectKey = user.updatedAt
             )
-        }
-    }
-
-    // clears link preview
-    private fun clearPreviewLink() {
-        ogTags = null
-        binding.linkPreview.apply {
-            root.hide()
         }
     }
 
@@ -394,21 +416,6 @@ class CreatePostFragment :
                 attachmentsLimitExceeded()
                 showAttachedDocuments()
             }
-        }
-    }
-
-    // shows toast and removes extra items if attachments limit is exceeded
-    private fun attachmentsLimitExceeded() {
-        if (selectedMediaUris.size > 10) {
-            showErrorMessageToast(
-                requireContext(), requireContext().resources.getQuantityString(
-                    R.plurals.you_can_select_upto_x_items,
-                    POST_ATTACHMENTS_LIMIT,
-                    POST_ATTACHMENTS_LIMIT
-                )
-            )
-            val size = selectedMediaUris.size
-            selectedMediaUris.subList(POST_ATTACHMENTS_LIMIT, size).clear()
         }
     }
 
@@ -596,6 +603,7 @@ class CreatePostFragment :
         }
     }
 
+
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
         binding.linkPreview.apply {
@@ -603,13 +611,10 @@ class CreatePostFragment :
                 clearPreviewLink()
                 return
             }
-
             val link = text.getUrlIfExist()
-
             if (ogTags != null && link.equals(ogTags?.url)) {
                 return
             }
-
             if (!link.isNullOrEmpty()) {
                 if (link == ogTags?.url) {
                     return
@@ -655,31 +660,11 @@ class CreatePostFragment :
         }
     }
 
-    // handles visibility of add attachment layouts
-    private fun handleAddAttachmentLayouts(show: Boolean) {
-        binding.groupAddAttachments.isVisible = show
-    }
-
-    // handles Post Done button click-ability
-    private fun handlePostButton(
-        clickable: Boolean,
-        showProgress: Boolean? = null
-    ) {
-        val createPostActivity = requireActivity() as CreatePostActivity
-        createPostActivity.binding.apply {
-            if (showProgress == true || showProgress != null) {
-                pbPosting.show()
-                tvPostDone.hide()
-            } else {
-                pbPosting.hide()
-                if (clickable) {
-                    tvPostDone.isClickable = true
-                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
-                } else {
-                    tvPostDone.isClickable = false
-                    tvPostDone.setTextColor(Color.parseColor("#666666"))
-                }
-            }
+    // clears link preview
+    private fun clearPreviewLink() {
+        ogTags = null
+        binding.linkPreview.apply {
+            root.hide()
         }
     }
 
@@ -756,6 +741,49 @@ class CreatePostFragment :
                 ConstraintSet.BOTTOM,
                 margin
             )
+        }
+    }
+
+    // handles visibility of add attachment layouts
+    private fun handleAddAttachmentLayouts(show: Boolean) {
+        binding.groupAddAttachments.isVisible = show
+    }
+
+    // handles Post Done button click-ability
+    private fun handlePostButton(
+        clickable: Boolean,
+        showProgress: Boolean? = null
+    ) {
+        val createPostActivity = requireActivity() as CreatePostActivity
+        createPostActivity.binding.apply {
+            if (showProgress == true || showProgress != null) {
+                pbPosting.show()
+                tvPostDone.hide()
+            } else {
+                pbPosting.hide()
+                if (clickable) {
+                    tvPostDone.isClickable = true
+                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
+                } else {
+                    tvPostDone.isClickable = false
+                    tvPostDone.setTextColor(Color.parseColor("#666666"))
+                }
+            }
+        }
+    }
+
+    // shows toast and removes extra items if attachments limit is exceeded
+    private fun attachmentsLimitExceeded() {
+        if (selectedMediaUris.size > 10) {
+            showErrorMessageToast(
+                requireContext(), requireContext().resources.getQuantityString(
+                    R.plurals.you_can_select_upto_x_items,
+                    POST_ATTACHMENTS_LIMIT,
+                    POST_ATTACHMENTS_LIMIT
+                )
+            )
+            val size = selectedMediaUris.size
+            selectedMediaUris.subList(POST_ATTACHMENTS_LIMIT, size).clear()
         }
     }
 
