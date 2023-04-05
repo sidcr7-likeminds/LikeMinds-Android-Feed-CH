@@ -374,6 +374,7 @@ class CreatePostFragment :
     private fun onMediaPicked(result: MediaPickerResult) {
         val data =
             MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        viewModel.sendMediaAttachedEvent(data)
         selectedMediaUris.addAll(data)
         showPostMedia()
     }
@@ -384,6 +385,7 @@ class CreatePostFragment :
             val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
                 requireContext(), it
             )
+            viewModel.sendMediaAttachedEvent(mediaUris)
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
                 showPostMedia()
@@ -397,6 +399,7 @@ class CreatePostFragment :
             val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
                 requireContext(), it
             )
+            viewModel.sendMediaAttachedEvent(mediaUris)
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
                 attachmentsLimitExceeded()

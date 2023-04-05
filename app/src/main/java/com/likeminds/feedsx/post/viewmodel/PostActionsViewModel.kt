@@ -4,7 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.DeletePostRequest
@@ -90,12 +93,12 @@ class PostActionsViewModel @Inject constructor(
 
     //for delete post
     fun deletePost(
-        postId: String,
+        post: PostViewData,
         reason: String? = null
     ) {
         viewModelScope.launchIO {
             val request = DeletePostRequest.Builder()
-                .postId(postId)
+                .postId(post.id)
                 .deleteReason(reason)
                 .build()
 
@@ -103,33 +106,75 @@ class PostActionsViewModel @Inject constructor(
             val response = lmFeedClient.deletePost(request)
 
             if (response.success) {
-                _deletePostResponse.postValue(postId)
+                sendPostDeletedEvent(post, reason)
+                _deletePostResponse.postValue(post.id)
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.DeletePost(response.errorMessage))
             }
         }
     }
 
+    private fun sendPostDeletedEvent(
+        post: PostViewData,
+        reason: String? = null
+    ) {
+        val userStateString = if (reason == null) {
+            "member"
+        } else {
+            "CM"
+        }
+        val map = mapOf(
+            "user_state" to post.userId,
+            LMAnalytics.Keys.USER_ID to userStateString,
+            LMAnalytics.Keys.POST_ID to post.id,
+            "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
+        )
+        LMAnalytics.track(
+            LMAnalytics.Events.POST_DELETED,
+            map
+        )
+    }
+
     //for pin/unpin post
-    fun pinPost(postId: String) {
+    fun pinPost(post: PostViewData) {
         viewModelScope.launchIO {
             val request = PinPostRequest.Builder()
-                .postId(postId)
+                .postId(post.id)
                 .build()
 
             //call pin api
             val response = lmFeedClient.pinPost(request)
 
             if (response.success) {
-                _pinPostResponse.postValue(postId)
+                sendPinUnpinPostEvent(post)
+                _pinPostResponse.postValue(post.id)
             } else {
                 errorMessageChannel.send(
                     ErrorMessageEvent.PinPost(
-                        postId,
+                        post.id,
                         response.errorMessage
                     )
                 )
             }
+        }
+    }
+
+    private fun sendPinUnpinPostEvent(post: PostViewData) {
+        val map = mapOf(
+            "created_by_id" to post.userId,
+            LMAnalytics.Keys.POST_ID to post.id,
+            "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
+        )
+        if (post.isPinned) {
+            LMAnalytics.track(
+                LMAnalytics.Events.POST_UNPINNED,
+                map
+            )
+        } else {
+            LMAnalytics.track(
+                LMAnalytics.Events.POST_PINNED,
+                map
+            )
         }
     }
 }

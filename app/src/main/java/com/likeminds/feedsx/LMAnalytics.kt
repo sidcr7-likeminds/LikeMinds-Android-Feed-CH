@@ -1,5 +1,7 @@
 package com.likeminds.feedsx
 
+import android.util.Log
+
 object LMAnalytics {
     /*
     * Event names variables
@@ -23,7 +25,7 @@ object LMAnalytics {
         const val COMMENT_DELETED = "Comment deleted"
         const val COMMENT_REPORTED = "Comment reported"
         const val COMMENT_POSTED = "Comment posted"
-        const val REPLY_POSTED = "Reply posted"
+        const val REPLY_POSTED = " "
         const val REPLY_DELETED = "Reply deleted"
         const val REPLY_REPORTED = "Reply reported"
     }
@@ -45,6 +47,11 @@ object LMAnalytics {
     }
 
     fun track(eventName: String, eventProperties: Map<String, String> = mapOf()) {
-
+        Log.d(
+            "LMAnalytics", """
+            eventName: $eventName
+            eventProperties: $eventProperties
+        """.trimIndent()
+        )
     }
 }

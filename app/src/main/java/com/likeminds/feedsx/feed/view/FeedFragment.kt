@@ -385,7 +385,7 @@ class FeedFragment :
 
     override fun onResume() {
         super.onResume()
-
+        viewModel.sendFeedOpenedEvent()
         val temporaryId = viewModel.getTemporaryId()
         if (temporaryId != -1L && !alreadyPosting) {
             removePostingView()
@@ -709,7 +709,6 @@ class FeedFragment :
     //opens post detail screen when post content is clicked
     override fun postDetail(postData: PostViewData) {
         PostPublisher.getPublisher().subscribe(this)
-        // todo: ask
         viewModel.sendCommentListOpenEvent()
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
@@ -720,12 +719,14 @@ class FeedFragment :
 
     // callback when self post is deleted by user
     override fun selfDelete(deleteExtras: DeleteExtras) {
-        postActionsViewModel.deletePost(deleteExtras.postId)
+        val post = getIndexAndPostFromAdapter(deleteExtras.postId).second
+        postActionsViewModel.deletePost(post)
     }
 
     // callback when other's post is deleted by CM
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
-        postActionsViewModel.deletePost(deleteExtras.postId, reason)
+        val post = getIndexAndPostFromAdapter(deleteExtras.postId).second
+        postActionsViewModel.deletePost(post, reason)
     }
 
     // updates the fromPostLiked/fromPostSaved variables and updates the rv list
@@ -819,7 +820,7 @@ class FeedFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostAdapter.update(index, newViewData)
@@ -853,7 +854,7 @@ class FeedFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostAdapter.update(index, newViewData)

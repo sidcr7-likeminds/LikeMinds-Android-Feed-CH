@@ -16,8 +16,10 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.NavHostFragment
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.customview.snackbar.LikeMindsSnackbar
+import com.likeminds.feedsx.utils.model.*
 
 //view related utils class
 object ViewUtils {
@@ -119,6 +121,32 @@ object ViewUtils {
             snackBar.setAnchorView(anchorView)
         }
         snackBar.show()
+    }
+
+    fun getPostTypeFromViewType(postViewType: Int?): String {
+        return when (postViewType) {
+            ITEM_POST_TEXT_ONLY -> {
+                LMAnalytics.Keys.POST_TYPE_TEXT
+            }
+            ITEM_POST_SINGLE_IMAGE -> {
+                LMAnalytics.Keys.POST_TYPE_IMAGE
+            }
+            ITEM_POST_SINGLE_VIDEO -> {
+                LMAnalytics.Keys.POST_TYPE_VIDEO
+            }
+            ITEM_POST_DOCUMENTS -> {
+                LMAnalytics.Keys.POST_TYPE_DOCUMENT
+            }
+            ITEM_POST_MULTIPLE_MEDIA -> {
+                LMAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
+            }
+            ITEM_POST_LINK -> {
+                LMAnalytics.Keys.POST_TYPE_LINK
+            }
+            else -> {
+                LMAnalytics.Keys.POST_TYPE_TEXT
+            }
+        }
     }
 
     //find parent for a particular view

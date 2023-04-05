@@ -222,7 +222,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         commentId: String,
     ) {
         LMAnalytics.track(
-            LMAnalytics.Events.COMMENT_POSTED,
+            LMAnalytics.Events.REPLY_POSTED,
             mapOf(
                 LMAnalytics.Keys.USER_ID to userId,
                 LMAnalytics.Keys.POST_ID to postId,

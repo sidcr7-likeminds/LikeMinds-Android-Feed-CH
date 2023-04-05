@@ -298,6 +298,15 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    fun sendFeedOpenedEvent() {
+        LMAnalytics.track(
+            LMAnalytics.Events.FEED_OPENED,
+            mapOf(
+                "feed_type" to "universal_feed"
+            )
+        )
+    }
+
     /**
      * Triggers when the user clicks on New Post button
      **/

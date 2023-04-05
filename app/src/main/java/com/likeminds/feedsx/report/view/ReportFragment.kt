@@ -9,7 +9,6 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
-import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentReportBinding
 import com.likeminds.feedsx.report.model.*
@@ -19,7 +18,6 @@ import com.likeminds.feedsx.report.viewmodel.ReportViewModel
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
-import com.likeminds.feedsx.utils.model.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -112,7 +110,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 viewModel.sendPostReportedEvent(
                     extras.entityId,
                     extras.entityCreatorId,
-                    getPostType(extras.postViewType),
+                    ViewUtils.getPostTypeFromViewType(extras.postViewType),
                     reason
                 )
             }
@@ -132,32 +130,6 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                     extras.entityId,
                     reason
                 )
-            }
-        }
-    }
-
-    private fun getPostType(postViewType: Int?): String {
-        return when (postViewType) {
-            ITEM_POST_TEXT_ONLY -> {
-                LMAnalytics.Keys.POST_TYPE_TEXT
-            }
-            ITEM_POST_SINGLE_IMAGE -> {
-                LMAnalytics.Keys.POST_TYPE_IMAGE
-            }
-            ITEM_POST_SINGLE_VIDEO -> {
-                LMAnalytics.Keys.POST_TYPE_VIDEO
-            }
-            ITEM_POST_DOCUMENTS -> {
-                LMAnalytics.Keys.POST_TYPE_DOCUMENT
-            }
-            ITEM_POST_MULTIPLE_MEDIA -> {
-                LMAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
-            }
-            ITEM_POST_LINK -> {
-                LMAnalytics.Keys.POST_TYPE_LINK
-            }
-            else -> {
-                LMAnalytics.Keys.POST_TYPE_TEXT
             }
         }
     }

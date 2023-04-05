@@ -1059,7 +1059,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
@@ -1094,7 +1094,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
@@ -1185,7 +1185,8 @@ class PostDetailFragment :
     override fun selfDelete(deleteExtras: DeleteExtras) {
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> {
-                postActionsViewModel.deletePost(deleteExtras.postId)
+                val post = mPostDetailAdapter[postDataPosition] as PostViewData
+                postActionsViewModel.deletePost(post)
             }
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
@@ -1202,7 +1203,8 @@ class PostDetailFragment :
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> {
-                postActionsViewModel.deletePost(deleteExtras.postId, reason)
+                val post = mPostDetailAdapter[postDataPosition] as PostViewData
+                postActionsViewModel.deletePost(post, reason)
             }
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
