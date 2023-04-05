@@ -295,10 +295,10 @@ class FeedViewModel @Inject constructor(
      * Triggers when the user clicks on New Post button
      **/
     fun sendPostCreationStartedEvent() {
-        LMAnalytics.track(LMAnalytics.POST_CREATION_STARTED)
+        LMAnalytics.track(LMAnalytics.Events.POST_CREATION_STARTED)
     }
 
     fun sendCommentListOpenEvent() {
-        LMAnalytics.track(LMAnalytics.COMMENT_LIST_OPEN)
+        LMAnalytics.track(LMAnalytics.Events.COMMENT_LIST_OPEN)
     }
 }

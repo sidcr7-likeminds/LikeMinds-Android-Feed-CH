@@ -621,7 +621,9 @@ class PostDetailFragment :
                 if (parentCommentIdToReply != null) {
                     // input text is reply to a comment
                     val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
+                    val parentComment = getIndexAndCommentFromAdapter(parentCommentId).second
                     viewModel.replyComment(
+                        parentComment.userId,
                         postDetailExtras.postId,
                         parentCommentId,
                         updatedText

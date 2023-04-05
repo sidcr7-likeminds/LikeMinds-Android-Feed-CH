@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -83,5 +84,59 @@ class ReportViewModel @Inject constructor() : ViewModel() {
                 _errorMessage.postValue(response.errorMessage)
             }
         }
+    }
+
+    fun sendPostReportedEvent(
+        postId: String,
+        creatorId: String,
+        postType: String,
+        reason: String
+    ) {
+        LMAnalytics.track(
+            LMAnalytics.Events.POST_REPORTED,
+            mapOf(
+                "created_by_id" to creatorId,
+                LMAnalytics.Keys.POST_ID to postId,
+                "report_reason" to reason,
+                "post_type" to postType,
+            )
+        )
+    }
+
+    fun sendCommentReportedEvent(
+        postId: String,
+        creatorId: String,
+        commentId: String,
+        reason: String
+    ) {
+        LMAnalytics.track(
+            LMAnalytics.Events.COMMENT_REPORTED,
+            mapOf(
+                LMAnalytics.Keys.POST_ID to postId,
+                LMAnalytics.Keys.USER_ID to creatorId,
+                LMAnalytics.Keys.COMMENT_ID to commentId,
+                "reason" to reason,
+            )
+        )
+    }
+
+    fun sendReplyReportedEvent(
+        postId: String,
+        creatorId: String,
+        parentCommentId: String?,
+        replyId: String,
+        reason: String
+    ) {
+        val updatedParentId = parentCommentId ?: ""
+        LMAnalytics.track(
+            LMAnalytics.Events.REPLY_REPORTED,
+            mapOf(
+                LMAnalytics.Keys.POST_ID to postId,
+                LMAnalytics.Keys.COMMENT_ID to updatedParentId,
+                LMAnalytics.Keys.COMMENT_REPLY_ID to replyId,
+                LMAnalytics.Keys.USER_ID to creatorId,
+                "reason" to reason,
+            )
+        )
     }
 }

@@ -9,8 +9,10 @@ import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.FragmentReportBinding
+import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
@@ -18,6 +20,7 @@ import com.likeminds.feedsx.report.viewmodel.ReportViewModel
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
+import com.likeminds.feedsx.utils.model.*
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,6 +28,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
     ReportAdapterListener {
 
     private val viewModel: ReportViewModel by viewModels()
+    private lateinit var reason: String
 
     override fun getViewBinding(): FragmentReportBinding {
         return FragmentReportBinding.inflate(layoutInflater)
@@ -85,6 +89,10 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         viewModel.postReportResponse.observe(viewLifecycleOwner) { success ->
             if (success) {
                 Log.d(LOG_TAG, "report send successfully")
+
+                //send analytics events
+                sendReportEvent()
+
                 val intent = Intent().apply {
                     putExtra(
                         REPORT_RESULT,
@@ -94,6 +102,63 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 //set result, from where the result is coming.
                 requireActivity().setResult(Activity.RESULT_OK, intent)
                 requireActivity().finish()
+            }
+        }
+    }
+
+    //send report event depending upon which type of the report is created
+    private fun sendReportEvent() {
+        when (extras.entityType) {
+            REPORT_TYPE_POST -> {
+                viewModel.sendPostReportedEvent(
+                    extras.entityId,
+                    extras.entityCreatorId,
+                    getPostType(extras.post),
+                    reason
+                )
+            }
+            REPORT_TYPE_COMMENT -> {
+                viewModel.sendCommentReportedEvent(
+                    extras.post.id,
+                    extras.entityCreatorId,
+                    extras.entityId,
+                    reason
+                )
+            }
+            REPORT_TYPE_REPLY -> {
+                viewModel.sendReplyReportedEvent(
+                    extras.post.id,
+                    extras.entityCreatorId,
+                    extras.parentCommentId,
+                    extras.entityId,
+                    reason
+                )
+            }
+        }
+    }
+
+    private fun getPostType(post: PostViewData): String {
+        return when (post.viewType) {
+            ITEM_POST_TEXT_ONLY -> {
+                LMAnalytics.Keys.POST_TYPE_TEXT
+            }
+            ITEM_POST_SINGLE_IMAGE -> {
+                LMAnalytics.Keys.POST_TYPE_IMAGE
+            }
+            ITEM_POST_SINGLE_VIDEO -> {
+                LMAnalytics.Keys.POST_TYPE_VIDEO
+            }
+            ITEM_POST_DOCUMENTS -> {
+                LMAnalytics.Keys.POST_TYPE_DOCUMENT
+            }
+            ITEM_POST_MULTIPLE_MEDIA -> {
+                LMAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
+            }
+            ITEM_POST_LINK -> {
+                LMAnalytics.Keys.POST_TYPE_LINK
+            }
+            else -> {
+                LMAnalytics.Keys.POST_TYPE_TEXT
             }
         }
     }
@@ -135,7 +200,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 .find { it.isSelected }
 
             //get reason for [edittext]
-            val reason = binding.etOthers.text?.trim().toString()
+            reason = binding.etOthers.text?.trim().toString()
             val isOthersSelected = tagSelected?.name?.contains("Others", true)
 
             //if no tag is selected

@@ -162,16 +162,17 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
 
     private fun sendCommentPostedEvent(postId: String, commentId: String) {
         LMAnalytics.track(
-            LMAnalytics.COMMENT_POSTED,
+            LMAnalytics.Events.COMMENT_POSTED,
             mapOf(
-                LMAnalytics.POST_ID to postId,
-                LMAnalytics.COMMENT_ID to commentId
+                LMAnalytics.Keys.POST_ID to postId,
+                LMAnalytics.Keys.COMMENT_ID to commentId
             )
         )
     }
 
     // for replying on a comment on the post
     fun replyComment(
+        userId: String,
         postId: String,
         parentCommentId: String,
         text: String
@@ -190,9 +191,8 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val comment = data.comment
                 val users = data.users
-                // todo: add user id
                 sendReplyPostedEvent(
-                    "user_id",
+                    userId,
                     postId,
                     parentCommentId,
                     comment.id
@@ -222,12 +222,12 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         commentId: String,
     ) {
         LMAnalytics.track(
-            LMAnalytics.COMMENT_POSTED,
+            LMAnalytics.Events.COMMENT_POSTED,
             mapOf(
-                LMAnalytics.USER_ID to userId,
-                LMAnalytics.POST_ID to postId,
-                LMAnalytics.COMMENT_ID to parentCommentId,
-                LMAnalytics.COMMENT_REPLY_ID to commentId
+                LMAnalytics.Keys.USER_ID to userId,
+                LMAnalytics.Keys.POST_ID to postId,
+                LMAnalytics.Keys.COMMENT_ID to parentCommentId,
+                LMAnalytics.Keys.COMMENT_REPLY_ID to commentId
             )
         )
     }
@@ -307,20 +307,20 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         if (parentCommentId == null) {
             // comment deleted event
             LMAnalytics.track(
-                LMAnalytics.COMMENT_DELETED,
+                LMAnalytics.Events.COMMENT_DELETED,
                 mapOf(
-                    LMAnalytics.POST_ID to postId,
-                    LMAnalytics.COMMENT_ID to commentId
+                    LMAnalytics.Keys.POST_ID to postId,
+                    LMAnalytics.Keys.COMMENT_ID to commentId
                 )
             )
         } else {
             // reply deleted event
             LMAnalytics.track(
-                LMAnalytics.REPLY_DELETED,
+                LMAnalytics.Events.REPLY_DELETED,
                 mapOf(
-                    LMAnalytics.POST_ID to postId,
-                    LMAnalytics.COMMENT_ID to parentCommentId,
-                    LMAnalytics.COMMENT_REPLY_ID to commentId,
+                    LMAnalytics.Keys.POST_ID to postId,
+                    LMAnalytics.Keys.COMMENT_ID to parentCommentId,
+                    LMAnalytics.Keys.COMMENT_REPLY_ID to commentId,
                 )
             )
         }
