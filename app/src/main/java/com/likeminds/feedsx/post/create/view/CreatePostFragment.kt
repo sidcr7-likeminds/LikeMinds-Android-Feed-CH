@@ -21,7 +21,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -173,7 +173,7 @@ class CreatePostFragment :
                 .editText(binding.etPostContent)
                 .maxHeightInPercentage(0.4f)
                 .color(
-                    BrandingData.currentAdvanced?.third
+                    LMBranding.currentAdvanced?.third
                         ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
                 )
                 .build()
@@ -745,7 +745,7 @@ class CreatePostFragment :
                 pbPosting.hide()
                 if (clickable) {
                     tvPostDone.isClickable = true
-                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
+                    tvPostDone.setTextColor(LMBranding.getButtonsColor())
                 } else {
                     tvPostDone.isClickable = false
                     tvPostDone.setTextColor(Color.parseColor("#666666"))

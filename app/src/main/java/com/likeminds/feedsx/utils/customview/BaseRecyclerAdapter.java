@@ -11,7 +11,7 @@ import androidx.databinding.ViewDataBinding;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.likeminds.feedsx.branding.model.BrandingData;
+import com.likeminds.feedsx.branding.model.LMBranding;
 import com.likeminds.feedsx.feed.util.FeedDiffUtilCallback;
 import com.likeminds.feedsx.notificationfeed.util.NotificationFeedDiffUtilCallback;
 import com.likeminds.feedsx.post.detail.util.PostDetailDiffUtilCallback;
@@ -99,17 +99,17 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
     }
 
     private void callBranding(ViewDataBinder viewDataBinder, ViewDataBinding binding) {
-        if (BrandingData.currentPrimary != null) {
-            viewDataBinder.drawPrimaryColor(binding, BrandingData.currentPrimary);
-        } else if (BrandingData.currentAdvanced != null) {
+        if (LMBranding.currentPrimary != null) {
+            viewDataBinder.drawPrimaryColor(binding, LMBranding.currentPrimary);
+        } else if (LMBranding.currentAdvanced != null) {
             viewDataBinder.drawAdvancedColor(
                     binding,
-                    BrandingData.currentAdvanced.getFirst(),
-                    BrandingData.currentAdvanced.getSecond(),
-                    BrandingData.currentAdvanced.getThird()
+                    LMBranding.currentAdvanced.getFirst(),
+                    LMBranding.currentAdvanced.getSecond(),
+                    LMBranding.currentAdvanced.getThird()
             );
         } else {
-            viewDataBinder.drawPrimaryColor(binding, BrandingData.INSTANCE.getDefaultColor());
+            viewDataBinder.drawPrimaryColor(binding, LMBranding.INSTANCE.getDefaultColor());
         }
     }
 

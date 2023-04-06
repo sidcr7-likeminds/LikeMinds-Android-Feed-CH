@@ -8,7 +8,6 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
@@ -19,7 +18,7 @@ import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.LayoutSearchBarBinding
 import com.likeminds.feedsx.utils.AnimationUtils.circleHideView
 import com.likeminds.feedsx.utils.AnimationUtils.circleRevealView
@@ -199,10 +198,10 @@ class CustomSearchBar @JvmOverloads constructor(
         binding.etSearch.setText("")
         binding.etSearch.requestFocus()
         circleRevealView(binding.searchToolbar)
-        if (BrandingData.currentPrimary != null) {
-            setBackgroundColor(BrandingData.currentPrimary!!)
-        } else if (BrandingData.currentAdvanced != null) {
-            setBackgroundColor(BrandingData.currentAdvanced!!.first)
+        if (LMBranding.currentPrimary != null) {
+            setBackgroundColor(LMBranding.currentPrimary!!)
+        } else if (LMBranding.currentAdvanced != null) {
+            setBackgroundColor(LMBranding.currentAdvanced!!.first)
         }
         elevation = 20F
         isOpen = true

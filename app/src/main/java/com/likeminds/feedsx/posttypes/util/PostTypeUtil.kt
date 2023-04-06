@@ -14,7 +14,7 @@ import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
@@ -354,7 +354,7 @@ object PostTypeUtil {
                 tvPostContent,
                 trimmedText,
                 enableClick = true,
-                BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
+                LMBranding.currentAdvanced?.third ?: ContextCompat.getColor(
                     tvPostContent.context,
                     R.color.pure_blue
                 )

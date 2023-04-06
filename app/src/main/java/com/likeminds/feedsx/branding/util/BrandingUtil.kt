@@ -5,12 +5,12 @@ import android.graphics.Color
 import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 
 object BrandingUtil {
 
     fun getTypeFace(context: Context, fontStyle: String?): Typeface? {
-        val currentFont = BrandingData.getCurrentFonts()
+        val currentFont = LMBranding.getCurrentFonts()
 
         val typeface = when (fontStyle) {
             "bold" -> {
@@ -44,14 +44,14 @@ object BrandingUtil {
     fun getTextColor(defaultColor: Int, textType: String?): Int {
         val color = when (textType) {
             "title" -> {
-                if (BrandingData.isBrandingBasic) {
+                if (LMBranding.isBrandingBasic) {
                     Color.BLACK
                 } else {
                     Color.WHITE
                 }
             }
             "special" -> {
-                BrandingData.getButtonsColor()
+                LMBranding.getButtonsColor()
             }
             else -> {
                 defaultColor

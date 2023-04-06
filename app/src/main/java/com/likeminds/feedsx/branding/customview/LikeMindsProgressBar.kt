@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import android.widget.ProgressBar
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 
 class LikeMindsProgressBar : ProgressBar {
     constructor(context: Context) : super(context) {
@@ -25,6 +25,6 @@ class LikeMindsProgressBar : ProgressBar {
 
     private fun initiate() {
         // color
-        this.progressTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+        this.progressTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
     }
 }

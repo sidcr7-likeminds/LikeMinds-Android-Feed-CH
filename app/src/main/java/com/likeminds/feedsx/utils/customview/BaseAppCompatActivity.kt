@@ -13,7 +13,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.utils.permissions.Permission
 import com.likeminds.feedsx.utils.permissions.PermissionCallback
 import com.likeminds.feedsx.utils.permissions.SessionPermission
@@ -66,17 +66,17 @@ open class BaseAppCompatActivity : AppCompatActivity() {
 
     private fun callBranding() {
         when {
-            BrandingData.currentPrimary != null -> {
-                drawPrimaryColor(BrandingData.currentPrimary!!)
+            LMBranding.currentPrimary != null -> {
+                drawPrimaryColor(LMBranding.currentPrimary!!)
                 setStatusBarColor(Color.WHITE)
             }
-            BrandingData.currentAdvanced != null -> {
+            LMBranding.currentAdvanced != null -> {
                 drawAdvancedColor(
-                    BrandingData.currentAdvanced!!.first,
-                    BrandingData.currentAdvanced!!.second,
-                    BrandingData.currentAdvanced!!.third
+                    LMBranding.currentAdvanced!!.first,
+                    LMBranding.currentAdvanced!!.second,
+                    LMBranding.currentAdvanced!!.third
                 )
-                setStatusBarColor(BrandingData.getHeaderColor())
+                setStatusBarColor(LMBranding.getHeaderColor())
             }
             else -> {
                 drawPrimaryColor(ContextCompat.getColor(this, R.color.colorPrimary))

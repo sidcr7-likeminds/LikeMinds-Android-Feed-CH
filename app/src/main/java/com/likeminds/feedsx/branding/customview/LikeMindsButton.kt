@@ -5,7 +5,7 @@ import android.content.res.ColorStateList
 import android.util.AttributeSet
 import com.google.android.material.button.MaterialButton
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.branding.util.BrandingUtil
 
 internal class LikeMindsButton : MaterialButton {
@@ -35,6 +35,6 @@ internal class LikeMindsButton : MaterialButton {
 
         // color
         if (!buttonType.equals("normal"))
-            this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+            this.backgroundTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
     }
 }

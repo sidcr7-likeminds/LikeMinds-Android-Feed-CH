@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.SeeMoreUtil
@@ -92,7 +92,7 @@ object PostDetailUtil {
                 tvCommentContent,
                 trimmedText,
                 enableClick = true,
-                BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
+                LMBranding.currentAdvanced?.third ?: ContextCompat.getColor(
                     context,
                     R.color.pure_blue
                 )

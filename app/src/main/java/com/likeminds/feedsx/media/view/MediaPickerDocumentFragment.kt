@@ -14,7 +14,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentMediaPickerDocumentBinding
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
@@ -82,7 +82,7 @@ class MediaPickerDocumentFragment :
     }
 
     private fun updateMenu(menu: Menu) {
-        val isBrandingBasic = BrandingData.isBrandingBasic
+        val isBrandingBasic = LMBranding.isBrandingBasic
 
         //update search icon
         val item = menu.findItem(R.id.menu_item_search)

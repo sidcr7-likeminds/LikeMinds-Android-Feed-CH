@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.res.ColorStateList
 import android.util.AttributeSet
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 
 class LikeMindsFAB : FloatingActionButton {
     constructor(context: Context) : super(context) {
@@ -25,7 +25,7 @@ class LikeMindsFAB : FloatingActionButton {
 
     private fun initiate() {
         // color
-        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+        this.backgroundTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
     }
 
 }

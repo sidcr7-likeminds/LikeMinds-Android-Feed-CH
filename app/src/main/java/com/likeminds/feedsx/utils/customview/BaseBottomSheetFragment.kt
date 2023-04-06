@@ -14,7 +14,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 
 abstract class BaseBottomSheetFragment<B : ViewBinding> :
     BottomSheetDialogFragment() {
@@ -93,13 +93,13 @@ abstract class BaseBottomSheetFragment<B : ViewBinding> :
     }
 
     private fun callBranding() {
-        if (BrandingData.currentPrimary != null) {
-            drawPrimaryColor(BrandingData.currentPrimary!!)
-        } else if (BrandingData.currentAdvanced != null) {
+        if (LMBranding.currentPrimary != null) {
+            drawPrimaryColor(LMBranding.currentPrimary!!)
+        } else if (LMBranding.currentAdvanced != null) {
             drawAdvancedColor(
-                BrandingData.currentAdvanced!!.first,
-                BrandingData.currentAdvanced!!.second,
-                BrandingData.currentAdvanced!!.third
+                LMBranding.currentAdvanced!!.first,
+                LMBranding.currentAdvanced!!.second,
+                LMBranding.currentAdvanced!!.third
             )
         }
     }

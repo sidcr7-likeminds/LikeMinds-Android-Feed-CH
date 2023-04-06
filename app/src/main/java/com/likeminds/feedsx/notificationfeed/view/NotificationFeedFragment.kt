@@ -3,7 +3,7 @@ package com.likeminds.feedsx.notificationfeed.view
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter
@@ -186,7 +186,7 @@ class NotificationFeedFragment :
     private fun initSwipeRefreshLayout() {
         mSwipeRefreshLayout = binding.swipeRefreshLayout
         mSwipeRefreshLayout.setColorSchemeColors(
-            BrandingData.getButtonsColor(),
+            LMBranding.getButtonsColor(),
         )
 
         mSwipeRefreshLayout.setOnRefreshListener {

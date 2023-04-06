@@ -6,7 +6,7 @@ import android.util.AttributeSet
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.AppCompatEditText
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.branding.util.BrandingUtil
 
 
@@ -27,7 +27,7 @@ internal class LikeMindsEditText @JvmOverloads constructor(
         //edittext background color
         val etType = array.getString(R.styleable.LikeMindsEditText_et_type)
         if (etType.equals("special"))
-            this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+            this.backgroundTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
 
         array.recycle()
     }

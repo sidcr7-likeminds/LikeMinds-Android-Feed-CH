@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 
 abstract class BaseFragment<B : ViewBinding> : Fragment() {
 
@@ -117,18 +117,18 @@ abstract class BaseFragment<B : ViewBinding> : Fragment() {
 
     private fun callBranding() {
         when {
-            BrandingData.currentPrimary != null -> {
-                drawPrimaryColor(BrandingData.currentPrimary!!)
+            LMBranding.currentPrimary != null -> {
+                drawPrimaryColor(LMBranding.currentPrimary!!)
             }
-            BrandingData.currentAdvanced != null -> {
+            LMBranding.currentAdvanced != null -> {
                 drawAdvancedColor(
-                    BrandingData.currentAdvanced!!.first,
-                    BrandingData.currentAdvanced!!.second,
-                    BrandingData.currentAdvanced!!.third
+                    LMBranding.currentAdvanced!!.first,
+                    LMBranding.currentAdvanced!!.second,
+                    LMBranding.currentAdvanced!!.third
                 )
             }
             else -> {
-                drawPrimaryColor(BrandingData.defaultColor)
+                drawPrimaryColor(LMBranding.defaultColor)
             }
         }
     }
