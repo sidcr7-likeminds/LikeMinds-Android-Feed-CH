@@ -16,14 +16,4 @@ abstract class ViewDataBinder<V : ViewDataBinding, T : BaseViewType> {
     abstract fun bindData(binding: V, data: T, position: Int)
 
     fun bindData(binding: V, data: Bundle, position: Int) {}
-
-    protected open fun drawPrimaryColor(binding: V, color: Int) {}
-
-    protected open fun drawAdvancedColor(
-        binding: V,
-        headerColor: Int,
-        buttonsIconsColor: Int,
-        textLinksColor: Int,
-    ) {
-    }
 }

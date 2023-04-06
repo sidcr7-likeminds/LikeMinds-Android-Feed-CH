@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.detail.view
 import android.app.Activity
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
@@ -13,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
@@ -107,6 +106,7 @@ class PostDetailFragment :
     override fun setUpViews() {
         super.setUpViews()
 
+        binding.buttonColor = LMBranding.getButtonsColor()
         fetchPostData()
         initRecyclerView()
         initMemberTaggingView()
@@ -151,8 +151,7 @@ class PostDetailFragment :
                 .editText(binding.etComment)
                 .maxHeightInPercentage(0.4f)
                 .color(
-                    BrandingData.currentAdvanced?.third
-                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                    LMBranding.getTextLinkColor()
                 )
                 .build()
         )
@@ -167,7 +166,7 @@ class PostDetailFragment :
     private fun initSwipeRefreshLayout() {
         mSwipeRefreshLayout = binding.swipeRefreshLayout
         mSwipeRefreshLayout.setColorSchemeColors(
-            BrandingData.getButtonsColor(),
+            LMBranding.getButtonsColor(),
         )
 
         mSwipeRefreshLayout.setOnRefreshListener {

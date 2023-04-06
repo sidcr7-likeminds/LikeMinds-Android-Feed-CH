@@ -2,7 +2,6 @@ package com.likeminds.feedsx.utils.customview
 
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.SparseArray
@@ -11,9 +10,7 @@ import android.view.WindowManager
 import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.utils.permissions.Permission
 import com.likeminds.feedsx.utils.permissions.PermissionCallback
 import com.likeminds.feedsx.utils.permissions.SessionPermission
@@ -57,32 +54,11 @@ open class BaseAppCompatActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        callBranding()
+        setStatusBarColor(LMBranding.getHeaderColor())
     }
 
     override fun onPause() {
         super.onPause()
-    }
-
-    private fun callBranding() {
-        when {
-            BrandingData.currentPrimary != null -> {
-                drawPrimaryColor(BrandingData.currentPrimary!!)
-                setStatusBarColor(Color.WHITE)
-            }
-            BrandingData.currentAdvanced != null -> {
-                drawAdvancedColor(
-                    BrandingData.currentAdvanced!!.first,
-                    BrandingData.currentAdvanced!!.second,
-                    BrandingData.currentAdvanced!!.third
-                )
-                setStatusBarColor(BrandingData.getHeaderColor())
-            }
-            else -> {
-                drawPrimaryColor(ContextCompat.getColor(this, R.color.colorPrimary))
-                setStatusBarColor(Color.WHITE)
-            }
-        }
     }
 
     private fun setStatusBarColor(statusBarColor: Int) {

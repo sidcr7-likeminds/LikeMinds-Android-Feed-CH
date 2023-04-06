@@ -14,14 +14,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -161,7 +160,6 @@ class CreatePostFragment :
         }
     }
 
-    // TODO: remove branding
     /**
      * initializes the [memberTaggingView] with the edit text
      * also sets listener to the [memberTaggingView]
@@ -173,8 +171,7 @@ class CreatePostFragment :
                 .editText(binding.etPostContent)
                 .maxHeightInPercentage(0.4f)
                 .color(
-                    BrandingData.currentAdvanced?.third
-                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                    LMBranding.getTextLinkColor()
                 )
                 .build()
         )
@@ -519,6 +516,7 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.show()
+            multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
             multipleMediaAttachment.btnAddMore.visibility =
                 if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
                     View.GONE
@@ -745,7 +743,7 @@ class CreatePostFragment :
                 pbPosting.hide()
                 if (clickable) {
                     tvPostDone.isClickable = true
-                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
+                    tvPostDone.setTextColor(LMBranding.getButtonsColor())
                 } else {
                     tvPostDone.isClickable = false
                     tvPostDone.setTextColor(Color.parseColor("#666666"))

@@ -46,7 +46,7 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="ContentDescription" />
 
-        <TextView
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/textViewFolderTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -57,13 +57,14 @@
             android:text="@{folderData.title}"
             android:textColor="@color/white"
             android:textSize="12sp"
+            app:fontType="regular"
             app:layout_constraintBottom_toBottomOf="@+id/iv_folder_icon"
             app:layout_constraintEnd_toStartOf="@+id/tv_folder_item_count"
             app:layout_constraintStart_toEndOf="@+id/iv_folder_icon"
             app:layout_constraintTop_toTopOf="@+id/iv_folder_icon"
             tools:text="Camera" />
 
-        <TextView
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_folder_item_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -72,6 +73,7 @@
             android:text="@{Integer.toString(folderData.itemCount)}"
             android:textColor="@color/white"
             android:textSize="12sp"
+            app:fontType="regular"
             app:layout_constraintBottom_toBottomOf="@+id/iv_folder_icon"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/iv_folder_icon"

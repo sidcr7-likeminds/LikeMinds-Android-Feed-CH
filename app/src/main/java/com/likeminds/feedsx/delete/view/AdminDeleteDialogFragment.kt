@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.DialogFragmentAdminDeleteBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
@@ -119,7 +119,7 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
     private fun handleConfirmButton(isEnabled: Boolean) {
         binding.tvConfirm.isEnabled = isEnabled
         if (isEnabled) {
-            binding.tvConfirm.setTextColor(BrandingData.getButtonsColor())
+            binding.tvConfirm.setTextColor(LMBranding.getButtonsColor())
         } else {
             binding.tvConfirm.setTextColor(
                 ContextCompat.getColor(

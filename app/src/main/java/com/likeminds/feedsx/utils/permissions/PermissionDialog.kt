@@ -11,7 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.DialogPermissionBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import com.likeminds.feedsx.utils.permissions.PermissionManager.Companion.REQUEST_CODE_SETTINGS_PERMISSION
@@ -30,8 +30,8 @@ class PermissionDialog(
         setContentView(dialogPermissionBinding.root)
 
         //set branding to view
-        dialogPermissionBinding.imageViewIcon.setBackgroundColor(BrandingData.getButtonsColor())
-        dialogPermissionBinding.textViewPositiveButton.setTextColor(BrandingData.getButtonsColor())
+        dialogPermissionBinding.imageViewIcon.setBackgroundColor(LMBranding.getButtonsColor())
+        dialogPermissionBinding.textViewPositiveButton.setTextColor(LMBranding.getButtonsColor())
 
         dialogPermissionBinding.imageViewIcon.setImageDrawable(
             ContextCompat.getDrawable(

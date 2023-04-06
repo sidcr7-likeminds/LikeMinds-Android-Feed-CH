@@ -14,7 +14,7 @@ import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
@@ -43,6 +43,8 @@ object PostTypeUtil {
         listener: PostAdapterListener
     ) {
         binding.apply {
+            // sets button color variable in xml
+            buttonColor = LMBranding.getButtonsColor()
             if (data.isPinned) {
                 ivPin.show()
             } else {
@@ -259,24 +261,28 @@ object PostTypeUtil {
 
     // initializes view pager for multiple media post
     fun initViewPager(binding: ItemPostMultipleMediaBinding, data: PostViewData) {
-        val attachments = data.attachments.map {
-            when (it.attachmentType) {
-                IMAGE -> {
-                    it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
-                }
-                VIDEO -> {
-                    it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
-                }
-                else -> {
-                    it
+        binding.apply {
+            // sets button color variable in xml
+            buttonColor = LMBranding.getButtonsColor()
+            val attachments = data.attachments.map {
+                when (it.attachmentType) {
+                    IMAGE -> {
+                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
+                    }
+                    VIDEO -> {
+                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
+                    }
+                    else -> {
+                        it
+                    }
                 }
             }
+            viewpagerMultipleMedia.isSaveEnabled = false
+            val multipleMediaPostAdapter = MultipleMediaPostAdapter()
+            viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
+            dotsIndicator.setViewPager2(binding.viewpagerMultipleMedia)
+            multipleMediaPostAdapter.replace(attachments)
         }
-        binding.viewpagerMultipleMedia.isSaveEnabled = false
-        val multipleMediaPostAdapter = MultipleMediaPostAdapter()
-        binding.viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
-        binding.dotsIndicator.setViewPager2(binding.viewpagerMultipleMedia)
-        multipleMediaPostAdapter.replace(attachments)
     }
 
     // handles the text content of each post
@@ -349,15 +355,11 @@ object PostTypeUtil {
                     textForLinkify
                 }
 
-            // TODO: remove branding
             MemberTaggingDecoder.decode(
                 tvPostContent,
                 trimmedText,
                 enableClick = true,
-                BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
-                    tvPostContent.context,
-                    R.color.pure_blue
-                )
+                LMBranding.getTextLinkColor()
             ) { tag ->
                 onMemberTagClicked()
             }

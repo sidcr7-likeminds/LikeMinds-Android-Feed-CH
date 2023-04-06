@@ -1,10 +1,9 @@
 package com.likeminds.feedsx.branding.customview
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import androidx.appcompat.widget.Toolbar
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 
 
 class LikeMindsToolbar : Toolbar {
@@ -26,10 +25,10 @@ class LikeMindsToolbar : Toolbar {
 
     private fun initiate() {
         // background color
-        this.setBackgroundColor(BrandingData.getHeaderColor())
+        this.setBackgroundColor(LMBranding.getHeaderColor())
 
-        // icon color
-        val color = if (BrandingData.isBrandingBasic) Color.WHITE else Color.BLACK
+        // toolbar color
+        val color = LMBranding.getToolbarColor()
         this.overflowIcon?.setTint(color)
         this.navigationIcon?.setTint(color)
     }

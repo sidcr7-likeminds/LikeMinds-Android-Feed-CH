@@ -2,11 +2,9 @@ package com.likeminds.feedsx.branding.customview
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.Typeface
 import android.util.AttributeSet
-import androidx.core.content.res.ResourcesCompat
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.util.BrandingUtil
 
@@ -35,6 +33,6 @@ internal class LikeMindsExtendedFAB : ExtendedFloatingActionButton {
         array.recycle()
 
         // color
-        this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+        this.backgroundTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
     }
 }
