@@ -86,7 +86,6 @@ object PostDetailUtil {
                     textForLinkify
                 }
 
-            // TODO: remove branding
             // decodes tags in text and creates span around those tags
             MemberTaggingDecoder.decode(
                 tvCommentContent,

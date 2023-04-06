@@ -10,6 +10,10 @@ object LMBranding {
     private var textLinkColor: String = "#007AFF"
     private var fonts: LMFonts? = null
 
+    /**
+     * @param setBrandingRequest - Request to set branding with colors and fonts
+     * sets headerColor, buttonsColor, textLinkColor and fonts, used throughout the app
+     * */
     fun setBranding(setBrandingRequest: SetBrandingRequest) {
         this.headerColor = setBrandingRequest.headerColor
         this.buttonsColor = setBrandingRequest.buttonsColor

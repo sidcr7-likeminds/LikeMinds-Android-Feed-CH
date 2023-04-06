@@ -8,6 +8,11 @@ import com.likeminds.feedsx.branding.model.LMBranding
 
 object BrandingUtil {
 
+    /**
+     * @param context - context to retrieve assets
+     * @param fontStyle - style of font to be applied
+     * @return Typeface? - typeface of current font as per the [fontStyle]
+     * */
     fun getTypeFace(context: Context, fontStyle: String?): Typeface? {
         val currentFont = LMBranding.getCurrentFonts()
 
@@ -40,6 +45,11 @@ object BrandingUtil {
         return typeface
     }
 
+    /**
+     * @param defaultColor - color already set to the view
+     * @param textType - type of text
+     * @return Int - integer color
+     * */
     fun getTextColor(defaultColor: Int, textType: String?): Int {
         val color = when (textType) {
             "title" -> {

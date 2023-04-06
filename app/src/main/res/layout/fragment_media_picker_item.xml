@@ -39,8 +39,6 @@
                     app:tint="@color/black"
                     tools:ignore="ContentDescription" />
 
-                <!-- TODO ... Apply branding -->
-
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="0dp"
