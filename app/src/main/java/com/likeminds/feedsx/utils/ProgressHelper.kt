@@ -1,10 +1,8 @@
 package com.likeminds.feedsx.utils
 
-import android.content.res.ColorStateList
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ProgressBarBinding
 
 object ProgressHelper {
@@ -22,9 +20,6 @@ object ProgressHelper {
         } else {
             progressBarBinding.root.background = null
         }
-        progressBarBinding.progView.indeterminateTintList = ColorStateList.valueOf(
-            LMBranding.getButtonsColor()
-        )
         progressBarBinding.root.visibility = View.VISIBLE
         progressBarBinding.root.setOnClickListener { }
     }
