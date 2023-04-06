@@ -943,22 +943,6 @@ class FeedFragment :
 //        lmExoplayer.initialize(this, Player.REPEAT_MODE_ONE, false)
     }
 
-    override fun videoEnded(positionOfItemInAdapter: Int) {
-        super.videoEnded(positionOfItemInAdapter)
-//        if (positionOfItemInAdapter == -1) return
-//
-//        val post = getPostFromAdapter(positionOfItemInAdapter)
-//        val attachment = post.attachments.first()
-//        val newAttachments = attachment.toBuilder()
-//            .mediaActions(MEDIA_ACTION_NONE)
-//            .build()
-//        val newPost = post.toBuilder()
-//            .attachments(listOf(newAttachments))
-//            .fromVideoAction(true)
-//            .build()
-//        mPostAdapter.update(positionOfItemInAdapter, newPost)
-    }
-
     override fun getLMExoPlayer(): LMExoplayer? {
         Log.d("PUI", "post detail get lmExoplayer: $lmExoplayer")
         return lmExoplayer

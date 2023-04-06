@@ -27,6 +27,7 @@ import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.LMExoplayer
+import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
@@ -64,7 +65,8 @@ import kotlinx.coroutines.flow.*
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding>(),
     CreatePostListener,
-    VideoPlayerPageChangeListener {
+    VideoPlayerPageChangeListener,
+    LMExoplayerListener {
 
     private val viewModel: CreatePostViewModel by viewModels()
 
@@ -481,7 +483,12 @@ class CreatePostFragment :
                         lmExoplayer = null
                     }
 
-                    lmExoplayer = LMExoplayer(requireContext(), false, Player.REPEAT_MODE_OFF)
+                    lmExoplayer = LMExoplayer(
+                        requireContext(),
+                        false,
+                        Player.REPEAT_MODE_OFF,
+                        this@CreatePostFragment
+                    )
                     vvSingleVideoPost.player = lmExoplayer?.exoPlayer
                 }
 

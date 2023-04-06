@@ -7,6 +7,7 @@ import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
 import com.likeminds.feedsx.media.util.LMExoplayer
+import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
@@ -16,7 +17,7 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 class ItemPostSingleVideoViewDataBinder constructor(
     val listener: PostAdapterListener,
     private val isPostDetail: Boolean
-) : ViewDataBinder<ItemPostSingleVideoBinding, PostViewData>() {
+) : ViewDataBinder<ItemPostSingleVideoBinding, PostViewData>(), LMExoplayerListener {
 
     override val viewType: Int
         get() = ITEM_POST_SINGLE_VIDEO
@@ -73,9 +74,10 @@ class ItemPostSingleVideoViewDataBinder constructor(
 
     private fun initializePlayer(playerView: StyledPlayerView, uri: Uri) {
         if (lmExoplayer == null) {
-            lmExoplayer = LMExoplayer(playerView.context, true, Player.REPEAT_MODE_ONE)
+            lmExoplayer = LMExoplayer(playerView.context, true, Player.REPEAT_MODE_ONE, this)
             listener.setLMExoPlayer(lmExoplayer)
             playerView.player = lmExoplayer?.exoPlayer
+            playerView.setShowBuffering(StyledPlayerView.SHOW_BUFFERING_WHEN_PLAYING)
         }
         lmExoplayer?.setMediaItem(uri)
     }

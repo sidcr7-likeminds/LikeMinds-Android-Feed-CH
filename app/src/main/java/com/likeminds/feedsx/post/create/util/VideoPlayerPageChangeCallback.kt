@@ -7,6 +7,7 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.util.LMExoplayer
+import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 
 class VideoPlayerPageChangeCallback(
@@ -16,7 +17,7 @@ class VideoPlayerPageChangeCallback(
     private val playWhenReady: Boolean,
     private val repeatMode: Int,
     private val listener: VideoPlayerPageChangeListener
-) : ViewPager2.OnPageChangeCallback() {
+) : ViewPager2.OnPageChangeCallback(), LMExoplayerListener {
 
     private var count = 0
 
@@ -52,11 +53,12 @@ class VideoPlayerPageChangeCallback(
 
     private fun initializePlayer(playerView: StyledPlayerView, uri: Uri) {
         if (lmExoplayer == null) {
-            lmExoplayer = LMExoplayer(playerView.context, playWhenReady, repeatMode)
+            lmExoplayer = LMExoplayer(playerView.context, playWhenReady, repeatMode, this)
             Log.d("PUI", "count: $count")
             count++
             listener.setLMExoPlayer(lmExoplayer)
             playerView.player = lmExoplayer?.exoPlayer
+            playerView.setShowBuffering(StyledPlayerView.SHOW_BUFFERING_WHEN_PLAYING)
         }
         lmExoplayer?.setMediaItem(uri)
     }
