@@ -13,11 +13,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.exoplayer2.Player
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeCallback
+import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeListener
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
@@ -258,7 +261,11 @@ object PostTypeUtil {
     }
 
     // initializes view pager for multiple media post
-    fun initViewPager(binding: ItemPostMultipleMediaBinding, data: PostViewData) {
+    fun initViewPager(
+        binding: ItemPostMultipleMediaBinding,
+        data: PostViewData,
+        pageChangeListener: VideoPlayerPageChangeListener
+    ) {
         val attachments = data.attachments.map {
             when (it.attachmentType) {
                 IMAGE -> {
@@ -272,9 +279,23 @@ object PostTypeUtil {
                 }
             }
         }
-        binding.viewpagerMultipleMedia.isSaveEnabled = false
+
+        if (binding.viewpagerMultipleMedia.adapter != null) return
+
         val multipleMediaPostAdapter = MultipleMediaPostAdapter()
-        binding.viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
+        binding.viewpagerMultipleMedia.apply {
+            adapter = multipleMediaPostAdapter
+            registerOnPageChangeCallback(
+                VideoPlayerPageChangeCallback(
+                    data.attachments,
+                    this,
+                    isCreatePostFlow = false,
+                    playWhenReady = true,
+                    repeatMode = Player.REPEAT_MODE_ONE,
+                    listener = pageChangeListener
+                )
+            )
+        }
         binding.dotsIndicator.setViewPager2(binding.viewpagerMultipleMedia)
         multipleMediaPostAdapter.replace(attachments)
     }

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -26,12 +27,12 @@ import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.LMExoplayer
-import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeCallback
+import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeListener
 import com.likeminds.feedsx.post.create.view.CreatePostActivity.Companion.POST_ATTACHMENTS_LIMIT
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
@@ -63,7 +64,7 @@ import kotlinx.coroutines.flow.*
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding>(),
     CreatePostListener,
-    LMExoplayerListener {
+    VideoPlayerPageChangeListener {
 
     private val viewModel: CreatePostViewModel by viewModels()
 
@@ -72,6 +73,7 @@ class CreatePostFragment :
 
     private lateinit var multiMediaAdapter: CreatePostMultipleMediaAdapter
     private lateinit var documentsAdapter: CreatePostDocumentsAdapter
+    private lateinit var pageChangeCallback: VideoPlayerPageChangeCallback
 
     private lateinit var etPostTextChangeListener: TextWatcher
 
@@ -130,6 +132,14 @@ class CreatePostFragment :
                 finish()
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("PUI", "on pause called")
+        Log.d("PUI", "lmExoplayer: $lmExoplayer")
+        lmExoplayer?.release()
+        lmExoplayer = null
     }
 
     private fun fetchUserFromDB() {
@@ -536,21 +546,34 @@ class CreatePostFragment :
             val attachments = selectedMediaUris.map {
                 convertSingleDataUri(it)
             }
-
+            if (!this@CreatePostFragment::pageChangeCallback.isInitialized) {
+                pageChangeCallback = VideoPlayerPageChangeCallback(
+                    attachments,
+                    multipleMediaAttachment.viewpagerMultipleMedia,
+                    isCreatePostFlow = true,
+                    playWhenReady = false,
+                    repeatMode = Player.REPEAT_MODE_OFF,
+                    listener = this@CreatePostFragment
+                )
+            } else {
+                pageChangeCallback.setList(attachments)
+            }
             multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
             multipleMediaAttachment.viewpagerMultipleMedia.apply {
                 adapter = multiMediaAdapter
-                registerOnPageChangeCallback(
-                    VideoPlayerPageChangeCallback(
-                        selectedMediaUris,
-                        this,
-                        lmExoplayer
-                    )
-                )
+                registerOnPageChangeCallback(pageChangeCallback)
             }
             multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
             multiMediaAdapter.replace(attachments)
         }
+    }
+
+    override fun getLMExoPlayer(): LMExoplayer? {
+        return lmExoplayer
+    }
+
+    override fun setLMExoPlayer(lmExoplayer: LMExoplayer?) {
+        this.lmExoplayer = lmExoplayer
     }
 
     // shows document recycler view with attached files
@@ -780,6 +803,8 @@ class CreatePostFragment :
                 binding.documentsAttachment.root.hide()
             }
         } else {
+            lmExoplayer?.release()
+            lmExoplayer = null
             multiMediaAdapter.removeIndex(position)
         }
         showPostMedia()

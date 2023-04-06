@@ -5,7 +5,9 @@ import android.net.Uri
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import javax.inject.Singleton
 
+@Singleton
 class LMExoplayer(
     private val context: Context,
     private val playWhenReady: Boolean,

@@ -37,6 +37,7 @@ import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
+import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
@@ -86,8 +87,7 @@ class FeedFragment :
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
 
-//    @Inject
-//    lateinit var lmExoplayer: LMExoplayer
+    private var lmExoplayer: LMExoplayer? = null
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -421,10 +421,11 @@ class FeedFragment :
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        //release player
-//        lmExoplayer.release()
+    override fun onPause() {
+        super.onPause()
+//        release player
+        lmExoplayer?.release()
+        lmExoplayer = null
     }
 
     override fun onDestroy() {
@@ -956,6 +957,16 @@ class FeedFragment :
 //            .fromVideoAction(true)
 //            .build()
 //        mPostAdapter.update(positionOfItemInAdapter, newPost)
+    }
+
+    override fun getLMExoPlayer(): LMExoplayer? {
+        Log.d("PUI", "post detail get lmExoplayer: $lmExoplayer")
+        return lmExoplayer
+    }
+
+    override fun setLMExoPlayer(lmExoplayer: LMExoplayer?) {
+        this.lmExoplayer = lmExoplayer
+        Log.d("PUI", "post detail set lmExoplayer: ${this.lmExoplayer}")
     }
 
     override fun sendMediaItemToExoPlayer(

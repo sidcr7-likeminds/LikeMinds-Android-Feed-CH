@@ -11,9 +11,9 @@ import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 
 class PostDetailAdapter constructor(
-    val postAdapterListener: PostAdapterListener,
-    val postDetailAdapterListener: PostDetailAdapterListener,
-    val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
+    private val postAdapterListener: PostAdapterListener,
+    private val postDetailAdapterListener: PostDetailAdapterListener,
+    private val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
 ) : BaseRecyclerAdapter<BaseViewType>() {
 
     init {
@@ -41,7 +41,7 @@ class PostDetailAdapter constructor(
         viewDataBinders.add(itemPostSingleImageViewDataBinder)
 
         val itemPostSingleVideoViewDataBinder =
-            ItemPostSingleVideoViewDataBinder(postAdapterListener)
+            ItemPostSingleVideoViewDataBinder(postAdapterListener, true)
         viewDataBinders.add(itemPostSingleVideoViewDataBinder)
 
         val itemPostLinkViewDataBinder = ItemPostLinkViewDataBinder(postAdapterListener)
@@ -51,7 +51,7 @@ class PostDetailAdapter constructor(
         viewDataBinders.add(itemPostDocumentsViewDataBinder)
 
         val itemPostMultipleMediaViewDataBinder =
-            ItemPostMultipleMediaViewDataBinder(postAdapterListener)
+            ItemPostMultipleMediaViewDataBinder(postAdapterListener,true)
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
 
         return viewDataBinders

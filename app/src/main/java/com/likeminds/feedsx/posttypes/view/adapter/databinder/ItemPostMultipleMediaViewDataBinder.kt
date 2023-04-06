@@ -1,17 +1,21 @@
 package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
+import com.likeminds.feedsx.media.util.LMExoplayer
+import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeListener
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
 
-class ItemPostMultipleMediaViewDataBinder constructor(
-    val listener: PostAdapterListener
-) : ViewDataBinder<ItemPostMultipleMediaBinding, PostViewData>() {
+class ItemPostMultipleMediaViewDataBinder(
+    val listener: PostAdapterListener,
+    private val isPostDetail: Boolean
+) : ViewDataBinder<ItemPostMultipleMediaBinding, PostViewData>(), VideoPlayerPageChangeListener {
 
     override val viewType: Int
         get() = ITEM_POST_MULTIPLE_MEDIA
@@ -29,6 +33,7 @@ class ItemPostMultipleMediaViewDataBinder constructor(
         data: PostViewData,
         position: Int
     ) {
+        Log.d("PUI","bind data called")
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
@@ -47,8 +52,15 @@ class ItemPostMultipleMediaViewDataBinder constructor(
             returnBinder = {
                 return@initPostTypeBindData
             }, executeBinder = {
-                // sets the view pager for multiple medias in the post
-                PostTypeUtil.initViewPager(binding, data)
+                PostTypeUtil.initViewPager(binding, data, this)
             })
+    }
+
+    override fun getLMExoPlayer(): LMExoplayer? {
+        return listener.getLMExoPlayer()
+    }
+
+    override fun setLMExoPlayer(lmExoplayer: LMExoplayer?) {
+        listener.setLMExoPlayer(lmExoplayer)
     }
 }

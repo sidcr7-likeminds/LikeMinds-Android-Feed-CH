@@ -2,6 +2,7 @@ package com.likeminds.feedsx.posttypes.view.adapter
 
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
+import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
 import com.likeminds.feedsx.utils.ValueUtils.getItemInList
@@ -26,7 +27,8 @@ class PostAdapter constructor(
         val itemPostSingleImageViewDataBinder = ItemPostSingleImageViewDataBinder(listener)
         viewDataBinders.add(itemPostSingleImageViewDataBinder)
 
-        val itemPostSingleVideoViewDataBinder = ItemPostSingleVideoViewDataBinder(listener)
+        val itemPostSingleVideoViewDataBinder =
+            ItemPostSingleVideoViewDataBinder(listener, false)
         viewDataBinders.add(itemPostSingleVideoViewDataBinder)
 
         val itemPostLinkViewDataBinder = ItemPostLinkViewDataBinder(listener)
@@ -35,7 +37,10 @@ class PostAdapter constructor(
         val itemPostDocumentsViewDataBinder = ItemPostDocumentsViewDataBinder(listener)
         viewDataBinders.add(itemPostDocumentsViewDataBinder)
 
-        val itemPostMultipleMediaViewDataBinder = ItemPostMultipleMediaViewDataBinder(listener)
+        val itemPostMultipleMediaViewDataBinder = ItemPostMultipleMediaViewDataBinder(
+            listener,
+            false
+        )
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
 
         return viewDataBinders
@@ -71,4 +76,9 @@ interface PostAdapterListener {
     }
 
     fun playPauseOnVideo(position: Int) {}
+
+    fun getLMExoPlayer(): LMExoplayer? {
+        return null
+    }
+    fun setLMExoPlayer(lmExoplayer: LMExoplayer?) {}
 }

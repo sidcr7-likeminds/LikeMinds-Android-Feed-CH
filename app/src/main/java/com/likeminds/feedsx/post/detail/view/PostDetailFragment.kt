@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -23,6 +24,7 @@ import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
+import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
@@ -83,6 +85,8 @@ class PostDetailFragment :
     private val commentsCountPosition = 1
     private val commentsStartPosition = 2
 
+    private var lmExoplayer: LMExoplayer? = null
+
     // [postPublisher] to publish changes in the post
     private val postEvent = PostEvent.getPublisher()
 
@@ -125,7 +129,11 @@ class PostDetailFragment :
     // initializes the post detail screen recycler view
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(context)
-        mPostDetailAdapter = PostDetailAdapter(this, this, this)
+        mPostDetailAdapter = PostDetailAdapter(
+            postAdapterListener = this,
+            postDetailAdapterListener = this,
+            postDetailReplyAdapterListener = this
+        )
         binding.rvPostDetails.apply {
             layoutManager = linearLayoutManager
             adapter = mPostDetailAdapter
@@ -166,6 +174,7 @@ class PostDetailFragment :
     // initializes swipe refresh layout and sets refresh listener
     private fun initSwipeRefreshLayout() {
         mSwipeRefreshLayout = binding.swipeRefreshLayout
+        mSwipeRefreshLayout.isRefreshing = false
         mSwipeRefreshLayout.setColorSchemeColors(
             BrandingData.getButtonsColor(),
         )
@@ -222,6 +231,24 @@ class PostDetailFragment :
                 hideReplyingToView()
             }
         }
+    }
+
+    override fun getLMExoPlayer(): LMExoplayer? {
+        Log.d("PUI", "post detail get lmExoplayer: $lmExoplayer")
+        return lmExoplayer
+    }
+
+    override fun setLMExoPlayer(lmExoplayer: LMExoplayer?) {
+        this.lmExoplayer = lmExoplayer
+        Log.d("PUI", "post detail set lmExoplayer: ${this.lmExoplayer}")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("PUI", "on pause called")
+        Log.d("PUI", "lmExoplayer: $lmExoplayer")
+        lmExoplayer?.release()
+        lmExoplayer = null
     }
 
     override fun observeData() {
