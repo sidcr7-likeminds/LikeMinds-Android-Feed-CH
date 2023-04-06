@@ -349,7 +349,6 @@ object PostTypeUtil {
                     textForLinkify
                 }
 
-            // TODO: remove branding
             MemberTaggingDecoder.decode(
                 tvPostContent,
                 trimmedText,

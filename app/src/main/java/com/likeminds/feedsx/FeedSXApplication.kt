@@ -5,6 +5,9 @@ import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
+import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFonts
+import com.likeminds.feedsx.branding.model.SetBrandingRequest
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.likemindsfeed.LMCallback
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -36,12 +39,30 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
     override fun onCreate() {
         super.onCreate()
 
+        setupBranding()
         initAWSMobileClient()
 
         // extras to instantiate LMFeedClient
         val extra = LMFeedClient.Builder(this)
             .lmCallback(this)
             .build()
+    }
+
+    // TODO: testing data
+    private fun setupBranding() {
+        val lmFonts = LMFonts.Builder()
+            .bold("fonts/montserrat-bold.ttf")
+            .medium("fonts/montserrat-medium.ttf")
+            .regular("fonts/montserrat-regular.ttf")
+            .build()
+
+        val setBrandingRequest = SetBrandingRequest.Builder()
+//            .headerColor()
+//            .buttonsColor()
+//            .textLinkColor()
+            .fonts(lmFonts)
+            .build()
+        LMBranding.setBranding(setBrandingRequest)
     }
 
     private fun initAWSMobileClient() {

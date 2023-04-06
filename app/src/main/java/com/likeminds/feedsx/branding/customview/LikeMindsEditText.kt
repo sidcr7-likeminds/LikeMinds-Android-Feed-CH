@@ -21,7 +21,7 @@ internal class LikeMindsEditText @JvmOverloads constructor(
         val array = context.obtainStyledAttributes(attributeSet, R.styleable.LikeMindsEditText)
         this.typeface = BrandingUtil.getTypeFace(
             context,
-            array.getString(R.styleable.LikeMindsTextView_fontType)
+            array.getString(R.styleable.LikeMindsEditText_font_style)
         )
 
         //edittext background color

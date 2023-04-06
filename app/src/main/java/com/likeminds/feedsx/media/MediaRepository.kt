@@ -14,6 +14,7 @@ import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.annotation.WorkerThread
 import com.annimon.stream.Stream
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.utils.DateUtil
@@ -130,7 +131,7 @@ class MediaRepository @Inject constructor() {
                 mediaFolders.add(
                     0, MediaFolderViewData.Builder()
                         .thumbnailUri(data.third)
-                        .title("All media")
+                        .title(context.getString(R.string.all_media))
                         .itemCount(allMediaCount)
                         .bucketId(ALL_MEDIA_BUCKET_ID)
                         .folderType(MediaFolderType.NORMAL)
