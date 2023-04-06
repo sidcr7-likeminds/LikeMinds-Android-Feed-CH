@@ -7,6 +7,7 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ActivityCreatePostBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,8 +41,7 @@ class CreatePostActivity : BaseAppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityCreatePostBinding.inflate(layoutInflater)
 
-        //TODO: Set as per branding
-        binding.isBrandingBasic = true
+        binding.toolbarColor = LMBranding.getToolbarColor()
 
         setContentView(binding.root)
 

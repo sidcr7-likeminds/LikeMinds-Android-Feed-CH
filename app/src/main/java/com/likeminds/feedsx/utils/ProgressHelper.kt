@@ -22,11 +22,9 @@ object ProgressHelper {
         } else {
             progressBarBinding.root.background = null
         }
-        if (LMBranding.currentPrimary != null || LMBranding.currentAdvanced != null) {
-            progressBarBinding.progView.indeterminateTintList = ColorStateList.valueOf(
-                LMBranding.currentPrimary ?: LMBranding.currentAdvanced!!.second
-            )
-        }
+        progressBarBinding.progView.indeterminateTintList = ColorStateList.valueOf(
+            LMBranding.getButtonsColor()
+        )
         progressBarBinding.root.visibility = View.VISIBLE
         progressBarBinding.root.setOnClickListener { }
     }

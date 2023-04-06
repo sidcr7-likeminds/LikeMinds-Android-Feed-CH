@@ -2,7 +2,6 @@ package com.likeminds.feedsx.media.view
 
 import android.app.Activity
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -16,9 +15,9 @@ import androidx.lifecycle.lifecycleScope
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentMediaPickerDocumentBinding
+import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
-import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.viewmodel.MediaViewModel
 import com.likeminds.feedsx.search.util.CustomSearchBar
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -82,15 +81,15 @@ class MediaPickerDocumentFragment :
     }
 
     private fun updateMenu(menu: Menu) {
-        val isBrandingBasic = LMBranding.isBrandingBasic
+        val toolbarColor = LMBranding.getToolbarColor()
 
         //update search icon
         val item = menu.findItem(R.id.menu_item_search)
-        item?.icon?.setTint(if (isBrandingBasic) Color.BLACK else Color.WHITE)
+        item?.icon?.setTint(toolbarColor)
 
         //update sort icon
         val item2 = menu.findItem(R.id.menu_item_sort)
-        item2?.icon?.setTint(if (isBrandingBasic) Color.BLACK else Color.WHITE)
+        item2?.icon?.setTint(toolbarColor)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

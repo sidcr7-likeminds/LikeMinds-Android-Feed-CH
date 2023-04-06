@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ItemReportTagsBinding
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
@@ -27,42 +28,20 @@ class ReportTagItemViewDataBinder constructor(
             parent,
             false
         )
+        setTagBackground(binding)
         setListeners(binding)
         return binding
     }
 
-    override fun drawPrimaryColor(binding: ItemReportTagsBinding, color: Int) {
-        super.drawPrimaryColor(binding, color)
+    // sets tag background to the buttons color
+    private fun setTagBackground(binding: ItemReportTagsBinding) {
         val drawable = binding.tvReportTag.background as GradientDrawable
         drawable.mutate()
         val width = ViewUtils.dpToPx(1)
 
         if (binding.reportTagViewData?.isSelected == true) {
-            drawable.color = ColorStateList.valueOf(color)
-            drawable.setStroke(width, color)
-        } else {
-            drawable.color = ColorStateList.valueOf(Color.WHITE)
-            drawable.setStroke(
-                width,
-                ContextCompat.getColor(binding.root.context, R.color.brown_grey)
-            )
-        }
-    }
-
-    override fun drawAdvancedColor(
-        binding: ItemReportTagsBinding,
-        headerColor: Int,
-        buttonsIconsColor: Int,
-        textLinksColor: Int
-    ) {
-        super.drawAdvancedColor(binding, headerColor, buttonsIconsColor, textLinksColor)
-        val drawable = binding.tvReportTag.background as GradientDrawable
-        drawable.mutate()
-        val width = ViewUtils.dpToPx(1)
-
-        if (binding.reportTagViewData?.isSelected == true) {
-            drawable.color = ColorStateList.valueOf(buttonsIconsColor)
-            drawable.setStroke(width, buttonsIconsColor)
+            drawable.color = ColorStateList.valueOf(LMBranding.getButtonsColor())
+            drawable.setStroke(width, LMBranding.getButtonsColor())
         } else {
             drawable.color = ColorStateList.valueOf(Color.WHITE)
             drawable.setStroke(

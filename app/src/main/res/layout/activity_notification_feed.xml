@@ -8,8 +8,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="isBrandingBasic"
-            type="Boolean" />
+            name="toolbarColor"
+            type="int" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -41,7 +41,7 @@
                     android:layout_marginTop="18dp"
                     android:layout_marginBottom="19dp"
                     android:foreground="?selectableItemBackgroundBorderless"
-                    android:tint="@{isBrandingBasic ? @color/black : @color/white}"
+                    android:tint="@{toolbarColor}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"

@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.branding.util
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 import com.likeminds.feedsx.R
@@ -44,11 +43,7 @@ object BrandingUtil {
     fun getTextColor(defaultColor: Int, textType: String?): Int {
         val color = when (textType) {
             "title" -> {
-                if (LMBranding.isBrandingBasic) {
-                    Color.BLACK
-                } else {
-                    Color.WHITE
-                }
+                LMBranding.getToolbarColor()
             }
             "special" -> {
                 LMBranding.getButtonsColor()

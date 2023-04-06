@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ActivityPostDetailBinding
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.utils.ViewUtils
@@ -49,8 +50,7 @@ class PostDetailActivity : BaseAppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = ActivityPostDetailBinding.inflate(layoutInflater)
-        //TODO: Set as per branding
-        binding.isBrandingBasic = true
+        binding.toolbarColor = LMBranding.getToolbarColor()
         setContentView(binding.root)
 
         val bundle = intent.getBundleExtra("bundle")

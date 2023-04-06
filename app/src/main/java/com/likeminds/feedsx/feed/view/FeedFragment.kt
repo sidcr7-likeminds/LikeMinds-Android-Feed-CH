@@ -425,8 +425,7 @@ class FeedFragment :
 
     // initializes various UI components
     private fun initUI() {
-        //TODO: Set as per branding
-        binding.isBrandingBasic = true
+        binding.toolbarColor = LMBranding.getToolbarColor()
 
         initRecyclerView()
         initSwipeRefreshLayout()

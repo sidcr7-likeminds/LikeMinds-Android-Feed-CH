@@ -354,10 +354,7 @@ object PostTypeUtil {
                 tvPostContent,
                 trimmedText,
                 enableClick = true,
-                LMBranding.currentAdvanced?.third ?: ContextCompat.getColor(
-                    tvPostContent.context,
-                    R.color.pure_blue
-                )
+                LMBranding.getTextLinkColor()
             ) { tag ->
                 onMemberTagClicked()
             }

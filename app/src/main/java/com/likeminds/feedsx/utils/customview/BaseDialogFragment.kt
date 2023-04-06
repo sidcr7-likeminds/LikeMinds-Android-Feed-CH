@@ -11,7 +11,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.fragment.app.DialogFragment
 import androidx.viewbinding.ViewBinding
-import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.utils.ViewUtils
 
 abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
@@ -32,13 +31,6 @@ abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
     protected open fun observeData() {}
     protected open fun attachDagger() {}
     protected open fun receiveExtras() {}
-    protected open fun drawPrimaryColor(color: Int) {}
-    protected open fun drawAdvancedColor(
-        headerColor: Int,
-        buttonsIconsColor: Int,
-        textLinksColor: Int
-    ) {
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -67,7 +59,6 @@ abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
         savedInstanceState: Bundle?,
     ): View {
         _binding = getViewBinding()
-        callBranding()
         return binding.root
     }
 
@@ -82,17 +73,5 @@ abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
-    }
-
-    private fun callBranding() {
-        if (LMBranding.currentPrimary != null) {
-            drawPrimaryColor(LMBranding.currentPrimary!!)
-        } else if (LMBranding.currentAdvanced != null) {
-            drawAdvancedColor(
-                LMBranding.currentAdvanced!!.first,
-                LMBranding.currentAdvanced!!.second,
-                LMBranding.currentAdvanced!!.third
-            )
-        }
     }
 }

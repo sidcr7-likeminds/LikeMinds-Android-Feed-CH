@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
-import com.likeminds.feedsx.branding.model.LMBranding
 
 abstract class BaseFragment<B : ViewBinding> : Fragment() {
 
@@ -31,21 +30,6 @@ abstract class BaseFragment<B : ViewBinding> : Fragment() {
      * Only use to receive extras in fragment
      */
     protected open fun receiveExtras() {}
-
-    /**
-     * Only use to set basic branding inside fragment
-     */
-    protected open fun drawPrimaryColor(color: Int) {}
-
-    /**
-     * Only use to set advanced branding inside fragment
-     */
-    protected open fun drawAdvancedColor(
-        headerColor: Int,
-        buttonsIconsColor: Int,
-        textLinksColor: Int,
-    ) {
-    }
 
     /**
      * attachs to the component
@@ -92,7 +76,6 @@ abstract class BaseFragment<B : ViewBinding> : Fragment() {
         if (_binding == null) {
             _binding = getViewBinding()
         }
-        callBranding()
         return binding.root
     }
 
@@ -113,23 +96,5 @@ abstract class BaseFragment<B : ViewBinding> : Fragment() {
             _binding = null
         }
         super.onDestroyView()
-    }
-
-    private fun callBranding() {
-        when {
-            LMBranding.currentPrimary != null -> {
-                drawPrimaryColor(LMBranding.currentPrimary!!)
-            }
-            LMBranding.currentAdvanced != null -> {
-                drawAdvancedColor(
-                    LMBranding.currentAdvanced!!.first,
-                    LMBranding.currentAdvanced!!.second,
-                    LMBranding.currentAdvanced!!.third
-                )
-            }
-            else -> {
-                drawPrimaryColor(LMBranding.defaultColor)
-            }
-        }
     }
 }

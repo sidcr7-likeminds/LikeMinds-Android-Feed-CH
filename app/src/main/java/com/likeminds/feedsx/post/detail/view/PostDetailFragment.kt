@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.detail.view
 import android.app.Activity
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
@@ -151,8 +150,7 @@ class PostDetailFragment :
                 .editText(binding.etComment)
                 .maxHeightInPercentage(0.4f)
                 .color(
-                    LMBranding.currentAdvanced?.third
-                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                    LMBranding.getTextLinkColor()
                 )
                 .build()
         )

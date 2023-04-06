@@ -26,5 +26,6 @@ class LikeMindsProgressBar : ProgressBar {
     private fun initiate() {
         // color
         this.progressTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
+        this.indeterminateTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
     }
 }

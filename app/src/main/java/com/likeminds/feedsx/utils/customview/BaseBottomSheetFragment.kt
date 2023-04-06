@@ -14,7 +14,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
 
 abstract class BaseBottomSheetFragment<B : ViewBinding> :
     BottomSheetDialogFragment() {
@@ -31,15 +30,6 @@ abstract class BaseBottomSheetFragment<B : ViewBinding> :
     protected open fun receiveExtras() {}
 
     protected open fun attachDagger() {}
-
-    protected open fun drawPrimaryColor(color: Int) {}
-
-    protected open fun drawAdvancedColor(
-        headerColor: Int,
-        buttonsIconsColor: Int,
-        textLinksColor: Int,
-    ) {
-    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -76,7 +66,6 @@ abstract class BaseBottomSheetFragment<B : ViewBinding> :
         if (_binding == null) {
             _binding = getViewBinding()
         }
-        callBranding()
         return binding.root
     }
 
@@ -91,17 +80,4 @@ abstract class BaseBottomSheetFragment<B : ViewBinding> :
         _binding = null
         super.onDestroyView()
     }
-
-    private fun callBranding() {
-        if (LMBranding.currentPrimary != null) {
-            drawPrimaryColor(LMBranding.currentPrimary!!)
-        } else if (LMBranding.currentAdvanced != null) {
-            drawAdvancedColor(
-                LMBranding.currentAdvanced!!.first,
-                LMBranding.currentAdvanced!!.second,
-                LMBranding.currentAdvanced!!.third
-            )
-        }
-    }
-
 }

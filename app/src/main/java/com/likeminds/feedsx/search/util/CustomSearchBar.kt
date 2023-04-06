@@ -28,7 +28,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.onStart
 
 class CustomSearchBar @JvmOverloads constructor(
     mContext: Context,
@@ -198,11 +197,7 @@ class CustomSearchBar @JvmOverloads constructor(
         binding.etSearch.setText("")
         binding.etSearch.requestFocus()
         circleRevealView(binding.searchToolbar)
-        if (LMBranding.currentPrimary != null) {
-            setBackgroundColor(LMBranding.currentPrimary!!)
-        } else if (LMBranding.currentAdvanced != null) {
-            setBackgroundColor(LMBranding.currentAdvanced!!.first)
-        }
+        setBackgroundColor(LMBranding.getHeaderColor())
         elevation = 20F
         isOpen = true
         mSearchViewListener?.onSearchViewOpened()
@@ -232,7 +227,7 @@ class CustomSearchBar @JvmOverloads constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun observeSearchView(debounce: Boolean = true) {
-        if(debounce) {
+        if (debounce) {
             binding.etSearch.textChanges()
                 .debounce(500)
                 .distinctUntilChanged()
