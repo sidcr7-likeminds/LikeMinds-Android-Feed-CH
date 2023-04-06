@@ -8,17 +8,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.post.create.util.PostPreferences
+import com.likeminds.feedsx.posttypes.model.IMAGE
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
+import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
+import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
+import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_IMAGE
+import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
@@ -223,13 +231,16 @@ class FeedViewModel @Inject constructor(
             val response = lmFeedClient.addPost(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
+                val postViewData = convertPost(
+                    data.post,
+                    data.users
+                )
+
+                // sends post creation completed event
+                sendPostCreationCompletedEvent(postViewData)
+
                 postDataEventChannel.send(
-                    PostDataEvent.PostResponseData(
-                        convertPost(
-                            data.post,
-                            data.users
-                        )
-                    )
+                    PostDataEvent.PostResponseData(postViewData)
                 )
                 // post added successfully update the post in db
                 val temporaryId = postPreferences.getTemporaryId()
@@ -287,6 +298,132 @@ class FeedViewModel @Inject constructor(
             postWithAttachmentsRepository.updateUploadWorkerUUID(postId, uploadData.second)
             uploadData.first.enqueue()
             fetchPendingPostFromDB()
+        }
+    }
+
+    /**
+     * Triggers when the user opens feed fragment
+     **/
+    fun sendFeedOpenedEvent() {
+        LMAnalytics.track(
+            LMAnalytics.Events.FEED_OPENED,
+            mapOf(
+                "feed_type" to "universal_feed"
+            )
+        )
+    }
+
+    /**
+     * Triggers when the user clicks on New Post button
+     **/
+    fun sendPostCreationStartedEvent() {
+        LMAnalytics.track(LMAnalytics.Events.POST_CREATION_STARTED)
+    }
+
+    /**
+     * Triggers when the user opens post detail screen
+     **/
+    fun sendCommentListOpenEvent() {
+        LMAnalytics.track(LMAnalytics.Events.COMMENT_LIST_OPEN)
+    }
+
+    /**
+     * Triggers when the user opens post is created successfully
+     **/
+    private fun sendPostCreationCompletedEvent(
+        post: PostViewData
+    ) {
+        val map = hashMapOf<String, String>()
+        // fetches list of tagged users
+        val taggedUsers = MemberTaggingDecoder.decodeAndReturnAllTaggedMembers(post.text)
+
+        // adds tagged user count and their ids in the map
+        if (taggedUsers.isNotEmpty()) {
+            map["user_tagged"] = "yes"
+            map["tagged_users_count"] = taggedUsers.size.toString()
+            val taggedUserIds =
+                taggedUsers.joinToString {
+                    it.first
+                }
+            map["tagged_users_id"] = taggedUserIds
+        } else {
+            map["user_tagged"] = "no"
+        }
+
+        // gets event property key and corresponding value for post attachments
+        val attachmentInfo = getEventAttachmentInfo(post)
+        attachmentInfo.forEach {
+            map[it.first] = it.second
+        }
+        LMAnalytics.track(
+            LMAnalytics.Events.POST_CREATION_COMPLETED,
+            map
+        )
+    }
+
+    /**
+     * @param post - view data of post
+     * @return - a list of pair of event key and value
+     * */
+    private fun getEventAttachmentInfo(post: PostViewData): List<Pair<String, String>> {
+        return when (post.viewType) {
+            ITEM_POST_SINGLE_IMAGE -> {
+                listOf(
+                    Pair("image_attached", "1"),
+                    Pair("video_attached", "no"),
+                    Pair("document_attached", "no"),
+                    Pair("link_attached", "no")
+                )
+            }
+            ITEM_POST_SINGLE_VIDEO -> {
+                listOf(
+                    Pair("video_attached", "1"),
+                    Pair("image_attached", "no"),
+                    Pair("document_attached", "no"),
+                    Pair("link_attached", "no")
+                )
+            }
+            ITEM_POST_DOCUMENTS -> {
+                listOf(
+                    Pair("video_attached", "no"),
+                    Pair("image_attached", "no"),
+                    Pair("document_attached", post.attachments.size.toString()),
+                    Pair("link_attached", "no")
+                )
+            }
+            ITEM_POST_MULTIPLE_MEDIA -> {
+                val imageCount = post.attachments.count {
+                    it.attachmentType == IMAGE
+                }
+                val imageCountString = if (imageCount == 0) {
+                    "no"
+                } else {
+                    imageCount.toString()
+                }
+                val videCount = post.attachments.count {
+                    it.attachmentType == VIDEO
+                }
+                val videoCountString = if (videCount == 0) {
+                    "no"
+                } else {
+                    videCount.toString()
+                }
+                listOf(
+                    Pair(
+                        "image_attached",
+                        imageCountString
+                    ),
+                    Pair(
+                        "video_attached",
+                        videoCountString
+                    ),
+                    Pair("document_attached", "no"),
+                    Pair("link_attached", "no")
+                )
+            }
+            else -> {
+                return emptyList()
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
     ReportAdapterListener {
 
     private val viewModel: ReportViewModel by viewModels()
+    private lateinit var reasonOrTag: String
 
     override fun getViewBinding(): FragmentReportBinding {
         return FragmentReportBinding.inflate(layoutInflater)
@@ -85,6 +86,10 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
         viewModel.postReportResponse.observe(viewLifecycleOwner) { success ->
             if (success) {
                 Log.d(LOG_TAG, "report send successfully")
+
+                //send analytics events
+                sendReportEvent()
+
                 val intent = Intent().apply {
                     putExtra(
                         REPORT_RESULT,
@@ -94,6 +99,40 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                 //set result, from where the result is coming.
                 requireActivity().setResult(Activity.RESULT_OK, intent)
                 requireActivity().finish()
+            }
+        }
+    }
+
+    //send report event depending upon which type of the report is created
+    private fun sendReportEvent() {
+        when (extras.entityType) {
+            REPORT_TYPE_POST -> {
+                // sends post reported event
+                viewModel.sendPostReportedEvent(
+                    extras.entityId,
+                    extras.entityCreatorId,
+                    ViewUtils.getPostTypeFromViewType(extras.postViewType),
+                    reasonOrTag
+                )
+            }
+            REPORT_TYPE_COMMENT -> {
+                // sends comment reported event
+                viewModel.sendCommentReportedEvent(
+                    extras.postId,
+                    extras.entityCreatorId,
+                    extras.entityId,
+                    reasonOrTag
+                )
+            }
+            REPORT_TYPE_REPLY -> {
+                // sends reply reported event
+                viewModel.sendReplyReportedEvent(
+                    extras.postId,
+                    extras.entityCreatorId,
+                    extras.parentCommentId,
+                    extras.entityId,
+                    reasonOrTag
+                )
             }
         }
     }
@@ -154,6 +193,13 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
                     "Please enter a reason."
                 )
                 return@setOnClickListener
+            }
+
+            // update [reasonOrTag] with tag value or reason
+            reasonOrTag = if (isOthersSelected == true) {
+                reason
+            } else {
+                tagSelected?.name ?: reason
             }
 
             //call post api

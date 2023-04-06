@@ -202,7 +202,10 @@ class PostDetailFragment :
                 if (parentCommentIdToReply != null) {
                     // input text is reply to a comment
                     val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
+                    val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
+                        ?: return@setOnClickListener
                     viewModel.replyComment(
+                        parentComment.userId,
                         postDetailExtras.postId,
                         parentCommentId,
                         updatedText
@@ -641,13 +644,19 @@ class PostDetailFragment :
         entityId: String,
         creatorId: String,
         @ReportType
-        entityType: Int
+        entityType: Int,
+        postId: String,
+        postViewType: Int? = null,
+        parentCommentId: String? = null
     ) {
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(entityId)
             .entityCreatorId(creatorId)
             .entityType(entityType)
+            .postId(postId)
+            .postViewType(postViewType)
+            .parentCommentId(parentCommentId)
             .build()
 
         //get Intent for [ReportActivity]
@@ -951,7 +960,40 @@ class PostDetailFragment :
         }
     }
 
-    private fun pinPost(postId: String) {
+    // callback when post menu items are clicked
+    override fun onPostMenuItemClicked(
+        postId: String,
+        creatorId: String,
+        title: String
+    ) {
+        when (title) {
+            DELETE_POST_MENU_ITEM -> {
+                deletePost(
+                    postId,
+                    creatorId
+                )
+            }
+            REPORT_POST_MENU_ITEM -> {
+                val postData = mPostDetailAdapter[postDataPosition] as PostViewData
+                val postViewType = postData.viewType
+                reportEntity(
+                    postId,
+                    creatorId,
+                    REPORT_TYPE_POST,
+                    postId,
+                    postViewType = postViewType
+                )
+            }
+            PIN_POST_MENU_ITEM -> {
+                pinPost()
+            }
+            UNPIN_POST_MENU_ITEM -> {
+                unpinPost()
+            }
+        }
+    }
+
+    private fun pinPost() {
         //get item
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
@@ -976,7 +1018,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
@@ -985,7 +1027,7 @@ class PostDetailFragment :
         postEvent.notify(Pair(newViewData.id, newViewData))
     }
 
-    private fun unpinPost(postId: String) {
+    private fun unpinPost() {
         //get item
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
@@ -1011,7 +1053,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)
@@ -1030,31 +1072,6 @@ class PostDetailFragment :
             comment.id,
             1
         )
-    }
-
-    // callback when post menu items are clicked
-    override fun onPostMenuItemClicked(
-        postId: String,
-        creatorId: String,
-        title: String
-    ) {
-        when (title) {
-            DELETE_POST_MENU_ITEM -> {
-                deletePost(
-                    postId,
-                    creatorId
-                )
-            }
-            REPORT_POST_MENU_ITEM -> {
-                reportEntity(postId, creatorId, REPORT_TYPE_POST)
-            }
-            PIN_POST_MENU_ITEM -> {
-                pinPost(postId)
-            }
-            UNPIN_POST_MENU_ITEM -> {
-                unpinPost(postId)
-            }
-        }
     }
 
     // callback for comment's menu is item
@@ -1076,7 +1093,8 @@ class PostDetailFragment :
                 reportEntity(
                     commentId,
                     creatorId,
-                    REPORT_TYPE_COMMENT
+                    REPORT_TYPE_COMMENT,
+                    postId
                 )
             }
         }
@@ -1116,7 +1134,9 @@ class PostDetailFragment :
                 reportEntity(
                     replyId,
                     creatorId,
-                    REPORT_TYPE_REPLY
+                    REPORT_TYPE_REPLY,
+                    postId,
+                    parentCommentId = parentCommentId
                 )
             }
         }
@@ -1126,7 +1146,8 @@ class PostDetailFragment :
     override fun selfDelete(deleteExtras: DeleteExtras) {
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> {
-                postActionsViewModel.deletePost(deleteExtras.postId)
+                val post = mPostDetailAdapter[postDataPosition] as PostViewData
+                postActionsViewModel.deletePost(post)
             }
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
@@ -1143,7 +1164,8 @@ class PostDetailFragment :
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
         when (deleteExtras.entityType) {
             DELETE_TYPE_POST -> {
-                postActionsViewModel.deletePost(deleteExtras.postId, reason)
+                val post = mPostDetailAdapter[postDataPosition] as PostViewData
+                postActionsViewModel.deletePost(post, reason)
             }
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
