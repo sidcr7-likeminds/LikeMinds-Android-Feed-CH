@@ -33,6 +33,14 @@ internal class LikeMindsButton : MaterialButton {
         this.typeface = BrandingUtil.getTypeFace(context, fontStyle)
         array.recycle()
 
+        // sets text color
+        setTextColor(LMBranding.getButtonsColor())
+
+        // applies button color to button drawables
+        compoundDrawables.forEach {
+            it?.setTintList(ColorStateList.valueOf(LMBranding.getButtonsColor()))
+        }
+
         // color
         if (!buttonType.equals("normal"))
             this.backgroundTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())

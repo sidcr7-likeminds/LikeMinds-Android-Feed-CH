@@ -50,17 +50,17 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
 
     // TODO: testing data
     private fun setupBranding() {
-        val lmFonts = LMFonts.Builder()
-            .bold("fonts/montserrat-bold.ttf")
-            .medium("fonts/montserrat-medium.ttf")
-            .regular("fonts/montserrat-regular.ttf")
-            .build()
+//        val lmFonts = LMFonts.Builder()
+//            .bold("fonts/montserrat-bold.ttf")
+//            .medium("fonts/montserrat-medium.ttf")
+//            .regular("fonts/montserrat-regular.ttf")
+//            .build()
 
-        val setBrandingRequest = SetBrandingRequest.Builder()
-//            .headerColor()
-//            .buttonsColor()
-//            .textLinkColor()
-            .fonts(lmFonts)
+        val setBrandingRequest = SetBrandingRequest.Builder() 
+            .headerColor("#9B26AF")
+            .buttonsColor("#E81D62")
+            .textLinkColor("#4BAE4F")
+//            .fonts(lmFonts)
             .build()
         LMBranding.setBranding(setBrandingRequest)
     }

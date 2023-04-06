@@ -45,6 +45,9 @@ object BrandingUtil {
             "title" -> {
                 LMBranding.getToolbarColor()
             }
+            "subtitle" -> {
+                LMBranding.getSubtitleColor()
+            }
             "special" -> {
                 LMBranding.getButtonsColor()
             }

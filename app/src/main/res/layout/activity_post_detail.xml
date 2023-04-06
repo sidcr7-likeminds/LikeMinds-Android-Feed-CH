@@ -61,8 +61,8 @@
                     app:layout_constraintBottom_toTopOf="@id/tv_toolbar_sub_title"
                     app:layout_constraintStart_toEndOf="@+id/iv_back"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_chainStyle="packed" />
-                <!--                    app:textType="title" />-->
+                    app:layout_constraintVertical_chainStyle="packed"
+                    app:textType="title" />
 
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_sub_title"
@@ -78,8 +78,8 @@
                     app:layout_constraintStart_toStartOf="@+id/tv_toolbar_title"
                     app:layout_constraintTop_toBottomOf="@id/tv_toolbar_title"
                     app:layout_constraintVertical_chainStyle="packed"
+                    app:textType="subtitle"
                     tools:text="14 comments" />
-                <!--                    app:textType="subtitle" />-->
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -41,6 +41,15 @@ object LMBranding {
         }
     }
 
+    // returns color of subtitle text
+    fun getSubtitleColor(): Int {
+        return if (headerColor == "#FFFFFF") {
+            Color.GRAY
+        } else {
+            Color.WHITE
+        }
+    }
+
     // returns paths of the current fonts
     fun getCurrentFonts(): LMFonts? {
         return fonts

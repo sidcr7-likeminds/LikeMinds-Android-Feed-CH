@@ -160,7 +160,6 @@ class CreatePostFragment :
         }
     }
 
-    // TODO: remove branding
     /**
      * initializes the [memberTaggingView] with the edit text
      * also sets listener to the [memberTaggingView]
@@ -517,6 +516,7 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.show()
+            multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
             multipleMediaAttachment.btnAddMore.visibility =
                 if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
                     View.GONE

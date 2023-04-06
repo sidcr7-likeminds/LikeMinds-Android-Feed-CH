@@ -106,6 +106,7 @@ class PostDetailFragment :
     override fun setUpViews() {
         super.setUpViews()
 
+        binding.buttonColor = LMBranding.getButtonsColor()
         fetchPostData()
         initRecyclerView()
         initMemberTaggingView()
