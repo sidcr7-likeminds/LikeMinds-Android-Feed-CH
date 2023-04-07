@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
@@ -383,16 +384,26 @@ object PostTypeUtil {
                 )
             }
 
-            LinkifyCompat.addLinks(tvPostContent, Linkify.WEB_URLS)
-            tvPostContent.movementMethod = CustomLinkMovementMethod {
-                //TODO: Handle links etc.
-                true
-            }
-
             tvPostContent.text = TextUtils.concat(
                 trimmedText,
                 seeMoreSpannableStringBuilder
             )
+
+            LinkifyCompat.addLinks(tvPostContent, Linkify.ALL)
+            tvPostContent.movementMethod = CustomLinkMovementMethod { url ->
+                tvPostContent.setOnClickListener {
+                    null
+                }
+                val intent = Route.handleDeepLink(tvPostContent.context, url)
+                if (intent != null) {
+                    try {
+                        ActivityCompat.startActivity(tvPostContent.context, intent, null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                true
+            }
         }
     }
 
@@ -431,6 +442,16 @@ object PostTypeUtil {
         data: LinkOGTagsViewData
     ) {
         binding.apply {
+            root.setOnClickListener {
+                val intent = Route.handleDeepLink(root.context, data.url)
+                if (intent != null) {
+                    try {
+                        ActivityCompat.startActivity(root.context, intent, null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
                 data.title
             } else {

@@ -6,12 +6,14 @@ import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.view.View
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
+import com.likeminds.feedsx.utils.Route
 import com.likeminds.feedsx.utils.SeeMoreUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -107,17 +109,27 @@ object PostDetailUtil {
                 )
             }
 
-            LinkifyCompat.addLinks(tvCommentContent, Linkify.WEB_URLS)
-            tvCommentContent.movementMethod = CustomLinkMovementMethod {
-                //TODO: Handle links etc.
-                true
-            }
-
             // appends see more text at last
             tvCommentContent.text = TextUtils.concat(
                 trimmedText,
                 seeMoreSpannableStringBuilder
             )
+
+            LinkifyCompat.addLinks(tvCommentContent, Linkify.WEB_URLS)
+            tvCommentContent.movementMethod = CustomLinkMovementMethod { url ->
+                tvCommentContent.setOnClickListener {
+                    null
+                }
+                val intent = Route.handleDeepLink(tvCommentContent.context, url)
+                if (intent != null) {
+                    try {
+                        ActivityCompat.startActivity(tvCommentContent.context, intent, null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                true
+            }
         }
     }
 
