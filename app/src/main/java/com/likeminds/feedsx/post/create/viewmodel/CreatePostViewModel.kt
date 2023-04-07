@@ -146,11 +146,10 @@ class CreatePostViewModel @Inject constructor(
 
                 // adds post data in local db
                 storePost(
-                    uploadData.second,
+                    uploadData,
                     updatedText,
                     updatedFileUris
                 )
-                uploadData.first.enqueue()
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
@@ -177,11 +176,12 @@ class CreatePostViewModel @Inject constructor(
 
     //add post:{} into local db
     private fun storePost(
-        uuid: String,
+        uploadData: Pair<WorkContinuation, String>,
         text: String?,
         fileUris: List<SingleUriData>? = null
     ) {
         viewModelScope.launchIO {
+            val uuid = uploadData.second
             if (fileUris == null) {
                 return@launchIO
             }
@@ -202,6 +202,7 @@ class CreatePostViewModel @Inject constructor(
             // add it to local db
             postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             _postAdded.postValue(false)
+            uploadData.first.enqueue()
         }
     }
 
