@@ -71,9 +71,18 @@ object PostDetailUtil {
 
         // post is used here to get lines count in the text view
         tvCommentContent.post {
+            // decodes tags in text and creates span around those tags
+            MemberTaggingDecoder.decode(
+                tvCommentContent,
+                textForLinkify,
+                enableClick = true,
+                LMBranding.getTextLinkColor()
+            ) { tag ->
+                onMemberTagClicked()
+            }
+
             // gets short text to set with seeMore
             val shortText: String? = SeeMoreUtil.getShortContent(
-                data.text,
                 tvCommentContent,
                 3,
                 500
@@ -81,20 +90,10 @@ object PostDetailUtil {
 
             val trimmedText =
                 if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                    shortText
+                    tvCommentContent.editableText.subSequence(0, shortText.length)
                 } else {
-                    textForLinkify
+                    tvCommentContent.editableText
                 }
-
-            // decodes tags in text and creates span around those tags
-            MemberTaggingDecoder.decode(
-                tvCommentContent,
-                trimmedText,
-                enableClick = true,
-                LMBranding.getTextLinkColor()
-            ) { tag ->
-                onMemberTagClicked()
-            }
 
             val seeMoreSpannableStringBuilder = SpannableStringBuilder()
             if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
@@ -116,7 +115,7 @@ object PostDetailUtil {
 
             // appends see more text at last
             tvCommentContent.text = TextUtils.concat(
-                tvCommentContent.text,
+                trimmedText,
                 seeMoreSpannableStringBuilder
             )
         }

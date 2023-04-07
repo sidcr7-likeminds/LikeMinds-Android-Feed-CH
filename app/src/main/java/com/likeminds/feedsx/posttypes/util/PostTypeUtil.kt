@@ -332,6 +332,9 @@ object PostTypeUtil {
         )
         val seeMoreClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
+                tvPostContent.setOnClickListener {
+                    null
+                }
                 alreadySeenFullContent = true
                 adapterListener.updatePostSeenFullContent(itemPosition, true)
             }
@@ -341,20 +344,21 @@ object PostTypeUtil {
             }
         }
 
-        val postTextClickableSpan = object : ClickableSpan() {
-            override fun onClick(view: View) {
-                adapterListener.postDetail(data)
-            }
-
-            override fun updateDrawState(textPaint: TextPaint) {
-                textPaint.isUnderlineText = false
-            }
-        }
-
         // post is used here to get lines count in the text view
         tvPostContent.post {
+            tvPostContent.setOnClickListener {
+                adapterListener.postDetail(data)
+            }
+            MemberTaggingDecoder.decode(
+                tvPostContent,
+                textForLinkify,
+                enableClick = true,
+                LMBranding.getTextLinkColor()
+            ) { tag ->
+                onMemberTagClicked()
+            }
+
             val shortText: String? = SeeMoreUtil.getShortContent(
-                data.text,
                 tvPostContent,
                 3,
                 500
@@ -362,19 +366,10 @@ object PostTypeUtil {
 
             val trimmedText =
                 if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                    shortText
+                    tvPostContent.editableText.subSequence(0, shortText.length)
                 } else {
-                    textForLinkify
+                    tvPostContent.editableText
                 }
-
-            MemberTaggingDecoder.decode(
-                tvPostContent,
-                trimmedText,
-                enableClick = true,
-                LMBranding.getTextLinkColor()
-            ) { tag ->
-                onMemberTagClicked()
-            }
 
             val seeMoreSpannableStringBuilder = SpannableStringBuilder()
             if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
@@ -388,15 +383,6 @@ object PostTypeUtil {
                 )
             }
 
-            val postTextSpannableStringBuilder = SpannableStringBuilder()
-            postTextSpannableStringBuilder.append(trimmedText)
-            postTextSpannableStringBuilder.setSpan(
-                postTextClickableSpan,
-                0,
-                trimmedText.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-
             LinkifyCompat.addLinks(tvPostContent, Linkify.WEB_URLS)
             tvPostContent.movementMethod = CustomLinkMovementMethod {
                 //TODO: Handle links etc.
@@ -404,7 +390,7 @@ object PostTypeUtil {
             }
 
             tvPostContent.text = TextUtils.concat(
-                tvPostContent.text,
+                trimmedText,
                 seeMoreSpannableStringBuilder
             )
         }
