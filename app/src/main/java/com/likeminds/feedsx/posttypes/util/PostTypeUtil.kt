@@ -24,7 +24,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
-import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
+import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -116,25 +116,27 @@ object PostTypeUtil {
         postAdapterListener: PostAdapterListener,
         position: Int
     ) {
-        val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
-        binding.rvDocuments.apply {
-            adapter = mDocumentsAdapter
-            layoutManager = LinearLayoutManager(binding.root.context)
-        }
+        binding.apply {
+            val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
+            rvDocuments.apply {
+                adapter = mDocumentsAdapter
+                layoutManager = LinearLayoutManager(root.context)
+            }
 
-        val documents = postData.attachments
+            val documents = postData.attachments
 
-        if (postData.isExpanded || documents.size <= SHOW_MORE_COUNT) {
-            binding.tvShowMore.hide()
-            mDocumentsAdapter.replace(postData.attachments)
-        } else {
-            binding.tvShowMore.show()
-            "+${documents.size - SHOW_MORE_COUNT} more".also { binding.tvShowMore.text = it }
-            mDocumentsAdapter.replace(documents.take(SHOW_MORE_COUNT))
-        }
+            if (postData.isExpanded || documents.size <= SHOW_MORE_COUNT) {
+                tvShowMore.hide()
+                mDocumentsAdapter.replace(postData.attachments)
+            } else {
+                tvShowMore.show()
+                "+${documents.size - SHOW_MORE_COUNT} more".also { tvShowMore.text = it }
+                mDocumentsAdapter.replace(documents.take(SHOW_MORE_COUNT))
+            }
 
-        binding.tvShowMore.setOnClickListener {
-            postAdapterListener.onMultipleDocumentsExpanded(postData, position)
+            tvShowMore.setOnClickListener {
+                postAdapterListener.onMultipleDocumentsExpanded(postData, position)
+            }
         }
     }
 
@@ -197,15 +199,15 @@ object PostTypeUtil {
             else ivLike.setImageResource(R.drawable.ic_like_unfilled)
 
             if (data.isLiked) {
-                binding.ivLike.setImageResource(R.drawable.ic_like_filled)
+                ivLike.setImageResource(R.drawable.ic_like_filled)
             } else {
-                binding.ivLike.setImageResource(R.drawable.ic_like_unfilled)
+                ivLike.setImageResource(R.drawable.ic_like_unfilled)
             }
 
             if (data.isSaved) {
-                binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+                ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
             } else {
-                binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+                ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
             }
 
             likesCount.text =
@@ -280,7 +282,7 @@ object PostTypeUtil {
             viewpagerMultipleMedia.isSaveEnabled = false
             val multipleMediaPostAdapter = MultipleMediaPostAdapter()
             viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
-            dotsIndicator.setViewPager2(binding.viewpagerMultipleMedia)
+            dotsIndicator.setViewPager2(viewpagerMultipleMedia)
             multipleMediaPostAdapter.replace(attachments)
         }
     }
@@ -432,36 +434,29 @@ object PostTypeUtil {
         binding: ItemPostLinkBinding,
         data: LinkOGTagsViewData
     ) {
-        val isYoutubeLink = data.url?.isValidYoutubeLink() == true
-        binding.tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-            data.title
-        } else {
-            binding.root.context.getString(R.string.link)
+        binding.apply {
+            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+                data.title
+            } else {
+                root.context.getString(R.string.link)
+            }
+            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
+            tvLinkDescription.text = data.description
+
+            val isImageValid = data.image.isImageValid()
+            if (isImageValid) {
+                ImageBindingUtil.loadImage(
+                    ivLink,
+                    data.image,
+                    placeholder = R.drawable.ic_link_primary_40dp,
+                    cornerRadius = 8
+                )
+            } else {
+                ivLink.hide()
+            }
+
+            tvLinkUrl.text = data.url
         }
-        binding.tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-        binding.tvLinkDescription.text = data.description
-
-        if (isYoutubeLink) {
-            binding.ivLink.hide()
-            binding.ivPlay.isVisible = !data.image.isNullOrEmpty()
-            binding.ivYoutubeLink.isVisible = !data.image.isNullOrEmpty()
-            binding.ivYoutubeLogo.isVisible = !data.image.isNullOrEmpty()
-        } else {
-            binding.ivPlay.hide()
-            binding.ivYoutubeLink.hide()
-            binding.ivYoutubeLogo.hide()
-            binding.ivLink.isVisible = !data.image.isNullOrEmpty()
-        }
-
-        ImageBindingUtil.loadImage(
-            if (isYoutubeLink) binding.ivYoutubeLink else binding.ivLink,
-            data.image,
-            placeholder = R.drawable.ic_link_primary_40dp,
-            cornerRadius = 8,
-            isBlur = isYoutubeLink
-        )
-
-        binding.tvLinkUrl.text = data.url
     }
 
     // performs action when member tag is clicked

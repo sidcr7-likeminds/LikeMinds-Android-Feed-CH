@@ -145,15 +145,15 @@ class MemberTaggingView(
         }
     }
 
-    private fun getMemberFromSelectedList(id: Int): UserTagViewData? {
+    private fun getMemberFromSelectedList(userUniqueId: String): UserTagViewData? {
         return selectedMembers.firstOrNull { member ->
-            member.id == id
+            member.userUniqueId == userUniqueId
         }
     }
 
-    private fun getMember(id: Int): UserTagViewData? {
-        return communityMembersAndGroups.firstOrNull { user ->
-            user.id == id
+    private fun getMember(userUniqueId: String): UserTagViewData? {
+        return communityMembersAndGroups.firstOrNull { member ->
+            member.userUniqueId == userUniqueId
         }
     }
 
@@ -162,7 +162,7 @@ class MemberTaggingView(
             memberTaggingViewListener?.onShow()
             val lastItem = communityMembersAndGroups.lastOrNull()
             mAdapter.setMembers(communityMembersAndGroups.map {
-                if (it.id == lastItem?.id) {
+                if (it.userUniqueId == lastItem?.userUniqueId) {
                     //if last item hide bottom line in item view
                     it.toBuilder().isLastItem(true).build()
                 } else {
@@ -182,8 +182,8 @@ class MemberTaggingView(
 
     override fun onMemberRemoved(regex: String) {
         val memberRoute = MemberTaggingDecoder.getRouteFromRegex(regex) ?: return
-        val memberId = memberRoute.lastPathSegment ?: return
-        val member = getMemberFromSelectedList(memberId.toInt())
+        val userUniqueId = memberRoute.lastPathSegment ?: return
+        val member = getMemberFromSelectedList(userUniqueId)
         if (member != null) {
             selectedMembers.remove(member)
             memberTaggingViewListener?.onMemberRemoved(member)
@@ -204,7 +204,7 @@ class MemberTaggingView(
             user.tag
         } else {
             //create regex from name and id
-            "<<${user.name}|route://member/${user.id}>>"
+            "<<${user.name}|route://member/${user.userUniqueId}>>"
         }
 
         //set span
@@ -214,7 +214,7 @@ class MemberTaggingView(
                 regex
             ), 0, memberName.length, 0
         )
-        val selectedMember = getMemberFromSelectedList(user.id)
+        val selectedMember = getMemberFromSelectedList(user.userUniqueId)
         if (selectedMember == null) {
             selectedMembers.add(user)
         }
@@ -232,8 +232,8 @@ class MemberTaggingView(
         )
         val firstMember = MemberTaggingDecoder.decodeAndReturnAllTaggedMembers(text).firstOrNull()
             ?: return null
-        val member = getMember(firstMember.first.toInt()) ?: return null
-        if (getMemberFromSelectedList(member.id) == null) {
+        val member = getMember(firstMember.first) ?: return null
+        if (getMemberFromSelectedList(member.userUniqueId) == null) {
             selectedMembers.add(member)
         }
         return member.name

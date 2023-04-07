@@ -6,9 +6,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
         android:background="@color/white"
-        android:paddingHorizontal="16dp"
-        android:layout_marginBottom="12dp">
+        android:paddingHorizontal="16dp">
 
         <include
             android:id="@+id/author_frame"
@@ -24,11 +24,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:background="?selectableItemBackground"
             android:lineSpacingExtra="1sp"
             android:textColor="@color/grey"
             android:textSize="16sp"
             app:fontType="regular"
-            android:background="?selectableItemBackground"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/author_frame"
@@ -55,57 +55,6 @@
                 android:layout_height="wrap_content">
 
                 <ImageView
-                    android:id="@+id/iv_youtube_link"
-                    android:layout_width="0dp"
-                    android:layout_height="134dp"
-                    android:scaleType="center"
-                    android:src="@color/black"
-                    android:visibility="gone"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription" />
-
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
-                    android:id="@+id/tv_playing_this_video"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="sans-serif"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:textStyle="normal"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/iv_youtube_link"
-                    app:layout_constraintEnd_toEndOf="@+id/iv_youtube_link"
-                    app:layout_constraintStart_toStartOf="@+id/iv_youtube_link"
-                    app:layout_constraintTop_toTopOf="@+id/iv_youtube_link"
-                    tools:text="Playing this video…" />
-
-                <ImageView
-                    android:id="@+id/iv_play"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_play"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/iv_youtube_link"
-                    app:layout_constraintEnd_toEndOf="@+id/iv_youtube_link"
-                    app:layout_constraintStart_toStartOf="@+id/iv_youtube_link"
-                    app:layout_constraintTop_toTopOf="@+id/iv_youtube_link"
-                    tools:ignore="ContentDescription" />
-
-                <ImageView
-                    android:id="@+id/iv_youtube_logo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_marginBottom="12dp"
-                    android:src="@drawable/you_tube_logo_2017"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@+id/iv_youtube_link"
-                    app:layout_constraintEnd_toEndOf="@+id/iv_youtube_link"
-                    tools:ignore="ContentDescription" />
-
-                <ImageView
                     android:id="@+id/iv_link"
                     android:layout_width="match_parent"
                     android:layout_height="216dp"
@@ -114,7 +63,7 @@
                     android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/iv_youtube_link"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
 
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView

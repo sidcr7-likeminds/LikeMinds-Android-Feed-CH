@@ -35,12 +35,12 @@ import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
-import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -611,7 +611,7 @@ class CreatePostFragment :
         binding.linkPreview.apply {
             root.show()
 
-            val isImageValid = (data.image != null && data.image.isValidUrl())
+            val isImageValid = data.image.isImageValid()
             ivLink.isVisible = isImageValid
             handleLinkPreviewConstraints(isImageValid)
 

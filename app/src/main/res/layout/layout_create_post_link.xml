@@ -31,7 +31,7 @@
                     android:layout_height="216dp"
                     android:scaleType="center"
                     android:src="@drawable/ic_link_primary_40dp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
