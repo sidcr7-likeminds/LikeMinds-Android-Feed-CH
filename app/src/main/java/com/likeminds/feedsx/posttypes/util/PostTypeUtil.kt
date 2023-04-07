@@ -12,6 +12,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
@@ -118,6 +119,15 @@ object PostTypeUtil {
     ) {
         binding.apply {
             val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
+            // item decorator to add spacing between items
+            val dividerItemDecorator =
+                DividerItemDecoration(root.context, DividerItemDecoration.VERTICAL)
+            dividerItemDecorator.setDrawable(
+                ContextCompat.getDrawable(
+                    root.context!!,
+                    R.drawable.document_item_divider
+                )!!
+            )
             rvDocuments.apply {
                 adapter = mDocumentsAdapter
                 layoutManager = LinearLayoutManager(root.context)
@@ -445,6 +455,7 @@ object PostTypeUtil {
 
             val isImageValid = data.image.isImageValid()
             if (isImageValid) {
+                ivLink.show()
                 ImageBindingUtil.loadImage(
                     ivLink,
                     data.image,

@@ -414,6 +414,7 @@ class PostDetailFragment :
                 }
                 is PostDetailViewModel.ErrorMessageEvent.GetPost -> {
                     mSwipeRefreshLayout.isRefreshing = false
+                    ProgressHelper.hideProgress(binding.progressBar)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.LikeComment -> {

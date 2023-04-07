@@ -14,10 +14,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
@@ -570,10 +572,20 @@ class CreatePostFragment :
             }
 
             if (documentsAdapter == null) {
+                // item decorator to add spacing between items
+                val dividerItemDecorator =
+                    DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+                dividerItemDecorator.setDrawable(
+                    ContextCompat.getDrawable(
+                        context!!,
+                        R.drawable.document_item_divider
+                    )!!
+                )
                 documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
                 documentsAttachment.rvDocuments.apply {
                     adapter = documentsAdapter
                     layoutManager = LinearLayoutManager(context)
+                    addItemDecoration(dividerItemDecorator)
                 }
             }
             documentsAdapter!!.replace(attachments)
