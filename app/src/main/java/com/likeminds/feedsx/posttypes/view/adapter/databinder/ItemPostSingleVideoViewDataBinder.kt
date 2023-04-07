@@ -31,11 +31,6 @@ class ItemPostSingleVideoViewDataBinder constructor(
             false
         )
 
-        binding.iconVideoPlay.setOnClickListener {
-            val position = binding.position ?: return@setOnClickListener
-            listener.playPauseOnVideo(position)
-        }
-
         return binding
     }
 

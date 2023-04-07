@@ -14,7 +14,7 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
 
 class ItemPostMultipleMediaViewDataBinder(
     val listener: PostAdapterListener,
-    private val isPostDetail: Boolean
+    private val flow: Int
 ) : ViewDataBinder<ItemPostMultipleMediaBinding, PostViewData>(), VideoPlayerPageChangeListener {
 
     override val viewType: Int
@@ -33,7 +33,7 @@ class ItemPostMultipleMediaViewDataBinder(
         data: PostViewData,
         position: Int
     ) {
-        Log.d("PUI","bind data called")
+        Log.d("PUI", "bind data called")
         // handles various actions for the post
         PostTypeUtil.initActionsLayout(
             binding.postActionsLayout,
@@ -52,7 +52,7 @@ class ItemPostMultipleMediaViewDataBinder(
             returnBinder = {
                 return@initPostTypeBindData
             }, executeBinder = {
-                PostTypeUtil.initViewPager(binding, data, this)
+                PostTypeUtil.initViewPager(binding, data, flow, this)
             })
     }
 

@@ -13,7 +13,7 @@ import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 class VideoPlayerPageChangeCallback(
     private var selectedMediaUri: List<AttachmentViewData>,
     private val viewPager2: ViewPager2,
-    private val isCreatePostFlow: Boolean,
+    @PostScreen private val flow: Int,
     private val playWhenReady: Boolean,
     private val repeatMode: Int,
     private val listener: VideoPlayerPageChangeListener
@@ -22,6 +22,8 @@ class VideoPlayerPageChangeCallback(
     private var count = 0
 
     private var lmExoplayer = listener.getLMExoPlayer()
+    private val isCreatePostFlow = PostScreen.isCreatePostFlow(flow)
+    private val isUniversalFeed = PostScreen.isUniversalFeedFlow(flow)
 
     fun setList(attachments: List<AttachmentViewData>) {
         selectedMediaUri = attachments
@@ -54,7 +56,7 @@ class VideoPlayerPageChangeCallback(
     private fun initializePlayer(playerView: StyledPlayerView, uri: Uri) {
         if (lmExoplayer == null) {
             lmExoplayer = LMExoplayer(playerView.context, playWhenReady, repeatMode, this)
-            Log.d("PUI", "count: $count")
+            Log.d("PUI", "count: $count lmExoplayer: $lmExoplayer")
             count++
             listener.setLMExoPlayer(lmExoplayer)
             playerView.player = lmExoplayer?.exoPlayer
@@ -64,6 +66,7 @@ class VideoPlayerPageChangeCallback(
     }
 
     private fun releasePlayer() {
+        Log.d("PUI", "callback: $lmExoplayer")
         lmExoplayer?.release()
         lmExoplayer = null
         listener.setLMExoPlayer(null)

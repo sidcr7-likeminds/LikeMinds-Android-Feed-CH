@@ -5,7 +5,6 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -16,13 +15,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.BrandingData
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
-import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
-import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
@@ -404,11 +402,6 @@ class FeedFragment :
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        initializeExoplayer()
     }
 
     override fun onResume() {
@@ -894,7 +887,11 @@ class FeedFragment :
     private fun handleVideoAttachment() {
         val layoutManager = binding.recyclerView.layoutManager as? LinearLayoutManager ?: return
         val itemVisible = layoutManager.findLastCompletelyVisibleItemPosition()
-        if (itemVisible < 0) return
+        if (itemVisible < 0) {
+            lmExoplayer?.release()
+            lmExoplayer = null
+            return
+        }
 
         val post = mPostAdapter[itemVisible] as? PostViewData
 
@@ -907,50 +904,39 @@ class FeedFragment :
         //check for video attachment
         val isVideo = attachment.attachmentType == VIDEO
         Log.d("PUI", "isVideo: $isVideo")
-        if (!isVideo) return
+        if (!isVideo) {
+            return
+        }
+
+        val attachmentCount = post.attachments.size
+        if (attachmentCount > 1) return
 
         val url = attachmentMeta.url
         val videoUri = Uri.parse(url)
-        val mediaItem = MediaItem.fromUri(videoUri)
-
-        if (post.attachments.size == 1) {
-            Log.d("PUI", "single video")
-            val binding =
-                (binding.recyclerView.findViewHolderForAdapterPosition(
-                    itemVisible
-                ) as? DataBoundViewHolder<*>)?.binding as? ItemPostSingleVideoBinding
-                    ?: return
-//            binding.videoPost.player = lmExoplayer.exoplayer
-        } else {
-            Log.d("PUI", "multiple video")
-            val postBinding =
-                (binding.recyclerView.findViewHolderForAdapterPosition(itemVisible) as? DataBoundViewHolder<*>)?.binding as? ItemPostMultipleMediaBinding
-                    ?: return
-            Log.d("PUI", "post binding video")
-            val videoBinding =
-                ((postBinding.viewpagerMultipleMedia[0] as? RecyclerView)?.findViewHolderForAdapterPosition(
-                    0
-                ) as? DataBoundViewHolder<*>)?.binding as? ItemMultipleMediaVideoBinding ?: return
-            Log.d("PUI", "video binding")
-//            videoBinding.videoPost.player = lmExoplayer.exoplayer
-        }
-//        lmExoplayer.stop()
-//        lmExoplayer.setMediaItem(mediaItem)
-    }
-
-    //initialize exo player
-    private fun initializeExoplayer() {
-//        lmExoplayer.initialize(this, Player.REPEAT_MODE_ONE, false)
+        lmExoplayer?.release()
+        lmExoplayer = null
+        Log.d("PUI", "single video")
+        val binding =
+            (binding.recyclerView.findViewHolderForAdapterPosition(
+                itemVisible
+            ) as? DataBoundViewHolder<*>)?.binding as? ItemPostSingleVideoBinding
+                ?: return
+        lmExoplayer = LMExoplayer(requireContext(), false, Player.REPEAT_MODE_ONE, this)
+        Log.d("PUI", "single video: $lmExoplayer")
+        binding.videoPost.player = lmExoplayer?.exoPlayer
+        binding.videoPost.setShowBuffering(StyledPlayerView.SHOW_BUFFERING_WHEN_PLAYING)
+        lmExoplayer?.stop()
+        lmExoplayer?.setMediaItem(videoUri)
     }
 
     override fun getLMExoPlayer(): LMExoplayer? {
-        Log.d("PUI", "post detail get lmExoplayer: $lmExoplayer")
+        Log.d("PUI", "feed get lmExoplayer: $lmExoplayer")
         return lmExoplayer
     }
 
     override fun setLMExoPlayer(lmExoplayer: LMExoplayer?) {
         this.lmExoplayer = lmExoplayer
-        Log.d("PUI", "post detail set lmExoplayer: ${this.lmExoplayer}")
+        Log.d("PUI", "feed set lmExoplayer: ${this.lmExoplayer}")
     }
 
     override fun sendMediaItemToExoPlayer(

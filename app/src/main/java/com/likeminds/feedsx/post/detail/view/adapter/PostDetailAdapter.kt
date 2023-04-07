@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.post.detail.view.adapter
 
+import com.likeminds.feedsx.post.create.util.POST_DETAIL
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentViewDataBinder
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentsCountViewDataBinder
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -51,7 +52,7 @@ class PostDetailAdapter constructor(
         viewDataBinders.add(itemPostDocumentsViewDataBinder)
 
         val itemPostMultipleMediaViewDataBinder =
-            ItemPostMultipleMediaViewDataBinder(postAdapterListener,true)
+            ItemPostMultipleMediaViewDataBinder(postAdapterListener, POST_DETAIL)
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
 
         return viewDataBinders

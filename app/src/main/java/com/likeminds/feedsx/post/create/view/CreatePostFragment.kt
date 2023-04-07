@@ -31,6 +31,7 @@ import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
+import com.likeminds.feedsx.post.create.util.CREATE_POST
 import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeCallback
 import com.likeminds.feedsx.post.create.util.VideoPlayerPageChangeListener
@@ -557,7 +558,7 @@ class CreatePostFragment :
                 pageChangeCallback = VideoPlayerPageChangeCallback(
                     attachments,
                     multipleMediaAttachment.viewpagerMultipleMedia,
-                    isCreatePostFlow = true,
+                    flow = CREATE_POST,
                     playWhenReady = false,
                     repeatMode = Player.REPEAT_MODE_OFF,
                     listener = this@CreatePostFragment

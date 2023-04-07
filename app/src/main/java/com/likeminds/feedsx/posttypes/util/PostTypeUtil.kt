@@ -264,6 +264,7 @@ object PostTypeUtil {
     fun initViewPager(
         binding: ItemPostMultipleMediaBinding,
         data: PostViewData,
+        flow: Int,
         pageChangeListener: VideoPlayerPageChangeListener
     ) {
         val attachments = data.attachments.map {
@@ -289,8 +290,8 @@ object PostTypeUtil {
                 VideoPlayerPageChangeCallback(
                     data.attachments,
                     this,
-                    isCreatePostFlow = false,
-                    playWhenReady = true,
+                    flow = flow,
+                    playWhenReady = false,
                     repeatMode = Player.REPEAT_MODE_ONE,
                     listener = pageChangeListener
                 )

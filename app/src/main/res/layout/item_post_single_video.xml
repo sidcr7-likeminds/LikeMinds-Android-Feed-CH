@@ -56,19 +56,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_post_content"
             app:layout_constraintVertical_bias="0.0"
             app:player_layout_id="@layout/exo_playback_player_view"
-            app:use_controller="false" />
-
-        <ImageView
-            android:id="@+id/icon_video_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:src="@drawable/ic_play"
-            app:layout_constraintBottom_toBottomOf="@id/video_post"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/video_post"
-            tools:ignore="ContentDescription" />
+            app:use_controller="true" />
 
         <include
             android:id="@+id/post_actions_layout"

@@ -3,6 +3,7 @@ package com.likeminds.feedsx.posttypes.view.adapter
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.media.util.LMExoplayer
+import com.likeminds.feedsx.post.create.util.UNIVERSAL_FEED
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
 import com.likeminds.feedsx.utils.ValueUtils.getItemInList
@@ -39,7 +40,7 @@ class PostAdapter constructor(
 
         val itemPostMultipleMediaViewDataBinder = ItemPostMultipleMediaViewDataBinder(
             listener,
-            false
+            UNIVERSAL_FEED
         )
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
 
