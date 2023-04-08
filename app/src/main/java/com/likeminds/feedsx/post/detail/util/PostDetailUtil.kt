@@ -120,10 +120,12 @@ object PostDetailUtil {
                 tvCommentContent.setOnClickListener {
                     null
                 }
-                val intent = Route.handleDeepLink(tvCommentContent.context, url)
+                // creates a route and returns an intent to handle the link
+                val intent = Route.handleDeepLink(context, url)
                 if (intent != null) {
                     try {
-                        ActivityCompat.startActivity(tvCommentContent.context, intent, null)
+                        // starts activity with the intent
+                        ActivityCompat.startActivity(context, intent, null)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }

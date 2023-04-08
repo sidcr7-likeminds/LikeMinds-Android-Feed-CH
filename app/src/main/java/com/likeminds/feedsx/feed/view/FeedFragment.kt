@@ -473,12 +473,13 @@ class FeedFragment :
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
         // item decorator to add spacing between items
-        val dividerItemDecorator = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        val dividerItemDecorator =
+            DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
         dividerItemDecorator.setDrawable(
             ContextCompat.getDrawable(
-                context!!,
+                requireContext(),
                 R.drawable.feed_item_divider
-            )!!
+            ) ?: return
         )
         val linearLayoutManager = LinearLayoutManager(context)
         mPostAdapter = PostAdapter(this)

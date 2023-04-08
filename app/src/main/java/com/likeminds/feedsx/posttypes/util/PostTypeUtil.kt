@@ -119,15 +119,16 @@ object PostTypeUtil {
         position: Int
     ) {
         binding.apply {
+            val context = root.context ?: return
             val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
             // item decorator to add spacing between items
             val dividerItemDecorator =
                 DividerItemDecoration(root.context, DividerItemDecoration.VERTICAL)
             dividerItemDecorator.setDrawable(
                 ContextCompat.getDrawable(
-                    root.context!!,
+                    context,
                     R.drawable.document_item_divider
-                )!!
+                ) ?: return
             )
             rvDocuments.apply {
                 adapter = mDocumentsAdapter
@@ -394,10 +395,12 @@ object PostTypeUtil {
                 tvPostContent.setOnClickListener {
                     null
                 }
-                val intent = Route.handleDeepLink(tvPostContent.context, url)
+                // creates a route and returns an intent to handle the link
+                val intent = Route.handleDeepLink(context, url)
                 if (intent != null) {
                     try {
-                        ActivityCompat.startActivity(tvPostContent.context, intent, null)
+                        // starts activity with the intent
+                        ActivityCompat.startActivity(context, intent, null)
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -443,9 +446,11 @@ object PostTypeUtil {
     ) {
         binding.apply {
             root.setOnClickListener {
+                // creates a route and returns an intent to handle the link
                 val intent = Route.handleDeepLink(root.context, data.url)
                 if (intent != null) {
                     try {
+                        // starts activity with the intent
                         ActivityCompat.startActivity(root.context, intent, null)
                     } catch (e: Exception) {
                         e.printStackTrace()

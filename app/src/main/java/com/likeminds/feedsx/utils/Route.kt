@@ -84,6 +84,8 @@ object Route {
 //
 //    }
 
+
+    // creates route for url and returns corresponding intent
     fun handleDeepLink(context: Context, url: String?): Intent? {
         val data = Uri.parse(url) ?: return null
         val firstPath = createWebsiteRoute(data) ?: return null

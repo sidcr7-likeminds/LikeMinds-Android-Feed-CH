@@ -577,9 +577,9 @@ class CreatePostFragment :
                     DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
                 dividerItemDecorator.setDrawable(
                     ContextCompat.getDrawable(
-                        context!!,
+                        requireContext(),
                         R.drawable.document_item_divider
-                    )!!
+                    ) ?: return
                 )
                 documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
                 documentsAttachment.rvDocuments.apply {
