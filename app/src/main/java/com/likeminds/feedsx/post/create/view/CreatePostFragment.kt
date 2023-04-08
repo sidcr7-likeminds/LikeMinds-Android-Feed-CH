@@ -14,10 +14,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
@@ -35,12 +37,12 @@ import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
-import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -570,10 +572,20 @@ class CreatePostFragment :
             }
 
             if (documentsAdapter == null) {
+                // item decorator to add spacing between items
+                val dividerItemDecorator =
+                    DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+                dividerItemDecorator.setDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.document_item_divider
+                    ) ?: return
+                )
                 documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
                 documentsAttachment.rvDocuments.apply {
                     adapter = documentsAdapter
                     layoutManager = LinearLayoutManager(context)
+                    addItemDecoration(dividerItemDecorator)
                 }
             }
             documentsAdapter!!.replace(attachments)
@@ -611,7 +623,7 @@ class CreatePostFragment :
         binding.linkPreview.apply {
             root.show()
 
-            val isImageValid = (data.image != null && data.image.isValidUrl())
+            val isImageValid = data.image.isImageValid()
             ivLink.isVisible = isImageValid
             handleLinkPreviewConstraints(isImageValid)
 

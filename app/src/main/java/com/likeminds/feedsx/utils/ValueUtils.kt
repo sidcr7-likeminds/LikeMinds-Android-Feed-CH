@@ -6,6 +6,7 @@ import android.webkit.MimeTypeMap
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.VIDEO
+import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 
 object ValueUtils {
 
@@ -91,10 +92,7 @@ object ValueUtils {
         }
     }
 
-    fun String.isValidYoutubeLink(): Boolean {
-        val uri = Uri.parse(this)
-        return uri.host.equals("youtube") ||
-                uri.host.equals("youtu.be") ||
-                uri.host.equals("www.youtube.com")
+    fun String?.isImageValid(): Boolean {
+        return this?.isValidUrl() ?: false
     }
 }

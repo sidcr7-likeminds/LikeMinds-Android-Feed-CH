@@ -13,8 +13,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="8dp"
-        android:background="@color/cloudy_blue">
+        android:background="@color/cultured">
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
@@ -35,8 +34,8 @@
                     android:clipToPadding="false"
                     android:descendantFocusability="blocksDescendants"
                     android:overScrollMode="never"
-                    app:layout_constrainedHeight="true"
                     app:layout_constraintTop_toTopOf="parent"
+                    tools:itemCount="1"
                     tools:listitem="@layout/item_post_single_image" />
 
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView
@@ -85,7 +84,7 @@
             app:fontType="regular"
             app:layout_constraintBottom_toTopOf="@id/iv_comment_send"
             tools:text="Replying to Ronald Richards"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <ImageView
             android:id="@+id/iv_remove_replying_to"

@@ -9,9 +9,11 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.PopupMenu
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
@@ -24,7 +26,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
-import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
+import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -116,25 +118,37 @@ object PostTypeUtil {
         postAdapterListener: PostAdapterListener,
         position: Int
     ) {
-        val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
-        binding.rvDocuments.apply {
-            adapter = mDocumentsAdapter
-            layoutManager = LinearLayoutManager(binding.root.context)
-        }
+        binding.apply {
+            val context = root.context ?: return
+            val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
+            // item decorator to add spacing between items
+            val dividerItemDecorator =
+                DividerItemDecoration(root.context, DividerItemDecoration.VERTICAL)
+            dividerItemDecorator.setDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.document_item_divider
+                ) ?: return
+            )
+            rvDocuments.apply {
+                adapter = mDocumentsAdapter
+                layoutManager = LinearLayoutManager(root.context)
+            }
 
-        val documents = postData.attachments
+            val documents = postData.attachments
 
-        if (postData.isExpanded || documents.size <= SHOW_MORE_COUNT) {
-            binding.tvShowMore.hide()
-            mDocumentsAdapter.replace(postData.attachments)
-        } else {
-            binding.tvShowMore.show()
-            "+${documents.size - SHOW_MORE_COUNT} more".also { binding.tvShowMore.text = it }
-            mDocumentsAdapter.replace(documents.take(SHOW_MORE_COUNT))
-        }
+            if (postData.isExpanded || documents.size <= SHOW_MORE_COUNT) {
+                tvShowMore.hide()
+                mDocumentsAdapter.replace(postData.attachments)
+            } else {
+                tvShowMore.show()
+                "+${documents.size - SHOW_MORE_COUNT} more".also { tvShowMore.text = it }
+                mDocumentsAdapter.replace(documents.take(SHOW_MORE_COUNT))
+            }
 
-        binding.tvShowMore.setOnClickListener {
-            postAdapterListener.onMultipleDocumentsExpanded(postData, position)
+            tvShowMore.setOnClickListener {
+                postAdapterListener.onMultipleDocumentsExpanded(postData, position)
+            }
         }
     }
 
@@ -197,15 +211,15 @@ object PostTypeUtil {
             else ivLike.setImageResource(R.drawable.ic_like_unfilled)
 
             if (data.isLiked) {
-                binding.ivLike.setImageResource(R.drawable.ic_like_filled)
+                ivLike.setImageResource(R.drawable.ic_like_filled)
             } else {
-                binding.ivLike.setImageResource(R.drawable.ic_like_unfilled)
+                ivLike.setImageResource(R.drawable.ic_like_unfilled)
             }
 
             if (data.isSaved) {
-                binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
+                ivBookmark.setImageResource(R.drawable.ic_bookmark_filled)
             } else {
-                binding.ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
+                ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
             }
 
             likesCount.text =
@@ -280,7 +294,7 @@ object PostTypeUtil {
             viewpagerMultipleMedia.isSaveEnabled = false
             val multipleMediaPostAdapter = MultipleMediaPostAdapter()
             viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
-            dotsIndicator.setViewPager2(binding.viewpagerMultipleMedia)
+            dotsIndicator.setViewPager2(viewpagerMultipleMedia)
             multipleMediaPostAdapter.replace(attachments)
         }
     }
@@ -320,6 +334,9 @@ object PostTypeUtil {
         )
         val seeMoreClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
+                tvPostContent.setOnClickListener {
+                    null
+                }
                 alreadySeenFullContent = true
                 adapterListener.updatePostSeenFullContent(itemPosition, true)
             }
@@ -329,20 +346,21 @@ object PostTypeUtil {
             }
         }
 
-        val postTextClickableSpan = object : ClickableSpan() {
-            override fun onClick(view: View) {
-                adapterListener.postDetail(data)
-            }
-
-            override fun updateDrawState(textPaint: TextPaint) {
-                textPaint.isUnderlineText = false
-            }
-        }
-
         // post is used here to get lines count in the text view
         tvPostContent.post {
+            tvPostContent.setOnClickListener {
+                adapterListener.postDetail(data)
+            }
+            MemberTaggingDecoder.decode(
+                tvPostContent,
+                textForLinkify,
+                enableClick = true,
+                LMBranding.getTextLinkColor()
+            ) { tag ->
+                onMemberTagClicked()
+            }
+
             val shortText: String? = SeeMoreUtil.getShortContent(
-                data.text,
                 tvPostContent,
                 3,
                 500
@@ -350,19 +368,10 @@ object PostTypeUtil {
 
             val trimmedText =
                 if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                    shortText
+                    tvPostContent.editableText.subSequence(0, shortText.length)
                 } else {
-                    textForLinkify
+                    tvPostContent.editableText
                 }
-
-            MemberTaggingDecoder.decode(
-                tvPostContent,
-                trimmedText,
-                enableClick = true,
-                LMBranding.getTextLinkColor()
-            ) { tag ->
-                onMemberTagClicked()
-            }
 
             val seeMoreSpannableStringBuilder = SpannableStringBuilder()
             if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
@@ -376,25 +385,28 @@ object PostTypeUtil {
                 )
             }
 
-            val postTextSpannableStringBuilder = SpannableStringBuilder()
-            postTextSpannableStringBuilder.append(trimmedText)
-            postTextSpannableStringBuilder.setSpan(
-                postTextClickableSpan,
-                0,
-                trimmedText.length,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-
-            LinkifyCompat.addLinks(tvPostContent, Linkify.WEB_URLS)
-            tvPostContent.movementMethod = CustomLinkMovementMethod {
-                //TODO: Handle links etc.
-                true
-            }
-
             tvPostContent.text = TextUtils.concat(
-                tvPostContent.text,
+                trimmedText,
                 seeMoreSpannableStringBuilder
             )
+
+            LinkifyCompat.addLinks(tvPostContent, Linkify.ALL)
+            tvPostContent.movementMethod = CustomLinkMovementMethod { url ->
+                tvPostContent.setOnClickListener {
+                    null
+                }
+                // creates a route and returns an intent to handle the link
+                val intent = Route.handleDeepLink(context, url)
+                if (intent != null) {
+                    try {
+                        // starts activity with the intent
+                        ActivityCompat.startActivity(context, intent, null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                true
+            }
         }
     }
 
@@ -432,36 +444,42 @@ object PostTypeUtil {
         binding: ItemPostLinkBinding,
         data: LinkOGTagsViewData
     ) {
-        val isYoutubeLink = data.url?.isValidYoutubeLink() == true
-        binding.tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-            data.title
-        } else {
-            binding.root.context.getString(R.string.link)
+        binding.apply {
+            root.setOnClickListener {
+                // creates a route and returns an intent to handle the link
+                val intent = Route.handleDeepLink(root.context, data.url)
+                if (intent != null) {
+                    try {
+                        // starts activity with the intent
+                        ActivityCompat.startActivity(root.context, intent, null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+                data.title
+            } else {
+                root.context.getString(R.string.link)
+            }
+            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
+            tvLinkDescription.text = data.description
+
+            val isImageValid = data.image.isImageValid()
+            if (isImageValid) {
+                ivLink.show()
+                ImageBindingUtil.loadImage(
+                    ivLink,
+                    data.image,
+                    placeholder = R.drawable.ic_link_primary_40dp,
+                    cornerRadius = 8
+                )
+            } else {
+                ivLink.hide()
+            }
+
+            tvLinkUrl.text = data.url
         }
-        binding.tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-        binding.tvLinkDescription.text = data.description
-
-        if (isYoutubeLink) {
-            binding.ivLink.hide()
-            binding.ivPlay.isVisible = !data.image.isNullOrEmpty()
-            binding.ivYoutubeLink.isVisible = !data.image.isNullOrEmpty()
-            binding.ivYoutubeLogo.isVisible = !data.image.isNullOrEmpty()
-        } else {
-            binding.ivPlay.hide()
-            binding.ivYoutubeLink.hide()
-            binding.ivYoutubeLogo.hide()
-            binding.ivLink.isVisible = !data.image.isNullOrEmpty()
-        }
-
-        ImageBindingUtil.loadImage(
-            if (isYoutubeLink) binding.ivYoutubeLink else binding.ivLink,
-            data.image,
-            placeholder = R.drawable.ic_link_primary_40dp,
-            cornerRadius = 8,
-            isBlur = isYoutubeLink
-        )
-
-        binding.tvLinkUrl.text = data.url
     }
 
     // performs action when member tag is clicked

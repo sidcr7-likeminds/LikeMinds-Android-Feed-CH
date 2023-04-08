@@ -5,9 +5,11 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -62,6 +64,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 import java.util.*
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class FeedFragment :
@@ -292,11 +295,13 @@ class FeedFragment :
         when (response) {
             is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
                 val errorMessage = response.errorMessage
+                ProgressHelper.hideProgress(binding.progressBar)
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
             is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
                 val errorMessage = response.errorMessage
                 mSwipeRefreshLayout.isRefreshing = false
+                ProgressHelper.hideProgress(binding.progressBar)
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
             is FeedViewModel.ErrorMessageEvent.AddPost -> {
@@ -467,6 +472,15 @@ class FeedFragment :
 
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
+        // item decorator to add spacing between items
+        val dividerItemDecorator =
+            DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        dividerItemDecorator.setDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.feed_item_divider
+            ) ?: return
+        )
         val linearLayoutManager = LinearLayoutManager(context)
         mPostAdapter = PostAdapter(this)
         binding.recyclerView.apply {
@@ -474,6 +488,7 @@ class FeedFragment :
             adapter = mPostAdapter
             if (itemAnimator is SimpleItemAnimator)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            addItemDecoration(dividerItemDecorator)
             show()
         }
         attachScrollListener(
@@ -572,6 +587,7 @@ class FeedFragment :
     // shows invalid access error and logs out invalid user
     private fun showInvalidAccess() {
         binding.apply {
+            ProgressHelper.hideProgress(progressBar)
             recyclerView.hide()
             layoutAccessRemoved.root.show()
             memberImage.hide()
