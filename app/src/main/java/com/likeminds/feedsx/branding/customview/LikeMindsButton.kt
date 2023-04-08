@@ -44,6 +44,7 @@ internal class LikeMindsButton : MaterialButton {
             backgroundTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
         }
 
+        // text color
         if (!textType.equals("normal")) {
             setTextColor(LMBranding.getButtonsColor())
         }
