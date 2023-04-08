@@ -111,6 +111,7 @@
             android:paddingVertical="15dp"
             android:text="@string/report"
             android:textAllCaps="true"
+            app:text_type="normal"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:textStyle="bold"

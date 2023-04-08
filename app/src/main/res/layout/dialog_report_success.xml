@@ -48,6 +48,7 @@
             android:paddingVertical="13dp"
             android:text="@string/ok"
             android:textColor="@color/white"
+            app:text_type="normal"
             app:cornerRadius="22dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

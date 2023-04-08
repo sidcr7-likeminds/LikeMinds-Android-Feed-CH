@@ -1,7 +1,5 @@
 package com.likeminds.feedsx.report.view.adapter.databinder
 
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -28,7 +26,6 @@ class ReportTagItemViewDataBinder constructor(
             parent,
             false
         )
-        setTagBackground(binding)
         setListeners(binding)
         return binding
     }
@@ -39,15 +36,15 @@ class ReportTagItemViewDataBinder constructor(
         drawable.mutate()
         val width = ViewUtils.dpToPx(1)
 
-        if (binding.reportTagViewData?.isSelected == true) {
-            drawable.color = ColorStateList.valueOf(LMBranding.getButtonsColor())
-            drawable.setStroke(width, LMBranding.getButtonsColor())
-        } else {
-            drawable.color = ColorStateList.valueOf(Color.WHITE)
-            drawable.setStroke(
-                width,
-                ContextCompat.getColor(binding.root.context, R.color.brown_grey)
-            )
+        binding.apply {
+            if (reportTagViewData?.isSelected == true) {
+                drawable.setStroke(width, LMBranding.getButtonsColor())
+            } else {
+                drawable.setStroke(
+                    width,
+                    ContextCompat.getColor(root.context, R.color.brown_grey)
+                )
+            }
         }
     }
 
@@ -56,14 +53,20 @@ class ReportTagItemViewDataBinder constructor(
         data: ReportTagViewData,
         position: Int
     ) {
-        binding.reportTagViewData = data
+        binding.apply {
+            reportTagViewData = data
+            buttonColor = LMBranding.getButtonsColor()
+            setTagBackground(this)
+        }
     }
 
     // sets click listener to handle selected report tag
     private fun setListeners(binding: ItemReportTagsBinding) {
-        binding.tvReportTag.setOnClickListener {
-            val reportTagViewData = binding.reportTagViewData ?: return@setOnClickListener
-            listener.reportTagSelected(reportTagViewData)
+        binding.apply {
+            tvReportTag.setOnClickListener {
+                val reportTagViewData = reportTagViewData ?: return@setOnClickListener
+                listener.reportTagSelected(reportTagViewData)
+            }
         }
     }
 }
