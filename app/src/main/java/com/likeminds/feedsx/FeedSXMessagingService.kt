@@ -3,6 +3,7 @@ package com.likeminds.feedsx
 import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.pushnotification.LMFeedNotificationHandler
 
 class FeedSXMessagingService : FirebaseMessagingService() {
@@ -17,12 +18,12 @@ class FeedSXMessagingService : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("LikeMinds", "token generated: $token")
+        Log.d(LOG_TAG, "token generated: $token")
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
-        Log.d("LikeMinds", "message generated: ${message.data}")
+        Log.d(LOG_TAG, "message generated: ${message.data}")
         mNotificationHandler.handleNotification(message.data)
     }
 }

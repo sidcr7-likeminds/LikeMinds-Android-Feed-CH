@@ -124,7 +124,11 @@ class InitiateViewModel @Inject constructor(
     private fun registerDevice() {
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
-                Log.w("LikeMinds", "Fetching FCM registration token failed", task.exception)
+                Log.w(
+                    FeedSXApplication.LOG_TAG,
+                    "Fetching FCM registration token failed",
+                    task.exception
+                )
                 return@addOnCompleteListener
             }
 

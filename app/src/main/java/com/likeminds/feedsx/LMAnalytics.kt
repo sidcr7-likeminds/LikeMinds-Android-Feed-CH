@@ -1,6 +1,7 @@
 package com.likeminds.feedsx
 
 import android.util.Log
+import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 
 object LMAnalytics {
     /*
@@ -65,7 +66,7 @@ object LMAnalytics {
      * */
     fun track(eventName: String, eventProperties: Map<String, String?> = mapOf()) {
         Log.d(
-            "LMAnalytics", """
+            LOG_TAG, """
             eventName: $eventName
             eventProperties: $eventProperties
         """.trimIndent()

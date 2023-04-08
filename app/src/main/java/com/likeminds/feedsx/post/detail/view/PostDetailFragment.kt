@@ -950,9 +950,13 @@ class PostDetailFragment :
         // gets comment from adapter
         val indexAndComment = getIndexAndCommentFromAdapter(comment.id)
 
+        //if comment is not present in adapter
         if (indexAndComment == null) {
+            //set to false because comment is added
             toFindComment = false
+            //add comment to adapter
             mPostDetailAdapter.add(commentsStartPosition, comment)
+            //scroll to the comment
             binding.rvPostDetails.scrollToPosition(commentsStartPosition)
         } else {
             val index = indexAndComment.first
