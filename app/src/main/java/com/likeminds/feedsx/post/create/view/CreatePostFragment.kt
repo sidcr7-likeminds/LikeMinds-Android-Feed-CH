@@ -520,7 +520,8 @@ class CreatePostFragment :
                 //add more click listener
                 btnAddMore.setOnClickListener {
                     // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent("image, video")initiateMediaPicker(listOf(IMAGE, VIDEO))
+                    viewModel.sendClickedOnAttachmentEvent("image, video")
+                    initiateMediaPicker(listOf(IMAGE, VIDEO))
                 }
 
                 val selectedMediaUri = selectedMediaUris.first()
@@ -670,24 +671,21 @@ class CreatePostFragment :
                 convertSingleDataUri(it)
             }
 
-            if (documentsAdapter == null) {
-                // item decorator to add spacing between items
-                val dividerItemDecorator =
-                    DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-                dividerItemDecorator.setDrawable(
-                    ContextCompat.getDrawable(
-                        requireContext(),
-                        R.drawable.document_item_divider
-                    ) ?: return
-                )
-                documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
-                documentsAttachment.rvDocuments.apply {
-                    adapter = documentsAdapter
-                    layoutManager = LinearLayoutManager(context)
-                    addItemDecoration(dividerItemDecorator)
-                }
+            // item decorator to add spacing between items
+            val dividerItemDecorator =
+                DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+            dividerItemDecorator.setDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.document_item_divider
+                ) ?: return
+            )
+            documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
+            documentsAttachment.rvDocuments.apply {
+                adapter = documentsAdapter
+                layoutManager = LinearLayoutManager(context)
+                addItemDecoration(dividerItemDecorator)
             }
-
             documentsAdapter.replace(attachments)
         }
     }

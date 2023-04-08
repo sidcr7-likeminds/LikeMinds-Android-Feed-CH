@@ -485,7 +485,8 @@ class FeedFragment :
         }
 
         binding.layoutNoPost.fabNewPost.setOnClickListener {
-            val intent = CreatePostActivity.getIntent(requireContext())
+            val intent =
+                CreatePostActivity.getIntent(requireContext(), LMAnalytics.Source.UNIVERSAL_FEED)
             createPostLauncher.launch(intent)
         }
     }
