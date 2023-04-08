@@ -3,6 +3,7 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import com.likeminds.feedsx.feed.view.MainActivity
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
@@ -15,6 +16,7 @@ object Route {
     const val PARAM_POST_ID = "post_id"
     const val ROUTE_BROWSER = "browser"
     const val PARAM_COMMENT_ID = "comment_id"
+    const val ROUTE_MAIN = "main"
 
     private const val HTTPS_SCHEME = "https"
     private const val HTTP_SCHEME = "http"
@@ -23,7 +25,8 @@ object Route {
     fun getRouteIntent(
         context: Context,
         routeString: String,
-        flags: Int = 0
+        flags: Int = 0,
+        source: String? = null,
     ): Intent? {
         val route = Uri.parse(routeString)
         var intent: Intent? = null
@@ -31,18 +34,21 @@ object Route {
             ROUTE_POST_DETAIL -> {
                 intent = getRouteToPostDetail(
                     context,
-                    route
+                    route,
+                    source
                 )
             }
             ROUTE_FEED -> {
                 //TODO: navigation to feed fragment
             }
             ROUTE_CREATE_POST -> {
-                intent = getRouteToCreatePost(context)
+                intent = getRouteToCreatePost(context, source)
             }
             ROUTE_BROWSER -> {
                 intent = getRouteToBrowser(route)
             }
+            ROUTE_MAIN ->
+                intent = getRouteToMain(context)
         }
         if (intent != null) {
             intent.flags = flags
@@ -57,7 +63,8 @@ object Route {
     // route://post_detail?post_id=<post_id>&comment_id=<comment_id of new comment>
     private fun getRouteToPostDetail(
         context: Context,
-        route: Uri
+        route: Uri,
+        source: String?
     ): Intent {
         val postId = route.getQueryParameter(PARAM_POST_ID)
         val commentId = route.getQueryParameter(PARAM_COMMENT_ID)
@@ -66,6 +73,7 @@ object Route {
             .postId(postId.toString())
             .isEditTextFocused(false)
             .commentId(commentId)
+            .source(source)
             .build()
 
         return PostDetailActivity.getIntent(
@@ -115,8 +123,18 @@ object Route {
 
     // route://create_post
     private fun getRouteToCreatePost(
-        context: Context
+        context: Context,
+        source: String?
     ): Intent {
-        return CreatePostActivity.getIntent(context)
+        return CreatePostActivity.getIntent(context, source)
+    }
+
+    //route://main
+    fun getRouteToMain(
+        context: Context,
+    ): Intent {
+        return MainActivity.getIntent(
+            context
+        )
     }
 }

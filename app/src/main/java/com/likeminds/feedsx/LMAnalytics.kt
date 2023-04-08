@@ -28,6 +28,9 @@ object LMAnalytics {
         const val REPLY_POSTED = "Reply posted"
         const val REPLY_DELETED = "Reply deleted"
         const val REPLY_REPORTED = "Reply reported"
+
+        const val NOTIFICATION_RECEIVED = "Notification Received"
+        const val NOTIFICATION_CLICKED = "Notification Clicked"
     }
 
     /*
@@ -46,12 +49,18 @@ object LMAnalytics {
         const val POST_TYPE_LINK = "link"
     }
 
+    object Source {
+        const val NOTIFICATION = "notification"
+        const val UNIVERSAL_FEED = "universal_feed"
+        const val POST_DETAIL = "post_detail"
+    }
+
     /**
      * called to trigger events
      * @param eventName - name of the event to trigger
      * @param eventProperties - {key: value} pair for properties related to event
      * */
-    fun track(eventName: String, eventProperties: Map<String, String> = mapOf()) {
+    fun track(eventName: String, eventProperties: Map<String, String?> = mapOf()) {
         Log.d(
             "LMAnalytics", """
             eventName: $eventName

@@ -1,5 +1,7 @@
 package com.likeminds.feedsx.feed.view
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
@@ -17,6 +19,14 @@ class MainActivity : BaseAppCompatActivity() {
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
+
+    companion object {
+        fun getIntent(
+            context: Context
+        ): Intent {
+            return Intent(context, MainActivity::class.java)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

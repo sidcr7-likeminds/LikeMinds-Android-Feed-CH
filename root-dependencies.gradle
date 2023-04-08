@@ -33,6 +33,7 @@ versions.work_manager = '2.7.1'
 versions.gson = '2.8.6'
 versions.aws_s3 = '2.47.0'
 versions.room = '2.4.3'
+versions.firebase = '30.1.0'
 ext.versions = versions
 
 
@@ -116,4 +117,10 @@ room.main = "androidx.room:room-runtime:$versions.room"
 room.ktx = "androidx.room:room-ktx:$versions.room"
 room.compiler = "androidx.room:room-compiler:$versions.room"
 deps.room = room
+
+def firebase = [:]
+firebase.bom = "com.google.firebase:firebase-bom:$versions.firebase"
+firebase.messaging = "com.google.firebase:firebase-messaging-ktx"
+deps.firebase = firebase
+
 ext.deps = deps

@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.InitiateViewModel
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
@@ -38,10 +40,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
-import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.ProgressHelper
-import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -67,6 +66,8 @@ class PostDetailFragment :
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
     private val postActionsViewModel: PostActionsViewModel by activityViewModels()
 
+    private val initiateViewModel: InitiateViewModel by activityViewModels()
+
     private lateinit var postDetailExtras: PostDetailExtras
 
     private lateinit var mPostDetailAdapter: PostDetailAdapter
@@ -86,6 +87,7 @@ class PostDetailFragment :
     private val postEvent = PostEvent.getPublisher()
 
     companion object {
+        const val TAG = "PostDetailFragment"
         const val REPLIES_THRESHOLD = 5
     }
 
@@ -100,7 +102,9 @@ class PostDetailFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        postDetailExtras = arguments?.getParcelable(POST_DETAIL_EXTRAS)!!
+        postDetailExtras =
+            arguments?.getParcelable(POST_DETAIL_EXTRAS)
+                ?: throw emptyExtrasException(TAG)
     }
 
     override fun setUpViews() {
@@ -119,7 +123,16 @@ class PostDetailFragment :
     private fun fetchPostData() {
         // show progress bar
         ProgressHelper.showProgress(binding.progressBar)
-        viewModel.getPost(postDetailExtras.postId, 1)
+        if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+            initiateViewModel.initiateUser(
+                "69edd43f-4a5e-4077-9c50-2b7aa740acce",
+                "10002",
+                "D",
+                false
+            )
+        } else {
+            viewModel.getPost(postDetailExtras.postId, 1)
+        }
     }
 
     // initializes the post detail screen recycler view
@@ -228,11 +241,30 @@ class PostDetailFragment :
 
     override fun observeData() {
         super.observeData()
-
+        observeInitiateResponse()
         observePostData()
         observeCommentData()
         observeMembersTaggingList()
         observeErrors()
+    }
+
+    private fun observeInitiateResponse() {
+        initiateViewModel.userResponse.observe(viewLifecycleOwner) {
+            //get post detail
+            viewModel.getPost(postDetailExtras.postId, 1)
+        }
+
+        initiateViewModel.logoutResponse.observe(viewLifecycleOwner) {
+            binding.apply {
+                mainLayout.hide()
+                invalidAccessLayout.show()
+            }
+        }
+
+        initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
+            ProgressHelper.hideProgress(binding.progressBar)
+            ViewUtils.showErrorMessageToast(requireContext(), it)
+        }
     }
 
     // observes live data related to post
@@ -241,6 +273,10 @@ class PostDetailFragment :
         viewModel.postResponse.observe(viewLifecycleOwner) { pair ->
             //hide progress bar
             ProgressHelper.hideProgress(binding.progressBar)
+            binding.apply {
+                mainLayout.show()
+                invalidAccessLayout.hide()
+            }
             //page in sent in api
             val page = pair.first
 
@@ -722,7 +758,7 @@ class PostDetailFragment :
     private fun refreshPostData() {
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
-        viewModel.getPost(postDetailExtras.postId, 1)
+        fetchPostData()
     }
 
     override fun likePost(position: Int) {

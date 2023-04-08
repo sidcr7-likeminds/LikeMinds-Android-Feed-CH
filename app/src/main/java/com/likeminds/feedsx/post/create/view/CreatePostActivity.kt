@@ -25,6 +25,7 @@ class CreatePostActivity : BaseAppCompatActivity() {
 
         const val POST_ATTACHMENTS_LIMIT = 10
         const val RESULT_UPLOAD_POST = Activity.RESULT_FIRST_USER + 1
+        const val SOURCE_EXTRA = "SOURCE_EXTRA"
 
         @JvmStatic
         fun start(context: Context) {
@@ -32,24 +33,28 @@ class CreatePostActivity : BaseAppCompatActivity() {
         }
 
         @JvmStatic
-        fun getIntent(context: Context): Intent {
-            return Intent(context, CreatePostActivity::class.java)
+        fun getIntent(context: Context, source: String?): Intent {
+            val intent = Intent(context, CreatePostActivity::class.java)
+            intent.putExtra(SOURCE_EXTRA, source)
+            return intent
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCreatePostBinding.inflate(layoutInflater)
-
         binding.toolbarColor = LMBranding.getToolbarColor()
-
         setContentView(binding.root)
 
+        val source = intent.getStringExtra(SOURCE_EXTRA)
+        val args = Bundle().apply {
+            putString(SOURCE_EXTRA, source)
+        }
         //Navigation
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
-        navController.setGraph(R.navigation.nav_graph_create_post, intent.extras)
+        navController.setGraph(R.navigation.nav_graph_create_post, args)
 
         //Toolbar
         setSupportActionBar(binding.toolbar)

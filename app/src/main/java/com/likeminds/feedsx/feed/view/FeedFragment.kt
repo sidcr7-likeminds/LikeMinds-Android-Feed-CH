@@ -19,6 +19,8 @@ import androidx.work.WorkManager
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
+import com.likeminds.feedsx.InitiateViewModel
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
@@ -80,6 +82,8 @@ class FeedFragment :
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
     private val postActionsViewModel: PostActionsViewModel by activityViewModels()
 
+    private val initiateViewModel: InitiateViewModel by activityViewModels()
+
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
@@ -107,17 +111,22 @@ class FeedFragment :
         observePosting()
 
         // observes userResponse LiveData
-        viewModel.userResponse.observe(viewLifecycleOwner) { response ->
+        initiateViewModel.userResponse.observe(viewLifecycleOwner) { response ->
             observeUserResponse(response)
         }
 
         // observes logoutResponse LiveData
-        viewModel.logoutResponse.observe(viewLifecycleOwner) {
+        initiateViewModel.logoutResponse.observe(viewLifecycleOwner) {
             Log.d(
                 LOG_TAG,
                 "initiate api sdk called -> success and have not app access"
             )
             showInvalidAccess()
+        }
+
+        initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
+            ProgressHelper.hideProgress(binding.progressBar)
+            ViewUtils.showErrorMessageToast(requireContext(), it)
         }
 
         // observe universal feed
@@ -160,6 +169,7 @@ class FeedFragment :
     private fun observeUserResponse(user: UserViewData?) {
         initToolbar()
         setUserImage(user)
+        viewModel.getUniversalFeed(1)
     }
 
 
@@ -293,11 +303,6 @@ class FeedFragment :
     //observe error handling
     private fun observeErrorMessage(response: FeedViewModel.ErrorMessageEvent) {
         when (response) {
-            is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
-                val errorMessage = response.errorMessage
-                ProgressHelper.hideProgress(binding.progressBar)
-                ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
-            }
             is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
                 val errorMessage = response.errorMessage
                 mSwipeRefreshLayout.isRefreshing = false
@@ -416,9 +421,9 @@ class FeedFragment :
     // initiates SDK
     private fun initiateSDK() {
         ProgressHelper.showProgress(binding.progressBar)
-        viewModel.initiateUser(
+        initiateViewModel.initiateUser(
             "69edd43f-4a5e-4077-9c50-2b7aa740acce",
-            "029f66a8-264b-413f-a9df-3ae2f4166486",
+            "10002",
             "D",
             false
         )
@@ -449,7 +454,10 @@ class FeedFragment :
                 // sends post creation started event
                 viewModel.sendPostCreationStartedEvent()
 
-                val intent = CreatePostActivity.getIntent(requireContext())
+                val intent = CreatePostActivity.getIntent(
+                    requireContext(),
+                    LMAnalytics.Source.UNIVERSAL_FEED
+                )
                 createPostLauncher.launch(intent)
             }
         }
