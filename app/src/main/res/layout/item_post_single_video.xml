@@ -53,6 +53,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_post_content"
             app:layout_constraintVertical_bias="0.0"
+            app:controller_layout_id="@layout/exo_playback_control_view"
             app:player_layout_id="@layout/exo_playback_player_view"
             app:use_controller="true" />
 
