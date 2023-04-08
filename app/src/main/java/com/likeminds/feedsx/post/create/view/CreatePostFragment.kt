@@ -62,7 +62,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
-
 @AndroidEntryPoint
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding>(),
@@ -91,7 +90,6 @@ class CreatePostFragment :
     }
 
     override fun receiveExtras() {
-        // TODO: handle when opened from route
         super.receiveExtras()
         if (arguments == null || arguments?.containsKey(CreatePostActivity.SOURCE_EXTRA) == null) {
             requireActivity().supportFragmentManager.popBackStack()
@@ -102,7 +100,9 @@ class CreatePostFragment :
         checkForSource()
     }
 
+    //to check for source of the follow trigger
     private fun checkForSource() {
+        //if source is notification, then call initiate first in the background
         if (source == LMAnalytics.Source.NOTIFICATION) {
             initiateViewModel.initiateUser(
                 "69edd43f-4a5e-4077-9c50-2b7aa740acce",

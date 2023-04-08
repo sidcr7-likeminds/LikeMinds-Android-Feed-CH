@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.likeminds.feedsx.LMAnalytics
@@ -34,7 +33,6 @@ class LMFeedNotificationHandler {
         const val NOTIFICATION_TITLE = "title"
         const val NOTIFICATION_SUB_TITLE = "sub_title"
         const val NOTIFICATION_ROUTE = "route"
-        const val NOTIFICATION_UNREAD_NEW_CHATROOM = "unread_new_chatroom"
         const val NOTIFICATION_CATEGORY = "category"
         const val NOTIFICATION_SUBCATEGORY = "subcategory"
 
@@ -50,6 +48,7 @@ class LMFeedNotificationHandler {
     }
 
 
+    //create the instance of the handler and channel for notification
     fun create(application: Application) {
         mApplication = application
 
@@ -62,6 +61,7 @@ class LMFeedNotificationHandler {
         createNotificationChannel()
     }
 
+    //create notification channel
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createGeneralNotificationChannel()
@@ -83,6 +83,7 @@ class LMFeedNotificationHandler {
         }
     }
 
+    //handle and show notification
     fun handleNotification(data: MutableMap<String, String>) {
         val title = data[NOTIFICATION_TITLE] ?: return
         val subTitle = data[NOTIFICATION_SUB_TITLE] ?: return
@@ -90,19 +91,12 @@ class LMFeedNotificationHandler {
         val category = data[NOTIFICATION_CATEGORY]
         val subcategory = data[NOTIFICATION_SUBCATEGORY]
 
-        Log.d(
-            "LikeMinds", """
-            title: $title
-            subtitle: $subTitle
-            route: $route
-        """.trimIndent()
-        )
-
         //validate data
         if (category.isNullOrEmpty() && subcategory.isNullOrEmpty()) {
             return
         }
 
+        //create payload for analytics event
         val payloadJson = JSONObject().apply {
             put(NOTIFICATION_TITLE, title)
             put(NOTIFICATION_SUB_TITLE, subTitle)
@@ -116,6 +110,7 @@ class LMFeedNotificationHandler {
                 Pair(NOTIFICATION_SUBCATEGORY, subcategory)
             )
         )
+        //show notifications
         sendNormalNotification(
             mApplication,
             title,
@@ -126,6 +121,9 @@ class LMFeedNotificationHandler {
         )
     }
 
+    /**
+     * create pending intent and show notifications accordingly
+     * */
     private fun sendNormalNotification(
         context: Context,
         title: String,
@@ -161,6 +159,7 @@ class LMFeedNotificationHandler {
         }
     }
 
+    //create pending intent as per route in notification
     private fun getRoutePendingIntent(
         context: Context,
         notificationId: Int,
@@ -170,17 +169,21 @@ class LMFeedNotificationHandler {
         category: String?,
         subcategory: String?,
     ): PendingIntent? {
+        //get intent for route
         val intent = Route.getRouteIntent(
             context,
             route,
             0,
             LMAnalytics.Source.NOTIFICATION
         )
+
+        //get intent for main activity
         val mainIntent = Route.getRouteIntent(
             context,
             mainRoute(),
             Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK,
         )
+
         if (intent?.getBundleExtra("bundle") != null) {
             intent.getBundleExtra("bundle")!!.putParcelable(
                 NOTIFICATION_DATA,

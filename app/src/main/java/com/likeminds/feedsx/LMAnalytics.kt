@@ -49,6 +49,9 @@ object LMAnalytics {
         const val POST_TYPE_LINK = "link"
     }
 
+    /**
+     * Source keys variables
+     **/
     object Source {
         const val NOTIFICATION = "notification"
         const val UNIVERSAL_FEED = "universal_feed"

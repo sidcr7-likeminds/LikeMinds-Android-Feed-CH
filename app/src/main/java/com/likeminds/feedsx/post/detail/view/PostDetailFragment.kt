@@ -2,7 +2,6 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
 import android.os.Build
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -99,7 +98,6 @@ class PostDetailFragment :
     }
 
     override fun receiveExtras() {
-        // TODO: handle when opened from route
         super.receiveExtras()
         if (arguments == null || arguments?.containsKey(POST_DETAIL_EXTRAS) == false) {
             requireActivity().supportFragmentManager.popBackStack()
@@ -111,8 +109,9 @@ class PostDetailFragment :
         checkForComments()
     }
 
+    //to check for source of the follow trigger
     private fun checkForComments() {
-        Log.d("LikeMinds", "commentId: ${postDetailExtras.commentId}")
+        //if extras contains commentId: redirect to comment
         if (!postDetailExtras.commentId.isNullOrEmpty()) {
             toFindComment = true
         }
@@ -134,6 +133,7 @@ class PostDetailFragment :
     private fun fetchPostData() {
         // show progress bar
         ProgressHelper.showProgress(binding.progressBar)
+        //if source is notification, then call initiate first and then other apis
         if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
             initiateViewModel.initiateUser(
                 "69edd43f-4a5e-4077-9c50-2b7aa740acce",
@@ -755,12 +755,16 @@ class PostDetailFragment :
         mPostDetailAdapter.replace(postDetailList)
 
         if (toFindComment) {
+            //find the comments already present in adapter
             val index = mPostDetailAdapter.items().indexOfFirst {
                 (it is CommentViewData) && (it.id == postDetailExtras.commentId)
             }
+
+            //comment not present -> get it from api
             if (index == -1) {
                 viewModel.getComment(post.id, postDetailExtras.commentId ?: "", 1)
             } else {
+                //scroll to that comment
                 binding.rvPostDetails.scrollToPosition(index)
             }
         } else {
@@ -920,6 +924,7 @@ class PostDetailFragment :
         val indexAndComment = getIndexAndCommentFromAdapter(comment.id)
 
         if (indexAndComment == null) {
+            toFindComment = false
             mPostDetailAdapter.add(commentsStartPosition, comment)
             binding.rvPostDetails.scrollToPosition(commentsStartPosition)
         } else {
