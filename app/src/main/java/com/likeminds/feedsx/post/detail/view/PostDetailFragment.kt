@@ -40,6 +40,7 @@ import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.ReportActivity
+import com.likeminds.feedsx.report.view.ReportFragment
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -716,7 +717,8 @@ class PostDetailFragment :
     private val reportPostLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                ReportSuccessDialog("Message").show(
+                val data = result.data?.getStringExtra(ReportFragment.REPORT_RESULT)
+                ReportSuccessDialog(data ?: "").show(
                     childFragmentManager,
                     ReportSuccessDialog.TAG
                 )

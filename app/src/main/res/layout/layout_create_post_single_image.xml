@@ -27,7 +27,6 @@
             android:paddingHorizontal="24dp"
             android:text="@string/add_more"
             android:textAllCaps="false"
-            android:textColor="@color/majorelle_blue"
             android:textSize="14sp"
             app:font_type="medium"
             app:layout_constraintEnd_toEndOf="parent"
