@@ -6,12 +6,14 @@ import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.view.View
 import android.widget.TextView
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
+import com.likeminds.feedsx.utils.Route
 import com.likeminds.feedsx.utils.SeeMoreUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -71,9 +73,18 @@ object PostDetailUtil {
 
         // post is used here to get lines count in the text view
         tvCommentContent.post {
+            // decodes tags in text and creates span around those tags
+            MemberTaggingDecoder.decode(
+                tvCommentContent,
+                textForLinkify,
+                enableClick = true,
+                LMBranding.getTextLinkColor()
+            ) { tag ->
+                onMemberTagClicked()
+            }
+
             // gets short text to set with seeMore
             val shortText: String? = SeeMoreUtil.getShortContent(
-                data.text,
                 tvCommentContent,
                 3,
                 500
@@ -81,24 +92,10 @@ object PostDetailUtil {
 
             val trimmedText =
                 if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                    shortText
+                    tvCommentContent.editableText.subSequence(0, shortText.length)
                 } else {
-                    textForLinkify
+                    tvCommentContent.editableText
                 }
-
-            // TODO: remove branding
-            // decodes tags in text and creates span around those tags
-            MemberTaggingDecoder.decode(
-                tvCommentContent,
-                trimmedText,
-                enableClick = true,
-                BrandingData.currentAdvanced?.third ?: ContextCompat.getColor(
-                    context,
-                    R.color.pure_blue
-                )
-            ) { tag ->
-                onMemberTagClicked()
-            }
 
             val seeMoreSpannableStringBuilder = SpannableStringBuilder()
             if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
@@ -112,17 +109,29 @@ object PostDetailUtil {
                 )
             }
 
-            LinkifyCompat.addLinks(tvCommentContent, Linkify.WEB_URLS)
-            tvCommentContent.movementMethod = CustomLinkMovementMethod {
-                //TODO: Handle links etc.
-                true
-            }
-
             // appends see more text at last
             tvCommentContent.text = TextUtils.concat(
-                tvCommentContent.text,
+                trimmedText,
                 seeMoreSpannableStringBuilder
             )
+
+            LinkifyCompat.addLinks(tvCommentContent, Linkify.WEB_URLS)
+            tvCommentContent.movementMethod = CustomLinkMovementMethod { url ->
+                tvCommentContent.setOnClickListener {
+                    null
+                }
+                // creates a route and returns an intent to handle the link
+                val intent = Route.handleDeepLink(context, url)
+                if (intent != null) {
+                    try {
+                        // starts activity with the intent
+                        ActivityCompat.startActivity(context, intent, null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+                true
+            }
         }
     }
 

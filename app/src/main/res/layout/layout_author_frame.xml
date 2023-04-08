@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="buttonColor"
+            type="int" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -23,8 +30,8 @@
             android:id="@+id/tv_member_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
             android:layout_marginStart="12dp"
+            android:layout_marginTop="6dp"
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:lineHeight="20dp"
@@ -46,18 +53,20 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="6dp"
             android:background="@drawable/background_round_2dp"
-            android:backgroundTint="@color/majorelle_blue"
+            android:backgroundTint="@{buttonColor}"
             android:includeFontPadding="false"
             android:paddingHorizontal="8dp"
             android:paddingVertical="3dp"
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="11sp"
+            android:visibility="gone"
             app:fontType="medium"
             app:layout_constraintBottom_toBottomOf="@+id/tv_member_name"
             app:layout_constraintStart_toEndOf="@+id/tv_member_name"
             app:layout_constraintTop_toTopOf="@+id/tv_member_name"
-            tools:text="@string/admin" />
+            tools:text="@string/admin"
+            tools:visibility="visible" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_time"
@@ -107,6 +116,7 @@
             android:layout_marginEnd="16dp"
             android:paddingHorizontal="2dp"
             android:scaleType="fitCenter"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/iv_post_menu"
             app:layout_constraintTop_toTopOf="parent"

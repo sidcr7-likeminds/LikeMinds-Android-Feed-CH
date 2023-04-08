@@ -10,9 +10,9 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="24dp"
             app:layout_constraintBottom_toTopOf="@id/layout_add_image"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginBottom="24dp"
             tools:context=".post.create.view.CreatePostFragment">
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -39,8 +39,8 @@
                     android:ellipsize="end"
                     android:hint="@string/write_something_here"
                     android:inputType="textCapSentences|textMultiLine"
-                    android:minHeight="56dp"
                     android:maxHeight="220dp"
+                    android:minHeight="56dp"
                     android:overScrollMode="always"
                     android:scrollbarStyle="insideInset"
                     android:scrollbars="vertical"
@@ -118,9 +118,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
                     android:translationZ="5dp"
-                    app:layout_constraintTop_toBottomOf="@id/et_post_content"
                     app:layout_constraintEnd_toEndOf="@+id/et_post_content"
                     app:layout_constraintStart_toStartOf="@+id/et_post_content"
+                    app:layout_constraintTop_toBottomOf="@id/et_post_content"
                     tools:visibility="gone" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

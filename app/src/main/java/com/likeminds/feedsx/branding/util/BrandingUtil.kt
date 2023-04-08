@@ -1,16 +1,20 @@
 package com.likeminds.feedsx.branding.util
 
 import android.content.Context
-import android.graphics.Color
 import android.graphics.Typeface
 import androidx.core.content.res.ResourcesCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 
 object BrandingUtil {
 
+    /**
+     * @param context - context to retrieve assets
+     * @param fontStyle - style of font to be applied
+     * @return Typeface? - typeface of current font as per the [fontStyle]
+     * */
     fun getTypeFace(context: Context, fontStyle: String?): Typeface? {
-        val currentFont = BrandingData.getCurrentFonts()
+        val currentFont = LMBranding.getCurrentFonts()
 
         val typeface = when (fontStyle) {
             "bold" -> {
@@ -41,17 +45,21 @@ object BrandingUtil {
         return typeface
     }
 
+    /**
+     * @param defaultColor - color already set to the view
+     * @param textType - type of text
+     * @return Int - integer color
+     * */
     fun getTextColor(defaultColor: Int, textType: String?): Int {
         val color = when (textType) {
             "title" -> {
-                if (BrandingData.isBrandingBasic) {
-                    Color.BLACK
-                } else {
-                    Color.WHITE
-                }
+                LMBranding.getToolbarColor()
+            }
+            "subtitle" -> {
+                LMBranding.getSubtitleColor()
             }
             "special" -> {
-                BrandingData.getButtonsColor()
+                LMBranding.getButtonsColor()
             }
             else -> {
                 defaultColor

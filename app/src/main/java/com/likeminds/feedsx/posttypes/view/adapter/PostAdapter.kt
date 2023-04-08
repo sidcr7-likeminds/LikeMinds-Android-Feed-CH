@@ -53,7 +53,6 @@ class PostAdapter constructor(
 }
 
 interface PostAdapterListener {
-    //TODO: add compulsory methods
     fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
     fun savePost(position: Int)
     fun likePost(position: Int)

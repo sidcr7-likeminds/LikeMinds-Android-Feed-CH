@@ -8,7 +8,6 @@ import android.text.Editable
 import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnFocusChangeListener
@@ -19,7 +18,7 @@ import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.LayoutSearchBarBinding
 import com.likeminds.feedsx.utils.AnimationUtils.circleHideView
 import com.likeminds.feedsx.utils.AnimationUtils.circleRevealView
@@ -29,7 +28,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.onStart
 
 class CustomSearchBar @JvmOverloads constructor(
     mContext: Context,
@@ -199,11 +197,7 @@ class CustomSearchBar @JvmOverloads constructor(
         binding.etSearch.setText("")
         binding.etSearch.requestFocus()
         circleRevealView(binding.searchToolbar)
-        if (BrandingData.currentPrimary != null) {
-            setBackgroundColor(BrandingData.currentPrimary!!)
-        } else if (BrandingData.currentAdvanced != null) {
-            setBackgroundColor(BrandingData.currentAdvanced!!.first)
-        }
+        setBackgroundColor(LMBranding.getHeaderColor())
         elevation = 20F
         isOpen = true
         mSearchViewListener?.onSearchViewOpened()
@@ -233,7 +227,7 @@ class CustomSearchBar @JvmOverloads constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     fun observeSearchView(debounce: Boolean = true) {
-        if(debounce) {
+        if (debounce) {
             binding.etSearch.textChanges()
                 .debounce(500)
                 .distinctUntilChanged()

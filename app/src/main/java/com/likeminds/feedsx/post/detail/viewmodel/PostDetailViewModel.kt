@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
@@ -144,6 +145,8 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val comment = data.comment
                 val users = data.users
+                sendCommentPostedEvent(postId, comment.id)
+
                 _addCommentResponse.postValue(
                     ViewDataConverter.convertComment(
                         comment,
@@ -157,8 +160,22 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    /**
+     * Triggers when a comment is posted on a post
+     **/
+    private fun sendCommentPostedEvent(postId: String, commentId: String) {
+        LMAnalytics.track(
+            LMAnalytics.Events.COMMENT_POSTED,
+            mapOf(
+                LMAnalytics.Keys.POST_ID to postId,
+                LMAnalytics.Keys.COMMENT_ID to commentId
+            )
+        )
+    }
+
     // for replying on a comment on the post
     fun replyComment(
+        userId: String,
         postId: String,
         parentCommentId: String,
         text: String
@@ -177,6 +194,13 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val comment = data.comment
                 val users = data.users
+                sendReplyPostedEvent(
+                    userId,
+                    postId,
+                    parentCommentId,
+                    comment.id
+                )
+
                 _addReplyResponse.postValue(
                     Pair(
                         parentCommentId,
@@ -192,6 +216,26 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
             }
         }
+    }
+
+    /**
+     * Triggers when the reply is posted on a comment
+     **/
+    private fun sendReplyPostedEvent(
+        userId: String,
+        postId: String,
+        parentCommentId: String,
+        commentId: String,
+    ) {
+        LMAnalytics.track(
+            LMAnalytics.Events.REPLY_POSTED,
+            mapOf(
+                LMAnalytics.Keys.USER_ID to userId,
+                LMAnalytics.Keys.POST_ID to postId,
+                LMAnalytics.Keys.COMMENT_ID to parentCommentId,
+                LMAnalytics.Keys.COMMENT_REPLY_ID to commentId
+            )
+        )
     }
 
     // to get comment with paginated replies
@@ -249,10 +293,45 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             val response = lmFeedClient.deleteComment(request)
 
             if (response.success) {
+                sendCommentReplyDeletedEvent(
+                    postId,
+                    commentId,
+                    parentCommentId
+                )
                 _deleteCommentResponse.postValue(Pair(commentId, parentCommentId))
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.DeleteComment(response.errorMessage))
             }
+        }
+    }
+
+    /**
+     * Triggers when a comment/reply is deleted
+     **/
+    private fun sendCommentReplyDeletedEvent(
+        postId: String,
+        commentId: String,
+        parentCommentId: String?
+    ) {
+        if (parentCommentId == null) {
+            // comment deleted event
+            LMAnalytics.track(
+                LMAnalytics.Events.COMMENT_DELETED,
+                mapOf(
+                    LMAnalytics.Keys.POST_ID to postId,
+                    LMAnalytics.Keys.COMMENT_ID to commentId
+                )
+            )
+        } else {
+            // reply deleted event
+            LMAnalytics.track(
+                LMAnalytics.Events.REPLY_DELETED,
+                mapOf(
+                    LMAnalytics.Keys.POST_ID to postId,
+                    LMAnalytics.Keys.COMMENT_ID to parentCommentId,
+                    LMAnalytics.Keys.COMMENT_REPLY_ID to commentId,
+                )
+            )
         }
     }
 

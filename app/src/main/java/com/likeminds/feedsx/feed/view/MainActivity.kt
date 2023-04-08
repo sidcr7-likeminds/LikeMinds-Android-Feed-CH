@@ -1,9 +1,12 @@
 package com.likeminds.feedsx.feed.view
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ActivityMainBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -17,12 +20,19 @@ class MainActivity : BaseAppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
 
+    companion object {
+        fun getIntent(
+            context: Context
+        ): Intent {
+            return Intent(context, MainActivity::class.java)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
-        //TODO: Set as per branding
-        binding.isBrandingBasic = true
+        binding.toolbarColor = LMBranding.getToolbarColor()
         setContentView(binding.root)
 
         //Navigation

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.likes.model.POST
@@ -98,5 +99,23 @@ class LikesViewModel @Inject constructor() : ViewModel() {
             // posts error message if API call failed
             _errorMessage.postValue(response.errorMessage)
         }
+    }
+
+    /**
+     * Triggers when the user opens likes screen for post/comment
+     **/
+    fun sendLikeListOpenEvent(
+        postId: String,
+        commentId: String?
+    ) {
+        val map = hashMapOf<String, String>()
+        map[LMAnalytics.Keys.POST_ID] = postId
+        if (commentId != null) {
+            map[LMAnalytics.Keys.COMMENT_ID] = commentId
+        }
+        LMAnalytics.track(
+            LMAnalytics.Events.LIKE_LIST_OPEN,
+            map
+        )
     }
 }

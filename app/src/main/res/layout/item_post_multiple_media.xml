@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="buttonColor"
+            type="int" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -62,7 +69,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/viewpager_multiple_media"
-            app:selectedDotColor="@color/majorelle_blue" />
+            app:selectedDotColor="@{buttonColor}" />
 
         <include
             android:id="@+id/post_actions_layout"

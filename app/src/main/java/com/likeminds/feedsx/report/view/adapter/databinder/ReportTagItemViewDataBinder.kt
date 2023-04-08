@@ -1,12 +1,11 @@
 package com.likeminds.feedsx.report.view.adapter.databinder
 
-import android.content.res.ColorStateList
-import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ItemReportTagsBinding
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
@@ -31,44 +30,21 @@ class ReportTagItemViewDataBinder constructor(
         return binding
     }
 
-    override fun drawPrimaryColor(binding: ItemReportTagsBinding, color: Int) {
-        super.drawPrimaryColor(binding, color)
+    // sets tag background to the buttons color
+    private fun setTagBackground(binding: ItemReportTagsBinding) {
         val drawable = binding.tvReportTag.background as GradientDrawable
         drawable.mutate()
         val width = ViewUtils.dpToPx(1)
 
-        if (binding.reportTagViewData?.isSelected == true) {
-            drawable.color = ColorStateList.valueOf(color)
-            drawable.setStroke(width, color)
-        } else {
-            drawable.color = ColorStateList.valueOf(Color.WHITE)
-            drawable.setStroke(
-                width,
-                ContextCompat.getColor(binding.root.context, R.color.brown_grey)
-            )
-        }
-    }
-
-    override fun drawAdvancedColor(
-        binding: ItemReportTagsBinding,
-        headerColor: Int,
-        buttonsIconsColor: Int,
-        textLinksColor: Int
-    ) {
-        super.drawAdvancedColor(binding, headerColor, buttonsIconsColor, textLinksColor)
-        val drawable = binding.tvReportTag.background as GradientDrawable
-        drawable.mutate()
-        val width = ViewUtils.dpToPx(1)
-
-        if (binding.reportTagViewData?.isSelected == true) {
-            drawable.color = ColorStateList.valueOf(buttonsIconsColor)
-            drawable.setStroke(width, buttonsIconsColor)
-        } else {
-            drawable.color = ColorStateList.valueOf(Color.WHITE)
-            drawable.setStroke(
-                width,
-                ContextCompat.getColor(binding.root.context, R.color.brown_grey)
-            )
+        binding.apply {
+            if (reportTagViewData?.isSelected == true) {
+                drawable.setStroke(width, LMBranding.getButtonsColor())
+            } else {
+                drawable.setStroke(
+                    width,
+                    ContextCompat.getColor(root.context, R.color.brown_grey)
+                )
+            }
         }
     }
 
@@ -77,14 +53,20 @@ class ReportTagItemViewDataBinder constructor(
         data: ReportTagViewData,
         position: Int
     ) {
-        binding.reportTagViewData = data
+        binding.apply {
+            reportTagViewData = data
+            buttonColor = LMBranding.getButtonsColor()
+            setTagBackground(this)
+        }
     }
 
     // sets click listener to handle selected report tag
     private fun setListeners(binding: ItemReportTagsBinding) {
-        binding.tvReportTag.setOnClickListener {
-            val reportTagViewData = binding.reportTagViewData ?: return@setOnClickListener
-            listener.reportTagSelected(reportTagViewData)
+        binding.apply {
+            tvReportTag.setOnClickListener {
+                val reportTagViewData = reportTagViewData ?: return@setOnClickListener
+                listener.reportTagSelected(reportTagViewData)
+            }
         }
     }
 }

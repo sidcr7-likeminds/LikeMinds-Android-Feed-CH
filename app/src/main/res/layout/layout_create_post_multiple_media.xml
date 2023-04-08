@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="buttonColor"
+            type="int" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -30,7 +37,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/viewpager_multiple_media"
-            app:selectedDotColor="@color/majorelle_blue" />
+            app:selectedDotColor="@{buttonColor}" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsButton
             android:id="@+id/btn_add_more"
@@ -38,20 +45,20 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
             android:layout_marginBottom="16dp"
+            android:background="@drawable/background_round_8dp"
+            android:drawableLeft="@drawable/ic_plus"
+            android:paddingHorizontal="24dp"
             android:text="@string/add_more"
             android:textAllCaps="false"
             android:textColor="@color/majorelle_blue"
-            android:drawableLeft="@drawable/ic_plus"
             android:textSize="14sp"
             app:font_type="medium"
-            android:paddingHorizontal="24dp"
-            android:background="@drawable/background_round_8dp"
-            tools:visibility="visible"
-            tools:fontFamily="@font/roboto_medium"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dots_indicator"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            tools:fontFamily="@font/roboto_medium"
+            tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

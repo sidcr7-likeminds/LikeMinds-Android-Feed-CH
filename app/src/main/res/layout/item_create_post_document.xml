@@ -6,7 +6,6 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginBottom="8dp"
         android:background="@drawable/background_item_document">
 
         <ImageView
@@ -28,9 +27,9 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:padding="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:srcCompat="@drawable/ic_cross"
             tools:ignore="ContentDescription" />
 
@@ -42,7 +41,6 @@
             android:layout_marginEnd="10dp"
             android:layout_marginBottom="3dp"
             android:ellipsize="end"
-            tools:fontFamily="@font/roboto_medium"
             android:maxLines="1"
             android:textColor="@color/grey"
             android:textSize="16sp"
@@ -52,6 +50,7 @@
             app:layout_constraintStart_toEndOf="@+id/iv_document_icon"
             app:layout_constraintTop_toTopOf="@+id/iv_document_icon"
             app:layout_constraintVertical_chainStyle="packed"
+            tools:fontFamily="@font/roboto_medium"
             tools:text="Getting started.png" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
@@ -60,7 +59,6 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="14dp"
             android:layout_marginTop="3dp"
-            tools:fontFamily="@font/roboto_regular"
             android:textColor="@color/grey"
             android:textSize="14sp"
             android:textStyle="normal"
@@ -69,6 +67,7 @@
             app:layout_constraintStart_toEndOf="@+id/iv_document_icon"
             app:layout_constraintTop_toBottomOf="@+id/tv_document_name"
             app:layout_constraintVertical_chainStyle="packed"
+            tools:fontFamily="@font/roboto_regular"
             tools:text="2 Pages" />
 
         <View
@@ -86,7 +85,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            tools:fontFamily="@font/roboto_regular"
             android:textColor="@color/grey"
             android:textSize="14sp"
             android:textStyle="normal"
@@ -94,6 +92,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/view_meta_dot_1"
             app:layout_constraintStart_toEndOf="@+id/view_meta_dot_1"
             app:layout_constraintTop_toTopOf="@+id/view_meta_dot_1"
+            tools:fontFamily="@font/roboto_regular"
             tools:text="23.5 MB" />
 
         <View
@@ -111,7 +110,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            tools:fontFamily="@font/roboto_regular"
             android:textAllCaps="true"
             android:textColor="@color/grey"
             android:textSize="14sp"
@@ -120,6 +118,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/view_meta_dot_2"
             app:layout_constraintStart_toEndOf="@+id/view_meta_dot_2"
             app:layout_constraintTop_toTopOf="@+id/view_meta_dot_2"
+            tools:fontFamily="@font/roboto_regular"
             tools:text="@string/pdf" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ActivityNotificationFeedBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -35,8 +36,7 @@ class NotificationFeedActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityNotificationFeedBinding.inflate(layoutInflater)
-        //TODO: Set as per branding
-        binding.isBrandingBasic = true
+        binding.toolbarColor = LMBranding.getToolbarColor()
         setContentView(binding.root)
 
         //Navigation

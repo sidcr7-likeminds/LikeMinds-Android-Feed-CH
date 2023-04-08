@@ -3,6 +3,7 @@
 
     <declare-styleable name="LikeMindsButton">
         <attr name="font_type" format="string" />
+        <attr name="text_type" format="string" />
         <attr name="button_type" format="string"/>
     </declare-styleable>
 

@@ -18,12 +18,16 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.exoplayer2.Player
+import com.likeminds.feedsx.InitiateViewModel
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.LMExoplayer
@@ -43,16 +47,18 @@ import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
 import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
-import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.emptyExtrasException
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
@@ -70,6 +76,7 @@ class CreatePostFragment :
     LMExoplayerListener {
 
     private val viewModel: CreatePostViewModel by viewModels()
+    private val initiateViewModel: InitiateViewModel by activityViewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
@@ -81,11 +88,40 @@ class CreatePostFragment :
     private lateinit var etPostTextChangeListener: TextWatcher
 
     private lateinit var memberTagging: MemberTaggingView
+    private var source = ""
 
     private var lmExoplayer: LMExoplayer? = null
 
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
+    }
+
+    companion object {
+        const val TAG = "CreatePostFragment"
+    }
+
+    override fun receiveExtras() {
+        super.receiveExtras()
+        if (arguments == null || arguments?.containsKey(CreatePostActivity.SOURCE_EXTRA) == null) {
+            requireActivity().supportFragmentManager.popBackStack()
+            return
+        }
+        source = arguments?.getString(CreatePostActivity.SOURCE_EXTRA)
+            ?: throw emptyExtrasException(TAG)
+        checkForSource()
+    }
+
+    //to check for source of the follow trigger
+    private fun checkForSource() {
+        //if source is notification, then call initiate first in the background
+        if (source == LMAnalytics.Source.NOTIFICATION) {
+            initiateViewModel.initiateUser(
+                "69edd43f-4a5e-4077-9c50-2b7aa740acce",
+                "10002",
+                "D",
+                false
+            )
+        }
     }
 
     override fun setUpViews() {
@@ -182,7 +218,6 @@ class CreatePostFragment :
         }
     }
 
-    // TODO: remove branding
     /**
      * initializes the [memberTaggingView] with the edit text
      * also sets listener to the [memberTaggingView]
@@ -194,12 +229,19 @@ class CreatePostFragment :
                 .editText(binding.etPostContent)
                 .maxHeightInPercentage(0.4f)
                 .color(
-                    BrandingData.currentAdvanced?.third
-                        ?: ContextCompat.getColor(binding.root.context, R.color.pure_blue)
+                    LMBranding.getTextLinkColor()
                 )
                 .build()
         )
         memberTagging.addListener(object : MemberTaggingViewListener {
+            override fun onMemberTagged(user: UserTagViewData) {
+                // sends user tagged event
+                viewModel.sendUserTagEvent(
+                    user.userUniqueId,
+                    memberTagging.getTaggedMemberCount()
+                )
+            }
+
             override fun callApi(page: Int, searchName: String) {
                 viewModel.getMembersForTagging(page, searchName)
             }
@@ -285,6 +327,8 @@ class CreatePostFragment :
     private fun initAddAttachmentsView() {
         binding.apply {
             layoutAttachFiles.setOnClickListener {
+                // sends clicked on attachment event for file
+                viewModel.sendClickedOnAttachmentEvent("file")
                 val extra = MediaPickerExtras.Builder()
                     .mediaTypes(listOf(PDF))
                     .allowMultipleSelect(true)
@@ -294,10 +338,14 @@ class CreatePostFragment :
             }
 
             layoutAddImage.setOnClickListener {
+                // sends clicked on attachment event for photo
+                viewModel.sendClickedOnAttachmentEvent("photo")
                 initiateMediaPicker(listOf(IMAGE))
             }
 
             layoutAddVideo.setOnClickListener {
+                // sends clicked on attachment event for video
+                viewModel.sendClickedOnAttachmentEvent("video")
                 initiateMediaPicker(listOf(VIDEO))
             }
         }
@@ -385,6 +433,8 @@ class CreatePostFragment :
     private fun onMediaPicked(result: MediaPickerResult) {
         val data =
             MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        // sends media attached event with media type and count
+        viewModel.sendMediaAttachedEvent(data)
         selectedMediaUris.addAll(data)
         showPostMedia()
     }
@@ -395,6 +445,8 @@ class CreatePostFragment :
             val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
                 requireContext(), it
             )
+            // sends media attached event with media type and count
+            viewModel.sendMediaAttachedEvent(mediaUris)
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
                 showPostMedia()
@@ -408,6 +460,8 @@ class CreatePostFragment :
             val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
                 requireContext(), it
             )
+            // sends media attached event with media type and count
+            viewModel.sendMediaAttachedEvent(mediaUris)
             selectedMediaUris.addAll(mediaUris)
             if (mediaUris.isNotEmpty()) {
                 attachmentsLimitExceeded()
@@ -465,7 +519,8 @@ class CreatePostFragment :
 
                 //add more click listener
                 btnAddMore.setOnClickListener {
-                    initiateMediaPicker(listOf(IMAGE, VIDEO))
+                    // sends clicked on attachment event for image and video
+                viewModel.sendClickedOnAttachmentEvent("image, video")initiateMediaPicker(listOf(IMAGE, VIDEO))
                 }
 
                 val selectedMediaUri = selectedMediaUris.first()
@@ -510,6 +565,8 @@ class CreatePostFragment :
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
             singleImageAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for image and video
+                viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
             singleImageAttachment.layoutSingleImagePost.ivCross.setOnClickListener {
@@ -539,6 +596,7 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.show()
+            multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
             multipleMediaAttachment.btnAddMore.visibility =
                 if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
                     View.GONE
@@ -548,6 +606,8 @@ class CreatePostFragment :
 
 
             multipleMediaAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for image and video
+                viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
 
@@ -601,6 +661,8 @@ class CreatePostFragment :
                     View.VISIBLE
                 }
             documentsAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for file
+                viewModel.sendClickedOnAttachmentEvent("file")
                 initiateMediaPicker(listOf(PDF))
             }
 
@@ -608,10 +670,22 @@ class CreatePostFragment :
                 convertSingleDataUri(it)
             }
 
-            documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
-            documentsAttachment.rvDocuments.apply {
-                adapter = documentsAdapter
-                layoutManager = LinearLayoutManager(context)
+            if (documentsAdapter == null) {
+                // item decorator to add spacing between items
+                val dividerItemDecorator =
+                    DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+                dividerItemDecorator.setDrawable(
+                    ContextCompat.getDrawable(
+                        requireContext(),
+                        R.drawable.document_item_divider
+                    ) ?: return
+                )
+                documentsAdapter = CreatePostDocumentsAdapter(this@CreatePostFragment)
+                documentsAttachment.rvDocuments.apply {
+                    adapter = documentsAdapter
+                    layoutManager = LinearLayoutManager(context)
+                    addItemDecoration(dividerItemDecorator)
+                }
             }
 
             documentsAdapter.replace(attachments)
@@ -643,10 +717,13 @@ class CreatePostFragment :
 
     // renders data in the link view
     private fun initLinkView(data: LinkOGTagsViewData) {
+        val link = data.url ?: ""
+        // sends link attached event with the link
+        viewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
 
-            val isImageValid = (data.image != null && data.image.isValidUrl())
+            val isImageValid = data.image.isImageValid()
             ivLink.isVisible = isImageValid
             handleLinkPreviewConstraints(isImageValid)
 
@@ -778,7 +855,7 @@ class CreatePostFragment :
                 pbPosting.hide()
                 if (clickable) {
                     tvPostDone.isClickable = true
-                    tvPostDone.setTextColor(BrandingData.getButtonsColor())
+                    tvPostDone.setTextColor(LMBranding.getButtonsColor())
                 } else {
                     tvPostDone.isClickable = false
                     tvPostDone.setTextColor(Color.parseColor("#666666"))

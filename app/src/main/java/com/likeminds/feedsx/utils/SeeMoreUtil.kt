@@ -8,13 +8,11 @@ internal object SeeMoreUtil {
      * This function is for getting short post content for the see more feature
      */
     fun getShortContent(
-        textContent: String?,
         textView: TextView,
         maxLines: Int,
         seeMoreCountLimit: Int
     ): String? {
-        if (textContent == null)
-            return null
+        val textContent = textView.editableText ?: return null
 
         // variable to hold text limit as per max number of lines
         var shortTextLine: String? = null
@@ -25,8 +23,6 @@ internal object SeeMoreUtil {
                 0,
                 seeMoreCountLimit
             ) else null
-
-        textView.text = textContent
 
         //calculation of text limit as per max number of lines
         if (textView.lineCount >= maxLines) {

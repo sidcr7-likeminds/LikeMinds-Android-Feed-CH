@@ -44,6 +44,7 @@ object MemberTaggingDecoder {
                         try {
                             val tagUri = getRouteFromRegex(regex)
                                 ?: return@MemberTaggingClickableSpan
+                            textView.setOnClickListener { null }
                             listener?.onTagClick(tagUri)
                         } catch (e: Exception) {
                             e.printStackTrace()
@@ -123,7 +124,7 @@ object MemberTaggingDecoder {
                 stringBuilder.append(text.substring(lastIndex, start))
             }
             val tag = value.substring(2, value.length - 2).split("\\|".toRegex())
-            val name = tag.firstOrNull()
+            val name = "@${tag.firstOrNull()}"
             stringBuilder.append(name)
             lastIndex = end + 1
         }

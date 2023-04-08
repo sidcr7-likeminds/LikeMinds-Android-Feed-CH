@@ -5,9 +5,11 @@ import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -18,8 +20,10 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
+import com.likeminds.feedsx.InitiateViewModel
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
@@ -67,6 +71,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 import java.util.*
 
+
 @AndroidEntryPoint
 class FeedFragment :
     BaseFragment<FragmentFeedBinding>(),
@@ -80,6 +85,8 @@ class FeedFragment :
 
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
     private val postActionsViewModel: PostActionsViewModel by activityViewModels()
+
+    private val initiateViewModel: InitiateViewModel by activityViewModels()
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
@@ -107,17 +114,22 @@ class FeedFragment :
         observePosting()
 
         // observes userResponse LiveData
-        viewModel.userResponse.observe(viewLifecycleOwner) { response ->
+        initiateViewModel.userResponse.observe(viewLifecycleOwner) { response ->
             observeUserResponse(response)
         }
 
         // observes logoutResponse LiveData
-        viewModel.logoutResponse.observe(viewLifecycleOwner) {
+        initiateViewModel.logoutResponse.observe(viewLifecycleOwner) {
             Log.d(
                 LOG_TAG,
                 "initiate api sdk called -> success and have not app access"
             )
             showInvalidAccess()
+        }
+
+        initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
+            ProgressHelper.hideProgress(binding.progressBar)
+            ViewUtils.showErrorMessageToast(requireContext(), it)
         }
 
         // observe universal feed
@@ -165,6 +177,7 @@ class FeedFragment :
     private fun observeUserResponse(user: UserViewData?) {
         initToolbar()
         setUserImage(user)
+        viewModel.getUniversalFeed(1)
     }
 
     //observe feed response
@@ -316,13 +329,10 @@ class FeedFragment :
     //observe error handling
     private fun observeErrorMessage(response: FeedViewModel.ErrorMessageEvent) {
         when (response) {
-            is FeedViewModel.ErrorMessageEvent.InitiateUser -> {
-                val errorMessage = response.errorMessage
-                ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
-            }
             is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
                 val errorMessage = response.errorMessage
                 mSwipeRefreshLayout.isRefreshing = false
+                ProgressHelper.hideProgress(binding.progressBar)
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
             is FeedViewModel.ErrorMessageEvent.AddPost -> {
@@ -407,6 +417,9 @@ class FeedFragment :
     override fun onResume() {
         super.onResume()
 
+        // sends feed opened event
+        viewModel.sendFeedOpenedEvent()
+
         val temporaryId = viewModel.getTemporaryId()
         if (temporaryId != -1L && !alreadyPosting) {
             removePostingView()
@@ -430,10 +443,10 @@ class FeedFragment :
     // initiates SDK
     private fun initiateSDK() {
         ProgressHelper.showProgress(binding.progressBar)
-        viewModel.initiateUser(
+        initiateViewModel.initiateUser(
             "6b11d5f6-19fc-48aa-9140-0f59c88b0d0a",
-            "029f66a8-264b-413f-a9df-3ae2f4166486",
-            "D",
+            "1e9bc941-8817-4328-aa90-f1c90259b12c",
+            "A",
             false
         )
     }
@@ -444,8 +457,7 @@ class FeedFragment :
 
     // initializes various UI components
     private fun initUI() {
-        //TODO: Set as per branding
-        binding.isBrandingBasic = true
+        binding.toolbarColor = LMBranding.getToolbarColor()
 
         initRecyclerView()
         initSwipeRefreshLayout()
@@ -461,7 +473,13 @@ class FeedFragment :
                     getString(R.string.a_post_is_already_uploading)
                 )
             } else {
-                val intent = CreatePostActivity.getIntent(requireContext())
+                // sends post creation started event
+                viewModel.sendPostCreationStartedEvent()
+
+                val intent = CreatePostActivity.getIntent(
+                    requireContext(),
+                    LMAnalytics.Source.UNIVERSAL_FEED
+                )
                 createPostLauncher.launch(intent)
             }
         }
@@ -489,6 +507,15 @@ class FeedFragment :
 
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
+        // item decorator to add spacing between items
+        val dividerItemDecorator =
+            DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+        dividerItemDecorator.setDrawable(
+            ContextCompat.getDrawable(
+                requireContext(),
+                R.drawable.feed_item_divider
+            ) ?: return
+        )
         val linearLayoutManager = LinearLayoutManager(context)
         mPostAdapter = PostAdapter(this)
         binding.recyclerView.apply {
@@ -496,6 +523,7 @@ class FeedFragment :
             adapter = mPostAdapter
             if (itemAnimator is SimpleItemAnimator)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+            addItemDecoration(dividerItemDecorator)
             show()
         }
         attachScrollListener(
@@ -508,7 +536,7 @@ class FeedFragment :
     private fun initSwipeRefreshLayout() {
         mSwipeRefreshLayout = binding.swipeRefreshLayout
         mSwipeRefreshLayout.setColorSchemeColors(
-            BrandingData.getButtonsColor(),
+            LMBranding.getButtonsColor(),
         )
 
         mSwipeRefreshLayout.setOnRefreshListener {
@@ -546,21 +574,23 @@ class FeedFragment :
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                val isExtended = binding.newPostButton.isExtended
+                binding.apply {
+                    val isExtended = newPostButton.isExtended
 
-                // Scroll down
-                if (dy > 20 && isExtended) {
-                    binding.newPostButton.shrink()
-                }
+                    // Scroll down
+                    if (dy > 20 && isExtended) {
+                        newPostButton.shrink()
+                    }
 
-                // Scroll up
-                if (dy < -20 && !isExtended) {
-                    binding.newPostButton.extend()
-                }
+                    // Scroll up
+                    if (dy < -20 && !isExtended) {
+                        newPostButton.extend()
+                    }
 
-                // At the top
-                if (!recyclerView.canScrollVertically(-1)) {
-                    binding.newPostButton.extend()
+                    // At the top
+                    if (!recyclerView.canScrollVertically(-1)) {
+                        newPostButton.extend()
+                    }
                 }
 
                 handleVideoAttachment()
@@ -595,6 +625,7 @@ class FeedFragment :
     // shows invalid access error and logs out invalid user
     private fun showInvalidAccess() {
         binding.apply {
+            ProgressHelper.hideProgress(progressBar)
             recyclerView.hide()
             layoutAccessRemoved.root.show()
             memberImage.hide()
@@ -724,6 +755,10 @@ class FeedFragment :
     //opens post detail screen when add comment/comments count is clicked
     override fun comment(postId: String) {
         PostEvent.getPublisher().subscribe(this)
+
+        // sends comment list open event
+        viewModel.sendCommentListOpenEvent()
+
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postId)
             .isEditTextFocused(true)
@@ -734,6 +769,10 @@ class FeedFragment :
     //opens post detail screen when post content is clicked
     override fun postDetail(postData: PostViewData) {
         PostEvent.getPublisher().subscribe(this)
+
+        // sends comment list open event
+        viewModel.sendCommentListOpenEvent()
+
         val postDetailExtras = PostDetailExtras.Builder()
             .postId(postData.id)
             .isEditTextFocused(false)
@@ -743,12 +782,14 @@ class FeedFragment :
 
     // callback when self post is deleted by user
     override fun selfDelete(deleteExtras: DeleteExtras) {
-        postActionsViewModel.deletePost(deleteExtras.postId)
+        val post = getIndexAndPostFromAdapter(deleteExtras.postId)?.second ?: return
+        postActionsViewModel.deletePost(post)
     }
 
     // callback when other's post is deleted by CM
     override fun adminDelete(deleteExtras: DeleteExtras, reason: String) {
-        postActionsViewModel.deletePost(deleteExtras.postId, reason)
+        val post = getIndexAndPostFromAdapter(deleteExtras.postId)?.second ?: return
+        postActionsViewModel.deletePost(post, reason)
     }
 
     // updates the fromPostLiked/fromPostSaved variables and updates the rv list
@@ -786,11 +827,13 @@ class FeedFragment :
 
     // Processes report action on post
     private fun reportPost(postId: String, creatorId: String) {
+        val post = getIndexAndPostFromAdapter(postId)?.second ?: return
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
             .entityCreatorId(creatorId)
             .entityType(REPORT_TYPE_POST)
+            .postViewType(post.viewType)
             .build()
 
         //get Intent for [ReportActivity]
@@ -840,7 +883,7 @@ class FeedFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostAdapter.update(index, newViewData)
@@ -874,7 +917,7 @@ class FeedFragment :
             .build()
 
         //call api
-        postActionsViewModel.pinPost(postId)
+        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostAdapter.update(index, newViewData)

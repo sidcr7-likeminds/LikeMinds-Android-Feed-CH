@@ -5,7 +5,7 @@ import android.content.res.ColorStateList
 import android.util.AttributeSet
 import com.google.android.material.button.MaterialButton
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.BrandingData
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.branding.util.BrandingUtil
 
 internal class LikeMindsButton : MaterialButton {
@@ -30,11 +30,23 @@ internal class LikeMindsButton : MaterialButton {
         val array = context.obtainStyledAttributes(attrs, R.styleable.LikeMindsButton)
         val fontStyle = array.getString(R.styleable.LikeMindsButton_font_type)
         val buttonType = array.getString(R.styleable.LikeMindsButton_button_type)
-        this.typeface = BrandingUtil.getTypeFace(context, fontStyle)
+        val textType = array.getString(R.styleable.LikeMindsButton_text_type)
+        typeface = BrandingUtil.getTypeFace(context, fontStyle)
         array.recycle()
 
-        // color
-        if (!buttonType.equals("normal"))
-            this.backgroundTintList = ColorStateList.valueOf(BrandingData.getButtonsColor())
+        // applies button color to button drawables
+        compoundDrawables.forEach {
+            it?.setTintList(ColorStateList.valueOf(LMBranding.getButtonsColor()))
+        }
+
+        // bg color
+        if (!buttonType.equals("normal")) {
+            backgroundTintList = ColorStateList.valueOf(LMBranding.getButtonsColor())
+        }
+
+        // text color
+        if (!textType.equals("normal")) {
+            setTextColor(LMBranding.getButtonsColor())
+        }
     }
 }
