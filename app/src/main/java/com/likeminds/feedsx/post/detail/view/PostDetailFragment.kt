@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -75,6 +76,7 @@ class PostDetailFragment :
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     private var parentCommentIdToReply: String? = null
+    private var toFindComment: Boolean = false
 
     private lateinit var memberTagging: MemberTaggingView
 
@@ -105,6 +107,14 @@ class PostDetailFragment :
         postDetailExtras =
             arguments?.getParcelable(POST_DETAIL_EXTRAS)
                 ?: throw emptyExtrasException(TAG)
+        checkForComments()
+    }
+
+    private fun checkForComments() {
+        Log.d("LikeMinds", "commentId: ${postDetailExtras.commentId}")
+        if (!postDetailExtras.commentId.isNullOrEmpty()) {
+            toFindComment = true
+        }
     }
 
     override fun setUpViews() {
@@ -737,10 +747,24 @@ class PostDetailFragment :
             )
         }
 
+        val comments = post.replies.toList()
         // adds all the comments to the [postDetailList]
-        postDetailList.addAll(post.replies.toList())
+        postDetailList.addAll(comments)
         mPostDetailAdapter.replace(postDetailList)
-        binding.rvPostDetails.scrollToPosition(postDataPosition)
+
+        if (toFindComment) {
+            val index = mPostDetailAdapter.items().indexOfFirst {
+                (it is CommentViewData) && (it.id == postDetailExtras.commentId)
+            }
+            if (index == -1) {
+                viewModel.getComment(post.id, postDetailExtras.commentId ?: "", 1)
+            } else {
+                binding.rvPostDetails.scrollToPosition(index)
+            }
+        } else {
+            binding.rvPostDetails.scrollToPosition(postDataPosition)
+        }
+
     }
 
     // updates the post and add comments to adapter
@@ -891,21 +915,27 @@ class PostDetailFragment :
     // adds paginated replies to comment
     private fun addReplies(comment: CommentViewData, page: Int) {
         // gets comment from adapter
-        val indexAndComment = getIndexAndCommentFromAdapter(comment.id) ?: return
-        val index = indexAndComment.first
-        val adapterComment = indexAndComment.second
-        if (page == 1) {
-            // updates the comment with page-1 replies
-            mPostDetailAdapter.update(index, comment)
-            scrollToPositionWithOffset(index, 75)
+        val indexAndComment = getIndexAndCommentFromAdapter(comment.id)
+
+        if (indexAndComment == null) {
+            mPostDetailAdapter.add(commentsStartPosition, comment)
+            binding.rvPostDetails.scrollToPosition(commentsStartPosition)
         } else {
-            // adds replies in adapter and fetched replies
-            comment.replies.addAll(
-                0,
-                adapterComment.replies
-            )
-            mPostDetailAdapter.update(index, comment)
-            scrollToPositionWithOffset(index + 1, 100)
+            val index = indexAndComment.first
+            val adapterComment = indexAndComment.second
+            if (page == 1) {
+                // updates the comment with page-1 replies
+                mPostDetailAdapter.update(index, comment)
+                scrollToPositionWithOffset(index, 75)
+            } else {
+                // adds replies in adapter and fetched replies
+                comment.replies.addAll(
+                    0,
+                    adapterComment.replies
+                )
+                mPostDetailAdapter.update(index, comment)
+                scrollToPositionWithOffset(index + 1, 100)
+            }
         }
     }
 
