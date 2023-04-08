@@ -109,4 +109,6 @@
     <string name="post_unpinned">Post unpinned!</string>
     <string name="no_comment_found">No comment found</string>
     <string name="be_the_first_one_to_comment">Be the first one to comment</string>
+    <string name="general_channel_name">General notifications</string>
+    <string name="general_channel_description">All general notifications</string>
 </resources>

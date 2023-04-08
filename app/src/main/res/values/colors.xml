@@ -95,6 +95,7 @@
     <color name="faux_charcoal">#33384A</color>
     <color name="border_color_audio">#7effffff</color>
     <color name="vivid_red">#FF3B30</color>
+    <color name="vivid_red_50">#FF120A66</color>
     <color name="pure_blue">#007AFF</color>
     <color name="dark_grey">#333333</color>
     <color name="bright_red">#EE4747</color>
