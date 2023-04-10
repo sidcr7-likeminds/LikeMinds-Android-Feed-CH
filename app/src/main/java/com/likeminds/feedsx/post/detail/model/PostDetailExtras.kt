@@ -7,7 +7,8 @@ import kotlinx.parcelize.Parcelize
 class PostDetailExtras private constructor(
     var postId: String,
     var commentId: String?,
-    var isEditTextFocused: Boolean
+    var isEditTextFocused: Boolean,
+    val source: String?
 ) : Parcelable {
 
     class Builder {
@@ -15,18 +16,20 @@ class PostDetailExtras private constructor(
         private var postId: String = ""
         private var isEditTextFocused: Boolean = false
         private var commentId: String? = null
+        private var source: String? = null
 
         fun postId(postId: String) = apply { this.postId = postId }
         fun isEditTextFocused(isEditTextFocused: Boolean) =
             apply { this.isEditTextFocused = isEditTextFocused }
 
-
         fun commentId(commentId: String?) = apply { this.commentId = commentId }
+        fun source(source: String?) = apply { this.source = source }
 
         fun build() = PostDetailExtras(
             postId,
             commentId,
-            isEditTextFocused
+            isEditTextFocused,
+            source
         )
     }
 
@@ -34,5 +37,6 @@ class PostDetailExtras private constructor(
         return Builder().postId(postId)
             .isEditTextFocused(isEditTextFocused)
             .commentId(commentId)
+            .source(source)
     }
 }

@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.InitiateViewModel
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
@@ -39,10 +41,7 @@ import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.ReportActivity
 import com.likeminds.feedsx.report.view.ReportFragment
 import com.likeminds.feedsx.report.view.ReportSuccessDialog
-import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.ProgressHelper
-import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -68,6 +67,8 @@ class PostDetailFragment :
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
     private val postActionsViewModel: PostActionsViewModel by activityViewModels()
 
+    private val initiateViewModel: InitiateViewModel by activityViewModels()
+
     private lateinit var postDetailExtras: PostDetailExtras
 
     private lateinit var mPostDetailAdapter: PostDetailAdapter
@@ -75,6 +76,7 @@ class PostDetailFragment :
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
 
     private var parentCommentIdToReply: String? = null
+    private var toFindComment: Boolean = false
 
     private lateinit var memberTagging: MemberTaggingView
 
@@ -87,6 +89,7 @@ class PostDetailFragment :
     private val postEvent = PostEvent.getPublisher()
 
     companion object {
+        const val TAG = "PostDetailFragment"
         const val REPLIES_THRESHOLD = 5
     }
 
@@ -95,13 +98,23 @@ class PostDetailFragment :
     }
 
     override fun receiveExtras() {
-        // TODO: handle when opened from route
         super.receiveExtras()
         if (arguments == null || arguments?.containsKey(POST_DETAIL_EXTRAS) == false) {
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        postDetailExtras = arguments?.getParcelable(POST_DETAIL_EXTRAS)!!
+        postDetailExtras =
+            arguments?.getParcelable(POST_DETAIL_EXTRAS)
+                ?: throw emptyExtrasException(TAG)
+        checkForComments()
+    }
+
+    //to check for source of the follow trigger
+    private fun checkForComments() {
+        //if extras contains commentId: redirect to comment
+        if (!postDetailExtras.commentId.isNullOrEmpty()) {
+            toFindComment = true
+        }
     }
 
     override fun setUpViews() {
@@ -120,7 +133,17 @@ class PostDetailFragment :
     private fun fetchPostData() {
         // show progress bar
         ProgressHelper.showProgress(binding.progressBar)
-        viewModel.getPost(postDetailExtras.postId, 1)
+        //if source is notification, then call initiate first and then other apis
+        if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+            initiateViewModel.initiateUser(
+                "69edd43f-4a5e-4077-9c50-2b7aa740acce",
+                "10002",
+                "D",
+                false
+            )
+        } else {
+            viewModel.getPost(postDetailExtras.postId, 1)
+        }
     }
 
     // initializes the post detail screen recycler view
@@ -229,11 +252,30 @@ class PostDetailFragment :
 
     override fun observeData() {
         super.observeData()
-
+        observeInitiateResponse()
         observePostData()
         observeCommentData()
         observeMembersTaggingList()
         observeErrors()
+    }
+
+    private fun observeInitiateResponse() {
+        initiateViewModel.userResponse.observe(viewLifecycleOwner) {
+            //get post detail
+            viewModel.getPost(postDetailExtras.postId, 1)
+        }
+
+        initiateViewModel.logoutResponse.observe(viewLifecycleOwner) {
+            binding.apply {
+                mainLayout.hide()
+                invalidAccessLayout.show()
+            }
+        }
+
+        initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
+            ProgressHelper.hideProgress(binding.progressBar)
+            ViewUtils.showErrorMessageToast(requireContext(), it)
+        }
     }
 
     // observes live data related to post
@@ -242,6 +284,10 @@ class PostDetailFragment :
         viewModel.postResponse.observe(viewLifecycleOwner) { pair ->
             //hide progress bar
             ProgressHelper.hideProgress(binding.progressBar)
+            binding.apply {
+                mainLayout.show()
+                invalidAccessLayout.hide()
+            }
             //page in sent in api
             val page = pair.first
 
@@ -706,10 +752,28 @@ class PostDetailFragment :
             )
         }
 
+        val comments = post.replies.toList()
         // adds all the comments to the [postDetailList]
-        postDetailList.addAll(post.replies.toList())
+        postDetailList.addAll(comments)
         mPostDetailAdapter.replace(postDetailList)
-        binding.rvPostDetails.scrollToPosition(postDataPosition)
+
+        if (toFindComment) {
+            //find the comments already present in adapter
+            val index = mPostDetailAdapter.items().indexOfFirst {
+                (it is CommentViewData) && (it.id == postDetailExtras.commentId)
+            }
+
+            //comment not present -> get it from api
+            if (index == -1) {
+                viewModel.getComment(post.id, postDetailExtras.commentId ?: "", 1)
+            } else {
+                //scroll to that comment
+                binding.rvPostDetails.scrollToPosition(index)
+            }
+        } else {
+            binding.rvPostDetails.scrollToPosition(postDataPosition)
+        }
+
     }
 
     // updates the post and add comments to adapter
@@ -727,7 +791,7 @@ class PostDetailFragment :
     private fun refreshPostData() {
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
-        viewModel.getPost(postDetailExtras.postId, 1)
+        fetchPostData()
     }
 
     override fun likePost(position: Int) {
@@ -863,21 +927,32 @@ class PostDetailFragment :
     // adds paginated replies to comment
     private fun addReplies(comment: CommentViewData, page: Int) {
         // gets comment from adapter
-        val indexAndComment = getIndexAndCommentFromAdapter(comment.id) ?: return
-        val index = indexAndComment.first
-        val adapterComment = indexAndComment.second
-        if (page == 1) {
-            // updates the comment with page-1 replies
-            mPostDetailAdapter.update(index, comment)
-            scrollToPositionWithOffset(index, 75)
+        val indexAndComment = getIndexAndCommentFromAdapter(comment.id)
+
+        //if comment is not present in adapter
+        if (indexAndComment == null) {
+            //set to false because comment is added
+            toFindComment = false
+            //add comment to adapter
+            mPostDetailAdapter.add(commentsStartPosition, comment)
+            //scroll to the comment
+            binding.rvPostDetails.scrollToPosition(commentsStartPosition)
         } else {
-            // adds replies in adapter and fetched replies
-            comment.replies.addAll(
-                0,
-                adapterComment.replies
-            )
-            mPostDetailAdapter.update(index, comment)
-            scrollToPositionWithOffset(index + 1, 150)
+            val index = indexAndComment.first
+            val adapterComment = indexAndComment.second
+            if (page == 1) {
+                // updates the comment with page-1 replies
+                mPostDetailAdapter.update(index, comment)
+                scrollToPositionWithOffset(index, 75)
+            } else {
+                // adds replies in adapter and fetched replies
+                comment.replies.addAll(
+                    0,
+                    adapterComment.replies
+                )
+                mPostDetailAdapter.update(index, comment)
+                scrollToPositionWithOffset(index + 1, 150)
+            }
         }
     }
 

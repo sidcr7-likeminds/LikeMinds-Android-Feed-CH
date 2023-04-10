@@ -17,10 +17,13 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.likeminds.feedsx.InitiateViewModel
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
@@ -45,6 +48,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.emptyExtrasException
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
@@ -57,13 +61,13 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 
-
 @AndroidEntryPoint
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding>(),
     CreatePostListener {
 
     private val viewModel: CreatePostViewModel by viewModels()
+    private val initiateViewModel: InitiateViewModel by activityViewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
@@ -74,9 +78,38 @@ class CreatePostFragment :
     private lateinit var etPostTextChangeListener: TextWatcher
 
     private lateinit var memberTagging: MemberTaggingView
+    private var source = ""
 
     override fun getViewBinding(): FragmentCreatePostBinding {
         return FragmentCreatePostBinding.inflate(layoutInflater)
+    }
+
+    companion object {
+        const val TAG = "CreatePostFragment"
+    }
+
+    override fun receiveExtras() {
+        super.receiveExtras()
+        if (arguments == null || arguments?.containsKey(CreatePostActivity.SOURCE_EXTRA) == null) {
+            requireActivity().supportFragmentManager.popBackStack()
+            return
+        }
+        source = arguments?.getString(CreatePostActivity.SOURCE_EXTRA)
+            ?: throw emptyExtrasException(TAG)
+        checkForSource()
+    }
+
+    //to check for source of the follow trigger
+    private fun checkForSource() {
+        //if source is notification, then call initiate first in the background
+        if (source == LMAnalytics.Source.NOTIFICATION) {
+            initiateViewModel.initiateUser(
+                "69edd43f-4a5e-4077-9c50-2b7aa740acce",
+                "10002",
+                "D",
+                false
+            )
+        }
     }
 
     override fun setUpViews() {
