@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.create.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
@@ -116,7 +115,6 @@ class CreatePostViewModel @Inject constructor(
                 val ogTags = data.ogTags
                 _decodeUrlResponse.postValue(ViewDataConverter.convertLinkOGTags(ogTags))
             } else {
-                Log.d("PUI", "postDecodeUrlResponse: error ${response.errorMessage}")
                 // posts error message if API call failed
                 errorEventChannel.send(ErrorMessageEvent.DecodeUrl(response.errorMessage))
             }
