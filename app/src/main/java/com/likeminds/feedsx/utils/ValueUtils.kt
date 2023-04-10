@@ -2,7 +2,9 @@ package com.likeminds.feedsx.utils
 
 import android.content.Context
 import android.net.Uri
+import android.util.Patterns
 import android.webkit.MimeTypeMap
+import android.webkit.URLUtil
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.VIDEO
@@ -89,6 +91,29 @@ object ValueUtils {
             this > -1 && this < items.size
         } else {
             this > -1
+        }
+    }
+
+    fun String.getUrlIfExist(): String? {
+        return try {
+            val links: MutableList<String> = ArrayList()
+            val matcher = Patterns.WEB_URL.matcher(this)
+            while (matcher.find()) {
+                val link = matcher.group()
+                if (URLUtil.isValidUrl(link)) {
+                    links.add(link)
+                } else {
+                    val newHttpsLink = "https://$link"
+                    if (URLUtil.isValidUrl(newHttpsLink)) {
+                        links.add(newHttpsLink)
+                    }
+                }
+            }
+            if (links.isNotEmpty()) {
+                links.first()
+            } else null
+        } catch (e: Exception) {
+            return null
         }
     }
 

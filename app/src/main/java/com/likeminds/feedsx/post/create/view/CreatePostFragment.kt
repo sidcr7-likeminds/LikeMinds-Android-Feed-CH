@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -37,14 +38,12 @@ import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils
-import com.likeminds.feedsx.utils.ViewUtils.dpToPx
-import com.likeminds.feedsx.utils.ViewUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
-import com.likeminds.feedsx.utils.ViewUtils.showErrorMessageToast
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
@@ -52,6 +51,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+import com.likeminds.feedsx.utils.observeInLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -159,7 +159,7 @@ class CreatePostFragment :
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
-        }
+        }.observeInLifecycle(viewLifecycleOwner)
     }
 
     /**
@@ -601,6 +601,7 @@ class CreatePostFragment :
                 return
             }
             val link = text.getUrlIfExist()
+            Log.d("PUI", "link: $link")
             if (ogTags != null && link.equals(ogTags?.url)) {
                 return
             }
@@ -608,6 +609,7 @@ class CreatePostFragment :
                 if (link == ogTags?.url) {
                     return
                 }
+                clearPreviewLink()
                 viewModel.decodeUrl(link)
             } else {
                 clearPreviewLink()
@@ -682,8 +684,8 @@ class CreatePostFragment :
     // sets constraints of link preview when image is invalid
     private fun setInvalidLinkImageConstraints(constraintSet: ConstraintSet) {
         binding.linkPreview.apply {
-            val margin16 = dpToPx(16)
-            val margin4 = dpToPx(4)
+            val margin16 = ViewUtils.dpToPx(16)
+            val margin4 = ViewUtils.dpToPx(4)
             constraintSet.connect(
                 tvLinkTitle.id,
                 ConstraintSet.TOP,
@@ -711,7 +713,7 @@ class CreatePostFragment :
     // sets constraints of link preview when image is valid
     private fun setValidLinkImageConstraints(constraintSet: ConstraintSet) {
         binding.linkPreview.apply {
-            val margin = dpToPx(16)
+            val margin = ViewUtils.dpToPx(16)
             constraintSet.connect(
                 tvLinkTitle.id,
                 ConstraintSet.END,
@@ -767,7 +769,7 @@ class CreatePostFragment :
     // shows toast and removes extra items if attachments limit is exceeded
     private fun attachmentsLimitExceeded() {
         if (selectedMediaUris.size > 10) {
-            showErrorMessageToast(
+            ViewUtils.showErrorMessageToast(
                 requireContext(), requireContext().resources.getQuantityString(
                     R.plurals.you_can_select_upto_x_items,
                     POST_ATTACHMENTS_LIMIT,
