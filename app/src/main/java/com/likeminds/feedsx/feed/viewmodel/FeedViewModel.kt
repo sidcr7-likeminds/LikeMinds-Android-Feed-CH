@@ -9,15 +9,12 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.IMAGE
 import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.model.VIDEO
-import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
@@ -28,10 +25,7 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 import com.likeminds.likemindsfeed.LMFeedClient
-import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
-import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.post.model.*
-import com.likeminds.likemindsfeed.sdk.model.User
 import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -40,19 +34,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
-    private val userPreferences: UserPreferences,
     private val postPreferences: PostPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
-
-    private val _userResponse = MutableLiveData<UserViewData>()
-    val userResponse: LiveData<UserViewData> = _userResponse
-
-    private val _logoutResponse = MutableLiveData<Boolean>()
-    val logoutResponse: LiveData<Boolean> = _logoutResponse
 
     private val _universalFeedResponse = MutableLiveData<Pair<Int, List<PostViewData>>>()
     val universalFeedResponse: LiveData<Pair<Int, List<PostViewData>>> = _universalFeedResponse
@@ -61,7 +47,6 @@ class FeedViewModel @Inject constructor(
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
 
     sealed class ErrorMessageEvent {
-        data class InitiateUser(val errorMessage: String?) : ErrorMessageEvent()
         data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
     }
@@ -77,107 +62,6 @@ class FeedViewModel @Inject constructor(
 
     companion object {
         const val PAGE_SIZE = 20
-    }
-
-    /***
-     * calls InitiateUser API
-     * store user:{} in db
-     * and posts the response in LiveData
-     * */
-    fun initiateUser(
-        apiKey: String,
-        userId: String,
-        userName: String? = null,
-        guest: Boolean
-    ) {
-        viewModelScope.launchIO {
-            val request = InitiateUserRequest.Builder()
-                .apiKey(apiKey)
-                .deviceId(userPreferences.getDeviceId())
-                .userId(userId)
-                .userName(userName)
-                .isGuest(guest)
-                .build()
-
-            //call api
-            val initiateResponse = lmFeedClient.initiateUser(request)
-
-            if (initiateResponse.success) {
-                val data = initiateResponse.data ?: return@launchIO
-                if (data.logoutResponse != null) {
-                    //user is invalid
-                    _logoutResponse.postValue(true)
-                } else {
-                    val user = data.user
-                    val id = user?.userUniqueId ?: ""
-
-                    //add user in local db
-                    addUser(user)
-
-                    //save user.id in local prefs
-                    userPreferences.saveUserUniqueId(id)
-
-                    getUniversalFeed(1)
-
-                    //post the user response in LiveData
-                    _userResponse.postValue(ViewDataConverter.convertUser(user))
-                }
-            } else {
-                errorMessageChannel.send(ErrorMessageEvent.InitiateUser(initiateResponse.errorMessage))
-            }
-        }
-    }
-
-    //add user:{} into local db
-    private fun addUser(user: User?) {
-        if (user == null) return
-        viewModelScope.launchIO {
-            //convert user into userEntity
-            val userEntity = ViewDataConverter.createUserEntity(user)
-            //add it to local db
-            userRepository.insertUser(userEntity)
-
-            //call member state api
-            getMemberState()
-
-            //call register device api
-            registerDevice()
-        }
-    }
-
-    //call member state api
-    private fun getMemberState() {
-        viewModelScope.launchIO {
-            //get member state response
-            val memberStateResponse = lmFeedClient.getMemberState().data
-
-            val memberState = memberStateResponse?.state ?: return@launchIO
-            val isOwner = memberStateResponse.isOwner
-            val userId = memberStateResponse.userUniqueId
-
-            //get existing userEntity
-            var userEntity = userRepository.getUser(userId)
-
-            //updated userEntity
-            userEntity = userEntity.toBuilder().state(memberState).isOwner(isOwner).build()
-
-            //update userEntity in local db
-            userRepository.updateUser(userEntity)
-        }
-    }
-
-    //call register device
-    private fun registerDevice() {
-        viewModelScope.launchIO {
-            //create request
-            val request = RegisterDeviceRequest.Builder()
-                .deviceId(userPreferences.getDeviceId())
-                .token("YUYUYUYUYUY") //todo fix it with proper token
-                .build()
-
-            //call api
-            lmFeedClient.registerDevice(request)
-        }
     }
 
     //get universal feed

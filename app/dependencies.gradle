@@ -57,6 +57,10 @@ dependencies {
     implementation deps.room.ktx
     kapt deps.room.compiler
 
+    //firebase
+    implementation platform(deps.firebase.bom)
+    implementation deps.firebase.messaging
+
     // feed-sdk
     implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:70447bbd8e"
 }
