@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -601,7 +600,6 @@ class CreatePostFragment :
                 return
             }
             val link = text.getUrlIfExist()
-            Log.d("PUI", "link: $link")
             if (ogTags != null && link.equals(ogTags?.url)) {
                 return
             }
