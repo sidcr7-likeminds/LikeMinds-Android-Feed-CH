@@ -38,23 +38,19 @@ import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdap
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.utils.AndroidUtils
-import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.emptyExtrasException
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
-import com.likeminds.feedsx.utils.observeInLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -103,12 +99,7 @@ class CreatePostFragment :
     private fun checkForSource() {
         //if source is notification, then call initiate first in the background
         if (source == LMAnalytics.Source.NOTIFICATION) {
-            initiateViewModel.initiateUser(
-                "69edd43f-4a5e-4077-9c50-2b7aa740acce",
-                "10002",
-                "D",
-                false
-            )
+            initiateViewModel.initiateUser()
         }
     }
 

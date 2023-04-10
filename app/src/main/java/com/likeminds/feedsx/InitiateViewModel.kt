@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
+import com.likeminds.feedsx.auth.util.AuthPreferences
 import com.likeminds.feedsx.feed.UserRepository
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
@@ -20,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InitiateViewModel @Inject constructor(
+    private val authPreferences: AuthPreferences,
     private val userPreferences: UserPreferences,
     private val userRepository: UserRepository,
 ) : ViewModel() {
@@ -40,19 +42,14 @@ class InitiateViewModel @Inject constructor(
      * store user:{} in db
      * and posts the response in LiveData
      * */
-    fun initiateUser(
-        apiKey: String,
-        userId: String,
-        userName: String? = null,
-        guest: Boolean
-    ) {
+    fun initiateUser() {
         viewModelScope.launchIO {
             val request = InitiateUserRequest.Builder()
-                .apiKey(apiKey)
+                .apiKey(authPreferences.getApiKey())
                 .deviceId(userPreferences.getDeviceId())
-                .userId(userId)
-                .userName(userName)
-                .isGuest(guest)
+                .userId(authPreferences.getUserId())
+                .userName(authPreferences.getUserName())
+                .isGuest(false)
                 .build()
 
             //call api
@@ -62,6 +59,7 @@ class InitiateViewModel @Inject constructor(
                 val data = initiateResponse.data ?: return@launchIO
                 if (data.logoutResponse != null) {
                     //user is invalid
+                    authPreferences.clearPrefs()
                     _logoutResponse.postValue(true)
                 } else {
                     val user = data.user
