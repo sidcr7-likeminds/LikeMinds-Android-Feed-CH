@@ -238,9 +238,9 @@ class PostDetailFragment :
                     // input text is a comment
                     viewModel.addComment(postId, updatedText)
                 }
+                ViewUtils.hideKeyboard(this.root)
                 etComment.text = null
             }
-
             ivCommentSend.isClickable = false
             ivCommentSend.setImageResource(R.drawable.ic_comment_send_disable)
 
@@ -374,6 +374,9 @@ class PostDetailFragment :
 
             // adds new comment to adapter
             mPostDetailAdapter.add(commentsStartPosition, comment)
+
+            // scroll to comment's position
+            scrollToPositionWithOffset(commentsStartPosition, 75)
 
             // updates comment data in post
             mPostDetailAdapter.update(postDataPosition, post)
@@ -889,6 +892,9 @@ class PostDetailFragment :
 
         // updates the parentComment with added reply
         mPostDetailAdapter.update(parentIndex, newCommentViewData)
+
+        // scroll to comment's position
+        scrollToPositionWithOffset(parentIndex, 75)
     }
 
     // removes the reply from its parentComment
@@ -945,7 +951,7 @@ class PostDetailFragment :
                     adapterComment.replies
                 )
                 mPostDetailAdapter.update(index, comment)
-                scrollToPositionWithOffset(index + 1, 100)
+                scrollToPositionWithOffset(index + 1, 150)
             }
         }
     }

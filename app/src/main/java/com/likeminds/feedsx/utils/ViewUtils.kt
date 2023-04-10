@@ -83,29 +83,6 @@ object ViewUtils {
         return navHostFragment?.childFragmentManager?.fragments?.firstOrNull()
     }
 
-    fun String.getUrlIfExist(): String? {
-        return try {
-            val links: MutableList<String> = ArrayList()
-            val matcher = Patterns.WEB_URL.matcher(this)
-            while (matcher.find()) {
-                val link = matcher.group()
-                if (URLUtil.isValidUrl(link)) {
-                    links.add(link)
-                } else {
-                    val newHttpsLink = "https://$link"
-                    if (URLUtil.isValidUrl(newHttpsLink)) {
-                        links.add(newHttpsLink)
-                    }
-                }
-            }
-            if (links.isNotEmpty()) {
-                links.first()
-            } else null
-        } catch (e: Exception) {
-            return null
-        }
-    }
-
     fun String.isValidUrl(): Boolean {
         if (this.isEmpty()) {
             return false
