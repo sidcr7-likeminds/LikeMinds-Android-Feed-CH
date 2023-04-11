@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.detail.view
 import android.app.Activity
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -26,6 +25,7 @@ import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
+import com.likeminds.feedsx.post.detail.model.NoCommentsViewData
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
@@ -338,6 +338,9 @@ class PostDetailFragment :
     private fun observeCommentData() {
         // observes addCommentResponse LiveData
         viewModel.addCommentResponse.observe(viewLifecycleOwner) { comment ->
+            if (mPostDetailAdapter[commentsCountPosition] is NoCommentsViewData) {
+                mPostDetailAdapter.removeIndex(commentsCountPosition)
+            }
             // gets old [CommentsCountViewData] from adapter
             if (mPostDetailAdapter[commentsCountPosition] != null) {
                 val oldCommentsCountViewData =
@@ -355,7 +358,6 @@ class PostDetailFragment :
                 val newCommentsCountViewData = CommentsCountViewData.Builder()
                     .commentsCount(1)
                     .build()
-                handleNoCommentsView(false)
                 mPostDetailAdapter.add(commentsCountPosition, newCommentsCountViewData)
             }
 
@@ -367,6 +369,9 @@ class PostDetailFragment :
 
             // notifies the subscribers about the change in post data
             postEvent.notify(Pair(post.id, post))
+
+            // updates comments count on header
+            updateCommentsCount(post.commentsCount)
 
             // adds new comment to adapter
             mPostDetailAdapter.add(commentsStartPosition, comment)
@@ -438,6 +443,17 @@ class PostDetailFragment :
             requireContext(),
             getString(R.string.comment_deleted)
         )
+
+        if (newCommentsCountViewData.commentsCount == 0) {
+            mPostDetailAdapter.removeIndex(commentsCountPosition)
+            addNoCommentsView()
+        }
+    }
+
+    // adds no comments view data to adapter
+    private fun addNoCommentsView() {
+        val noCommentViewData = NoCommentsViewData.Builder().build()
+        mPostDetailAdapter.add(noCommentViewData)
     }
 
     /**
@@ -644,12 +660,12 @@ class PostDetailFragment :
     }
 
     // handles visibility of no comments view
-    private fun handleNoCommentsView(isVisible: Boolean) {
-        binding.apply {
-            tvNoComment.isVisible = isVisible
-            tvBeFirst.isVisible = isVisible
-        }
-    }
+//    private fun handleNoCommentsView(isVisible: Boolean) {
+//        binding.apply {
+//            tvNoComment.isVisible = isVisible
+//            tvBeFirst.isVisible = isVisible
+//        }
+//    }
 
     // hides the replying to view
     private fun hideReplyingToView() {
@@ -738,9 +754,9 @@ class PostDetailFragment :
         postDetailList.add(postDataPosition, post)
 
         if (post.commentsCount == 0) {
-            handleNoCommentsView(true)
+            val noCommentViewData = NoCommentsViewData.Builder().build()
+            postDetailList.add(noCommentViewData)
         } else {
-            handleNoCommentsView(false)
             // adds commentsCountViewData if comments are present
             postDetailList.add(
                 commentsCountPosition,
@@ -769,7 +785,6 @@ class PostDetailFragment :
         } else {
             binding.rvPostDetails.scrollToPosition(postDataPosition)
         }
-
     }
 
     // updates the post and add comments to adapter

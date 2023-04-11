@@ -61,34 +61,6 @@
                         tools:itemCount="1"
                         tools:listitem="@layout/item_post_single_image" />
 
-                    <com.likeminds.feedsx.branding.customview.LikeMindsTextView
-                        android:id="@+id/tv_no_comment"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/no_comment_found"
-                        android:textColor="@color/dark_grey"
-                        android:textSize="16sp"
-                        android:visibility="gone"
-                        app:fontType="regular"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/rv_post_details" />
-
-                    <com.likeminds.feedsx.branding.customview.LikeMindsTextView
-                        android:id="@+id/tv_be_first"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/be_the_first_one_to_comment"
-                        android:textColor="@color/grey"
-                        android:textSize="14sp"
-                        android:visibility="gone"
-                        app:fontType="regular"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/tv_no_comment" />
-
-
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
@@ -107,7 +79,7 @@
                 app:fontType="regular"
                 app:layout_constraintBottom_toTopOf="@id/iv_comment_send"
                 tools:text="Replying to Ronald Richards"
-                tools:visibility="visible" />
+                tools:visibility="gone" />
 
             <ImageView
                 android:id="@+id/iv_remove_replying_to"
