@@ -99,12 +99,7 @@ class CreatePostFragment :
     private fun checkForSource() {
         //if source is notification, then call initiate first in the background
         if (source == LMAnalytics.Source.NOTIFICATION) {
-            initiateViewModel.initiateUser(
-                "69edd43f-4a5e-4077-9c50-2b7aa740acce",
-                "10002",
-                "D",
-                false
-            )
+            initiateViewModel.initiateUser()
         }
     }
 
