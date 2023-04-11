@@ -269,6 +269,7 @@ class CreatePostFragment :
         val createPostActivity = requireActivity() as CreatePostActivity
         createPostActivity.binding.apply {
             tvPostDone.setOnClickListener {
+                handlePostButton(clickable = true, showProgress = true)
                 val text = binding.etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 if (selectedMediaUris.isNotEmpty()) {
@@ -279,7 +280,6 @@ class CreatePostFragment :
                         ogTags
                     )
                 } else {
-                    handlePostButton(clickable = true, showProgress = false)
                     viewModel.addPost(
                         requireContext(),
                         updatedText,
@@ -772,7 +772,7 @@ class CreatePostFragment :
     ) {
         val createPostActivity = requireActivity() as CreatePostActivity
         createPostActivity.binding.apply {
-            if (showProgress == true || showProgress != null) {
+            if (showProgress == true) {
                 pbPosting.show()
                 tvPostDone.hide()
             } else {
