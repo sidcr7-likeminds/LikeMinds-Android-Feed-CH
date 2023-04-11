@@ -487,8 +487,9 @@ class CreatePostFragment :
             multipleMediaAttachment.root.hide()
             singleVideoAttachment.btnAddMore.setOnClickListener {
                 // sends clicked on attachment event for image and video
+                //todo: removed video from here
                 viewModel.sendClickedOnAttachmentEvent("image, video")
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
+                initiateMediaPicker(listOf(IMAGE))
             }
             singleVideoAttachment.layoutSingleVideoPost.ivCross.setOnClickListener {
                 selectedMediaUris.clear()
@@ -518,7 +519,8 @@ class CreatePostFragment :
             singleImageAttachment.btnAddMore.setOnClickListener {
                 // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
+                //todo: removed video from here
+                initiateMediaPicker(listOf(IMAGE))
             }
             singleImageAttachment.layoutSingleImagePost.ivCross.setOnClickListener {
                 selectedMediaUris.clear()
@@ -556,7 +558,8 @@ class CreatePostFragment :
             multipleMediaAttachment.btnAddMore.setOnClickListener {
                 // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
+                //todo: removed video from here
+                initiateMediaPicker(listOf(IMAGE))
             }
 
             val attachments = selectedMediaUris.map {
