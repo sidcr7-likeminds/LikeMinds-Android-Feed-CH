@@ -52,6 +52,18 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/author_frame" />
 
+
+                <com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+                    android:id="@+id/member_tagging_view"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:translationZ="5dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/et_post_content"
+                    tools:visibility="gone" />
+
                 <include
                     android:id="@+id/single_image_attachment"
                     layout="@layout/layout_create_post_single_image"
@@ -117,31 +129,20 @@
 
         </androidx.core.widget.NestedScrollView>
 
-        <com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
-            android:id="@+id/member_tagging_view"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:translationZ="5dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/nested_scroll"
-            tools:visibility="gone" />
-
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group_add_attachments"
             android:layout_width="match_parent"
-            android:background="@color/white"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             app:constraint_referenced_ids="layout_add_image, layout_attach_files, video_file_separator" />
 
         <LinearLayout
             android:id="@+id/layout_attach_files"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/white"
             android:elevation="4dp"
             android:gravity="center_vertical"
-            android:background="@color/white"
             android:paddingHorizontal="16dp"
             android:paddingVertical="10dp"
             app:layout_constraintBottom_toBottomOf="parent">
@@ -206,16 +207,16 @@
             android:id="@+id/video_image_separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:visibility="gone"
             android:background="@color/cloudy_blue_50"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/layout_add_video" />
 
         <LinearLayout
             android:id="@+id/layout_add_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="4dp"
             android:background="@color/white"
+            android:elevation="4dp"
             android:foreground="?selectableItemBackground"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
