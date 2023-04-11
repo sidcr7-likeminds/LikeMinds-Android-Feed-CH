@@ -304,6 +304,15 @@ object ViewDataConverter {
                 )
             )
             .parentId(parentCommentId)
+            .parentComment(
+                comment.parentComment?.let {
+                    convertComment(
+                        it,
+                        usersMap,
+                        postId
+                    )
+                }
+            )
             .build()
     }
 

@@ -23,6 +23,7 @@ class CommentViewData private constructor(
     var menuItems: List<OverflowMenuItemViewData>,
     var replies: MutableList<CommentViewData>,
     var parentId: String?,
+    var parentComment: CommentViewData?,
     var alreadySeenFullContent: Boolean?,
     var fromCommentLiked: Boolean,
 ) : Parcelable, BaseViewType {
@@ -47,6 +48,7 @@ class CommentViewData private constructor(
         private var menuItems: List<OverflowMenuItemViewData> = listOf()
         private var replies: MutableList<CommentViewData> = mutableListOf()
         private var parentId: String? = null
+        private var parentComment: CommentViewData? = null
         private var alreadySeenFullContent: Boolean? = null
         private var fromCommentLiked: Boolean = false
 
@@ -65,6 +67,8 @@ class CommentViewData private constructor(
             apply { this.menuItems = menuItems }
 
         fun parentId(parentId: String?) = apply { this.parentId = parentId }
+        fun parentComment(parentComment: CommentViewData?) =
+            apply { this.parentComment = parentComment }
 
         fun replies(replies: MutableList<CommentViewData>) =
             apply { this.replies = replies }
@@ -90,6 +94,7 @@ class CommentViewData private constructor(
             menuItems,
             replies,
             parentId,
+            parentComment,
             alreadySeenFullContent,
             fromCommentLiked
         )
@@ -110,6 +115,7 @@ class CommentViewData private constructor(
             .menuItems(menuItems)
             .replies(replies)
             .parentId(parentId)
+            .parentComment(parentComment)
             .alreadySeenFullContent(alreadySeenFullContent)
             .fromCommentLiked(fromCommentLiked)
     }

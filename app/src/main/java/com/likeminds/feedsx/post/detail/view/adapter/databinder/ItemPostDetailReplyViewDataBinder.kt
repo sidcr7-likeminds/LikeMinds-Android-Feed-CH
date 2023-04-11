@@ -74,8 +74,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
 
             if (data.likesCount == 0) {
                 likesCount.hide()
-            }
-            else {
+            } else {
                 likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
