@@ -131,16 +131,17 @@
         <androidx.constraintlayout.widget.Group
             android:id="@+id/group_add_attachments"
             android:layout_width="match_parent"
+            android:background="@color/white"
             android:layout_height="wrap_content"
-            app:constraint_referenced_ids="layout_add_image, layout_attach_files, video_file_separator, video_image_separator" />
+            app:constraint_referenced_ids="layout_add_image, layout_attach_files, video_file_separator" />
 
         <LinearLayout
             android:id="@+id/layout_attach_files"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="4dp"
-            android:foreground="?selectableItemBackground"
             android:gravity="center_vertical"
+            android:background="@color/white"
             android:paddingHorizontal="16dp"
             android:paddingVertical="10dp"
             app:layout_constraintBottom_toBottomOf="parent">
@@ -205,6 +206,7 @@
             android:id="@+id/video_image_separator"
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:visibility="gone"
             android:background="@color/cloudy_blue_50"
             app:layout_constraintBottom_toTopOf="@+id/layout_add_video" />
 
@@ -213,6 +215,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:elevation="4dp"
+            android:background="@color/white"
             android:foreground="?selectableItemBackground"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
