@@ -106,7 +106,8 @@ class PostDetailFragment :
         postDetailExtras =
             arguments?.getParcelable(POST_DETAIL_EXTRAS)
                 ?: throw emptyExtrasException(TAG)
-        checkForComments()
+        // TODO: route for replies
+//        checkForComments()
     }
 
     //to check for source of the follow trigger

@@ -62,5 +62,5 @@ dependencies {
     implementation deps.firebase.messaging
 
     // feed-sdk
-    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:70447bbd8e"
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:9c02684587"
 }

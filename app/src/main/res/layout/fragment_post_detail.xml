@@ -101,19 +101,21 @@
                 android:gravity="center_vertical"
                 android:paddingHorizontal="16dp"
                 android:text="@string/replying_to_s"
-                android:textColor="@color/brown_grey"
+                android:textColor="@color/grey"
                 android:textSize="14sp"
                 android:visibility="gone"
                 app:fontType="regular"
                 app:layout_constraintBottom_toTopOf="@id/iv_comment_send"
                 tools:text="Replying to Ronald Richards"
-                tools:visibility="gone" />
+                tools:visibility="visible" />
 
             <ImageView
                 android:id="@+id/iv_remove_replying_to"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
+                android:layout_marginEnd="12dp"
+                android:foreground="?selectableItemBackground"
+                android:padding="4dp"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@id/tv_replying_to"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -162,6 +164,7 @@
                 android:background="@color/white"
                 android:clickable="false"
                 android:elevation="4dp"
+                android:foreground="?selectableItemBackground"
                 android:tint="@{buttonColor}"
                 app:layout_constraintBottom_toBottomOf="@id/et_comment"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -244,6 +244,7 @@ class CreatePostFragment :
                 .distinctUntilChanged()
                 .onEach {
                     val text = it?.toString()?.trim()
+                    if (selectedMediaUris.isNotEmpty()) return@onEach
                     if (!text.isNullOrEmpty()) {
                         showPostMedia()
                     }
@@ -255,10 +256,13 @@ class CreatePostFragment :
                 val text = it?.toString()?.trim()
                 if (text.isNullOrEmpty()) {
                     clearPreviewLink()
-                    if (selectedMediaUris.isEmpty()) handlePostButton(false)
-                    else handlePostButton(true)
+                    if (selectedMediaUris.isEmpty()) {
+                        handlePostButton(clickable = false)
+                    } else {
+                        handlePostButton(clickable = true)
+                    }
                 } else {
-                    handlePostButton(true)
+                    handlePostButton(clickable = true)
                 }
             }
         }
@@ -269,17 +273,18 @@ class CreatePostFragment :
         val createPostActivity = requireActivity() as CreatePostActivity
         createPostActivity.binding.apply {
             tvPostDone.setOnClickListener {
-                handlePostButton(clickable = true, showProgress = true)
                 val text = binding.etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 if (selectedMediaUris.isNotEmpty()) {
+                    handlePostButton(clickable = true, showProgress = true)
                     viewModel.addPost(
                         requireContext(),
                         updatedText,
                         selectedMediaUris,
                         ogTags
                     )
-                } else {
+                } else if (updatedText.isNotEmpty()) {
+                    handlePostButton(clickable = true, showProgress = true)
                     viewModel.addPost(
                         requireContext(),
                         updatedText,
@@ -464,7 +469,7 @@ class CreatePostFragment :
                 } else {
                     clearPreviewLink()
                 }
-                handlePostButton(!text.isNullOrEmpty())
+                handlePostButton(clickable = !text.isNullOrEmpty())
                 handleAddAttachmentLayouts(true)
             }
         }
@@ -473,7 +478,7 @@ class CreatePostFragment :
     // shows attached video in single video post type
     private fun showAttachedVideo() {
         handleAddAttachmentLayouts(false)
-        handlePostButton(true)
+        handlePostButton(clickable = true)
         binding.apply {
             singleVideoAttachment.root.show()
             singleImageAttachment.root.hide()
@@ -482,15 +487,16 @@ class CreatePostFragment :
             multipleMediaAttachment.root.hide()
             singleVideoAttachment.btnAddMore.setOnClickListener {
                 // sends clicked on attachment event for image and video
+                //todo: removed video from here
                 viewModel.sendClickedOnAttachmentEvent("image, video")
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
+                initiateMediaPicker(listOf(IMAGE))
             }
             singleVideoAttachment.layoutSingleVideoPost.ivCross.setOnClickListener {
                 selectedMediaUris.clear()
                 singleVideoAttachment.root.hide()
                 handleAddAttachmentLayouts(true)
                 val text = etPostContent.text?.trim()
-                handlePostButton(!text.isNullOrEmpty())
+                handlePostButton(clickable = !text.isNullOrEmpty())
             }
 
             //TODO: Use exo player
@@ -503,7 +509,7 @@ class CreatePostFragment :
     // shows attached image in single image post type
     private fun showAttachedImage() {
         handleAddAttachmentLayouts(false)
-        handlePostButton(true)
+        handlePostButton(clickable = true)
         binding.apply {
             singleImageAttachment.root.show()
             singleVideoAttachment.root.hide()
@@ -513,14 +519,15 @@ class CreatePostFragment :
             singleImageAttachment.btnAddMore.setOnClickListener {
                 // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
+                //todo: removed video from here
+                initiateMediaPicker(listOf(IMAGE))
             }
             singleImageAttachment.layoutSingleImagePost.ivCross.setOnClickListener {
                 selectedMediaUris.clear()
                 singleImageAttachment.root.hide()
                 handleAddAttachmentLayouts(true)
                 val text = etPostContent.text?.trim()
-                handlePostButton(!text.isNullOrEmpty())
+                handlePostButton(clickable = !text.isNullOrEmpty())
             }
 
             ImageBindingUtil.loadImage(
@@ -534,7 +541,7 @@ class CreatePostFragment :
     // shows view pager with multiple media
     private fun showMultiMediaAttachments() {
         handleAddAttachmentLayouts(false)
-        handlePostButton(true)
+        handlePostButton(clickable = true)
         binding.apply {
             singleImageAttachment.root.hide()
             singleVideoAttachment.root.hide()
@@ -551,7 +558,8 @@ class CreatePostFragment :
             multipleMediaAttachment.btnAddMore.setOnClickListener {
                 // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
+                //todo: removed video from here
+                initiateMediaPicker(listOf(IMAGE))
             }
 
             val attachments = selectedMediaUris.map {
@@ -571,7 +579,7 @@ class CreatePostFragment :
     // shows document recycler view with attached files
     private fun showAttachedDocuments() {
         handleAddAttachmentLayouts(false)
-        handlePostButton(true)
+        handlePostButton(clickable = true)
         binding.apply {
             singleVideoAttachment.root.hide()
             singleImageAttachment.root.hide()
