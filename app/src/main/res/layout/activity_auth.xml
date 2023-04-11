@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_heading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/login_details"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_api_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/enter_api_key"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_heading" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsEditText
+            android:id="@+id/et_api_key"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@color/black"
+            android:hint="@string/api_key"
+            android:inputType="text"
+            android:textColor="@color/black"
+            app:font_style="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_api_key"
+            tools:ignore="Autofill" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/user_name"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_api_key" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsEditText
+            android:id="@+id/et_user_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@color/black"
+            android:hint="@string/user_name"
+            android:inputType="text"
+            android:textColor="@color/black"
+            app:font_style="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_user_name"
+            tools:ignore="Autofill" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_user_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/user_id"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_user_name" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsEditText
+            android:id="@+id/et_user_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="5dp"
+            android:backgroundTint="@color/black"
+            android:hint="@string/user_id"
+            android:inputType="text"
+            android:textColor="@color/black"
+            app:font_style="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_user_id"
+            tools:ignore="Autofill" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsButton
+            android:id="@+id/btn_login"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="30dp"
+            android:text="@string/login"
+            android:textColor="@color/white"
+            app:font_type="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/et_user_id"
+            app:text_type="normal" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
