@@ -446,14 +446,10 @@ class PostDetailFragment :
 
         if (newCommentsCountViewData.commentsCount == 0) {
             mPostDetailAdapter.removeIndex(commentsCountPosition)
-            addNoCommentsView()
+            // adds no comments view data to adapter
+            val noCommentViewData = NoCommentsViewData.Builder().build()
+            mPostDetailAdapter.add(noCommentViewData)
         }
-    }
-
-    // adds no comments view data to adapter
-    private fun addNoCommentsView() {
-        val noCommentViewData = NoCommentsViewData.Builder().build()
-        mPostDetailAdapter.add(noCommentViewData)
     }
 
     /**
@@ -754,6 +750,7 @@ class PostDetailFragment :
         postDetailList.add(postDataPosition, post)
 
         if (post.commentsCount == 0) {
+            // adds no comments view data
             val noCommentViewData = NoCommentsViewData.Builder().build()
             postDetailList.add(noCommentViewData)
         } else {
