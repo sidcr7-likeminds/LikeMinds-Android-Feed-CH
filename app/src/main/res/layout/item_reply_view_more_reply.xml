@@ -13,14 +13,15 @@
             android:id="@+id/tv_view_more_replies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:foreground="?selectableItemBackground"
             android:paddingVertical="4dp"
             android:text="@string/view_more_replies"
             android:textColor="@color/dark_grayish_blue"
             android:textSize="14sp"
             app:fontType="medium"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             tools:fontFamily="@font/roboto_medium" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
@@ -32,9 +33,9 @@
             android:textColor="@color/dark_grayish_blue"
             android:textSize="12sp"
             app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
             tools:fontFamily="@font/roboto_medium" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
