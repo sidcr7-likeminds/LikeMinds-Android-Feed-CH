@@ -338,6 +338,7 @@ class PostDetailFragment :
     private fun observeCommentData() {
         // observes addCommentResponse LiveData
         viewModel.addCommentResponse.observe(viewLifecycleOwner) { comment ->
+            // remove NoCommentsViewData if visible
             if (mPostDetailAdapter[commentsCountPosition] is NoCommentsViewData) {
                 mPostDetailAdapter.removeIndex(commentsCountPosition)
             }
