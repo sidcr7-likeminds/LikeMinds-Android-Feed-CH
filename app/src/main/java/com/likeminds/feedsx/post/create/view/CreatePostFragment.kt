@@ -56,6 +56,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import java.util.*
 
 @AndroidEntryPoint
 class CreatePostFragment :
@@ -529,11 +530,13 @@ class CreatePostFragment :
                 val text = etPostContent.text?.trim()
                 handlePostButton(clickable = !text.isNullOrEmpty())
             }
+            // gets the shimmer drawable for placeholder
+            val shimmerDrawable = ViewUtils.getShimmer()
 
             ImageBindingUtil.loadImage(
                 singleImageAttachment.layoutSingleImagePost.ivSingleImagePost,
                 selectedMediaUris.first().uri,
-                placeholder = R.drawable.image_placeholder
+                placeholder = shimmerDrawable
             )
         }
     }
@@ -676,7 +679,7 @@ class CreatePostFragment :
                 )
             }
 
-            tvLinkUrl.text = data.url
+            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
             ivCross.setOnClickListener {
                 binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
                 clearPreviewLink()

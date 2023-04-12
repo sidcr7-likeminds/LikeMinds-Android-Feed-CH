@@ -2,11 +2,11 @@ package com.likeminds.feedsx.post.create.view.adapter.databinder.createpostmulti
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemCreatePostSingleImageBinding
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
@@ -31,11 +31,13 @@ class ItemCreatePostMultipleMediaImageViewDataBinder constructor(
         data: AttachmentViewData,
         position: Int
     ) {
+        // gets the shimmer drawable for placeholder
+        val shimmerDrawable = ViewUtils.getShimmer()
 
         ImageBindingUtil.loadImage(
             binding.ivSingleImagePost,
             data.attachmentMeta.uri,
-            placeholder = R.drawable.image_placeholder
+            placeholder = shimmerDrawable
         )
 
         binding.ivCross.setOnClickListener {

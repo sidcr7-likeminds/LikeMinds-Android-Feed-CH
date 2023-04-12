@@ -17,6 +17,7 @@ versions.espresso_core = "3.5.1"
 versions.recycler_view = "1.2.1"
 versions.lifecycle = '2.4.1'
 versions.glide = '4.12.0'
+versions.shimmer = '0.5.0'
 versions.fragment_ktx = '1.4.1'
 versions.viewpager2 = '1.0.0'
 versions.flexbox = '3.0.0'
@@ -74,6 +75,10 @@ def glide = [:]
 glide.core = "com.github.bumptech.glide:glide:$versions.glide"
 glide.compiler = "com.github.bumptech.glide:compiler:$versions.glide"
 deps.glide = glide
+
+def facebook = [:]
+facebook.shimmer = "com.facebook.shimmer:shimmer:$versions.shimmer"
+deps.facebook = facebook
 
 def ktx = [:]
 ktx.fragment = "androidx.fragment:fragment-ktx:$versions.fragment_ktx"
