@@ -34,6 +34,7 @@ import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
+import java.util.*
 
 object PostTypeUtil {
     private const val SHOW_MORE_COUNT = 2
@@ -411,11 +412,13 @@ object PostTypeUtil {
         data: PostViewData,
         adapterListener: PostAdapterListener
     ) {
+        // gets the shimmer drawable for placeholder
+        val shimmerDrawable = ViewUtils.getShimmer()
 
         ImageBindingUtil.loadImage(
             ivPost,
             data.attachments.first().attachmentMeta.url,
-            placeholder = R.drawable.image_placeholder
+            placeholder = shimmerDrawable
         )
 
         ivPost.setOnClickListener {
@@ -428,10 +431,13 @@ object PostTypeUtil {
         ivPost: ImageView,
         data: AttachmentViewData
     ) {
+        // gets the shimmer drawable for placeholder
+        val shimmerDrawable = ViewUtils.getShimmer()
+
         ImageBindingUtil.loadImage(
             ivPost,
             data.attachmentMeta.url,
-            placeholder = R.drawable.image_placeholder
+            placeholder = shimmerDrawable
         )
     }
 
@@ -474,7 +480,7 @@ object PostTypeUtil {
                 ivLink.hide()
             }
 
-            tvLinkUrl.text = data.url
+            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
         }
     }
 

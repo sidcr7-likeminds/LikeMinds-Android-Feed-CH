@@ -9,13 +9,14 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
-import android.webkit.URLUtil
 import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.NavHostFragment
+import com.facebook.shimmer.Shimmer
+import com.facebook.shimmer.ShimmerDrawable
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.customview.snackbar.LikeMindsSnackbar
@@ -53,6 +54,24 @@ object ViewUtils {
 
         saveBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
         view.startAnimation(saveBounceAnim)
+    }
+
+    // returns shimmer drawable
+    fun getShimmer(): ShimmerDrawable {
+        val shimmer =
+            Shimmer.AlphaHighlightBuilder()// The attributes for a ShimmerDrawable is set by this builder
+                .setDuration(1800) // how long the shimmering animation takes to do one full sweep
+                .setBaseAlpha(0.7f) //the alpha of the underlying children
+                .setHighlightAlpha(0.4f) // the shimmer alpha amount
+                .setDirection(Shimmer.Direction.LEFT_TO_RIGHT)
+                .setAutoStart(true)
+                .build()
+
+        // This is the placeholder for the imageView
+        val shimmerDrawable = ShimmerDrawable().apply {
+            setShimmer(shimmer)
+        }
+        return shimmerDrawable
     }
 
     fun View.hide() {
