@@ -62,6 +62,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
+import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 import java.util.*
@@ -138,6 +139,7 @@ class FeedFragment :
         postActionsViewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId)?.first ?: return@observe
             mPostAdapter.removeIndex(indexToRemove)
+            checkForNoPost(mPostAdapter.items())
             ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)
@@ -185,12 +187,15 @@ class FeedFragment :
 
         //if pull to refresh is called
         if (mSwipeRefreshLayout.isRefreshing) {
+            checkForNoPost(feed)
             setFeedAndScrollToTop(feed)
             mSwipeRefreshLayout.isRefreshing = false
+            return
         }
 
         //normal adding
         if (page == 1) {
+            checkForNoPost(feed)
             setFeedAndScrollToTop(feed)
         } else {
             mPostAdapter.addAll(feed)
@@ -230,6 +235,25 @@ class FeedFragment :
                 }
             }
         }.observeInLifecycle(viewLifecycleOwner)
+    }
+
+    // checks if there is any post or not
+    private fun checkForNoPost(feed: List<BaseViewType>) {
+        if (feed.isNotEmpty()) {
+            Log.d("PUI", "checkForNoPost: ")
+            binding.apply {
+                layoutNoPost.root.hide()
+                newPostButton.show()
+                recyclerView.show()
+            }
+        } else {
+            Log.d("PUI", "checkForNoPost:1 ")
+            binding.apply {
+                layoutNoPost.root.show()
+                newPostButton.hide()
+                recyclerView.hide()
+            }
+        }
     }
 
     // finds the upload worker by UUID and observes the worker
@@ -439,6 +463,17 @@ class FeedFragment :
 
     // handles new post fab click
     private fun initNewPostClick() {
+        binding.layoutNoPost.fabNewPost.setOnClickListener {
+            // sends post creation started event
+            viewModel.sendPostCreationStartedEvent()
+
+            val intent = CreatePostActivity.getIntent(
+                requireContext(),
+                LMAnalytics.Source.UNIVERSAL_FEED
+            )
+            createPostLauncher.launch(intent)
+        }
+
         binding.newPostButton.setOnClickListener {
             if (alreadyPosting) {
                 ViewUtils.showShortToast(

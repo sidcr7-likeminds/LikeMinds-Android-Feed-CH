@@ -121,4 +121,6 @@
     <string name="login">Login</string>
     <string name="enter_user_name">Enter user name</string>
     <string name="enter_user_id">Enter user id</string>
+    <string name="no_posts_to_show">No posts to show</string>
+    <string name="be_the_first_one_to_post_here">Be the first one to post here</string>
 </resources>
