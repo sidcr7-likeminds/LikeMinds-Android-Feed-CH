@@ -1,0 +1,66 @@
+dependencies {
+    //core android
+    implementation deps.android_core.core
+    implementation deps.android_core.appcompat
+    implementation deps.ktx.fragment
+
+    //ui
+    implementation deps.ui.material_design
+    implementation deps.ui.constraint_layout
+    implementation deps.ui.recycler_view
+    implementation deps.ui.circleimageview
+    implementation deps.ui.dot_indicator
+    implementation deps.ui.photo_view
+    implementation deps.ui.swiperefreshlayout
+    implementation deps.ui.flexbox
+
+    //hilt
+    implementation deps.hilt.main
+    kapt deps.hilt.compiler
+
+    //exoplayer
+    implementation deps.exo_player.main
+
+    //lifecycle and viewmodel
+    implementation deps.lifecycle.viewmodel
+    implementation deps.lifecycle.livedata
+    kapt deps.lifecycle.annotation
+
+    //navigation
+    implementation deps.navigation.main
+    implementation deps.navigation.ui
+
+    //glide
+    implementation deps.glide.core
+    kapt deps.glide.compiler
+
+    //Stream
+    implementation deps.stream.main
+
+    //work manager
+    implementation deps.work_manager.main
+
+    // gson
+    implementation deps.gson.main
+
+    //aws
+    implementation deps.aws.s3
+    implementation(deps.aws.mobile_client) { transitive = true }
+
+    //testing
+    testImplementation deps.testing.junit
+    androidTestImplementation deps.testing.android_junit
+    androidTestImplementation deps.testing.espresso
+
+    //room
+    implementation deps.room.main
+    implementation deps.room.ktx
+    kapt deps.room.compiler
+
+    //firebase
+    implementation platform(deps.firebase.bom)
+    implementation deps.firebase.messaging
+
+    // feed-sdk
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:9c02684587"
+}
