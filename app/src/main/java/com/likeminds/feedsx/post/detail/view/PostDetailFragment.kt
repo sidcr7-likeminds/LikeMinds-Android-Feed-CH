@@ -655,14 +655,6 @@ class PostDetailFragment :
         }
     }
 
-    // handles visibility of no comments view
-//    private fun handleNoCommentsView(isVisible: Boolean) {
-//        binding.apply {
-//            tvNoComment.isVisible = isVisible
-//            tvBeFirst.isVisible = isVisible
-//        }
-//    }
-
     // hides the replying to view
     private fun hideReplyingToView() {
         binding.apply {
