@@ -158,10 +158,12 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
                 tvReplyCount.setOnClickListener {
                     if (rvReplies.isVisible) {
+                        // if replies view is visible then hide the view on click
                         rvReplies.hide()
                         commentSeparator.show()
                         replyCommentSeparator.hide()
                     } else {
+                        // if replies view is not visible then fetch replies
                         postDetailAdapterListener.fetchReplies(
                             data.id
                         )

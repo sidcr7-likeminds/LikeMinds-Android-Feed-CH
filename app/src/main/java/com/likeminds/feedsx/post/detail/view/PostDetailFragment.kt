@@ -131,9 +131,11 @@ class PostDetailFragment :
     }
 
     // fetches post data to set initial data
-    private fun fetchPostData() {
-        // show progress bar
-        ProgressHelper.showProgress(binding.progressBar)
+    private fun fetchPostData(fromRefresh: Boolean = false) {
+        if (!fromRefresh) {
+            // show progress bar
+            ProgressHelper.showProgress(binding.progressBar)
+        }
         //if source is notification, then call initiate first and then other apis
         if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
             initiateViewModel.initiateUser()
@@ -338,6 +340,7 @@ class PostDetailFragment :
     private fun observeCommentData() {
         // observes addCommentResponse LiveData
         viewModel.addCommentResponse.observe(viewLifecycleOwner) { comment ->
+            // remove NoCommentsViewData if visible
             if (mPostDetailAdapter[commentsCountPosition] is NoCommentsViewData) {
                 mPostDetailAdapter.removeIndex(commentsCountPosition)
             }
@@ -791,7 +794,7 @@ class PostDetailFragment :
     private fun refreshPostData() {
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
-        fetchPostData()
+        fetchPostData(true)
     }
 
     override fun likePost(position: Int) {
