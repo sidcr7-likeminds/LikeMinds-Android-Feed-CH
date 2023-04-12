@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
@@ -134,12 +135,6 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     )
                 }
 
-                tvReplyCount.setOnClickListener {
-                    postDetailAdapterListener.fetchReplies(
-                        data.id
-                    )
-                }
-
                 ivCommentMenu.setOnClickListener { view ->
                     showMenu(
                         view,
@@ -154,13 +149,23 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     rvReplies.show()
                     commentSeparator.hide()
                     replyCommentSeparator.show()
-                    tvReplyCount.isClickable = false
                     handleViewMore(data)
                 } else {
                     rvReplies.hide()
                     commentSeparator.show()
                     replyCommentSeparator.hide()
-                    tvReplyCount.isClickable = true
+                }
+
+                tvReplyCount.setOnClickListener {
+                    if (rvReplies.isVisible) {
+                        rvReplies.hide()
+                        commentSeparator.show()
+                        replyCommentSeparator.hide()
+                    } else {
+                        postDetailAdapterListener.fetchReplies(
+                            data.id
+                        )
+                    }
                 }
             }
         }
