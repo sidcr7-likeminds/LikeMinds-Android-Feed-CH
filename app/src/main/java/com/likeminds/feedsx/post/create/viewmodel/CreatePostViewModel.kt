@@ -15,11 +15,9 @@ import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
-import com.likeminds.feedsx.utils.ViewDataConverter.convertUser
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
@@ -58,9 +56,6 @@ class CreatePostViewModel @Inject constructor(
     private val _taggingData = MutableLiveData<Pair<Int, ArrayList<UserTagViewData>>?>()
     val taggingData: LiveData<Pair<Int, ArrayList<UserTagViewData>>?> = _taggingData
 
-    private val _userData = MutableLiveData<UserViewData>()
-    val userData: LiveData<UserViewData> = _userData
-
     private var temporaryPostId: Long? = null
 
     sealed class ErrorMessageEvent {
@@ -83,17 +78,6 @@ class CreatePostViewModel @Inject constructor(
         callback: (media: List<MediaViewData>) -> Unit,
     ) {
         mediaRepository.getLocalUrisDetails(context, uris, callback)
-    }
-
-    // fetches user from DB and posts in the live data
-    fun fetchUserFromDB() {
-        viewModelScope.launchIO {
-            val userId = userPreferences.getUserUniqueId()
-
-            // fetches user from DB with user.id
-            val userWithRights = userWithRightsRepository.getUserWithRights(userId)
-            _userData.postValue(convertUser(userWithRights))
-        }
     }
 
     // calls DecodeUrl API
@@ -223,7 +207,7 @@ class CreatePostViewModel @Inject constructor(
             // generates awsFolderPath to upload the file
             val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
                 it.mediaName,
-                _userData.value?.userUniqueId
+                userPreferences.getUserUniqueId()
             )
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)

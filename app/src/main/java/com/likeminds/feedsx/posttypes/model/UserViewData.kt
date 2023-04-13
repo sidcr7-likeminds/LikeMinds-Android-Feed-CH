@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.posttypes.model
 
 import android.os.Parcelable
+import com.likeminds.feedsx.utils.memberrights.model.MemberRight
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_USER
 import kotlinx.parcelize.Parcelize
@@ -15,6 +16,7 @@ class UserViewData private constructor(
     var isGuest: Boolean,
     var isDeleted: Boolean?,
     var updatedAt: Long,
+    var state: Int,
     var memberRights: List<MemberRight>
 ) : Parcelable, BaseViewType {
     override val viewType: Int
@@ -29,6 +31,7 @@ class UserViewData private constructor(
         private var isGuest: Boolean = false
         private var isDeleted: Boolean? = null
         private var updatedAt: Long = 0
+        private var state: Int = 0
         private var memberRights: List<MemberRight> = listOf()
 
         fun id(id: Int) = apply { this.id = id }
@@ -39,6 +42,7 @@ class UserViewData private constructor(
         fun isGuest(isGuest: Boolean) = apply { this.isGuest = isGuest }
         fun isDeleted(isDeleted: Boolean?) = apply { this.isDeleted = isDeleted }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
+        fun state(state: Int) = apply { this.state = state }
         fun memberRights(memberRights: List<MemberRight>) =
             apply { this.memberRights = memberRights }
 
@@ -51,6 +55,7 @@ class UserViewData private constructor(
             isGuest,
             isDeleted,
             updatedAt,
+            state,
             memberRights
         )
     }
@@ -64,6 +69,7 @@ class UserViewData private constructor(
             .isGuest(isGuest)
             .isDeleted(isDeleted)
             .updatedAt(updatedAt)
+            .state(state)
             .memberRights(memberRights)
     }
 }

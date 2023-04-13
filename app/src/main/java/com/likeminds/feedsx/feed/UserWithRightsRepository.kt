@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.feed
 
-import android.util.Log
 import com.likeminds.feedsx.db.dao.UserWithRightsDao
 import com.likeminds.feedsx.db.models.MemberRightsEntity
 import com.likeminds.feedsx.db.models.UserEntity
@@ -15,12 +14,6 @@ class UserWithRightsRepository @Inject constructor(
     }
 
     suspend fun insertUserWithRights(user: UserEntity, memberRights: List<MemberRightsEntity>) {
-        Log.d(
-            "PUI", """
-            updateUser: ${user.state} 
-            ${memberRights.size}
-        """.trimIndent()
-        )
         userWithRightsDao.insertUserWithRights(user, memberRights)
     }
 

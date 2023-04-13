@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.posttypes.model
+package com.likeminds.feedsx.utils.memberrights.model
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

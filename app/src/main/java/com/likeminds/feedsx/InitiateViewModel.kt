@@ -28,8 +28,12 @@ class InitiateViewModel @Inject constructor(
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
+    // todo:create flow
     private val _userResponse = MutableLiveData<UserViewData>()
     val userResponse: LiveData<UserViewData> = _userResponse
+
+    private val _userData = MutableLiveData<UserViewData>()
+    val userData: LiveData<UserViewData> = _userData
 
     private val _logoutResponse = MutableLiveData<Boolean>()
     val logoutResponse: LiveData<Boolean> = _logoutResponse
@@ -118,8 +122,10 @@ class InitiateViewModel @Inject constructor(
                 memberStateResponse.memberRights
             )
 
-            //update userEntity in local db
+            //inserts userEntity with their rights in local db
             userWithRightsRepository.insertUserWithRights(userEntity, memberRights)
+            // todo ask
+            fetchUserFromDB()
         }
     }
 
@@ -150,6 +156,26 @@ class InitiateViewModel @Inject constructor(
 
             //call api
             lmFeedClient.registerDevice(request)
+        }
+    }
+
+    // fetches user from DB and posts in the live data
+    fun fetchUserFromDB() {
+        viewModelScope.launchIO {
+            val userId = userPreferences.getUserUniqueId()
+
+            // fetches user from DB with user.id
+            val userWithRights = userWithRightsRepository.getUserWithRights(userId)
+            Log.d(
+                "PUI", """
+                state: ${userWithRights.user.state}
+                name ${userWithRights.user.name}
+                id ${userWithRights.user.id}
+                uuid ${userWithRights.user.userUniqueId}
+                rights ${userWithRights.memberRights[1].state}
+            """.trimIndent()
+            )
+            _userData.postValue(ViewDataConverter.convertUser(userWithRights))
         }
     }
 }

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -117,7 +116,7 @@ class CreatePostFragment :
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        viewModel.fetchUserFromDB()
+        initiateViewModel.fetchUserFromDB()
     }
 
     // observes data
@@ -129,7 +128,7 @@ class CreatePostFragment :
         observeMembersTaggingList()
 
         // observes userData and initializes the user view
-        viewModel.userData.observe(viewLifecycleOwner) {
+        initiateViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
 
@@ -327,9 +326,6 @@ class CreatePostFragment :
 
     // sets data to the author frame
     private fun initAuthorFrame(user: UserViewData) {
-        Log.d("PUI", """
-            initAuthorFrame: ${user.memberRights[0].title}
-        """.trimIndent())
         binding.authorFrame.apply {
             tvCreatorName.text = user.name
             MemberImageUtil.setImage(

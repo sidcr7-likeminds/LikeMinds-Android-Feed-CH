@@ -62,6 +62,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
+import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
 import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
@@ -114,6 +115,11 @@ class FeedFragment :
         // observes userResponse LiveData
         initiateViewModel.userResponse.observe(viewLifecycleOwner) { response ->
             observeUserResponse(response)
+        }
+
+        // observes userData LiveData
+        initiateViewModel.userData.observe(viewLifecycleOwner) { data ->
+            observeUserData(data)
         }
 
         // observes logoutResponse LiveData
@@ -172,6 +178,11 @@ class FeedFragment :
         initToolbar()
         setUserImage(user)
         viewModel.getUniversalFeed(1)
+    }
+
+    // observes user data from local db
+    private fun observeUserData(user: UserViewData?) {
+        initNewPostClick(user)
     }
 
 
@@ -240,14 +251,12 @@ class FeedFragment :
     // checks if there is any post or not
     private fun checkForNoPost(feed: List<BaseViewType>) {
         if (feed.isNotEmpty()) {
-            Log.d("PUI", "checkForNoPost: ")
             binding.apply {
                 layoutNoPost.root.hide()
                 newPostButton.show()
                 recyclerView.show()
             }
         } else {
-            Log.d("PUI", "checkForNoPost:1 ")
             binding.apply {
                 layoutNoPost.root.show()
                 newPostButton.hide()
@@ -458,23 +467,24 @@ class FeedFragment :
 
         initRecyclerView()
         initSwipeRefreshLayout()
-        initNewPostClick()
+    }
+
+    // sets new post fab click listeners
+    private fun initNewPostClick(user: UserViewData?) {
+        binding.apply {
+            layoutNoPost.fabNewPost.setOnClickListener {
+                handleNewPostClick(user)
+            }
+
+            newPostButton.setOnClickListener {
+                handleNewPostClick(user)
+            }
+        }
     }
 
     // handles new post fab click
-    private fun initNewPostClick() {
-        binding.layoutNoPost.fabNewPost.setOnClickListener {
-            // sends post creation started event
-            viewModel.sendPostCreationStartedEvent()
-
-            val intent = CreatePostActivity.getIntent(
-                requireContext(),
-                LMAnalytics.Source.UNIVERSAL_FEED
-            )
-            createPostLauncher.launch(intent)
-        }
-
-        binding.newPostButton.setOnClickListener {
+    private fun handleNewPostClick(user: UserViewData?) {
+        if (MemberRightUtil.hasCreatePostsRight(user)) {
             if (alreadyPosting) {
                 ViewUtils.showShortToast(
                     requireContext(),
@@ -490,6 +500,11 @@ class FeedFragment :
                 )
                 createPostLauncher.launch(intent)
             }
+        } else {
+            ViewUtils.showShortSnack(
+                binding.root,
+                getString(R.string.you_do_not_have_permission_to_create_a_post)
+            )
         }
     }
 
