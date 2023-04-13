@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.likeminds.feedsx.db.FeedSXDatabase
 import com.likeminds.feedsx.db.dao.PostWithAttachmentsDao
-import com.likeminds.feedsx.db.dao.UserDao
+import com.likeminds.feedsx.db.dao.UserWithRightsDao
 import com.likeminds.feedsx.db.utils.DbConstants
 import dagger.Module
 import dagger.Provides
@@ -21,13 +21,12 @@ class RoomModule {
     @Singleton
     fun provideFeedSXDatabase(@ApplicationContext context: Context): FeedSXDatabase {
         return Room.databaseBuilder(context, FeedSXDatabase::class.java, DbConstants.FEED_SX_DB)
-            .fallbackToDestructiveMigration()
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideUserDao(db: FeedSXDatabase): UserDao {
+    fun provideUserDao(db: FeedSXDatabase): UserWithRightsDao {
         return db.userDao()
     }
 

@@ -20,6 +20,7 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.helper.model.TagMember
+import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
@@ -480,11 +481,42 @@ object ViewDataConverter {
             .build()
     }
 
+    fun createMemberRights(
+        userUniqueId: String,
+        memberRights: List<ManagementRightPermissionData>
+    ): List<MemberRightsEntity> {
+        return memberRights.map {
+            createMemberRightsEntity(
+                userUniqueId,
+                it
+            )
+        }
+    }
+
+    private fun createMemberRightsEntity(
+        userUniqueId: String,
+        memberRight: ManagementRightPermissionData
+    ): MemberRightsEntity {
+        return MemberRightsEntity.Builder()
+            .id(memberRight.id)
+            .isLocked(memberRight.isLocked)
+            .isSelected(memberRight.isSelected)
+            .state(memberRight.state)
+            .title(memberRight.title)
+            .subtitle(memberRight.subtitle)
+            .userUniqueId(userUniqueId)
+            .build()
+    }
+
     /**--------------------------------
      * Db Model -> View Data Model
     --------------------------------*/
 
-    fun convertUser(user: UserEntity): UserViewData {
+    fun convertUser(
+        userWithRights: UserWithRights
+    ): UserViewData {
+        val user = userWithRights.user
+        val memberRights = userWithRights.memberRights
         return UserViewData.Builder()
             .id(user.id)
             .imageUrl(user.imageUrl)
@@ -494,6 +526,24 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isDeleted(user.isDeleted)
             .userUniqueId(user.userUniqueId)
+            .memberRights(convertMemberRights(memberRights))
+            .build()
+    }
+
+    private fun convertMemberRights(memberRights: List<MemberRightsEntity>): List<MemberRight> {
+        return memberRights.map {
+            convertMemberRight(it)
+        }
+    }
+
+    private fun convertMemberRight(memberRight: MemberRightsEntity): MemberRight {
+        return MemberRight.Builder()
+            .id(memberRight.id)
+            .isLocked(memberRight.isLocked)
+            .isSelected(memberRight.isSelected)
+            .state(memberRight.state)
+            .title(memberRight.title)
+            .subtitle(memberRight.subtitle)
             .build()
     }
 

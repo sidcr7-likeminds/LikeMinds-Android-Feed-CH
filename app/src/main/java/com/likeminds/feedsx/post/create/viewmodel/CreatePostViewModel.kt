@@ -7,7 +7,7 @@ import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.feed.UserRepository
+import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -39,7 +39,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userWithRightsRepository: UserWithRightsRepository,
     private val userPreferences: UserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val postPreferences: PostPreferences,
@@ -91,8 +91,8 @@ class CreatePostViewModel @Inject constructor(
             val userId = userPreferences.getUserUniqueId()
 
             // fetches user from DB with user.id
-            val userEntity = userRepository.getUser(userId)
-            _userData.postValue(convertUser(userEntity))
+            val userWithRights = userWithRightsRepository.getUserWithRights(userId)
+            _userData.postValue(convertUser(userWithRights))
         }
     }
 

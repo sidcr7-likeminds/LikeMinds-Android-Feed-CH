@@ -134,6 +134,9 @@ object PostTypeUtil {
             rvDocuments.apply {
                 adapter = mDocumentsAdapter
                 layoutManager = LinearLayoutManager(root.context)
+                if (itemDecorationCount < 1) {
+                    addItemDecoration(dividerItemDecorator)
+                }
             }
 
             val documents = postData.attachments

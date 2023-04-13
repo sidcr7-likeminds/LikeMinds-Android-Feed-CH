@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.likeminds.feedsx.auth.util.AuthPreferences
-import com.likeminds.feedsx.feed.UserRepository
+import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
@@ -23,7 +23,7 @@ import javax.inject.Inject
 class InitiateViewModel @Inject constructor(
     private val authPreferences: AuthPreferences,
     private val userPreferences: UserPreferences,
-    private val userRepository: UserRepository,
+    private val userWithRightsRepository: UserWithRightsRepository,
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -87,7 +87,7 @@ class InitiateViewModel @Inject constructor(
             //convert user into userEntity
             val userEntity = ViewDataConverter.createUserEntity(user)
             //add it to local db
-            userRepository.insertUser(userEntity)
+            userWithRightsRepository.insertUser(userEntity)
 
             //call member state api
             getMemberState()
@@ -108,13 +108,18 @@ class InitiateViewModel @Inject constructor(
             val userId = memberStateResponse.userUniqueId
 
             //get existing userEntity
-            var userEntity = userRepository.getUser(userId)
+            var userEntity = userWithRightsRepository.getUser(userId)
 
             //updated userEntity
             userEntity = userEntity.toBuilder().state(memberState).isOwner(isOwner).build()
 
+            val memberRights = ViewDataConverter.createMemberRights(
+                userId,
+                memberStateResponse.memberRights
+            )
+
             //update userEntity in local db
-            userRepository.updateUser(userEntity)
+            userWithRightsRepository.insertUserWithRights(userEntity, memberRights)
         }
     }
 
