@@ -482,10 +482,15 @@ object ViewDataConverter {
             .build()
     }
 
+    /**
+     * converts list of [ManagementRightPermissionData] to list of [MemberRightEntity]
+     * @param userUniqueId: unique id of the user
+     * @param memberRights: list of [ManagementRightPermissionData]
+     * */
     fun createMemberRights(
         userUniqueId: String,
         memberRights: List<ManagementRightPermissionData>
-    ): List<MemberRightsEntity> {
+    ): List<MemberRightEntity> {
         return memberRights.map {
             createMemberRightsEntity(
                 userUniqueId,
@@ -494,11 +499,16 @@ object ViewDataConverter {
         }
     }
 
+    /**
+     * converts [ManagementRightPermissionData] to [MemberRightEntity]
+     * @param userUniqueId: unique id of the user
+     * @param memberRight: network model of member right [ManagementRightPermissionData]
+     * */
     private fun createMemberRightsEntity(
         userUniqueId: String,
         memberRight: ManagementRightPermissionData
-    ): MemberRightsEntity {
-        return MemberRightsEntity.Builder()
+    ): MemberRightEntity {
+        return MemberRightEntity.Builder()
             .id(memberRight.id)
             .isLocked(memberRight.isLocked)
             .isSelected(memberRight.isSelected)
@@ -568,13 +578,21 @@ object ViewDataConverter {
             .build()
     }
 
-    fun convertMemberRights(memberRights: List<MemberRightsEntity>): List<MemberRightViewData> {
+    /**
+     * converts list of [MemberRightEntity] to list of [MemberRightViewData]
+     * @param memberRights: list of [MemberRightEntity]
+     * */
+    fun convertMemberRights(memberRights: List<MemberRightEntity>): List<MemberRightViewData> {
         return memberRights.map {
             convertMemberRight(it)
         }
     }
 
-    private fun convertMemberRight(memberRight: MemberRightsEntity): MemberRightViewData {
+    /**
+     * converts [MemberRightEntity] to [MemberRightViewData]
+     * @param memberRight: [MemberRightEntity]
+     * */
+    private fun convertMemberRight(memberRight: MemberRightEntity): MemberRightViewData {
         return MemberRightViewData.Builder()
             .id(memberRight.id)
             .isLocked(memberRight.isLocked)

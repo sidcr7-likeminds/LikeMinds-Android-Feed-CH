@@ -382,6 +382,7 @@ class PostDetailViewModel @Inject constructor(
         }
     }
 
+    // gets user from db and check if it has comment rights or not
     fun checkCommentRights() {
         viewModelScope.launchIO {
             val userId = userPreferences.getUserUniqueId()

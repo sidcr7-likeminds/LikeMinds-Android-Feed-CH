@@ -118,9 +118,9 @@ class FeedFragment :
             observeUserResponse(response)
         }
 
-        // observes userData LiveData
+        // observes hasCreatePostRights LiveData
         initiateViewModel.hasCreatePostRights.observe(viewLifecycleOwner) {
-            observeCreatePostsRight(it)
+            initNewPostClick(it)
         }
 
         // observes logoutResponse LiveData
@@ -180,12 +180,6 @@ class FeedFragment :
         setUserImage(user)
         viewModel.getUniversalFeed(1)
     }
-
-    // observes create posts right data
-    private fun observeCreatePostsRight(hasCreatePostRights: Boolean) {
-        initNewPostClick(hasCreatePostRights)
-    }
-
 
     //observe feed response
     private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
@@ -471,9 +465,10 @@ class FeedFragment :
         initSwipeRefreshLayout()
     }
 
-    // sets new post fab click listeners
+    // initializes new post fab
     private fun initNewPostClick(hasCreatePostRights: Boolean) {
         binding.apply {
+            // sets color of fab button as per user rights
             if (hasCreatePostRights) {
                 layoutNoPost.fabNewPost.backgroundTintList =
                     ColorStateList.valueOf(LMBranding.getButtonsColor())

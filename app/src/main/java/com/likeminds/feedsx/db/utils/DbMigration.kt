@@ -4,7 +4,9 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.likeminds.feedsx.db.utils.DbConstants.MEMBER_RIGHTS_TABLE
 
+// all db migrations are written here
 object DbMigration {
+    // migration from version-1 to version-2
     val MIGRATION_1_2 = object : Migration(1, 2) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(

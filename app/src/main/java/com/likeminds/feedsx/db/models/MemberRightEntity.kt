@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.likeminds.feedsx.db.utils.DbConstants
 
 @Entity(tableName = DbConstants.MEMBER_RIGHTS_TABLE)
-class MemberRightsEntity constructor(
+class MemberRightEntity constructor(
     @ColumnInfo(name = "id")
     @PrimaryKey
     val id: Int,
@@ -40,7 +40,7 @@ class MemberRightsEntity constructor(
         fun subtitle(subtitle: String?) = apply { this.subtitle = subtitle }
         fun userUniqueId(userUniqueId: String) = apply { this.userUniqueId = userUniqueId }
 
-        fun build() = MemberRightsEntity(
+        fun build() = MemberRightEntity(
             id,
             isLocked,
             isSelected,

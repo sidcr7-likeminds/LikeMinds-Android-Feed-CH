@@ -2,7 +2,6 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
 import android.os.Build
-import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
@@ -260,6 +259,7 @@ class PostDetailFragment :
         observeErrors()
     }
 
+    // observes hasCommentRights live data
     private fun observeCommentsRightData() {
         viewModel.hasCommentRights.observe(viewLifecycleOwner) {
             if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION) {
@@ -294,9 +294,9 @@ class PostDetailFragment :
         }
     }
 
+    // shows restricted text view or comment edit text as per comment rights
     private fun handleCommentRights(hasCommentRights: Boolean) {
         binding.apply {
-            Log.d("PUI", "handleCommentRights: $hasCommentRights")
             if (hasCommentRights) {
                 etComment.show()
                 ivCommentSend.show()
