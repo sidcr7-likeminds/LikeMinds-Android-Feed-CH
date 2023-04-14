@@ -116,7 +116,7 @@ class CreatePostFragment :
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        initiateViewModel.fetchUserFromDB()
+        viewModel.fetchUserFromDB()
     }
 
     // observes data
@@ -128,7 +128,7 @@ class CreatePostFragment :
         observeMembersTaggingList()
 
         // observes userData and initializes the user view
-        initiateViewModel.userData.observe(viewLifecycleOwner) {
+        viewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
 

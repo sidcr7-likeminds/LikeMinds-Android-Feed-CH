@@ -115,7 +115,27 @@
                 app:font_style="regular"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="gone" />
+
+            <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                android:id="@+id/tv_restricted"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:lineSpacingExtra="3sp"
+                android:minHeight="48dp"
+                android:text="@string/you_do_not_have_permission_to_comment"
+                android:textColor="@color/grey_brown_50"
+                android:textSize="13sp"
+                android:visibility="gone"
+                app:fontType="regular"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:visibility="visible" />
 
 
             <com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
@@ -142,7 +162,8 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/et_comment"
                 app:srcCompat="@drawable/ic_comment_send_disable"
-                tools:ignore="ContentDescription" />
+                tools:ignore="ContentDescription"
+                tools:visibility="gone" />
 
             <include
                 android:id="@+id/progress_bar"

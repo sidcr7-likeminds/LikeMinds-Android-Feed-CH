@@ -15,6 +15,7 @@ import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
@@ -48,6 +49,9 @@ class CreatePostViewModel @Inject constructor(
 
     private val _decodeUrlResponse = MutableLiveData<LinkOGTagsViewData>()
     val decodeUrlResponse: LiveData<LinkOGTagsViewData> = _decodeUrlResponse
+
+    private val _userData = MutableLiveData<UserViewData>()
+    val userData: LiveData<UserViewData> = _userData
 
     /**
      * [taggingData] contains first -> page called
@@ -249,6 +253,17 @@ class CreatePostViewModel @Inject constructor(
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
         val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
+
+    // fetches user from DB and posts in the live data
+    fun fetchUserFromDB() {
+        viewModelScope.launchIO {
+            val userId = userPreferences.getUserUniqueId()
+
+            // fetches user from DB with user.id
+            val userWithRights = userWithRightsRepository.getUser(userId)
+            _userData.postValue(ViewDataConverter.convertUser(userWithRights))
+        }
     }
 
     // calls api to get members for tagging

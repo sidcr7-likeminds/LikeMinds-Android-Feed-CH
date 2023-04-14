@@ -12,6 +12,7 @@ import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
@@ -28,15 +29,17 @@ class InitiateViewModel @Inject constructor(
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    // todo:create flow
     private val _userResponse = MutableLiveData<UserViewData>()
     val userResponse: LiveData<UserViewData> = _userResponse
 
-    private val _userData = MutableLiveData<UserViewData>()
-    val userData: LiveData<UserViewData> = _userData
-
     private val _logoutResponse = MutableLiveData<Boolean>()
     val logoutResponse: LiveData<Boolean> = _logoutResponse
+
+    private val _hasCreatePostRights = MutableLiveData(true)
+    val hasCreatePostRights: LiveData<Boolean> = _hasCreatePostRights
+
+    private val _hasCommentRights = MutableLiveData(true)
+    val hasCommentRights: LiveData<Boolean> = _hasCommentRights
 
     private val _initiateErrorMessage = MutableLiveData<String?>()
     val initiateErrorMessage: LiveData<String?> = _initiateErrorMessage
@@ -122,10 +125,25 @@ class InitiateViewModel @Inject constructor(
                 memberStateResponse.memberRights
             )
 
+            val memberRightsViewData = ViewDataConverter.convertMemberRights(memberRights)
+
+            //update user's create posts right
+            _hasCreatePostRights.postValue(
+                MemberRightUtil.hasCreatePostsRight(
+                    memberState,
+                    memberRightsViewData
+                )
+            )
+
+            _hasCommentRights.postValue(
+                MemberRightUtil.hasCommentRight(
+                    memberState,
+                    memberRightsViewData
+                )
+            )
+
             //inserts userEntity with their rights in local db
             userWithRightsRepository.insertUserWithRights(userEntity, memberRights)
-            // todo ask
-            fetchUserFromDB()
         }
     }
 
@@ -156,26 +174,6 @@ class InitiateViewModel @Inject constructor(
 
             //call api
             lmFeedClient.registerDevice(request)
-        }
-    }
-
-    // fetches user from DB and posts in the live data
-    fun fetchUserFromDB() {
-        viewModelScope.launchIO {
-            val userId = userPreferences.getUserUniqueId()
-
-            // fetches user from DB with user.id
-            val userWithRights = userWithRightsRepository.getUserWithRights(userId)
-            Log.d(
-                "PUI", """
-                state: ${userWithRights.user.state}
-                name ${userWithRights.user.name}
-                id ${userWithRights.user.id}
-                uuid ${userWithRights.user.userUniqueId}
-                rights ${userWithRights.memberRights[1].state}
-            """.trimIndent()
-            )
-            _userData.postValue(ViewDataConverter.convertUser(userWithRights))
         }
     }
 }

@@ -191,7 +191,6 @@
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="15sp"
-            android:visibility="gone"
             app:font_Style="medium"
             app:icon="@drawable/ic_new_post_plus"
             app:iconGravity="start"

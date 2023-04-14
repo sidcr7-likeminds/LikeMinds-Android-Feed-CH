@@ -5,10 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -23,7 +26,10 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class PostDetailViewModel @Inject constructor() : ViewModel() {
+class PostDetailViewModel @Inject constructor(
+    private val userWithRightsRepository: UserWithRightsRepository,
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
@@ -56,6 +62,9 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
      * */
     private val _taggingData = MutableLiveData<Pair<Int, ArrayList<UserTagViewData>>?>()
     val taggingData: LiveData<Pair<Int, ArrayList<UserTagViewData>>?> = _taggingData
+
+    private val _hasCommentRights = MutableLiveData(true)
+    val hasCommentRights: LiveData<Boolean> = _hasCommentRights
 
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()
@@ -370,6 +379,25 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.GetTaggingList(response.errorMessage))
             }
+        }
+    }
+
+    fun checkCommentRights() {
+        viewModelScope.launchIO {
+            val userId = userPreferences.getUserUniqueId()
+
+            // fetches user with rights from DB with user.id
+            val userWithRights = userWithRightsRepository.getUserWithRights(userId)
+            val memberState = userWithRights.user.state
+            val memberRightsViewData =
+                ViewDataConverter.convertMemberRights(userWithRights.memberRights)
+
+            _hasCommentRights.postValue(
+                MemberRightUtil.hasCommentRight(
+                    memberState,
+                    memberRightsViewData
+                )
+            )
         }
     }
 }

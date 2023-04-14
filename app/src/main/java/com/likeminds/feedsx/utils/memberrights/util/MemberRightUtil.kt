@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.utils.memberrights.util
 
 import android.util.Log
-import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.memberrights.model.*
 
 object MemberRightUtil {
@@ -17,16 +16,13 @@ object MemberRightUtil {
         return memberState == STATE_MEMBER
     }
 
-    fun hasCreatePostsRight(user: UserViewData?): Boolean {
+    fun hasCreatePostsRight(memberState: Int, memberRights: List<MemberRightViewData>): Boolean {
         return when {
-            user == null -> {
-                false
-            }
-            isAdmin(user.state) -> {
+            isAdmin(memberState) -> {
                 true
             }
-            (isMember(user.state) && checkHasMemberRight(
-                user.memberRights,
+            (isMember(memberState) && checkHasMemberRight(
+                memberRights,
                 MEMBER_RIGHT_CREATE_POSTS
             )) -> {
                 true
@@ -37,20 +33,25 @@ object MemberRightUtil {
         }
     }
 
-    fun hasCommentRight(user: UserViewData?): Boolean {
+    fun hasCommentRight(memberState: Int, memberRights: List<MemberRightViewData>): Boolean {
         return when {
-            user == null -> false
-            isAdmin(user.state) -> true
-            (isMember(user.state) && checkHasMemberRight(
-                user.memberRights,
+            isAdmin(memberState) -> {
+                true
+            }
+            (isMember(memberState) && checkHasMemberRight(
+                memberRights,
                 MEMBER_RIGHT_COMMENT_AND_REPLY_ON_POSTS
-            )) -> return true
-            else -> false
+            )) -> {
+                true
+            }
+            else -> {
+                false
+            }
         }
     }
 
     private fun checkHasMemberRight(
-        memberRights: List<MemberRight>,
+        memberRights: List<MemberRightViewData>,
         rightState: Int,
     ): Boolean {
         var value = false
@@ -66,8 +67,14 @@ object MemberRightUtil {
             )
             it.state == rightState
         }?.let {
-            value = it.isSelected && it.isLocked == false
+            value = it.isSelected && (it.isLocked == false)
         }
+        Log.d(
+            "PUI", """
+            value $value
+            right $rightState
+        """.trimIndent()
+        )
         return value
     }
 }

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class MemberRight private constructor(
+class MemberRightViewData private constructor(
     val id: Int,
     val isLocked: Boolean?,
     val isSelected: Boolean,
@@ -27,7 +27,7 @@ class MemberRight private constructor(
         fun title(title: String) = apply { this.title = title }
         fun subtitle(subtitle: String?) = apply { this.subtitle = subtitle }
 
-        fun build() = MemberRight(
+        fun build() = MemberRightViewData(
             id,
             isLocked,
             isSelected,

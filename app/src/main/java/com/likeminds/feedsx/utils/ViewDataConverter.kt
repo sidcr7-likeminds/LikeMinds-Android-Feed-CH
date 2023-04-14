@@ -14,7 +14,7 @@ import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
-import com.likeminds.feedsx.utils.memberrights.model.MemberRight
+import com.likeminds.feedsx.utils.memberrights.model.MemberRightViewData
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
@@ -514,10 +514,8 @@ object ViewDataConverter {
     --------------------------------*/
 
     fun convertUser(
-        userWithRights: UserWithRights
+        user: UserEntity
     ): UserViewData {
-        val user = userWithRights.user
-        val memberRights = userWithRights.memberRights
         return UserViewData.Builder()
             .id(user.id)
             .imageUrl(user.imageUrl)
@@ -527,25 +525,6 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isDeleted(user.isDeleted)
             .userUniqueId(user.userUniqueId)
-            .state(user.state)
-            .memberRights(convertMemberRights(memberRights))
-            .build()
-    }
-
-    private fun convertMemberRights(memberRights: List<MemberRightsEntity>): List<MemberRight> {
-        return memberRights.map {
-            convertMemberRight(it)
-        }
-    }
-
-    private fun convertMemberRight(memberRight: MemberRightsEntity): MemberRight {
-        return MemberRight.Builder()
-            .id(memberRight.id)
-            .isLocked(memberRight.isLocked)
-            .isSelected(memberRight.isSelected)
-            .state(memberRight.state)
-            .title(memberRight.title)
-            .subtitle(memberRight.subtitle)
             .build()
     }
 
@@ -586,6 +565,23 @@ object ViewDataConverter {
             .uri(Uri.parse(attachmentMeta.uri))
             .width(attachmentMeta.width)
             .height(attachmentMeta.height)
+            .build()
+    }
+
+    fun convertMemberRights(memberRights: List<MemberRightsEntity>): List<MemberRightViewData> {
+        return memberRights.map {
+            convertMemberRight(it)
+        }
+    }
+
+    private fun convertMemberRight(memberRight: MemberRightsEntity): MemberRightViewData {
+        return MemberRightViewData.Builder()
+            .id(memberRight.id)
+            .isLocked(memberRight.isLocked)
+            .isSelected(memberRight.isSelected)
+            .state(memberRight.state)
+            .title(memberRight.title)
+            .subtitle(memberRight.subtitle)
             .build()
     }
 

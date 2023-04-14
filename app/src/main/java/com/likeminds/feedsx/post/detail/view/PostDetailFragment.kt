@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
 import android.os.Build
+import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
@@ -123,6 +124,7 @@ class PostDetailFragment :
 
         binding.buttonColor = LMBranding.getButtonsColor()
         fetchPostData()
+        viewModel.checkCommentRights()
         initRecyclerView()
         initMemberTaggingView()
         initSwipeRefreshLayout()
@@ -253,8 +255,17 @@ class PostDetailFragment :
         observeInitiateResponse()
         observePostData()
         observeCommentData()
+        observeCommentsRightData()
         observeMembersTaggingList()
         observeErrors()
+    }
+
+    private fun observeCommentsRightData() {
+        viewModel.hasCommentRights.observe(viewLifecycleOwner) {
+            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION) {
+                handleCommentRights(it)
+            }
+        }
     }
 
     private fun observeInitiateResponse() {
@@ -273,6 +284,28 @@ class PostDetailFragment :
         initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
             ProgressHelper.hideProgress(binding.progressBar)
             ViewUtils.showErrorMessageToast(requireContext(), it)
+        }
+
+        initiateViewModel.hasCommentRights.observe(viewLifecycleOwner) {
+            //if source is notification, update comments right from Initiate call
+            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+                handleCommentRights(it)
+            }
+        }
+    }
+
+    private fun handleCommentRights(hasCommentRights: Boolean) {
+        binding.apply {
+            Log.d("PUI", "handleCommentRights: $hasCommentRights")
+            if (hasCommentRights) {
+                etComment.show()
+                ivCommentSend.show()
+                tvRestricted.hide()
+            } else {
+                etComment.hide()
+                ivCommentSend.hide()
+                tvRestricted.show()
+            }
         }
     }
 

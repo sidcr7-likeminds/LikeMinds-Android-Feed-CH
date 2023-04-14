@@ -1,6 +1,8 @@
 package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
@@ -62,7 +64,6 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
-import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
 import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
@@ -118,8 +119,8 @@ class FeedFragment :
         }
 
         // observes userData LiveData
-        initiateViewModel.userData.observe(viewLifecycleOwner) { data ->
-            observeUserData(data)
+        initiateViewModel.hasCreatePostRights.observe(viewLifecycleOwner) {
+            observeCreatePostsRight(it)
         }
 
         // observes logoutResponse LiveData
@@ -180,9 +181,9 @@ class FeedFragment :
         viewModel.getUniversalFeed(1)
     }
 
-    // observes user data from local db
-    private fun observeUserData(user: UserViewData?) {
-        initNewPostClick(user)
+    // observes create posts right data
+    private fun observeCreatePostsRight(hasCreatePostRights: Boolean) {
+        initNewPostClick(hasCreatePostRights)
     }
 
 
@@ -466,45 +467,60 @@ class FeedFragment :
         binding.toolbarColor = LMBranding.getToolbarColor()
 
         initRecyclerView()
+        initNewPostClick(true)
         initSwipeRefreshLayout()
     }
 
     // sets new post fab click listeners
-    private fun initNewPostClick(user: UserViewData?) {
+    private fun initNewPostClick(hasCreatePostRights: Boolean) {
         binding.apply {
+            if (hasCreatePostRights) {
+                layoutNoPost.fabNewPost.backgroundTintList =
+                    ColorStateList.valueOf(LMBranding.getButtonsColor())
+                newPostButton.backgroundTintList =
+                    ColorStateList.valueOf(LMBranding.getButtonsColor())
+            } else {
+                layoutNoPost.fabNewPost.backgroundTintList =
+                    ColorStateList.valueOf(Color.GRAY)
+                newPostButton.backgroundTintList =
+                    ColorStateList.valueOf(Color.GRAY)
+            }
+
             layoutNoPost.fabNewPost.setOnClickListener {
-                handleNewPostClick(user)
+                handleNewPostClick(hasCreatePostRights)
             }
 
             newPostButton.setOnClickListener {
-                handleNewPostClick(user)
+                handleNewPostClick(hasCreatePostRights)
             }
         }
     }
 
     // handles new post fab click
-    private fun handleNewPostClick(user: UserViewData?) {
-        if (MemberRightUtil.hasCreatePostsRight(user)) {
-            if (alreadyPosting) {
-                ViewUtils.showShortToast(
-                    requireContext(),
-                    getString(R.string.a_post_is_already_uploading)
-                )
-            } else {
-                // sends post creation started event
-                viewModel.sendPostCreationStartedEvent()
+    private fun handleNewPostClick(hasCreatePostRights: Boolean) {
+        binding.apply {
+            if (hasCreatePostRights) {
+                if (alreadyPosting) {
+                    ViewUtils.showShortToast(
+                        requireContext(),
+                        getString(R.string.a_post_is_already_uploading)
+                    )
+                } else {
+                    // sends post creation started event
+                    viewModel.sendPostCreationStartedEvent()
 
-                val intent = CreatePostActivity.getIntent(
-                    requireContext(),
-                    LMAnalytics.Source.UNIVERSAL_FEED
+                    val intent = CreatePostActivity.getIntent(
+                        requireContext(),
+                        LMAnalytics.Source.UNIVERSAL_FEED
+                    )
+                    createPostLauncher.launch(intent)
+                }
+            } else {
+                ViewUtils.showShortSnack(
+                    root,
+                    getString(R.string.you_do_not_have_permission_to_create_a_post)
                 )
-                createPostLauncher.launch(intent)
             }
-        } else {
-            ViewUtils.showShortSnack(
-                binding.root,
-                getString(R.string.you_do_not_have_permission_to_create_a_post)
-            )
         }
     }
 
