@@ -40,10 +40,10 @@ import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
 import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
-import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
-import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
-import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
-import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM_ID
+import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM_ID
+import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM_ID
+import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM_ID
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
@@ -725,19 +725,19 @@ class FeedFragment :
     override fun onPostMenuItemClicked(
         postId: String,
         creatorId: String,
-        title: String
+        menuId: Int
     ) {
-        when (title) {
-            DELETE_POST_MENU_ITEM -> {
+        when (menuId) {
+            DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(postId, creatorId)
             }
-            REPORT_POST_MENU_ITEM -> {
+            REPORT_POST_MENU_ITEM_ID -> {
                 reportPost(postId, creatorId)
             }
-            PIN_POST_MENU_ITEM -> {
+            PIN_POST_MENU_ITEM_ID -> {
                 pinPost(postId)
             }
-            UNPIN_POST_MENU_ITEM -> {
+            UNPIN_POST_MENU_ITEM_ID -> {
                 unpinPost(postId)
             }
         }
@@ -865,7 +865,7 @@ class FeedFragment :
         //get pin menu item
         val menuItems = post.menuItems.toMutableList()
         val pinPostIndex = menuItems.indexOfFirst {
-            (it.title == PIN_POST_MENU_ITEM)
+            (it.id == PIN_POST_MENU_ITEM_ID)
         }
 
         //if pin item doesn't exist
@@ -873,7 +873,10 @@ class FeedFragment :
 
         //update pin menu item
         val pinPostMenuItem = menuItems[pinPostIndex]
-        val newPinPostMenuItem = pinPostMenuItem.toBuilder().title(UNPIN_POST_MENU_ITEM).build()
+        val newPinPostMenuItem =
+            pinPostMenuItem.toBuilder().id(UNPIN_POST_MENU_ITEM_ID)
+                .title(getString(R.string.unpin_this_post))
+                .build()
         menuItems[pinPostIndex] = newPinPostMenuItem
 
         //update the post view data
@@ -899,7 +902,7 @@ class FeedFragment :
         //get unpin menu item
         val menuItems = post.menuItems.toMutableList()
         val unPinPostIndex = menuItems.indexOfFirst {
-            (it.title == UNPIN_POST_MENU_ITEM)
+            (it.id == UNPIN_POST_MENU_ITEM_ID)
         }
 
         //if unpin item doesn't exist
@@ -907,7 +910,10 @@ class FeedFragment :
 
         //update unpin menu item
         val unPinPostMenuItem = menuItems[unPinPostIndex]
-        val newUnPinPostMenuItem = unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
+        val newUnPinPostMenuItem =
+            unPinPostMenuItem.toBuilder().id(PIN_POST_MENU_ITEM_ID)
+                .title(getString(R.string.pin_this_post))
+                .build()
         menuItems[unPinPostIndex] = newUnPinPostMenuItem
 
         //update the post view data

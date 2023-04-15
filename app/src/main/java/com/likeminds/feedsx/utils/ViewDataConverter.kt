@@ -331,6 +331,7 @@ object ViewDataConverter {
     ): List<OverflowMenuItemViewData> {
         return menuItems.map { menuItem ->
             OverflowMenuItemViewData.Builder()
+                .id(menuItem.id)
                 .title(menuItem.title)
                 .build()
         }

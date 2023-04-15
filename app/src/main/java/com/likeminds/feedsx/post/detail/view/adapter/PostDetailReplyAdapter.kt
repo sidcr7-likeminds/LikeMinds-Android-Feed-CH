@@ -43,7 +43,7 @@ class PostDetailReplyAdapter constructor(
             parentCommentId: String,
             replyId: String,
             creatorId: String,
-            title: String
+            menuId: Int
         )
     }
 }

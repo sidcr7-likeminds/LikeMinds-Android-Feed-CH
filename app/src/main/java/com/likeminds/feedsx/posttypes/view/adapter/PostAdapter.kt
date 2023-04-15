@@ -55,7 +55,7 @@ interface PostAdapterListener {
     fun onPostMenuItemClicked(
         postId: String,
         creatorId: String,
-        title: String
+        menuId: Int
     )
 
     fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
