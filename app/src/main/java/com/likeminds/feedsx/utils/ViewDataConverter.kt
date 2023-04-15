@@ -14,7 +14,6 @@ import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
-import com.likeminds.feedsx.utils.memberrights.model.MemberRightViewData
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
@@ -483,16 +482,16 @@ object ViewDataConverter {
     }
 
     /**
-     * converts list of [ManagementRightPermissionData] to list of [MemberRightEntity]
+     * converts list of [ManagementRightPermissionData] to list of [MemberRightsEntity]
      * @param userUniqueId: unique id of the user
      * @param memberRights: list of [ManagementRightPermissionData]
      * */
-    fun createMemberRights(
+    fun createMemberRightsEntity(
         userUniqueId: String,
         memberRights: List<ManagementRightPermissionData>
-    ): List<MemberRightEntity> {
+    ): List<MemberRightsEntity> {
         return memberRights.map {
-            createMemberRightsEntity(
+            createMemberRightEntity(
                 userUniqueId,
                 it
             )
@@ -500,15 +499,15 @@ object ViewDataConverter {
     }
 
     /**
-     * converts [ManagementRightPermissionData] to [MemberRightEntity]
+     * converts [ManagementRightPermissionData] to [MemberRightsEntity]
      * @param userUniqueId: unique id of the user
      * @param memberRight: network model of member right [ManagementRightPermissionData]
      * */
-    private fun createMemberRightsEntity(
+    private fun createMemberRightEntity(
         userUniqueId: String,
         memberRight: ManagementRightPermissionData
-    ): MemberRightEntity {
-        return MemberRightEntity.Builder()
+    ): MemberRightsEntity {
+        return MemberRightsEntity.Builder()
             .id(memberRight.id)
             .isLocked(memberRight.isLocked)
             .isSelected(memberRight.isSelected)
@@ -575,31 +574,6 @@ object ViewDataConverter {
             .uri(Uri.parse(attachmentMeta.uri))
             .width(attachmentMeta.width)
             .height(attachmentMeta.height)
-            .build()
-    }
-
-    /**
-     * converts list of [MemberRightEntity] to list of [MemberRightViewData]
-     * @param memberRights: list of [MemberRightEntity]
-     * */
-    fun convertMemberRights(memberRights: List<MemberRightEntity>): List<MemberRightViewData> {
-        return memberRights.map {
-            convertMemberRight(it)
-        }
-    }
-
-    /**
-     * converts [MemberRightEntity] to [MemberRightViewData]
-     * @param memberRight: [MemberRightEntity]
-     * */
-    private fun convertMemberRight(memberRight: MemberRightEntity): MemberRightViewData {
-        return MemberRightViewData.Builder()
-            .id(memberRight.id)
-            .isLocked(memberRight.isLocked)
-            .isSelected(memberRight.isSelected)
-            .state(memberRight.state)
-            .title(memberRight.title)
-            .subtitle(memberRight.subtitle)
             .build()
     }
 

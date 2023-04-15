@@ -1,22 +1,14 @@
 package com.likeminds.feedsx.utils.memberrights.util
 
-import com.likeminds.feedsx.utils.memberrights.model.*
+import com.likeminds.feedsx.db.models.MemberRightsEntity
+import com.likeminds.feedsx.utils.memberrights.model.MEMBER_RIGHT_COMMENT_AND_REPLY_ON_POSTS
+import com.likeminds.feedsx.utils.memberrights.model.MEMBER_RIGHT_CREATE_POSTS
+import com.likeminds.feedsx.utils.memberrights.model.MemberState.Companion.isAdmin
+import com.likeminds.feedsx.utils.memberrights.model.MemberState.Companion.isMember
 
 object MemberRightUtil {
-    private fun isAdmin(memberState: Int?): Boolean {
-        return memberState == STATE_ADMIN
-    }
-
-    private fun isNothing(memberState: Int?): Boolean {
-        return memberState == STATE_NOTHING
-    }
-
-    private fun isMember(memberState: Int?): Boolean {
-        return memberState == STATE_MEMBER
-    }
-
     // check if user has right to post or not
-    fun hasCreatePostsRight(memberState: Int, memberRights: List<MemberRightViewData>): Boolean {
+    fun hasCreatePostsRight(memberState: Int, memberRights: List<MemberRightsEntity>): Boolean {
         return when {
             isAdmin(memberState) -> {
                 true
@@ -34,7 +26,7 @@ object MemberRightUtil {
     }
 
     // check if user has right to comment or not
-    fun hasCommentRight(memberState: Int, memberRights: List<MemberRightViewData>): Boolean {
+    fun hasCommentRight(memberState: Int, memberRights: List<MemberRightsEntity>): Boolean {
         return when {
             isAdmin(memberState) -> {
                 true
@@ -53,11 +45,11 @@ object MemberRightUtil {
 
     /**
      * returns if the user has the queried right or not
-     * @param memberRights: list of [MemberRightViewData] for the user
+     * @param memberRights: list of [MemberRightsEntity] for the user
      * @param rightState: queried right
      * */
     private fun checkHasMemberRight(
-        memberRights: List<MemberRightViewData>,
+        memberRights: List<MemberRightsEntity>,
         rightState: Int,
     ): Boolean {
         var value = false

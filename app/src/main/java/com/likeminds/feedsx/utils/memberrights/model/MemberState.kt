@@ -12,4 +12,18 @@ const val STATE_MEMBER = 4
     STATE_MEMBER
 )
 @Retention(AnnotationRetention.SOURCE)
-annotation class MemberState
+annotation class MemberState {
+    companion object {
+        fun isAdmin(memberState: Int?): Boolean {
+            return memberState == STATE_ADMIN
+        }
+
+        fun isNothing(memberState: Int?): Boolean {
+            return memberState == STATE_NOTHING
+        }
+
+        fun isMember(memberState: Int?): Boolean {
+            return memberState == STATE_MEMBER
+        }
+    }
+}

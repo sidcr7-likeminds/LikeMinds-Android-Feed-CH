@@ -120,20 +120,17 @@ class InitiateViewModel @Inject constructor(
             //updated userEntity
             userEntity = userEntity.toBuilder().state(memberState).isOwner(isOwner).build()
 
-            // creates list of [MemberRightEntity]
-            val memberRights = ViewDataConverter.createMemberRights(
+            // creates list of [MemberRightsEntity]
+            val memberRightsEntity = ViewDataConverter.createMemberRightsEntity(
                 userId,
                 memberStateResponse.memberRights
             )
-
-            // creates list of [MemberRightViewData]
-            val memberRightsViewData = ViewDataConverter.convertMemberRights(memberRights)
 
             //updates user's create posts right
             _hasCreatePostRights.postValue(
                 MemberRightUtil.hasCreatePostsRight(
                     memberState,
-                    memberRightsViewData
+                    memberRightsEntity
                 )
             )
 
@@ -141,12 +138,12 @@ class InitiateViewModel @Inject constructor(
             _hasCommentRights.postValue(
                 MemberRightUtil.hasCommentRight(
                     memberState,
-                    memberRightsViewData
+                    memberRightsEntity
                 )
             )
 
             //inserts userEntity with their rights in local db
-            userWithRightsRepository.insertUserWithRights(userEntity, memberRights)
+            userWithRightsRepository.insertUserWithRights(userEntity, memberRightsEntity)
         }
     }
 

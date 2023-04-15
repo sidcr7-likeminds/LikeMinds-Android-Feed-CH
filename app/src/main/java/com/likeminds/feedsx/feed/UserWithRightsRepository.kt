@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.feed
 
 import com.likeminds.feedsx.db.dao.UserWithRightsDao
-import com.likeminds.feedsx.db.models.MemberRightEntity
+import com.likeminds.feedsx.db.models.MemberRightsEntity
 import com.likeminds.feedsx.db.models.UserEntity
 import com.likeminds.feedsx.db.models.UserWithRights
 import javax.inject.Inject
@@ -13,7 +13,7 @@ class UserWithRightsRepository @Inject constructor(
         userWithRightsDao.insertUser(user)
     }
 
-    suspend fun insertUserWithRights(user: UserEntity, memberRights: List<MemberRightEntity>) {
+    suspend fun insertUserWithRights(user: UserEntity, memberRights: List<MemberRightsEntity>) {
         userWithRightsDao.insertUserWithRights(user, memberRights)
     }
 

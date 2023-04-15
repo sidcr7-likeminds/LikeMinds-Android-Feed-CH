@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.db.dao
 
 import androidx.room.*
-import com.likeminds.feedsx.db.models.MemberRightEntity
+import com.likeminds.feedsx.db.models.MemberRightsEntity
 import com.likeminds.feedsx.db.models.UserEntity
 import com.likeminds.feedsx.db.models.UserWithRights
 import com.likeminds.feedsx.db.utils.DbConstants
@@ -15,7 +15,7 @@ interface UserWithRightsDao {
 
     //inserts user along with rights in local db
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertUserWithRights(user: UserEntity, memberRights: List<MemberRightEntity>)
+    suspend fun insertUserWithRights(user: UserEntity, memberRights: List<MemberRightsEntity>)
 
     //delete user in local db
     @Delete

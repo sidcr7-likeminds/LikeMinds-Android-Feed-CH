@@ -36,7 +36,7 @@ class UserEntity constructor(
         private var customTitle: String? = null
         private var isDeleted: Boolean? = null
         private var userUniqueId: String = ""
-        private var state: Int = 0
+        private var state: Int = -1
         private var isOwner: Boolean = false
 
         fun id(id: Int) = apply { this.id = id }

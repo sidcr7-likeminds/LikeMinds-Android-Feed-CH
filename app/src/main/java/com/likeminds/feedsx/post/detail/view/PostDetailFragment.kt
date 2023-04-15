@@ -123,7 +123,7 @@ class PostDetailFragment :
 
         binding.buttonColor = LMBranding.getButtonsColor()
         fetchPostData()
-        viewModel.checkCommentRights()
+        checkCommentsRight()
         initRecyclerView()
         initMemberTaggingView()
         initSwipeRefreshLayout()
@@ -143,6 +143,11 @@ class PostDetailFragment :
         } else {
             viewModel.getPost(postDetailExtras.postId, 1)
         }
+    }
+
+    // check if user has comment rights or not
+    private fun checkCommentsRight() {
+        viewModel.checkCommentRights()
     }
 
     // initializes the post detail screen recycler view

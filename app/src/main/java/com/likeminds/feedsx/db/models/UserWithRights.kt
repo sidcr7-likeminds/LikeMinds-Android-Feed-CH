@@ -10,5 +10,5 @@ data class UserWithRights constructor(
         parentColumn = "user_unique_id",
         entityColumn = "user_unique_id"
     )
-    val memberRights: List<MemberRightEntity>
+    val memberRights: List<MemberRightsEntity>
 )

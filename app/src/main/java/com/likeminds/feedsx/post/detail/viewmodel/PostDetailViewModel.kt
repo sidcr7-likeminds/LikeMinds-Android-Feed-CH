@@ -390,13 +390,12 @@ class PostDetailViewModel @Inject constructor(
             // fetches user with rights from DB with user.id
             val userWithRights = userWithRightsRepository.getUserWithRights(userId)
             val memberState = userWithRights.user.state
-            val memberRightsViewData =
-                ViewDataConverter.convertMemberRights(userWithRights.memberRights)
+            val memberRights = userWithRights.memberRights
 
             _hasCommentRights.postValue(
                 MemberRightUtil.hasCommentRight(
                     memberState,
-                    memberRightsViewData
+                    memberRights
                 )
             )
         }

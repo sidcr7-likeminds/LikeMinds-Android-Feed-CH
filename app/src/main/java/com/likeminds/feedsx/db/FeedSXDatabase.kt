@@ -5,7 +5,7 @@ import androidx.room.RoomDatabase
 import com.likeminds.feedsx.db.dao.PostWithAttachmentsDao
 import com.likeminds.feedsx.db.dao.UserWithRightsDao
 import com.likeminds.feedsx.db.models.AttachmentEntity
-import com.likeminds.feedsx.db.models.MemberRightEntity
+import com.likeminds.feedsx.db.models.MemberRightsEntity
 import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.db.models.UserEntity
 
@@ -14,7 +14,7 @@ import com.likeminds.feedsx.db.models.UserEntity
         UserEntity::class,
         PostEntity::class,
         AttachmentEntity::class,
-        MemberRightEntity::class
+        MemberRightsEntity::class
     ], version = 2, exportSchema = false
 )
 abstract class FeedSXDatabase : RoomDatabase() {
