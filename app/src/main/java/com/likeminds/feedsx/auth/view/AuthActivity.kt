@@ -40,6 +40,7 @@ class AuthActivity : BaseAppCompatActivity() {
         }
     }
 
+    // parses deep link to start corresponding activity
     private fun parseDeepLink() {
         //get intent for route
         val intent = Route.handleDeepLink(

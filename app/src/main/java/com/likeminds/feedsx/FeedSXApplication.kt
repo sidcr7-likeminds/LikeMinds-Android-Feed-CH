@@ -74,6 +74,7 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
         domain = "https://www.sampleapp.com"
     }
 
+    // function to get client domain
     fun getDomain(): String {
         return domain
     }

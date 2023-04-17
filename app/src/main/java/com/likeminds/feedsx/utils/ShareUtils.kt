@@ -6,6 +6,7 @@ import com.likeminds.feedsx.FeedSXApplication
 import com.likeminds.feedsx.R
 
 object ShareUtils {
+    //share post with url using default sharing in Android OS
     fun sharePost(context: Context, postId: String) {
         val domain = (context.applicationContext as FeedSXApplication).getDomain()
         val shareLink = "$domain/post?post_id=$postId"
