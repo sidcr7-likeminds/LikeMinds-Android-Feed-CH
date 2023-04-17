@@ -829,11 +829,6 @@ class FeedFragment :
         mPostAdapter.updateWithoutNotifyingRV(position, postData)
     }
 
-    // callback when user clicks to share the post
-    override fun sharePost(postId: String) {
-        ShareUtils.sharePost(requireContext(), postId)
-    }
-
     // processes delete post request
     private fun deletePost(postId: String, creatorId: String) {
         val deleteExtras = DeleteExtras.Builder()

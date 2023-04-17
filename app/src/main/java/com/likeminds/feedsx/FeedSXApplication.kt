@@ -23,8 +23,6 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
     @Inject
     lateinit var postWithAttachmentsRepository: PostWithAttachmentsRepository
 
-    private lateinit var domain: String
-
     companion object {
         const val LOG_TAG = "LikeMinds"
         private var feedSXApplication: FeedSXApplication? = null
@@ -42,7 +40,6 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
         super.onCreate()
 
         setupBranding()
-        setupDomain()
         initAWSMobileClient()
 
         // extras to instantiate LMFeedClient
@@ -67,15 +64,6 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
             .fonts(lmFonts)
             .build()
         LMBranding.setBranding(setBrandingRequest)
-    }
-
-    // function to set client domain
-    private fun setupDomain() {
-        domain = "https://www.sampleapp.com"
-    }
-
-    fun getDomain(): String {
-        return domain
     }
 
     private fun initAWSMobileClient() {

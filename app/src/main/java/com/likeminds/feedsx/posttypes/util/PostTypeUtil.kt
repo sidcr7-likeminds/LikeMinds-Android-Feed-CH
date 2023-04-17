@@ -265,7 +265,7 @@ object PostTypeUtil {
             }
 
             ivShare.setOnClickListener {
-                listener.sharePost(data.id)
+                listener.sharePost()
             }
 
             commentsCount.setOnClickListener {
