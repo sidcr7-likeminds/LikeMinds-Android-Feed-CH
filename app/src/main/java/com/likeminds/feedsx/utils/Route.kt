@@ -3,6 +3,8 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.view.MainActivity
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
@@ -11,12 +13,16 @@ import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 object Route {
 
     const val ROUTE_POST_DETAIL = "post_detail"
+    const val ROUTE_POST = "post"
     const val ROUTE_FEED = "feed"
     const val ROUTE_CREATE_POST = "create_post"
     const val PARAM_POST_ID = "post_id"
     const val ROUTE_BROWSER = "browser"
     const val PARAM_COMMENT_ID = "comment_id"
     const val ROUTE_MAIN = "main"
+
+    private const val DEEP_LINK_POST = "post"
+    private const val DEEP_LINK_SCHEME = "sample"
 
     private const val HTTPS_SCHEME = "https"
     private const val HTTP_SCHEME = "http"
@@ -31,6 +37,13 @@ object Route {
         val route = Uri.parse(routeString)
         var intent: Intent? = null
         when (route.host) {
+            ROUTE_POST -> {
+                intent = getRouteToPostDetail(
+                    context,
+                    route,
+                    source
+                )
+            }
             ROUTE_POST_DETAIL -> {
                 intent = getRouteToPostDetail(
                     context,
@@ -96,19 +109,42 @@ object Route {
     // creates route for url and returns corresponding intent
     fun handleDeepLink(context: Context, url: String?): Intent? {
         val data = Uri.parse(url).normalizeScheme() ?: return null
-        val firstPath = createWebsiteRoute(data) ?: return null
+        val firstPath = getRouteFromDeepLink(data) ?: return null
         return getRouteIntent(
             context,
             firstPath,
-            0
+            0,
+            source = LMAnalytics.Source.DEEP_LINK
         )
     }
 
-    /**
-     * Community website deep link
-     * https://community.likeminds.community/deutsch-in-tandem
-     * @return a url with host as route, eg : route://browser
-     */
+    //create route string as per uri
+    private fun getRouteFromDeepLink(data: Uri?): String? {
+        val host = data?.host ?: return null
+        val firstPathSegment = data.pathSegments.firstOrNull()
+        return when (firstPathSegment) {
+            DEEP_LINK_POST -> {
+                createPostDetailRoute(data)
+            }
+            else -> {
+                createWebsiteRoute(data)
+            }
+        }
+    }
+
+    // https://<domain>/post/post_id=<post_id>
+    private fun createPostDetailRoute(data: Uri): String? {
+        val postId = data.getQueryParameter(PARAM_POST_ID) ?: return null
+        Log.d("PUI", "getRouteFromDeepLink: $postId scheme: ${data.scheme}")
+        return Uri.Builder()
+            .scheme(ROUTE_SCHEME)
+            .authority(ROUTE_POST)
+            .appendQueryParameter(PARAM_POST_ID, postId)
+            .build()
+            .toString()
+    }
+
+    // creates a website route for the provided url
     private fun createWebsiteRoute(data: Uri): String? {
         if (data.scheme == HTTPS_SCHEME || data.scheme == HTTP_SCHEME) {
             return Uri.Builder()

@@ -5,6 +5,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.auth.util.AuthPreferences
 import com.likeminds.feedsx.databinding.ActivityAuthBinding
 import com.likeminds.feedsx.feed.view.MainActivity
+import com.likeminds.feedsx.utils.Route
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,12 +28,26 @@ class AuthActivity : BaseAppCompatActivity() {
         val isLoggedIn = authPreferences.getIsLoggedIn()
 
         if (isLoggedIn) {
-            // user already logged in, navigate to [MainActivity]
-            navigateToMain()
+            // user already logged in, navigate using deep linking or to [MainActivity]
+            if (intent.data != null) {
+                parseDeepLink()
+            } else {
+                navigateToMain()
+            }
         } else {
             // user is not logged in, ask login details.
             loginUser()
         }
+    }
+
+    private fun parseDeepLink() {
+        //get intent for route
+        val intent = Route.handleDeepLink(
+            this,
+            intent.data.toString()
+        )
+        startActivity(intent)
+        finish()
     }
 
     // navigates user to [MainActivity]
@@ -45,7 +60,7 @@ class AuthActivity : BaseAppCompatActivity() {
     // validates user input and save login details
     private fun loginUser() {
         binding.apply {
-            val context = this.root.context
+            val context = root.context
 
             btnLogin.setOnClickListener {
                 val apiKey = binding.etApiKey.text.toString().trim()
