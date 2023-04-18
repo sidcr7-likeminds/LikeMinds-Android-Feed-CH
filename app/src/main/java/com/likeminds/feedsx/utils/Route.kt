@@ -35,6 +35,13 @@ object Route {
         val route = Uri.parse(routeString)
         var intent: Intent? = null
         when (route.host) {
+            ROUTE_POST -> {
+                intent = getRouteToPostDetail(
+                    context,
+                    route,
+                    source
+                )
+            }
             ROUTE_POST_DETAIL -> {
                 intent = getRouteToPostDetail(
                     context,
@@ -100,7 +107,7 @@ object Route {
     // creates route for url and returns corresponding intent
     fun handleDeepLink(context: Context, url: String?): Intent? {
         val data = Uri.parse(url).normalizeScheme() ?: return null
-        val firstPath = createWebsiteRoute(data) ?: return null
+        val firstPath = getRouteFromDeepLink(data) ?: return null
         return getRouteIntent(
             context,
             firstPath,

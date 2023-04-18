@@ -42,6 +42,7 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
         super.onCreate()
 
         setupBranding()
+        setupDomain()
         initAWSMobileClient()
 
         // extras to instantiate LMFeedClient

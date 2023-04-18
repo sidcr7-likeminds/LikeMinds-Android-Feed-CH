@@ -61,7 +61,7 @@ class AuthActivity : BaseAppCompatActivity() {
     // validates user input and save login details
     private fun loginUser() {
         binding.apply {
-            val context = this.root.context
+            val context = root.context
 
             btnLogin.setOnClickListener {
                 val apiKey = binding.etApiKey.text.toString().trim()
