@@ -269,8 +269,9 @@ class PostDetailFragment :
     // observes hasCommentRights live data
     private fun observeCommentsRightData() {
         viewModel.hasCommentRights.observe(viewLifecycleOwner) {
+            //if source is notification/deep link, don't update comments right from here
             if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION &&
-                postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+                postDetailExtras.source != LMAnalytics.Source.DEEP_LINK
             ) {
                 handleCommentRights(it)
             }
