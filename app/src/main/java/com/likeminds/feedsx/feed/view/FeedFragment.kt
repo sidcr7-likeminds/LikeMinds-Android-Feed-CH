@@ -42,13 +42,12 @@ import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
 import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
-import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM_ID
-import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM_ID
-import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM_ID
-import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM_ID
+import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
+import com.likeminds.feedsx.post.edit.model.EditPostExtras
+import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -754,6 +753,12 @@ class FeedFragment :
         menuId: Int
     ) {
         when (menuId) {
+            EDIT_POST_MENU_ITEM_ID -> {
+                val editPostExtras = EditPostExtras.Builder()
+                    .postId(postId)
+                    .build()
+                EditPostActivity.start(requireContext(), editPostExtras)
+            }
             DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(postId, creatorId)
             }
