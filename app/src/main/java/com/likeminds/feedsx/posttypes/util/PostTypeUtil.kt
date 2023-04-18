@@ -5,6 +5,7 @@ import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
+import android.view.Menu.NONE
 import android.view.View
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -97,14 +98,19 @@ object PostTypeUtil {
     ) {
         val popup = PopupMenu(view.context, view)
         menuItems.forEach { menuItem ->
-            popup.menu.add(menuItem.title)
+            popup.menu.add(
+                NONE,
+                menuItem.id,
+                NONE,
+                menuItem.title
+            )
         }
 
         popup.setOnMenuItemClickListener { menuItem ->
             listener.onPostMenuItemClicked(
                 postId,
                 creatorId,
-                menuItem.title.toString()
+                menuItem.itemId
             )
             true
         }
@@ -265,7 +271,7 @@ object PostTypeUtil {
             }
 
             ivShare.setOnClickListener {
-                listener.sharePost(data.id)
+                listener.sharePost()
             }
 
             commentsCount.setOnClickListener {

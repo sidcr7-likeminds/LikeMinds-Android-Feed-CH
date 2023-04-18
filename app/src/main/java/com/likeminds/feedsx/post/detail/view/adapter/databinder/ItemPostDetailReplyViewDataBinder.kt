@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
@@ -122,7 +123,12 @@ class ItemPostDetailReplyViewDataBinder constructor(
     ) {
         val popup = PopupMenu(view.context, view)
         menuItems.forEach { menuItem ->
-            popup.menu.add(menuItem.title)
+            popup.menu.add(
+                Menu.NONE,
+                menuItem.id,
+                Menu.NONE,
+                menuItem.title
+            )
         }
 
         val updatedParentId = parentCommentId ?: ""
@@ -132,7 +138,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
                 updatedParentId,
                 commentId,
                 creatorId,
-                menuItem.title.toString()
+                menuItem.itemId
             )
             true
         }

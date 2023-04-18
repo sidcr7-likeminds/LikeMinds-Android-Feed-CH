@@ -5,28 +5,31 @@ import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_OVERFLOW_MENU_ITEM
 import kotlinx.parcelize.Parcelize
 
-// title -> title of the menu item
 @Parcelize
 class OverflowMenuItemViewData private constructor(
-    @OverflowMenuItemTitle
+    @OverflowMenuItemId
+    val id: Int,
     var title: String
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_OVERFLOW_MENU_ITEM
 
     class Builder {
-        @OverflowMenuItemTitle
-        private var title: String = DELETE_POST_MENU_ITEM
+        @OverflowMenuItemId
+        private var id: Int = DELETE_POST_MENU_ITEM_ID
+        private var title: String = ""
 
-        fun title(@OverflowMenuItemTitle title: String) = apply { this.title = title }
+        fun id(@OverflowMenuItemId id: Int) = apply { this.id = id }
+        fun title(title: String) = apply { this.title = title }
 
         fun build() = OverflowMenuItemViewData(
+            id,
             title
         )
     }
 
     fun toBuilder(): Builder {
-        return Builder().title(title)
+        return Builder().id(id).title(title)
     }
 
 }
