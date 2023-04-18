@@ -7,7 +7,7 @@ import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.feed.UserRepository
+import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -19,7 +19,6 @@ import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
-import com.likeminds.feedsx.utils.ViewDataConverter.convertUser
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
@@ -39,7 +38,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CreatePostViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val userWithRightsRepository: UserWithRightsRepository,
     private val userPreferences: UserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val postPreferences: PostPreferences,
@@ -51,15 +50,15 @@ class CreatePostViewModel @Inject constructor(
     private val _decodeUrlResponse = MutableLiveData<LinkOGTagsViewData>()
     val decodeUrlResponse: LiveData<LinkOGTagsViewData> = _decodeUrlResponse
 
+    private val _userData = MutableLiveData<UserViewData>()
+    val userData: LiveData<UserViewData> = _userData
+
     /**
      * [taggingData] contains first -> page called
      * second -> Community Members and Groups
      * */
     private val _taggingData = MutableLiveData<Pair<Int, ArrayList<UserTagViewData>>?>()
     val taggingData: LiveData<Pair<Int, ArrayList<UserTagViewData>>?> = _taggingData
-
-    private val _userData = MutableLiveData<UserViewData>()
-    val userData: LiveData<UserViewData> = _userData
 
     private var temporaryPostId: Long? = null
 
@@ -83,17 +82,6 @@ class CreatePostViewModel @Inject constructor(
         callback: (media: List<MediaViewData>) -> Unit,
     ) {
         mediaRepository.getLocalUrisDetails(context, uris, callback)
-    }
-
-    // fetches user from DB and posts in the live data
-    fun fetchUserFromDB() {
-        viewModelScope.launchIO {
-            val userId = userPreferences.getUserUniqueId()
-
-            // fetches user from DB with user.id
-            val userEntity = userRepository.getUser(userId)
-            _userData.postValue(convertUser(userEntity))
-        }
     }
 
     // calls DecodeUrl API
@@ -223,7 +211,7 @@ class CreatePostViewModel @Inject constructor(
             // generates awsFolderPath to upload the file
             val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
                 it.mediaName,
-                _userData.value?.userUniqueId
+                userPreferences.getUserUniqueId()
             )
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)
@@ -265,6 +253,17 @@ class CreatePostViewModel @Inject constructor(
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
         val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
+
+    // fetches user from DB and posts in the live data
+    fun fetchUserFromDB() {
+        viewModelScope.launchIO {
+            val userId = userPreferences.getUserUniqueId()
+
+            // fetches user from DB with user.id
+            val userWithRights = userWithRightsRepository.getUser(userId)
+            _userData.postValue(ViewDataConverter.convertUser(userWithRights))
+        }
     }
 
     // calls api to get members for tagging

@@ -140,6 +140,10 @@ object PostTypeUtil {
             rvDocuments.apply {
                 adapter = mDocumentsAdapter
                 layoutManager = LinearLayoutManager(root.context)
+                // if separator is not there already, then only add
+                if (itemDecorationCount < 1) {
+                    addItemDecoration(dividerItemDecorator)
+                }
             }
 
             val documents = postData.attachments

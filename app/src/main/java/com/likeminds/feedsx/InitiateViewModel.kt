@@ -7,11 +7,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.likeminds.feedsx.auth.util.AuthPreferences
-import com.likeminds.feedsx.feed.UserRepository
+import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
@@ -23,7 +24,7 @@ import javax.inject.Inject
 class InitiateViewModel @Inject constructor(
     private val authPreferences: AuthPreferences,
     private val userPreferences: UserPreferences,
-    private val userRepository: UserRepository,
+    private val userWithRightsRepository: UserWithRightsRepository,
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -33,6 +34,12 @@ class InitiateViewModel @Inject constructor(
 
     private val _logoutResponse = MutableLiveData<Boolean>()
     val logoutResponse: LiveData<Boolean> = _logoutResponse
+
+    private val _hasCreatePostRights = MutableLiveData(true)
+    val hasCreatePostRights: LiveData<Boolean> = _hasCreatePostRights
+
+    private val _hasCommentRights = MutableLiveData(true)
+    val hasCommentRights: LiveData<Boolean> = _hasCommentRights
 
     private val _initiateErrorMessage = MutableLiveData<String?>()
     val initiateErrorMessage: LiveData<String?> = _initiateErrorMessage
@@ -87,7 +94,7 @@ class InitiateViewModel @Inject constructor(
             //convert user into userEntity
             val userEntity = ViewDataConverter.createUserEntity(user)
             //add it to local db
-            userRepository.insertUser(userEntity)
+            userWithRightsRepository.insertUser(userEntity)
 
             //call member state api
             getMemberState()
@@ -108,13 +115,35 @@ class InitiateViewModel @Inject constructor(
             val userId = memberStateResponse.userUniqueId
 
             //get existing userEntity
-            var userEntity = userRepository.getUser(userId)
+            var userEntity = userWithRightsRepository.getUser(userId)
 
             //updated userEntity
             userEntity = userEntity.toBuilder().state(memberState).isOwner(isOwner).build()
 
-            //update userEntity in local db
-            userRepository.updateUser(userEntity)
+            // creates list of [MemberRightsEntity]
+            val memberRightsEntity = ViewDataConverter.createMemberRightsEntity(
+                userId,
+                memberStateResponse.memberRights
+            )
+
+            //updates user's create posts right
+            _hasCreatePostRights.postValue(
+                MemberRightUtil.hasCreatePostsRight(
+                    memberState,
+                    memberRightsEntity
+                )
+            )
+
+            //updates user's comment right
+            _hasCommentRights.postValue(
+                MemberRightUtil.hasCommentRight(
+                    memberState,
+                    memberRightsEntity
+                )
+            )
+
+            //inserts userEntity with their rights in local db
+            userWithRightsRepository.insertUserWithRights(userEntity, memberRightsEntity)
         }
     }
 
