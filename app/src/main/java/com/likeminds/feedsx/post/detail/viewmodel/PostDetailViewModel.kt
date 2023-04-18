@@ -36,6 +36,9 @@ class PostDetailViewModel @Inject constructor(
     private val _addCommentResponse = MutableLiveData<CommentViewData>()
     val addCommentResponse: LiveData<CommentViewData> = _addCommentResponse
 
+    private val _editCommentResponse = MutableLiveData<CommentViewData>()
+    val editCommentResponse: LiveData<CommentViewData> = _editCommentResponse
+
     // it holds pair of [parentCommentId] and [replyComment]
     private val _addReplyResponse = MutableLiveData<Pair<String, CommentViewData>>()
     val addReplyResponse: LiveData<Pair<String, CommentViewData>> = _addReplyResponse
@@ -75,6 +78,7 @@ class PostDetailViewModel @Inject constructor(
         ) : ErrorMessageEvent()
 
         data class AddComment(val errorMessage: String?) : ErrorMessageEvent()
+        data class EditComment(val errorMessage: String?) : ErrorMessageEvent()
         data class DeleteComment(val errorMessage: String?) : ErrorMessageEvent()
         data class GetComment(val errorMessage: String?) : ErrorMessageEvent()
     }
@@ -180,6 +184,40 @@ class PostDetailViewModel @Inject constructor(
                 LMAnalytics.Keys.COMMENT_ID to commentId
             )
         )
+    }
+
+    // for editing comment on post
+    fun editComment(
+        postId: String,
+        commentId: String,
+        text: String
+    ) {
+        viewModelScope.launchIO {
+            // builds api request
+            val request = EditCommentRequest.Builder()
+                .postId(postId)
+                .commentId(commentId)
+                .text(text)
+                .build()
+
+            // calls api
+            val response = lmFeedClient.editComment(request)
+            if (response.success) {
+                val data = response.data ?: return@launchIO
+                val comment = data.comment
+                val users = data.users
+
+                _editCommentResponse.postValue(
+                    ViewDataConverter.convertComment(
+                        comment,
+                        users,
+                        postId
+                    )
+                )
+            } else {
+                errorMessageChannel.send(ErrorMessageEvent.EditComment(response.errorMessage))
+            }
+        }
     }
 
     // for replying on a comment on the post

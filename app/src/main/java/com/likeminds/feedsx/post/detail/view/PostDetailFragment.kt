@@ -78,6 +78,8 @@ class PostDetailFragment :
     private var parentCommentIdToReply: String? = null
     private var toFindComment: Boolean = false
 
+    private var editCommentId: String? = null
+
     private lateinit var memberTagging: MemberTaggingView
 
     // fixed position of viewTypes in adapter
@@ -228,21 +230,34 @@ class PostDetailFragment :
                 val text = etComment.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 val postId = postDetailExtras.postId
-                if (parentCommentIdToReply != null) {
-                    // input text is reply to a comment
-                    val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
-                    val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
-                        ?: return@setOnClickListener
-                    viewModel.replyComment(
-                        parentComment.userId,
-                        postDetailExtras.postId,
-                        parentCommentId,
-                        updatedText
-                    )
-                    hideReplyingToView()
-                } else {
-                    // input text is a comment
-                    viewModel.addComment(postId, updatedText)
+                when {
+                    parentCommentIdToReply != null -> {
+                        // input text is reply to a comment
+                        val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
+                        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
+                            ?: return@setOnClickListener
+                        viewModel.replyComment(
+                            parentComment.userId,
+                            postDetailExtras.postId,
+                            parentCommentId,
+                            updatedText
+                        )
+                        hideReplyingToView()
+                    }
+                    editCommentId != null -> {
+                        // when an existing comment is edited
+                        val commentId = editCommentId ?: return@setOnClickListener
+                        viewModel.editComment(
+                            postId,
+                            commentId,
+                            updatedText
+                        )
+                        editCommentId = null
+                    }
+                    else -> {
+                        // input text is a comment
+                        viewModel.addComment(postId, updatedText)
+                    }
                 }
                 ViewUtils.hideKeyboard(this.root)
                 etComment.text = null
@@ -668,6 +683,26 @@ class PostDetailFragment :
             .build()
 
         showDeleteDialog(creatorId, deleteExtras)
+    }
+
+    // processes edit comment request
+    private fun editComment(commentId: String, parentCommentId: String? = null) {
+        val commentText =
+            if (parentCommentId == null) {
+                val comment = getIndexAndCommentFromAdapter(commentId)?.second ?: return
+                comment.text
+            } else {
+                val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second ?: return
+                val reply = getIndexAndReplyFromComment(parentComment, commentId)
+                reply.second.text
+            }
+
+        binding.apply {
+            editCommentId = commentId
+            etComment.setText(commentText)
+            etComment.setSelection(etComment.length())
+            etComment.focusAndShowKeyboard()
+        }
     }
 
     // processes delete comment request
@@ -1219,6 +1254,9 @@ class PostDetailFragment :
         menuId: Int
     ) {
         when (menuId) {
+            EDIT_COMMENT_MENU_ITEM_ID -> {
+                editComment(commentId)
+            }
             DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
@@ -1259,6 +1297,9 @@ class PostDetailFragment :
         menuId: Int
     ) {
         when (menuId) {
+            EDIT_COMMENT_MENU_ITEM_ID -> {
+                editComment(replyId, parentCommentId)
+            }
             DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
