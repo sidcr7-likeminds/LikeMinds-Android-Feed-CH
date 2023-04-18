@@ -12,7 +12,6 @@ import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 object Route {
 
     const val ROUTE_POST_DETAIL = "post_detail"
-    const val ROUTE_POST = "post"
     const val ROUTE_FEED = "feed"
     const val ROUTE_CREATE_POST = "create_post"
     const val PARAM_POST_ID = "post_id"
@@ -35,13 +34,6 @@ object Route {
         val route = Uri.parse(routeString)
         var intent: Intent? = null
         when (route.host) {
-            ROUTE_POST -> {
-                intent = getRouteToPostDetail(
-                    context,
-                    route,
-                    source
-                )
-            }
             ROUTE_POST_DETAIL -> {
                 intent = getRouteToPostDetail(
                     context,
@@ -134,7 +126,7 @@ object Route {
         val postId = data.getQueryParameter(PARAM_POST_ID) ?: return null
         return Uri.Builder()
             .scheme(ROUTE_SCHEME)
-            .authority(ROUTE_POST)
+            .authority(ROUTE_POST_DETAIL)
             .appendQueryParameter(PARAM_POST_ID, postId)
             .build()
             .toString()
