@@ -50,7 +50,7 @@ interface PostAdapterListener {
     fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
     fun savePost(position: Int)
     fun likePost(position: Int)
-    fun sharePost() {}
+    fun sharePost(postId: String)
     fun comment(postId: String)
     fun onPostMenuItemClicked(
         postId: String,

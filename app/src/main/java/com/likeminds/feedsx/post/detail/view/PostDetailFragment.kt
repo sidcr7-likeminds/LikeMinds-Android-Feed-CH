@@ -137,8 +137,10 @@ class PostDetailFragment :
             // show progress bar
             ProgressHelper.showProgress(binding.progressBar)
         }
-        //if source is notification, then call initiate first and then other apis
-        if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+        //if source is notification/deep link, then call initiate first and then other apis
+        if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
+            postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+        ) {
             initiateViewModel.initiateUser()
         } else {
             viewModel.getPost(postDetailExtras.postId, 1)
@@ -267,7 +269,10 @@ class PostDetailFragment :
     // observes hasCommentRights live data
     private fun observeCommentsRightData() {
         viewModel.hasCommentRights.observe(viewLifecycleOwner) {
-            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION) {
+            //if source is notification/deep link, don't update comments right from here
+            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION &&
+                postDetailExtras.source != LMAnalytics.Source.DEEP_LINK
+            ) {
                 handleCommentRights(it)
             }
         }
@@ -292,8 +297,10 @@ class PostDetailFragment :
         }
 
         initiateViewModel.hasCommentRights.observe(viewLifecycleOwner) {
-            //if source is notification, update comments right from Initiate call
-            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+            //if source is notification/deep link, update comments right from Initiate call
+            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
+                postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+            ) {
                 handleCommentRights(it)
             }
         }
@@ -1332,6 +1339,11 @@ class PostDetailFragment :
             .fromVideoAction(false)
             .build()
         mPostDetailAdapter.updateWithoutNotifyingRV(position, postData)
+    }
+
+    // callback when user clicks to share the post
+    override fun sharePost(postId: String) {
+        ShareUtils.sharePost(requireContext(), postId)
     }
 
     //get index and post from the adapter using postId
