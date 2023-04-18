@@ -446,6 +446,11 @@ class PostDetailFragment :
             mPostDetailAdapter.update(postDataPosition, post)
         }
 
+        // observes editCommentResponse LiveData
+        viewModel.editCommentResponse.observe(viewLifecycleOwner) { comment ->
+            editCommentInAdapter(comment)
+        }
+
         // observes addReplyResponse LiveData
         viewModel.addReplyResponse.observe(viewLifecycleOwner) { pair ->
             // [parentCommentId] for the reply
@@ -481,6 +486,33 @@ class PostDetailFragment :
 
             // adds paginated replies to adapter
             addReplies(comment, page)
+        }
+    }
+
+    private fun editCommentInAdapter(comment: CommentViewData) {
+        val parentComment = comment.parentComment
+        if (parentComment == null) {
+            // edited comment is of level-0
+            val commentPosition = getIndexAndCommentFromAdapter(comment.id)?.first ?: return
+            mPostDetailAdapter.update(commentPosition, comment)
+        } else {
+            // edited comment is of level-1 (reply)
+
+            val parentCommentId = parentComment.id
+            val pair = getIndexAndCommentFromAdapter(parentCommentId) ?: return
+            val parentIndex = pair.first
+            val parentCommentInAdapter = pair.second
+
+            val index = parentCommentInAdapter.replies.indexOfFirst {
+                it.id == comment.id
+            }
+
+            if (index == -1) return
+
+            parentComment.replies[index] = comment
+
+            // updates the parentComment with edited reply
+            mPostDetailAdapter.update(parentIndex, parentComment)
         }
     }
 
@@ -568,6 +600,9 @@ class PostDetailFragment :
                 is PostDetailViewModel.ErrorMessageEvent.GetComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+                is PostDetailViewModel.ErrorMessageEvent.EditComment -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
             }
         }
 
@@ -637,9 +672,9 @@ class PostDetailFragment :
     }
 
 
-    /*
-    * UI Block
-    */
+/*
+* UI Block
+*/
 
 
     // updates the comments count on toolbar
@@ -693,7 +728,7 @@ class PostDetailFragment :
                 comment.text
             } else {
                 val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second ?: return
-                val reply = getIndexAndReplyFromComment(parentComment, commentId)
+                val reply = getIndexAndReplyFromComment(parentComment, commentId) ?: return
                 reply.second.text
             }
 
@@ -748,9 +783,9 @@ class PostDetailFragment :
     }
 
 
-    /*
-    * Navigation Block
-    */
+/*
+* Navigation Block
+*/
 
 
     // callback when likes count of post is clicked - opens likes screen
@@ -817,7 +852,7 @@ class PostDetailFragment :
      */
 
 
-    // sets page-1 data of post and scrolls to top
+// sets page-1 data of post and scrolls to top
     private fun setPostDataAndScrollToTop(post: PostViewData) {
         // [ArrayList] to add all the items to adapter
         val postDetailList = ArrayList<BaseViewType>()
@@ -996,6 +1031,8 @@ class PostDetailFragment :
             val index = parentCommentViewData.replies.indexOfFirst {
                 it.id == replyId
             }
+            if (index == -1) return
+
             parentCommentViewData.replies.removeAt(index)
         }
 
@@ -1072,7 +1109,7 @@ class PostDetailFragment :
         val parentComment = parentIndexAndComment.second
 
         // gets reply from the comment
-        val reply = getIndexAndReplyFromComment(parentComment, replyId)
+        val reply = getIndexAndReplyFromComment(parentComment, replyId) ?: return
         val replyIndex = reply.first
         val replyViewData = reply.second
 
@@ -1410,9 +1447,13 @@ class PostDetailFragment :
     private fun getIndexAndReplyFromComment(
         parentComment: CommentViewData,
         replyId: String
-    ): Pair<Int, CommentViewData> {
+    ): Pair<Int, CommentViewData>? {
         val index = parentComment.replies.indexOfFirst {
             it.id == replyId
+        }
+
+        if (index == -1) {
+            return null
         }
 
         val reply = parentComment.replies[index]

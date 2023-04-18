@@ -12,6 +12,7 @@ class CommentViewData private constructor(
     var id: String,
     var postId: String,
     var isLiked: Boolean,
+    var isEdited: Boolean,
     var userId: String,
     var text: String,
     var level: Int,
@@ -37,6 +38,7 @@ class CommentViewData private constructor(
         private var id: String = ""
         private var postId: String = ""
         private var isLiked: Boolean = false
+        private var isEdited: Boolean = false
         private var userId: String = ""
         private var text: String = ""
         private var level: Int = 0
@@ -55,6 +57,7 @@ class CommentViewData private constructor(
         fun id(id: String) = apply { this.id = id }
         fun postId(postId: String) = apply { this.postId = postId }
         fun isLiked(isLiked: Boolean) = apply { this.isLiked = isLiked }
+        fun isEdited(isEdited: Boolean) = apply { this.isEdited = isEdited }
         fun userId(userId: String) = apply { this.userId = userId }
         fun text(text: String) = apply { this.text = text }
         fun level(level: Int) = apply { this.level = level }
@@ -83,6 +86,7 @@ class CommentViewData private constructor(
             id,
             postId,
             isLiked,
+            isEdited,
             userId,
             text,
             level,
@@ -104,6 +108,7 @@ class CommentViewData private constructor(
         return Builder().id(id)
             .postId(postId)
             .isLiked(isLiked)
+            .isEdited(isEdited)
             .userId(userId)
             .text(text)
             .level(level)

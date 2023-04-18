@@ -142,6 +142,7 @@
             android:layout_height="wrap_content"
             android:background="@color/white"
             android:elevation="4dp"
+            android:foreground="?selectableItemBackground"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
             android:paddingVertical="10dp"

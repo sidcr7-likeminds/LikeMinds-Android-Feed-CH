@@ -55,6 +55,14 @@ object PostTypeUtil {
                 ivPin.hide()
             }
 
+            if (data.isEdited) {
+                viewDotEdited.show()
+                tvEdited.show()
+            } else {
+                viewDotEdited.hide()
+                tvEdited.hide()
+            }
+
             ivPostMenu.setOnClickListener { view ->
                 showMenu(
                     view,
@@ -81,9 +89,6 @@ object PostTypeUtil {
                 memberImage,
                 showRoundImage = true
             )
-
-            viewDotEdited.hide()
-            tvEdited.hide()
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
         }
     }
