@@ -123,6 +123,7 @@ class PostDetailFragment :
 
         binding.buttonColor = LMBranding.getButtonsColor()
         fetchPostData()
+        checkCommentsRight()
         initRecyclerView()
         initMemberTaggingView()
         initSwipeRefreshLayout()
@@ -142,6 +143,11 @@ class PostDetailFragment :
         } else {
             viewModel.getPost(postDetailExtras.postId, 1)
         }
+    }
+
+    // check if user has comment rights or not
+    private fun checkCommentsRight() {
+        viewModel.checkCommentRights()
     }
 
     // initializes the post detail screen recycler view
@@ -253,8 +259,18 @@ class PostDetailFragment :
         observeInitiateResponse()
         observePostData()
         observeCommentData()
+        observeCommentsRightData()
         observeMembersTaggingList()
         observeErrors()
+    }
+
+    // observes hasCommentRights live data
+    private fun observeCommentsRightData() {
+        viewModel.hasCommentRights.observe(viewLifecycleOwner) {
+            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION) {
+                handleCommentRights(it)
+            }
+        }
     }
 
     private fun observeInitiateResponse() {
@@ -273,6 +289,28 @@ class PostDetailFragment :
         initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
             ProgressHelper.hideProgress(binding.progressBar)
             ViewUtils.showErrorMessageToast(requireContext(), it)
+        }
+
+        initiateViewModel.hasCommentRights.observe(viewLifecycleOwner) {
+            //if source is notification, update comments right from Initiate call
+            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+                handleCommentRights(it)
+            }
+        }
+    }
+
+    // shows restricted text view or comment edit text as per comment rights
+    private fun handleCommentRights(hasCommentRights: Boolean) {
+        binding.apply {
+            if (hasCommentRights) {
+                etComment.show()
+                ivCommentSend.show()
+                tvRestricted.hide()
+            } else {
+                etComment.hide()
+                ivCommentSend.hide()
+                tvRestricted.show()
+            }
         }
     }
 
