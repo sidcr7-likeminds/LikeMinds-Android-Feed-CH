@@ -3,7 +3,6 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.view.MainActivity
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
@@ -22,7 +21,6 @@ object Route {
     const val ROUTE_MAIN = "main"
 
     private const val DEEP_LINK_POST = "post"
-    private const val DEEP_LINK_SCHEME = "sample"
 
     private const val HTTPS_SCHEME = "https"
     private const val HTTP_SCHEME = "http"
@@ -121,8 +119,7 @@ object Route {
     //create route string as per uri
     private fun getRouteFromDeepLink(data: Uri?): String? {
         val host = data?.host ?: return null
-        val firstPathSegment = data.pathSegments.firstOrNull()
-        return when (firstPathSegment) {
+        return when (data.pathSegments.firstOrNull()) {
             DEEP_LINK_POST -> {
                 createPostDetailRoute(data)
             }
@@ -135,7 +132,6 @@ object Route {
     // https://<domain>/post/post_id=<post_id>
     private fun createPostDetailRoute(data: Uri): String? {
         val postId = data.getQueryParameter(PARAM_POST_ID) ?: return null
-        Log.d("PUI", "getRouteFromDeepLink: $postId scheme: ${data.scheme}")
         return Uri.Builder()
             .scheme(ROUTE_SCHEME)
             .authority(ROUTE_POST)
