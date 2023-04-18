@@ -269,7 +269,9 @@ class PostDetailFragment :
     // observes hasCommentRights live data
     private fun observeCommentsRightData() {
         viewModel.hasCommentRights.observe(viewLifecycleOwner) {
-            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION) {
+            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION &&
+                postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+            ) {
                 handleCommentRights(it)
             }
         }
@@ -294,8 +296,10 @@ class PostDetailFragment :
         }
 
         initiateViewModel.hasCommentRights.observe(viewLifecycleOwner) {
-            //if source is notification, update comments right from Initiate call
-            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+            //if source is notification/deep link, update comments right from Initiate call
+            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
+                postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+            ) {
                 handleCommentRights(it)
             }
         }
