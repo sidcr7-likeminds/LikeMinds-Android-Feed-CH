@@ -9,24 +9,34 @@ import android.view.View
 import android.widget.EditText
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentEditPostBinding
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
+import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
 import com.likeminds.feedsx.post.edit.viewmodel.EditPostViewModel
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.util.PostTypeUtil
+import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ProgressHelper
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
+import com.likeminds.feedsx.utils.ValueUtils.isImageValid
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
@@ -39,6 +49,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import java.util.*
 
 @AndroidEntryPoint
 class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
@@ -74,7 +85,6 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         initMemberTaggingView()
         initToolbar()
         fetchPost()
-        initPostContentTextListener()
         initPostSaveListener()
     }
 
@@ -143,16 +153,6 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
                     attachments = fileAttachments,
                     ogTags = ogTags
                 )
-//                if (!fileAttachments.isNullOrEmpty()) {
-//                    handleSaveButton(clickable = true, showProgress = true)
-//                    viewModel.editPost(
-//                    )
-//                } else {
-//                    handleSaveButton(clickable = true, showProgress = true)
-//                    viewModel.editPost(
-//                        updatedText,
-//                    )
-//                }
             }
         }
     }
@@ -331,22 +331,229 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
             when (post.viewType) {
                 ITEM_POST_SINGLE_IMAGE -> {
                     fileAttachments = attachments
+                    showSingleImagePreview()
                 }
                 ITEM_POST_SINGLE_VIDEO -> {
                     fileAttachments = attachments
+                    showSingleVideoPreview()
                 }
                 ITEM_POST_DOCUMENTS -> {
                     fileAttachments = attachments
+                    showDocumentsPreview()
                 }
                 ITEM_POST_MULTIPLE_MEDIA -> {
                     fileAttachments = attachments
+                    showMultimediaPreview()
                 }
                 ITEM_POST_LINK -> {
                     ogTags = attachments.first().attachmentMeta.ogTags
+                    initLinkView()
                 }
                 else -> {
                 }
             }
+            initPostContentTextListener()
+        }
+    }
+
+    private fun showMultimediaPreview() {
+        handleSaveButton(clickable = true)
+        binding.apply {
+            multipleMediaAttachment.root.show()
+            multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
+            val multiMediaAdapter = MultipleMediaPostAdapter()
+            multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
+            multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+            val attachments = fileAttachments?.map {
+                when (it.attachmentType) {
+                    IMAGE -> {
+                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
+                    }
+                    VIDEO -> {
+                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
+                    }
+                    else -> {
+                        it
+                    }
+                }
+            } ?: return
+            multiMediaAdapter.replace(attachments)
+        }
+    }
+
+    private fun showDocumentsPreview() {
+        binding.apply {
+            handleSaveButton(clickable = true)
+            documentsAttachment.root.show()
+            val mDocumentsAdapter = EditPostDocumentsAdapter()
+            // item decorator to add spacing between items
+            val dividerItemDecorator =
+                DividerItemDecoration(root.context, DividerItemDecoration.VERTICAL)
+            dividerItemDecorator.setDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.document_item_divider
+                ) ?: return
+            )
+            documentsAttachment.rvDocuments.apply {
+                adapter = mDocumentsAdapter
+                layoutManager = LinearLayoutManager(root.context)
+                // if separator is not there already, then only add
+                if (itemDecorationCount < 1) {
+                    addItemDecoration(dividerItemDecorator)
+                }
+            }
+
+            val documents = fileAttachments ?: return
+
+            if (documents.size <= PostTypeUtil.SHOW_MORE_COUNT) {
+                documentsAttachment.tvShowMore.hide()
+                mDocumentsAdapter.replace(documents)
+            } else {
+                documentsAttachment.tvShowMore.show()
+                "+${documents.size - PostTypeUtil.SHOW_MORE_COUNT} more".also {
+                    documentsAttachment.tvShowMore.text = it
+                }
+                mDocumentsAdapter.replace(documents.take(PostTypeUtil.SHOW_MORE_COUNT))
+            }
+
+            documentsAttachment.tvShowMore.setOnClickListener {
+                documentsAttachment.tvShowMore.hide()
+                mDocumentsAdapter.replace(documents)
+            }
+        }
+    }
+
+    private fun showSingleVideoPreview() {
+        // TODO: exo player
+    }
+
+    private fun showSingleImagePreview() {
+        handleSaveButton(clickable = true)
+        val attachmentUrl = fileAttachments?.first()?.attachmentMeta?.url ?: return
+        // gets the shimmer drawable for placeholder
+        val shimmerDrawable = ViewUtils.getShimmer()
+        binding.apply {
+            singleImageAttachment.root.show()
+            ImageBindingUtil.loadImage(
+                singleImageAttachment.ivSingleImagePost,
+                attachmentUrl,
+                placeholder = shimmerDrawable
+            )
+        }
+    }
+
+    // renders data in the link view
+    private fun initLinkView() {
+        val data = ogTags ?: return
+        val link = data.url ?: ""
+        // sends link attached event with the link
+//        viewModel.sendLinkAttachedEvent(link)
+        binding.linkPreview.apply {
+            root.show()
+
+            val isImageValid = data.image.isImageValid()
+            ivLink.isVisible = isImageValid
+            handleLinkPreviewConstraints(isImageValid)
+
+            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+                data.title
+            } else {
+                root.context.getString(R.string.link)
+            }
+            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
+            tvLinkDescription.text = data.description
+
+            if (isImageValid) {
+                ImageBindingUtil.loadImage(
+                    ivLink,
+                    data.image,
+                    placeholder = R.drawable.ic_link_primary_40dp,
+                    cornerRadius = 8
+                )
+            }
+
+            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
+            ivCross.setOnClickListener {
+                binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
+                clearPreviewLink()
+            }
+        }
+    }
+
+    // if image url is invalid/empty then handle link preview constraints
+    private fun handleLinkPreviewConstraints(
+        isImageValid: Boolean
+    ) {
+        binding.linkPreview.apply {
+            val constraintLayout: ConstraintLayout = clLink
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            if (isImageValid) {
+                // if image is valid then we show link image and set title constraints
+                setValidLinkImageConstraints(constraintSet)
+            } else {
+                // if image is not valid then we don't show image and set title constraints
+                setInvalidLinkImageConstraints(constraintSet)
+            }
+            constraintSet.applyTo(constraintLayout)
+        }
+    }
+
+    // sets constraints of link preview when image is invalid
+    private fun setInvalidLinkImageConstraints(constraintSet: ConstraintSet) {
+        binding.linkPreview.apply {
+            val margin16 = ViewUtils.dpToPx(16)
+            val margin4 = ViewUtils.dpToPx(4)
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.TOP,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.TOP,
+                margin16
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.START,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.START,
+                margin16
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.END,
+                ivCross.id,
+                ConstraintSet.START,
+                margin4
+            )
+        }
+    }
+
+    // sets constraints of link preview when image is valid
+    private fun setValidLinkImageConstraints(constraintSet: ConstraintSet) {
+        binding.linkPreview.apply {
+            val margin = ViewUtils.dpToPx(16)
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.END,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.END,
+                margin
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.START,
+                ConstraintSet.PARENT_ID,
+                ConstraintSet.START,
+                margin
+            )
+            constraintSet.connect(
+                tvLinkTitle.id,
+                ConstraintSet.TOP,
+                ivLink.id,
+                ConstraintSet.BOTTOM,
+                margin
+            )
         }
     }
 
