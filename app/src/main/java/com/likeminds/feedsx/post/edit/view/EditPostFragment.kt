@@ -116,10 +116,10 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         memberTagging.addListener(object : MemberTaggingViewListener {
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
-//                viewModel.sendUserTagEvent(
-//                    user.userUniqueId,
-//                    memberTagging.getTaggedMemberCount()
-//                )
+                postUpdateViewModel.sendUserTagEvent(
+                    user.userUniqueId,
+                    memberTagging.getTaggedMemberCount()
+                )
             }
 
             override fun callApi(page: Int, searchName: String) {
@@ -128,6 +128,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         })
     }
 
+    // initializes the toolbar
     private fun initToolbar() {
         binding.apply {
             toolbarColor = LMBranding.getToolbarColor()
@@ -140,6 +141,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         }
     }
 
+    // fetches the post data
     private fun fetchPost() {
         ProgressHelper.showProgress(binding.progressBar)
         viewModel.getPost(editPostExtras.postId)
@@ -199,7 +201,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
                     .launchIn(lifecycleScope)
             }
 
-            // text watcher to handlePostButton click-ability
+            // text watcher to handleSaveButton click-ability
             addTextChangedListener {
                 val text = it?.toString()?.trim()
                 if (text.isNullOrEmpty()) {
@@ -371,12 +373,14 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         }
     }
 
+    // sets the post data in view
     private fun setPostData(post: PostViewData) {
         binding.apply {
             val attachments = post.attachments
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
 
+            // decodes the post text and sets to the edit text
             MemberTaggingDecoder.decode(
                 etPostContent,
                 post.text,
@@ -411,31 +415,28 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         }
     }
 
-    private fun showMultimediaPreview() {
+    // shows single image preview
+    private fun showSingleImagePreview() {
         handleSaveButton(clickable = true)
+        val attachmentUrl = fileAttachments?.first()?.attachmentMeta?.url ?: return
+        // gets the shimmer drawable for placeholder
+        val shimmerDrawable = ViewUtils.getShimmer()
         binding.apply {
-            multipleMediaAttachment.root.show()
-            multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
-            val multiMediaAdapter = MultipleMediaPostAdapter()
-            multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
-            multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
-            val attachments = fileAttachments?.map {
-                when (it.attachmentType) {
-                    IMAGE -> {
-                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
-                    }
-                    VIDEO -> {
-                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
-                    }
-                    else -> {
-                        it
-                    }
-                }
-            } ?: return
-            multiMediaAdapter.replace(attachments)
+            singleImageAttachment.root.show()
+            ImageBindingUtil.loadImage(
+                singleImageAttachment.ivSingleImagePost,
+                attachmentUrl,
+                placeholder = shimmerDrawable
+            )
         }
     }
 
+    // shows single video preview
+    private fun showSingleVideoPreview() {
+        // TODO: exo player
+    }
+
+    // shows documents preview
     private fun showDocumentsPreview() {
         binding.apply {
             handleSaveButton(clickable = true)
@@ -479,22 +480,29 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         }
     }
 
-    private fun showSingleVideoPreview() {
-        // TODO: exo player
-    }
-
-    private fun showSingleImagePreview() {
+    // shows multimedia preview
+    private fun showMultimediaPreview() {
         handleSaveButton(clickable = true)
-        val attachmentUrl = fileAttachments?.first()?.attachmentMeta?.url ?: return
-        // gets the shimmer drawable for placeholder
-        val shimmerDrawable = ViewUtils.getShimmer()
         binding.apply {
-            singleImageAttachment.root.show()
-            ImageBindingUtil.loadImage(
-                singleImageAttachment.ivSingleImagePost,
-                attachmentUrl,
-                placeholder = shimmerDrawable
-            )
+            multipleMediaAttachment.root.show()
+            multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
+            val multiMediaAdapter = MultipleMediaPostAdapter()
+            multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
+            multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+            val attachments = fileAttachments?.map {
+                when (it.attachmentType) {
+                    IMAGE -> {
+                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
+                    }
+                    VIDEO -> {
+                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
+                    }
+                    else -> {
+                        it
+                    }
+                }
+            } ?: return
+            multiMediaAdapter.replace(attachments)
         }
     }
 
@@ -503,7 +511,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         val data = ogTags ?: return
         val link = data.url ?: ""
         // sends link attached event with the link
-//        viewModel.sendLinkAttachedEvent(link)
+        postUpdateViewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
 

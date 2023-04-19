@@ -538,7 +538,6 @@ class FeedFragment :
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             when (result.resultCode) {
                 Activity.RESULT_OK -> {
-                    // post of type text/link has been created and posted
                     refreshFeed()
                 }
             }

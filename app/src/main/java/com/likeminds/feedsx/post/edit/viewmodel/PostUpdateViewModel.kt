@@ -4,10 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
-import com.likeminds.feedsx.media.MediaRepository
-import com.likeminds.feedsx.post.PostWithAttachmentsRepository
-import com.likeminds.feedsx.post.create.util.PostPreferences
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.UserPreferences
@@ -29,10 +27,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PostUpdateViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
-    private val userPreferences: UserPreferences,
-    private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
-    private val postPreferences: PostPreferences,
-    private val mediaRepository: MediaRepository
+    private val userPreferences: UserPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -130,5 +125,33 @@ class PostUpdateViewModel @Inject constructor(
                 errorEventChannel.send(ErrorMessageEvent.GetTaggingList(response.errorMessage))
             }
         }
+    }
+
+    /**
+     * Triggers event when the user tags someone
+     * @param userId user-unique-id
+     * @param userCount count of tagged users
+     */
+    fun sendUserTagEvent(userId: String, userCount: Int) {
+        LMAnalytics.track(
+            LMAnalytics.Events.USER_TAGGED_IN_POST,
+            mapOf(
+                "tagged_user_id" to userId,
+                "tagged_user_count" to userCount.toString()
+            )
+        )
+    }
+
+    /**
+     * Triggers when the user attaches link
+     * @param link - url of the link
+     **/
+    fun sendLinkAttachedEvent(link: String) {
+        LMAnalytics.track(
+            LMAnalytics.Events.LINK_ATTACHED_IN_POST,
+            mapOf(
+                "link" to link
+            )
+        )
     }
 }

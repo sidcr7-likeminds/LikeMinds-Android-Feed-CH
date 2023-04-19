@@ -30,16 +30,14 @@ class EditPostDocumentViewDataBinder : ViewDataBinder<ItemDocumentBinding, Attac
         data: AttachmentViewData,
         position: Int
     ) {
-
         // sets the document data on the doc view
-        initDocument(binding, data, position)
+        initDocument(binding, data)
     }
 
     // initializes document item of the document recyclerview
     private fun initDocument(
         binding: ItemDocumentBinding,
-        document: AttachmentViewData,
-        position: Int
+        document: AttachmentViewData
     ) {
         binding.apply {
             tvMeta1.hide()

@@ -211,7 +211,7 @@ class CreatePostFragment :
         memberTagging.addListener(object : MemberTaggingViewListener {
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
-                viewModel.sendUserTagEvent(
+                postUpdateViewModel.sendUserTagEvent(
                     user.userUniqueId,
                     memberTagging.getTaggedMemberCount()
                 )
@@ -661,7 +661,7 @@ class CreatePostFragment :
     private fun initLinkView(data: LinkOGTagsViewData) {
         val link = data.url ?: ""
         // sends link attached event with the link
-        viewModel.sendLinkAttachedEvent(link)
+        postUpdateViewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
 

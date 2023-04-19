@@ -214,21 +214,6 @@ class CreatePostViewModel @Inject constructor(
         )
     }
 
-    /**
-     * Triggers event when the user tags someone
-     * @param userId user-unique-id
-     * @param userCount count of tagged users
-     */
-    fun sendUserTagEvent(userId: String, userCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.USER_TAGGED_IN_POST,
-            mapOf(
-                "tagged_user_id" to userId,
-                "tagged_user_count" to userCount.toString()
-            )
-        )
-    }
-
     fun sendMediaAttachedEvent(data: ArrayList<SingleUriData>) {
         // counts number of images in attachments
         val imageCount = data.count {
@@ -255,19 +240,6 @@ class CreatePostViewModel @Inject constructor(
         if (docsCount > 0) {
             sendDocumentAttachedEvent(docsCount)
         }
-    }
-
-    /**
-     * Triggers when the user attaches link
-     * @param link - url of the link
-     **/
-    fun sendLinkAttachedEvent(link: String) {
-        LMAnalytics.track(
-            LMAnalytics.Events.LINK_ATTACHED_IN_POST,
-            mapOf(
-                "link" to link
-            )
-        )
     }
 
     /**

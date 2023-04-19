@@ -36,7 +36,7 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorEventFlow = errorEventChannel.receiveAsFlow()
 
-    // to getPost
+    // to get the Post to be edited
     fun getPost(postId: String) {
         viewModelScope.launchIO {
             // builds api request
@@ -90,6 +90,8 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                     }
                     requestBuilder.build()
                 }
+
+            // calls api
             val response = lmFeedClient.editPost(request)
             if (response.success) {
                 _postEdited.postValue(true)

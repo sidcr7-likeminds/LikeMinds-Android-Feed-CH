@@ -491,10 +491,12 @@ class PostDetailFragment :
         }
     }
 
+    // finds and edits comment/reply in the adapter
     private fun editCommentInAdapter(comment: CommentViewData) {
         val parentComment = comment.parentComment
         if (parentComment == null) {
             // edited comment is of level-0
+
             val commentPosition = getIndexAndCommentFromAdapter(comment.id)?.first ?: return
             mPostDetailAdapter.update(commentPosition, comment)
         } else {
@@ -505,9 +507,9 @@ class PostDetailFragment :
             val parentIndex = pair.first
             val parentCommentInAdapter = pair.second
 
-            val index = parentCommentInAdapter.replies.indexOfFirst {
-                it.id == comment.id
-            }
+            // finds index of the reply inside the comment
+            val index =
+                getIndexAndReplyFromComment(parentCommentInAdapter, comment.id)?.first ?: return
 
             if (index == -1) return
 
@@ -674,9 +676,9 @@ class PostDetailFragment :
     }
 
 
-/*
-* UI Block
-*/
+    /*
+    * UI Block
+    */
 
 
     // updates the comments count on toolbar
@@ -724,6 +726,7 @@ class PostDetailFragment :
 
     // processes edit comment request
     private fun editComment(commentId: String, parentCommentId: String? = null) {
+        // gets text of the comment/reply
         val commentText =
             if (parentCommentId == null) {
                 val comment = getIndexAndCommentFromAdapter(commentId)?.second ?: return
@@ -734,6 +737,7 @@ class PostDetailFragment :
                 reply.second.text
             }
 
+        // updates the edittext with the comment to be edited
         binding.apply {
             editCommentId = commentId
             etComment.setText(commentText)
@@ -785,9 +789,9 @@ class PostDetailFragment :
     }
 
 
-/*
-* Navigation Block
-*/
+    /*
+    * Navigation Block
+    */
 
 
     // callback when likes count of post is clicked - opens likes screen
@@ -854,7 +858,7 @@ class PostDetailFragment :
      */
 
 
-// sets page-1 data of post and scrolls to top
+    // sets page-1 data of post and scrolls to top
     private fun setPostDataAndScrollToTop(post: PostViewData) {
         // [ArrayList] to add all the items to adapter
         val postDetailList = ArrayList<BaseViewType>()
@@ -1176,7 +1180,8 @@ class PostDetailFragment :
                 val editPostExtras = EditPostExtras.Builder()
                     .postId(postId)
                     .build()
-                EditPostActivity.start(requireContext(), editPostExtras)
+                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                editPostLauncher.launch(intent)
             }
             DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(
@@ -1203,6 +1208,16 @@ class PostDetailFragment :
             }
         }
     }
+
+    // launcher for [EditPostActivity]
+    private val editPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    refreshPostData()
+                }
+            }
+        }
 
     private fun pinPost() {
         //get item
