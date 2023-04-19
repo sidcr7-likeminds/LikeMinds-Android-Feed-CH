@@ -36,6 +36,7 @@ import com.likeminds.feedsx.post.create.view.CreatePostActivity.Companion.POST_A
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.PostUpdateViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.*
@@ -65,6 +66,7 @@ class CreatePostFragment :
 
     private val viewModel: CreatePostViewModel by viewModels()
     private val initiateViewModel: InitiateViewModel by activityViewModels()
+    private val postUpdateViewModel: PostUpdateViewModel by activityViewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
@@ -116,7 +118,7 @@ class CreatePostFragment :
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        viewModel.fetchUserFromDB()
+        postUpdateViewModel.fetchUserFromDB()
     }
 
     // observes data
@@ -128,12 +130,12 @@ class CreatePostFragment :
         observeMembersTaggingList()
 
         // observes userData and initializes the user view
-        viewModel.userData.observe(viewLifecycleOwner) {
+        postUpdateViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
 
         // observes decodeUrlResponse and returns link ogTags
-        viewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
+        postUpdateViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
             initLinkView(ogTags)
         }
@@ -159,7 +161,7 @@ class CreatePostFragment :
      * second -> Community Members and Groups
      */
     private fun observeMembersTaggingList() {
-        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
+        postUpdateViewModel.taggingData.observe(viewLifecycleOwner) { result ->
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
@@ -168,18 +170,23 @@ class CreatePostFragment :
     private fun observeErrors() {
         viewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is CreatePostViewModel.ErrorMessageEvent.DecodeUrl -> {
+                is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
+                    handlePostButton(clickable = true, showProgress = false)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
+
+        postUpdateViewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is PostUpdateViewModel.ErrorMessageEvent.DecodeUrl -> {
                     val postText = binding.etPostContent.text.toString()
                     val link = postText.getUrlIfExist()
                     if (link != ogTags?.url) {
                         clearPreviewLink()
                     }
                 }
-                is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
-                    handlePostButton(clickable = true, showProgress = false)
-                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
-                }
-                is CreatePostViewModel.ErrorMessageEvent.GetTaggingList -> {
+                is PostUpdateViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
@@ -211,7 +218,7 @@ class CreatePostFragment :
             }
 
             override fun callApi(page: Int, searchName: String) {
-                viewModel.getMembersForTagging(page, searchName)
+                postUpdateViewModel.getMembersForTagging(page, searchName)
             }
         })
     }
@@ -643,7 +650,7 @@ class CreatePostFragment :
                     return
                 }
                 clearPreviewLink()
-                viewModel.decodeUrl(link)
+                postUpdateViewModel.decodeUrl(link)
             } else {
                 clearPreviewLink()
             }

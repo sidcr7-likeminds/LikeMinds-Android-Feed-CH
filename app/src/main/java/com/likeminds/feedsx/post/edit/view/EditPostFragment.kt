@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.post.edit.view
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
@@ -14,6 +15,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -25,6 +27,7 @@ import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
 import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
 import com.likeminds.feedsx.post.edit.viewmodel.EditPostViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.PostUpdateViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
@@ -44,6 +47,7 @@ import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.utils.observeInLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -55,6 +59,7 @@ import java.util.*
 class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
 
     private val viewModel: EditPostViewModel by viewModels()
+    private val postUpdateViewModel: PostUpdateViewModel by activityViewModels()
 
     private lateinit var editPostExtras: EditPostExtras
 
@@ -90,7 +95,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        viewModel.fetchUserFromDB()
+        postUpdateViewModel.fetchUserFromDB()
     }
 
     /**
@@ -118,7 +123,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
             }
 
             override fun callApi(page: Int, searchName: String) {
-                viewModel.getMembersForTagging(page, searchName)
+                postUpdateViewModel.getMembersForTagging(page, searchName)
             }
         })
     }
@@ -274,7 +279,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
                     return
                 }
                 clearPreviewLink()
-                viewModel.decodeUrl(link)
+                postUpdateViewModel.decodeUrl(link)
             } else {
                 clearPreviewLink()
             }
@@ -292,10 +297,12 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
     override fun observeData() {
         super.observeData()
 
+        // observes error message
+        observeErrors()
         observeMembersTaggingList()
 
         // observes userData and initializes the user view
-        viewModel.userData.observe(viewLifecycleOwner) {
+        postUpdateViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
 
@@ -303,6 +310,54 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         viewModel.postResponse.observe(viewLifecycleOwner) { post ->
             setPostData(post)
         }
+
+        // observes decodeUrlResponse and returns link ogTags
+        postUpdateViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
+            this.ogTags = ogTags
+            initLinkView()
+        }
+
+        // observes postEdited, once post is edited
+        viewModel.postEdited.observe(viewLifecycleOwner) {
+            requireActivity().apply {
+                setResult(Activity.RESULT_OK)
+                finish()
+            }
+        }
+    }
+
+    // observes error events
+    private fun observeErrors() {
+        viewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is EditPostViewModel.ErrorMessageEvent.EditPost -> {
+                    handleSaveButton(clickable = true, showProgress = false)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is EditPostViewModel.ErrorMessageEvent.GetPost -> {
+                    requireActivity().apply {
+                        ViewUtils.showErrorMessageToast(this, response.errorMessage)
+                        setResult(Activity.RESULT_CANCELED)
+                        finish()
+                    }
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
+
+        postUpdateViewModel.errorEventFlow.onEach { response ->
+            when (response) {
+                is PostUpdateViewModel.ErrorMessageEvent.DecodeUrl -> {
+                    val postText = binding.etPostContent.text.toString()
+                    val link = postText.getUrlIfExist()
+                    if (link != ogTags?.url) {
+                        clearPreviewLink()
+                    }
+                }
+                is PostUpdateViewModel.ErrorMessageEvent.GetTaggingList -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
     }
 
     /**
@@ -311,7 +366,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
      * second -> Community Members and Groups
      */
     private fun observeMembersTaggingList() {
-        viewModel.taggingData.observe(viewLifecycleOwner) { result ->
+        postUpdateViewModel.taggingData.observe(viewLifecycleOwner) { result ->
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
