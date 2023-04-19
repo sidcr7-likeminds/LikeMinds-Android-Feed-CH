@@ -190,5 +190,4 @@ object MemberTaggingDecoder {
             return pathSegments[0]
         return null
     }
-
 }
