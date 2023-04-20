@@ -48,6 +48,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
@@ -740,7 +741,12 @@ class PostDetailFragment :
         // updates the edittext with the comment to be edited
         binding.apply {
             editCommentId = commentId
-            etComment.setText(commentText)
+            // decodes the comment text and sets to the edit text
+            MemberTaggingDecoder.decode(
+                etComment,
+                commentText,
+                LMBranding.getTextLinkColor()
+            )
             etComment.setSelection(etComment.length())
             etComment.focusAndShowKeyboard()
         }
