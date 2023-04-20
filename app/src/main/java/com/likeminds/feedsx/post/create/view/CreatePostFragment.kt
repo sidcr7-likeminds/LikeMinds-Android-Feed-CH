@@ -36,7 +36,7 @@ import com.likeminds.feedsx.post.create.view.CreatePostActivity.Companion.POST_A
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
-import com.likeminds.feedsx.post.edit.viewmodel.PostUpdateViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.*
@@ -66,7 +66,7 @@ class CreatePostFragment :
 
     private val viewModel: CreatePostViewModel by viewModels()
     private val initiateViewModel: InitiateViewModel by activityViewModels()
-    private val postUpdateViewModel: PostUpdateViewModel by activityViewModels()
+    private val helperViewModel: HelperViewModel by activityViewModels()
 
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
@@ -118,7 +118,7 @@ class CreatePostFragment :
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        postUpdateViewModel.fetchUserFromDB()
+        helperViewModel.fetchUserFromDB()
     }
 
     // observes data
@@ -130,12 +130,12 @@ class CreatePostFragment :
         observeMembersTaggingList()
 
         // observes userData and initializes the user view
-        postUpdateViewModel.userData.observe(viewLifecycleOwner) {
+        helperViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
 
         // observes decodeUrlResponse and returns link ogTags
-        postUpdateViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
+        helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
             initLinkView(ogTags)
         }
@@ -161,7 +161,7 @@ class CreatePostFragment :
      * second -> Community Members and Groups
      */
     private fun observeMembersTaggingList() {
-        postUpdateViewModel.taggingData.observe(viewLifecycleOwner) { result ->
+        helperViewModel.taggingData.observe(viewLifecycleOwner) { result ->
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
@@ -177,16 +177,16 @@ class CreatePostFragment :
             }
         }.observeInLifecycle(viewLifecycleOwner)
 
-        postUpdateViewModel.errorEventFlow.onEach { response ->
+        helperViewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is PostUpdateViewModel.ErrorMessageEvent.DecodeUrl -> {
+                is HelperViewModel.ErrorMessageEvent.DecodeUrl -> {
                     val postText = binding.etPostContent.text.toString()
                     val link = postText.getUrlIfExist()
                     if (link != ogTags?.url) {
                         clearPreviewLink()
                     }
                 }
-                is PostUpdateViewModel.ErrorMessageEvent.GetTaggingList -> {
+                is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
@@ -211,14 +211,14 @@ class CreatePostFragment :
         memberTagging.addListener(object : MemberTaggingViewListener {
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
-                postUpdateViewModel.sendUserTagEvent(
+                helperViewModel.sendUserTagEvent(
                     user.userUniqueId,
                     memberTagging.getTaggedMemberCount()
                 )
             }
 
             override fun callApi(page: Int, searchName: String) {
-                postUpdateViewModel.getMembersForTagging(page, searchName)
+                helperViewModel.getMembersForTagging(page, searchName)
             }
         })
     }
@@ -650,7 +650,7 @@ class CreatePostFragment :
                     return
                 }
                 clearPreviewLink()
-                postUpdateViewModel.decodeUrl(link)
+                helperViewModel.decodeUrl(link)
             } else {
                 clearPreviewLink()
             }
@@ -661,7 +661,7 @@ class CreatePostFragment :
     private fun initLinkView(data: LinkOGTagsViewData) {
         val link = data.url ?: ""
         // sends link attached event with the link
-        postUpdateViewModel.sendLinkAttachedEvent(link)
+        helperViewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
 

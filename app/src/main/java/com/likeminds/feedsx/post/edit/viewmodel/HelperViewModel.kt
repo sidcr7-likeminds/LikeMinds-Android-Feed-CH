@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class PostUpdateViewModel @Inject constructor(
+class HelperViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
     private val userPreferences: UserPreferences
 ) : ViewModel() {

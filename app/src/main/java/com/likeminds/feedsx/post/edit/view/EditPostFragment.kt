@@ -27,7 +27,7 @@ import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
 import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
 import com.likeminds.feedsx.post.edit.viewmodel.EditPostViewModel
-import com.likeminds.feedsx.post.edit.viewmodel.PostUpdateViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
@@ -59,7 +59,7 @@ import java.util.*
 class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
 
     private val viewModel: EditPostViewModel by viewModels()
-    private val postUpdateViewModel: PostUpdateViewModel by activityViewModels()
+    private val helperViewModel: HelperViewModel by activityViewModels()
 
     private lateinit var editPostExtras: EditPostExtras
 
@@ -95,7 +95,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        postUpdateViewModel.fetchUserFromDB()
+        helperViewModel.fetchUserFromDB()
     }
 
     /**
@@ -116,14 +116,14 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         memberTagging.addListener(object : MemberTaggingViewListener {
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
-                postUpdateViewModel.sendUserTagEvent(
+                helperViewModel.sendUserTagEvent(
                     user.userUniqueId,
                     memberTagging.getTaggedMemberCount()
                 )
             }
 
             override fun callApi(page: Int, searchName: String) {
-                postUpdateViewModel.getMembersForTagging(page, searchName)
+                helperViewModel.getMembersForTagging(page, searchName)
             }
         })
     }
@@ -281,7 +281,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
                     return
                 }
                 clearPreviewLink()
-                postUpdateViewModel.decodeUrl(link)
+                helperViewModel.decodeUrl(link)
             } else {
                 clearPreviewLink()
             }
@@ -304,7 +304,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         observeMembersTaggingList()
 
         // observes userData and initializes the user view
-        postUpdateViewModel.userData.observe(viewLifecycleOwner) {
+        helperViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
 
@@ -314,7 +314,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         }
 
         // observes decodeUrlResponse and returns link ogTags
-        postUpdateViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
+        helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
             initLinkView()
         }
@@ -346,16 +346,16 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
             }
         }.observeInLifecycle(viewLifecycleOwner)
 
-        postUpdateViewModel.errorEventFlow.onEach { response ->
+        helperViewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is PostUpdateViewModel.ErrorMessageEvent.DecodeUrl -> {
+                is HelperViewModel.ErrorMessageEvent.DecodeUrl -> {
                     val postText = binding.etPostContent.text.toString()
                     val link = postText.getUrlIfExist()
                     if (link != ogTags?.url) {
                         clearPreviewLink()
                     }
                 }
-                is PostUpdateViewModel.ErrorMessageEvent.GetTaggingList -> {
+                is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
@@ -368,7 +368,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
      * second -> Community Members and Groups
      */
     private fun observeMembersTaggingList() {
-        postUpdateViewModel.taggingData.observe(viewLifecycleOwner) { result ->
+        helperViewModel.taggingData.observe(viewLifecycleOwner) { result ->
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
@@ -511,7 +511,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         val data = ogTags ?: return
         val link = data.url ?: ""
         // sends link attached event with the link
-        postUpdateViewModel.sendLinkAttachedEvent(link)
+        helperViewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
 
