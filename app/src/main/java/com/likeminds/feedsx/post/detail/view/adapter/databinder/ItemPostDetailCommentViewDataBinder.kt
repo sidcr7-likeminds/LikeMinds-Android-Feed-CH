@@ -104,7 +104,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 postDetailAdapterListener.likeComment(data.id)
             }
 
-            if (data.fromCommentLiked) {
+            if (data.fromCommentLiked || data.fromCommentEdited) {
                 return
             } else {
                 if (data.repliesCount == 0) {
