@@ -62,6 +62,7 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
@@ -221,7 +222,10 @@ class FeedFragment :
                             ivPostThumbnail.hide()
                         } else {
                             ivPostThumbnail.show()
-                            ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
+                            ImageBindingUtil.loadImage(
+                                ivPostThumbnail,
+                                Uri.parse(post.thumbnail)
+                            )
                         }
                         postingProgress.progress = 0
                         postingProgress.show()
