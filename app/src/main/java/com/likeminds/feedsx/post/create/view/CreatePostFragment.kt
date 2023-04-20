@@ -12,8 +12,6 @@ import android.view.View.OnTouchListener
 import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
@@ -47,6 +45,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
+import com.likeminds.feedsx.utils.link.util.LinkUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
@@ -667,7 +666,10 @@ class CreatePostFragment :
 
             val isImageValid = data.image.isImageValid()
             ivLink.isVisible = isImageValid
-            handleLinkPreviewConstraints(isImageValid)
+            LinkUtil.handleLinkPreviewConstraints(
+                this,
+                isImageValid
+            )
 
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
                 data.title
@@ -699,82 +701,6 @@ class CreatePostFragment :
         ogTags = null
         binding.linkPreview.apply {
             root.hide()
-        }
-    }
-
-    // if image url is invalid/empty then handle link preview constraints
-    private fun handleLinkPreviewConstraints(
-        isImageValid: Boolean
-    ) {
-        binding.linkPreview.apply {
-            val constraintLayout: ConstraintLayout = clLink
-            val constraintSet = ConstraintSet()
-            constraintSet.clone(constraintLayout)
-            if (isImageValid) {
-                // if image is valid then we show link image and set title constraints
-                setValidLinkImageConstraints(constraintSet)
-            } else {
-                // if image is not valid then we don't show image and set title constraints
-                setInvalidLinkImageConstraints(constraintSet)
-            }
-            constraintSet.applyTo(constraintLayout)
-        }
-    }
-
-    // sets constraints of link preview when image is invalid
-    private fun setInvalidLinkImageConstraints(constraintSet: ConstraintSet) {
-        binding.linkPreview.apply {
-            val margin16 = ViewUtils.dpToPx(16)
-            val margin4 = ViewUtils.dpToPx(4)
-            constraintSet.connect(
-                tvLinkTitle.id,
-                ConstraintSet.TOP,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.TOP,
-                margin16
-            )
-            constraintSet.connect(
-                tvLinkTitle.id,
-                ConstraintSet.START,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.START,
-                margin16
-            )
-            constraintSet.connect(
-                tvLinkTitle.id,
-                ConstraintSet.END,
-                ivCross.id,
-                ConstraintSet.START,
-                margin4
-            )
-        }
-    }
-
-    // sets constraints of link preview when image is valid
-    private fun setValidLinkImageConstraints(constraintSet: ConstraintSet) {
-        binding.linkPreview.apply {
-            val margin = ViewUtils.dpToPx(16)
-            constraintSet.connect(
-                tvLinkTitle.id,
-                ConstraintSet.END,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.END,
-                margin
-            )
-            constraintSet.connect(
-                tvLinkTitle.id,
-                ConstraintSet.START,
-                ConstraintSet.PARENT_ID,
-                ConstraintSet.START,
-                margin
-            )
-            constraintSet.connect(
-                tvLinkTitle.id,
-                ConstraintSet.TOP,
-                ivLink.id,
-                ConstraintSet.BOTTOM,
-                margin
-            )
         }
     }
 
