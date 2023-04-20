@@ -499,7 +499,14 @@ class PostDetailFragment :
             // edited comment is of level-0
 
             val commentPosition = getIndexAndCommentFromAdapter(comment.id)?.first ?: return
-            mPostDetailAdapter.update(commentPosition, comment)
+
+            //update comment view data
+            val updatedComment = comment.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(true)
+                .build()
+
+            mPostDetailAdapter.update(commentPosition, updatedComment)
         } else {
             // edited comment is of level-1 (reply)
 
@@ -514,10 +521,10 @@ class PostDetailFragment :
 
             if (index == -1) return
 
-            parentComment.replies[index] = comment
+            parentCommentInAdapter.replies[index] = comment
 
             // updates the parentComment with edited reply
-            mPostDetailAdapter.update(parentIndex, parentComment)
+            mPostDetailAdapter.update(parentIndex, parentCommentInAdapter)
         }
     }
 
@@ -587,6 +594,7 @@ class PostDetailFragment :
                     val updatedComment = comment.toBuilder()
                         .isLiked(false)
                         .fromCommentLiked(true)
+                        .fromCommentEdited(false)
                         .likesCount(comment.likesCount - 1)
                         .build()
 
@@ -1001,6 +1009,7 @@ class PostDetailFragment :
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .fromCommentLiked(false)
+                .fromCommentEdited(false)
                 .build()
             mPostDetailAdapter.update(position, newViewData)
         }
@@ -1103,6 +1112,7 @@ class PostDetailFragment :
         //update comment view data
         val newViewData = comment.toBuilder()
             .fromCommentLiked(true)
+            .fromCommentEdited(false)
             .isLiked(!comment.isLiked)
             .likesCount(newLikesCount)
             .build()
