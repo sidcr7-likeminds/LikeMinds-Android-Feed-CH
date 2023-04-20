@@ -224,6 +224,7 @@ object ViewDataConverter {
             .isPinned(post.isPinned)
             .isSaved(post.isSaved)
             .isLiked(post.isLiked)
+            .isEdited(post.isEdited)
             .menuItems(convertOverflowMenuItems(post.menuItems))
             .replies(
                 convertComments(
@@ -287,6 +288,7 @@ object ViewDataConverter {
             .id(comment.id)
             .postId(postId)
             .isLiked(comment.isLiked)
+            .isEdited(comment.isEdited)
             .userId(userId)
             .text(comment.text)
             .level(comment.level)

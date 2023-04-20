@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.likes.view
+package com.likeminds.feedsx.post.edit.view
 
 import android.content.Context
 import android.content.Intent
@@ -6,41 +6,40 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.ActivityLikesBinding
-import com.likeminds.feedsx.likes.model.LikesScreenExtras
+import com.likeminds.feedsx.databinding.ActivityEditPostBinding
+import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class LikesActivity : BaseAppCompatActivity() {
+class EditPostActivity : BaseAppCompatActivity() {
 
-    lateinit var binding: ActivityLikesBinding
+    lateinit var binding: ActivityEditPostBinding
 
-    private var likesScreenExtras: LikesScreenExtras? = null
+    private var editPostExtras: EditPostExtras? = null
 
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
 
     companion object {
-        const val LIKES_SCREEN_EXTRAS = "LIKES_SCREEN_EXTRAS"
+        const val EDIT_POST_EXTRAS = "EDIT_POST_EXTRAS"
 
         @JvmStatic
-        fun start(context: Context, extras: LikesScreenExtras) {
-            val intent = Intent(context, LikesActivity::class.java)
+        fun start(context: Context, extras: EditPostExtras) {
+            val intent = Intent(context, EditPostActivity::class.java)
             val bundle = Bundle()
-            bundle.putParcelable(LIKES_SCREEN_EXTRAS, extras)
+            bundle.putParcelable(EDIT_POST_EXTRAS, extras)
             intent.putExtra("bundle", bundle)
             context.startActivity(intent)
         }
 
         @JvmStatic
-        fun getIntent(context: Context, extras: LikesScreenExtras): Intent {
-            val intent = Intent(context, LikesActivity::class.java)
+        fun getIntent(context: Context, extras: EditPostExtras): Intent {
+            val intent = Intent(context, EditPostActivity::class.java)
             val bundle = Bundle()
-            bundle.putParcelable(LIKES_SCREEN_EXTRAS, extras)
+            bundle.putParcelable(EDIT_POST_EXTRAS, extras)
             intent.putExtra("bundle", bundle)
             return intent
         }
@@ -49,34 +48,22 @@ class LikesActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityLikesBinding.inflate(layoutInflater)
-        binding.toolbarColor = LMBranding.getToolbarColor()
+        binding = ActivityEditPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            likesScreenExtras = bundle.getParcelable(LIKES_SCREEN_EXTRAS)
+            editPostExtras = bundle.getParcelable(EDIT_POST_EXTRAS)
             val args = Bundle().apply {
-                putParcelable(LIKES_SCREEN_EXTRAS, likesScreenExtras)
+                putParcelable(EDIT_POST_EXTRAS, editPostExtras)
             }
 
             //Navigation
             navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             navController = navHostFragment.navController
-            navController.setGraph(R.navigation.nav_graph_likes, args)
-
-            //Toolbar
-            initActionBar()
-
-            navController.addOnDestinationChangedListener { controller, destination, arguments ->
-                when (destination.label) {
-                    LikesFragment::class.simpleName -> {
-                        binding.toolbar.setTitle(R.string.likes)
-                    }
-                }
-            }
+            navController.setGraph(R.navigation.nav_graph_edit_post, args)
         } else {
             redirectActivity(true)
         }
@@ -89,13 +76,6 @@ class LikesActivity : BaseAppCompatActivity() {
         supportFragmentManager.popBackStack()
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
-    }
-
-    private fun initActionBar() {
-        setSupportActionBar(binding.toolbar)
-        binding.ivBack.setOnClickListener {
-            onBackPressed()
-        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

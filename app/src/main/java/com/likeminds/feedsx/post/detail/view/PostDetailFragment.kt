@@ -32,6 +32,8 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
+import com.likeminds.feedsx.post.edit.model.EditPostExtras
+import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -46,6 +48,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
@@ -77,6 +80,8 @@ class PostDetailFragment :
 
     private var parentCommentIdToReply: String? = null
     private var toFindComment: Boolean = false
+
+    private var editCommentId: String? = null
 
     private lateinit var memberTagging: MemberTaggingView
 
@@ -228,21 +233,34 @@ class PostDetailFragment :
                 val text = etComment.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 val postId = postDetailExtras.postId
-                if (parentCommentIdToReply != null) {
-                    // input text is reply to a comment
-                    val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
-                    val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
-                        ?: return@setOnClickListener
-                    viewModel.replyComment(
-                        parentComment.userId,
-                        postDetailExtras.postId,
-                        parentCommentId,
-                        updatedText
-                    )
-                    hideReplyingToView()
-                } else {
-                    // input text is a comment
-                    viewModel.addComment(postId, updatedText)
+                when {
+                    parentCommentIdToReply != null -> {
+                        // input text is reply to a comment
+                        val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
+                        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
+                            ?: return@setOnClickListener
+                        viewModel.replyComment(
+                            parentComment.userId,
+                            postDetailExtras.postId,
+                            parentCommentId,
+                            updatedText
+                        )
+                        hideReplyingToView()
+                    }
+                    editCommentId != null -> {
+                        // when an existing comment is edited
+                        val commentId = editCommentId ?: return@setOnClickListener
+                        viewModel.editComment(
+                            postId,
+                            commentId,
+                            updatedText
+                        )
+                        editCommentId = null
+                    }
+                    else -> {
+                        // input text is a comment
+                        viewModel.addComment(postId, updatedText)
+                    }
                 }
                 ViewUtils.hideKeyboard(this.root)
                 etComment.text = null
@@ -431,6 +449,11 @@ class PostDetailFragment :
             mPostDetailAdapter.update(postDataPosition, post)
         }
 
+        // observes editCommentResponse LiveData
+        viewModel.editCommentResponse.observe(viewLifecycleOwner) { comment ->
+            editCommentInAdapter(comment)
+        }
+
         // observes addReplyResponse LiveData
         viewModel.addReplyResponse.observe(viewLifecycleOwner) { pair ->
             // [parentCommentId] for the reply
@@ -466,6 +489,35 @@ class PostDetailFragment :
 
             // adds paginated replies to adapter
             addReplies(comment, page)
+        }
+    }
+
+    // finds and edits comment/reply in the adapter
+    private fun editCommentInAdapter(comment: CommentViewData) {
+        val parentComment = comment.parentComment
+        if (parentComment == null) {
+            // edited comment is of level-0
+
+            val commentPosition = getIndexAndCommentFromAdapter(comment.id)?.first ?: return
+            mPostDetailAdapter.update(commentPosition, comment)
+        } else {
+            // edited comment is of level-1 (reply)
+
+            val parentCommentId = parentComment.id
+            val pair = getIndexAndCommentFromAdapter(parentCommentId) ?: return
+            val parentIndex = pair.first
+            val parentCommentInAdapter = pair.second
+
+            // finds index of the reply inside the comment
+            val index =
+                getIndexAndReplyFromComment(parentCommentInAdapter, comment.id)?.first ?: return
+
+            if (index == -1) return
+
+            parentComment.replies[index] = comment
+
+            // updates the parentComment with edited reply
+            mPostDetailAdapter.update(parentIndex, parentComment)
         }
     }
 
@@ -551,6 +603,9 @@ class PostDetailFragment :
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.GetComment -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is PostDetailViewModel.ErrorMessageEvent.EditComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
@@ -668,6 +723,33 @@ class PostDetailFragment :
             .build()
 
         showDeleteDialog(creatorId, deleteExtras)
+    }
+
+    // processes edit comment request
+    private fun editComment(commentId: String, parentCommentId: String? = null) {
+        // gets text of the comment/reply
+        val commentText =
+            if (parentCommentId == null) {
+                val comment = getIndexAndCommentFromAdapter(commentId)?.second ?: return
+                comment.text
+            } else {
+                val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second ?: return
+                val reply = getIndexAndReplyFromComment(parentComment, commentId) ?: return
+                reply.second.text
+            }
+
+        // updates the edittext with the comment to be edited
+        binding.apply {
+            editCommentId = commentId
+            // decodes the comment text and sets to the edit text
+            MemberTaggingDecoder.decode(
+                etComment,
+                commentText,
+                LMBranding.getTextLinkColor()
+            )
+            etComment.setSelection(etComment.length())
+            etComment.focusAndShowKeyboard()
+        }
     }
 
     // processes delete comment request
@@ -961,6 +1043,8 @@ class PostDetailFragment :
             val index = parentCommentViewData.replies.indexOfFirst {
                 it.id == replyId
             }
+            if (index == -1) return
+
             parentCommentViewData.replies.removeAt(index)
         }
 
@@ -1037,7 +1121,7 @@ class PostDetailFragment :
         val parentComment = parentIndexAndComment.second
 
         // gets reply from the comment
-        val reply = getIndexAndReplyFromComment(parentComment, replyId)
+        val reply = getIndexAndReplyFromComment(parentComment, replyId) ?: return
         val replyIndex = reply.first
         val replyViewData = reply.second
 
@@ -1098,6 +1182,13 @@ class PostDetailFragment :
         menuId: Int
     ) {
         when (menuId) {
+            EDIT_POST_MENU_ITEM_ID -> {
+                val editPostExtras = EditPostExtras.Builder()
+                    .postId(postId)
+                    .build()
+                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                editPostLauncher.launch(intent)
+            }
             DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(
                     postId,
@@ -1123,6 +1214,16 @@ class PostDetailFragment :
             }
         }
     }
+
+    // launcher for [EditPostActivity]
+    private val editPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    refreshPostData()
+                }
+            }
+        }
 
     private fun pinPost() {
         //get item
@@ -1219,6 +1320,9 @@ class PostDetailFragment :
         menuId: Int
     ) {
         when (menuId) {
+            EDIT_COMMENT_MENU_ITEM_ID -> {
+                editComment(commentId)
+            }
             DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
@@ -1259,6 +1363,9 @@ class PostDetailFragment :
         menuId: Int
     ) {
         when (menuId) {
+            EDIT_COMMENT_MENU_ITEM_ID -> {
+                editComment(replyId, parentCommentId)
+            }
             DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
@@ -1369,9 +1476,13 @@ class PostDetailFragment :
     private fun getIndexAndReplyFromComment(
         parentComment: CommentViewData,
         replyId: String
-    ): Pair<Int, CommentViewData> {
+    ): Pair<Int, CommentViewData>? {
         val index = parentComment.replies.indexOfFirst {
             it.id == replyId
+        }
+
+        if (index == -1) {
+            return null
         }
 
         val reply = parentComment.replies[index]

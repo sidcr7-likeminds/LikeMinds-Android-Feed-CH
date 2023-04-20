@@ -53,8 +53,11 @@
             android:exported="false" />
         <activity
             android:name=".post.create.view.CreatePostActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".post.edit.view.EditPostActivity"
+            android:exported="false" />
         <activity
             android:name=".likes.view.LikesActivity"
             android:exported="false" />

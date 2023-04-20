@@ -38,7 +38,7 @@ import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
 import java.util.*
 
 object PostTypeUtil {
-    private const val SHOW_MORE_COUNT = 2
+    const val SHOW_MORE_COUNT = 2
 
     // initializes author data frame on the post
     private fun initAuthorFrame(
@@ -53,6 +53,14 @@ object PostTypeUtil {
                 ivPin.show()
             } else {
                 ivPin.hide()
+            }
+
+            if (data.isEdited) {
+                viewDotEdited.show()
+                tvEdited.show()
+            } else {
+                viewDotEdited.hide()
+                tvEdited.hide()
             }
 
             ivPostMenu.setOnClickListener { view ->
@@ -81,9 +89,6 @@ object PostTypeUtil {
                 memberImage,
                 showRoundImage = true
             )
-
-            viewDotEdited.hide()
-            tvEdited.hide()
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
         }
     }

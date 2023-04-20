@@ -42,13 +42,12 @@ import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
 import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
-import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM_ID
-import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM_ID
-import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM_ID
-import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM_ID
+import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
+import com.likeminds.feedsx.post.edit.model.EditPostExtras
+import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -63,6 +62,7 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
@@ -222,7 +222,10 @@ class FeedFragment :
                             ivPostThumbnail.hide()
                         } else {
                             ivPostThumbnail.show()
-                            ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
+                            ImageBindingUtil.loadImage(
+                                ivPostThumbnail,
+                                Uri.parse(post.thumbnail)
+                            )
                         }
                         postingProgress.progress = 0
                         postingProgress.show()
@@ -534,6 +537,16 @@ class FeedFragment :
             }
         }
 
+    // launcher for [EditPostActivity]
+    private val editPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    refreshFeed()
+                }
+            }
+        }
+
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
         // item decorator to add spacing between items
@@ -754,6 +767,13 @@ class FeedFragment :
         menuId: Int
     ) {
         when (menuId) {
+            EDIT_POST_MENU_ITEM_ID -> {
+                val editPostExtras = EditPostExtras.Builder()
+                    .postId(postId)
+                    .build()
+                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                editPostLauncher.launch(intent)
+            }
             DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(postId, creatorId)
             }
