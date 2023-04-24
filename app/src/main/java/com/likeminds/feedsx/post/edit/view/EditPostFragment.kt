@@ -85,12 +85,20 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
     override fun setUpViews() {
         super.setUpViews()
 
+        setBindingVariables()
         fetchUserFromDB()
         initMemberTaggingView()
         initToolbar()
         fetchPost()
         initPostSaveListener()
     }
+
+    // sets the binding variables
+    private fun setBindingVariables() {
+        binding.toolbarColor = LMBranding.getToolbarColor()
+        binding.buttonColor = LMBranding.getButtonsColor()
+    }
+
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
@@ -385,6 +393,10 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
                 post.text,
                 LMBranding.getTextLinkColor()
             )
+
+            // sets the cursor to the end and opens keyboard
+            etPostContent.setSelection(etPostContent.length())
+            etPostContent.focusAndShowKeyboard()
 
             when (post.viewType) {
                 ITEM_POST_SINGLE_IMAGE -> {
