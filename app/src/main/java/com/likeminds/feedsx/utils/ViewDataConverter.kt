@@ -277,6 +277,7 @@ object ViewDataConverter {
         val userId = comment.userId
         val user = usersMap[userId]
         val replies = comment.replies?.toMutableList()
+        val parentId = parentCommentId ?: comment.parentComment?.id
 
         val userViewData = if (user == null) {
             createDeletedUser()
@@ -306,7 +307,7 @@ object ViewDataConverter {
                     comment.id
                 )
             )
-            .parentId(parentCommentId)
+            .parentId(parentId)
             .parentComment(
                 comment.parentComment?.let {
                     convertComment(
