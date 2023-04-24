@@ -1,7 +1,5 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
@@ -22,11 +20,14 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
-    private val _postResponse = MutableLiveData<PostViewData>()
-    val postResponse: LiveData<PostViewData> = _postResponse
+    sealed class PostDataEvent {
+        data class GetPost(val post: PostViewData) : PostDataEvent()
 
-    private val _postEdited = MutableLiveData<Boolean>()
-    val postEdited: LiveData<Boolean> = _postEdited
+        data class EditPost(val post: PostViewData) : PostDataEvent()
+    }
+
+    private val postDataEventChannel = Channel<PostDataEvent>(Channel.BUFFERED)
+    val postDataEventFlow = postDataEventChannel.receiveAsFlow()
 
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()
@@ -52,7 +53,14 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
-                _postResponse.postValue(ViewDataConverter.convertPost(post, users))
+                postDataEventChannel.send(
+                    PostDataEvent.GetPost(
+                        ViewDataConverter.convertPost(
+                            post,
+                            users
+                        )
+                    )
+                )
             } else {
                 errorEventChannel.send(ErrorMessageEvent.GetPost(response.errorMessage))
             }
@@ -94,7 +102,17 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
             // calls api
             val response = lmFeedClient.editPost(request)
             if (response.success) {
-                _postEdited.postValue(true)
+                val data = response.data ?: return@launchIO
+                val post = data.post
+                val users = data.users
+                postDataEventChannel.send(
+                    PostDataEvent.EditPost(
+                        ViewDataConverter.convertPost(
+                            post,
+                            users
+                        )
+                    )
+                )
             } else {
                 errorEventChannel.send(ErrorMessageEvent.EditPost(response.errorMessage))
             }

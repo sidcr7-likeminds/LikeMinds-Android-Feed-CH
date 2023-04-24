@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentEditPostBinding
+import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
 import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
@@ -68,6 +69,9 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
     private lateinit var etPostTextChangeListener: TextWatcher
 
     private lateinit var memberTagging: MemberTaggingView
+
+    // [postPublisher] to publish changes in the post
+    private val postEvent = PostEvent.getPublisher()
 
     override fun getViewBinding(): FragmentEditPostBinding {
         return FragmentEditPostBinding.inflate(layoutInflater)
@@ -316,22 +320,34 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
         }
 
         // observes postResponse live data
-        viewModel.postResponse.observe(viewLifecycleOwner) { post ->
-            setPostData(post)
-        }
+        viewModel.postDataEventFlow.onEach { response ->
+            when (response) {
+                is EditPostViewModel.PostDataEvent.EditPost -> {
+                    // updated post from editPost response
+
+                    val post = response.post
+
+                    // notifies the subscribers about the change in post data
+                    postEvent.notify(Pair(post.id, post))
+
+                    requireActivity().apply {
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    }
+                }
+                is EditPostViewModel.PostDataEvent.GetPost -> {
+                    // post from getPost response
+
+                    val post = response.post
+                    setPostData(post)
+                }
+            }
+        }.observeInLifecycle(viewLifecycleOwner)
 
         // observes decodeUrlResponse and returns link ogTags
         helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
             initLinkView()
-        }
-
-        // observes postEdited, once post is edited
-        viewModel.postEdited.observe(viewLifecycleOwner) {
-            requireActivity().apply {
-                setResult(Activity.RESULT_OK)
-                finish()
-            }
         }
     }
 

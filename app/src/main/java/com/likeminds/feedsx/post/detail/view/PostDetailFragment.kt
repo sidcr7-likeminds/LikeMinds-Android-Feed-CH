@@ -523,8 +523,13 @@ class PostDetailFragment :
 
             parentCommentInAdapter.replies[index] = comment
 
+            val newViewData = parentCommentInAdapter.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(false)
+                .build()
+
             // updates the parentComment with edited reply
-            mPostDetailAdapter.update(parentIndex, parentCommentInAdapter)
+            mPostDetailAdapter.update(parentIndex, newViewData)
         }
     }
 
@@ -1026,6 +1031,8 @@ class PostDetailFragment :
         parentCommentViewData.replies.add(0, reply)
 
         val newCommentViewData = parentCommentViewData.toBuilder()
+            .fromCommentLiked(false)
+            .fromCommentEdited(false)
             .repliesCount(parentCommentViewData.repliesCount + 1)
             .build()
 
@@ -1058,6 +1065,8 @@ class PostDetailFragment :
         }
 
         val newCommentViewData = parentCommentViewData.toBuilder()
+            .fromCommentLiked(false)
+            .fromCommentEdited(false)
             .repliesCount(parentCommentViewData.repliesCount - 1)
             .build()
 
@@ -1152,6 +1161,8 @@ class PostDetailFragment :
 
         //update comment view data
         val newViewData = parentComment.toBuilder()
+            .fromCommentLiked(false)
+            .fromCommentEdited(false)
             .replies(parentComment.replies)
             .build()
 

@@ -537,16 +537,6 @@ class FeedFragment :
             }
         }
 
-    // launcher for [EditPostActivity]
-    private val editPostLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            when (result.resultCode) {
-                Activity.RESULT_OK -> {
-                    refreshFeed()
-                }
-            }
-        }
-
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
         // item decorator to add spacing between items
@@ -772,7 +762,7 @@ class FeedFragment :
                     .postId(postId)
                     .build()
                 val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
-                editPostLauncher.launch(intent)
+                startActivity(intent)
             }
             DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(postId, creatorId)
@@ -1096,6 +1086,7 @@ class FeedFragment :
         } else {
             // Post was updated
             mPostAdapter.update(postIndex, updatedPost)
+            scrollToPositionWithOffset(postIndex)
         }
     }
 
