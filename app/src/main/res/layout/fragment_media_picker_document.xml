@@ -41,7 +41,7 @@
                     app:tint="@color/black"
                     tools:ignore="ContentDescription" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     app:textType="title" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_selected_count"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <com.likeminds.feedsx.search.util.CustomSearchBar
+        <com.likeminds.feedsample.search.util.CustomSearchBar
             android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"

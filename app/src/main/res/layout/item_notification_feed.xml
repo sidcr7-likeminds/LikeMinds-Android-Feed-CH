@@ -41,7 +41,7 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_notification_content"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
             tools:fontFamily="@font/roboto_regular"
             tools:text="Nishkarsh Kaushik commented on your post: “Here is a list of social media tools to help you...”" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_notification_date"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

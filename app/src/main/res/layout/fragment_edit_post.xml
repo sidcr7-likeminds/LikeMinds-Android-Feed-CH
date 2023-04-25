@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
+        <com.likeminds.feedsample.branding.customview.LikeMindsToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -57,7 +57,7 @@
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
                     tools:ignore="ContentDescription" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     app:textType="title" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_save"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -91,7 +91,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsProgressBar
+                <com.likeminds.feedsample.branding.customview.LikeMindsProgressBar
                     android:id="@+id/pb_saving"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -103,7 +103,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
+        </com.likeminds.feedsample.branding.customview.LikeMindsToolbar>
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll"
@@ -127,7 +127,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsEditText
+                <com.likeminds.feedsample.branding.customview.LikeMindsEditText
                     android:id="@+id/et_post_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -149,7 +149,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/author_frame" />
 
-                <com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+                <com.likeminds.feedsample.utils.membertagging.view.MemberTaggingView
                     android:id="@+id/member_tagging_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

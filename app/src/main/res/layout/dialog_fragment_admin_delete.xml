@@ -7,7 +7,7 @@
 
         <variable
             name="reasonData"
-            type="com.likeminds.feedsx.delete.model.ReasonChooseViewData" />
+            type="com.likeminds.feedsample.delete.model.ReasonChooseViewData" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +35,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -50,7 +50,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:text="@string/delete_post_question" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_description"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -78,7 +78,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_description">
 
-                    <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                    <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                         android:id="@+id/tv_reason"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -111,7 +111,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/cv_reason">
 
-                    <com.likeminds.feedsx.branding.customview.LikeMindsEditText
+                    <com.likeminds.feedsample.branding.customview.LikeMindsEditText
                         android:id="@+id/et_other_reason"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -126,7 +126,7 @@
                         app:font_style="regular" />
                 </androidx.cardview.widget.CardView>
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_cancel"
                     android:layout_width="wrap_content"
                     android:layout_height="42dp"
@@ -146,7 +146,7 @@
                     app:layout_constraintTop_toBottomOf="@id/cv_other_reason"
                     app:layout_constraintEnd_toStartOf="@+id/tv_confirm" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_confirm"
                     android:layout_width="wrap_content"
                     android:layout_height="42dp"

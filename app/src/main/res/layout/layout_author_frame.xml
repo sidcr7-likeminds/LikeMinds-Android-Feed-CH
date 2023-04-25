@@ -33,7 +33,7 @@
             android:orientation="vertical"
             app:layout_constraintGuide_percent="0.5" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_member_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,7 +54,7 @@
             tools:fontFamily="@font/roboto_medium"
             tools:text="sfldsfdsafasdfafsdfdsfdsfdfasfskfldkf" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_custom_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -77,7 +77,7 @@
             tools:text="Community Manager"
             tools:visibility="visible" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -102,7 +102,7 @@
             app:layout_constraintTop_toTopOf="@+id/tv_time"
             tools:visibility="visible" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_edited"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

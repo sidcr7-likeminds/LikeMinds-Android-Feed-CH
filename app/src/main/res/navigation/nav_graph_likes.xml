@@ -6,6 +6,6 @@
 
     <fragment
         android:id="@+id/fragment_likes"
-        android:name="com.likeminds.feedsx.likes.view.LikesFragment"
+        android:name="com.likeminds.feedsample.likes.view.LikesFragment"
         android:label="LikesFragment" />
 </navigation>

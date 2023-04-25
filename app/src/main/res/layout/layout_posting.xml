@@ -20,7 +20,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_posting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,7 +37,7 @@
             app:layout_constraintStart_toEndOf="@id/iv_post_thumbnail"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsProgressBar
+        <com.likeminds.feedsample.branding.customview.LikeMindsProgressBar
             android:id="@+id/posting_progress"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="24dp"
@@ -51,7 +51,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
             android:id="@+id/tv_retry"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
