@@ -13,7 +13,7 @@
 
         <variable
             name="mediaViewData"
-            type="com.likeminds.feedsample.media.model.MediaViewData" />
+            type="com.likeminds.feedsampleapp.media.model.MediaViewData" />
 
         <variable
             name="isSelected"

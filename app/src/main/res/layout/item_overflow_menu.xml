@@ -9,7 +9,7 @@
 
         <variable
             name="data"
-            type="com.likeminds.feedsample.overflowmenu.model.OverflowMenuItemViewData" />
+            type="com.likeminds.feedsampleapp.overflowmenu.model.OverflowMenuItemViewData" />
 
     </data>
 
@@ -20,7 +20,7 @@
         android:clickable="true"
         android:focusable="true">
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/text_view_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

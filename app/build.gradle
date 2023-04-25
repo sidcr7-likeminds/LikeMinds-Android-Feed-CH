@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace 'com.likeminds.feedsample'
+    namespace 'com.likeminds.feedsampleapp'
     compileSdk versions.compile_sdk
 
     defaultConfig {
-        applicationId "com.likeminds.feedsample"
+        applicationId "com.likeminds.feedsampleapp"
         minSdk versions.min_sdk
         targetSdk versions.target_sdk
         versionCode versions.app_version_code

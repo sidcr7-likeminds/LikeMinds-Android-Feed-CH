@@ -23,7 +23,7 @@
             app:srcCompat="@drawable/ic_like_filled"
             tools:ignore="ContentDescription" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/likes_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
             tools:fontFamily="@font/roboto_regular"
             tools:text="39 Likes" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/comments_count"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

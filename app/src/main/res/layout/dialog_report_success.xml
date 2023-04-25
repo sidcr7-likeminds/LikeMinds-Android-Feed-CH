@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:background="@color/white">
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_reported_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -23,7 +23,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_report_sub_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -39,7 +39,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_reported_header" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsButton
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsButton
             android:id="@+id/btn_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

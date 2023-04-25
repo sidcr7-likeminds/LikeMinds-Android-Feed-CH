@@ -18,7 +18,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_post_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

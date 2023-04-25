@@ -33,7 +33,7 @@
             app:srcCompat="@drawable/ic_cross"
             tools:ignore="ContentDescription" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_document_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
             tools:fontFamily="@font/roboto_medium"
             tools:text="Getting started.png" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_meta_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -80,7 +80,7 @@
             app:layout_constraintStart_toEndOf="@+id/tv_meta_1"
             app:layout_constraintTop_toTopOf="@+id/tv_meta_1" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_meta_2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -105,7 +105,7 @@
             app:layout_constraintStart_toEndOf="@+id/tv_meta_2"
             app:layout_constraintTop_toTopOf="@+id/tv_meta_2" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_meta_3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

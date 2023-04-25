@@ -7,7 +7,7 @@
 
         <variable
             name="folderData"
-            type="com.likeminds.feedsample.media.model.MediaFolderViewData" />
+            type="com.likeminds.feedsampleapp.media.model.MediaFolderViewData" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -46,7 +46,7 @@
             app:layout_constraintStart_toStartOf="parent"
             tools:ignore="ContentDescription" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/textViewFolderTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -64,7 +64,7 @@
             app:layout_constraintTop_toTopOf="@+id/iv_folder_icon"
             tools:text="Camera" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/tv_folder_item_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

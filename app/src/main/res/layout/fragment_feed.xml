@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:background="@color/cultured">
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsToolbar
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
                     android:id="@+id/toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
 
-                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_notification_count"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
@@ -112,7 +112,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.likeminds.feedsample.branding.customview.LikeMindsToolbar>
+        </com.likeminds.feedsampleapp.branding.customview.LikeMindsToolbar>
 
         <include
             android:id="@+id/layout_posting"
@@ -178,7 +178,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsExtendedFAB
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsExtendedFAB
             android:id="@+id/new_post_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

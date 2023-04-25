@@ -16,7 +16,7 @@
         android:background="@color/white"
         tools:context=".likes.view.LikesActivity">
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsToolbar
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -48,7 +48,7 @@
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
                     tools:ignore="ContentDescription" />
 
-                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     app:textType="title" />
 
-                <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_sub_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -85,7 +85,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.likeminds.feedsample.branding.customview.LikeMindsToolbar>
+        </com.likeminds.feedsampleapp.branding.customview.LikeMindsToolbar>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"

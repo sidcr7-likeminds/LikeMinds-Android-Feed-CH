@@ -8,7 +8,7 @@
 
         <variable
             name="viewData"
-            type="com.likeminds.feedsample.delete.model.ReasonChooseViewData" />
+            type="com.likeminds.feedsampleapp.delete.model.ReasonChooseViewData" />
 
         <variable
             name="hideBottomLine"
@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsTextView
             android:id="@+id/textViewTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -6,6 +6,6 @@
 
     <fragment
         android:id="@+id/fragment_post_detail"
-        android:name="com.likeminds.feedsample.post.detail.view.PostDetailFragment"
+        android:name="com.likeminds.feedsampleapp.post.detail.view.PostDetailFragment"
         android:label="PostDetailFragment" />
 </navigation>

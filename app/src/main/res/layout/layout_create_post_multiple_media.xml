@@ -39,7 +39,7 @@
             app:layout_constraintTop_toBottomOf="@+id/viewpager_multiple_media"
             app:selectedDotColor="@{buttonColor}" />
 
-        <com.likeminds.feedsample.branding.customview.LikeMindsButton
+        <com.likeminds.feedsampleapp.branding.customview.LikeMindsButton
             android:id="@+id/btn_add_more"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

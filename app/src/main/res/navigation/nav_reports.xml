@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_report"
-        android:name="com.likeminds.feedsample.report.view.ReportFragment"
+        android:name="com.likeminds.feedsampleapp.report.view.ReportFragment"
         android:label="ReportFragment"
         tools:layout="@layout/fragment_report" />
 
