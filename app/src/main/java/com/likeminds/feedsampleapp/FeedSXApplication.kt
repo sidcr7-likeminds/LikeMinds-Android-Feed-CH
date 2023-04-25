@@ -5,10 +5,7 @@ import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
-import com.likeminds.feedsampleapp.branding.model.LMBranding
-import com.likeminds.feedsampleapp.branding.model.LMFonts
-import com.likeminds.feedsampleapp.branding.model.SetBrandingRequest
-import com.likeminds.feedsampleapp.post.PostWithAttachmentsRepository
+import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.likemindsfeed.LMCallback
 import com.likeminds.likemindsfeed.LMFeedClient
 import dagger.hilt.android.HiltAndroidApp
@@ -54,19 +51,19 @@ class FeedSXApplication @Inject constructor() : Application(), LMCallback {
     // TODO: testing data
     // sets branding to the app
     private fun setupBranding() {
-        val lmFonts = LMFonts.Builder()
+        val lmFonts = com.likeminds.feedsx.branding.model.LMFonts.Builder()
             .bold("fonts/montserrat-bold.ttf")
             .medium("fonts/montserrat-medium.ttf")
             .regular("fonts/montserrat-regular.ttf")
             .build()
 
-        val setBrandingRequest = SetBrandingRequest.Builder()
+        val setBrandingRequest = com.likeminds.feedsx.branding.model.SetBrandingRequest.Builder()
             .headerColor("#9B26AF")
             .buttonsColor("#E81D62")
             .textLinkColor("#4BAE4F")
             .fonts(lmFonts)
             .build()
-        LMBranding.setBranding(setBrandingRequest)
+        com.likeminds.feedsx.branding.model.LMBranding.setBranding(setBrandingRequest)
     }
 
     // function to set client domain

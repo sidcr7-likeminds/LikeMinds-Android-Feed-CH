@@ -4,7 +4,7 @@ import android.util.Log
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.likeminds.feedsampleapp.FeedSXApplication.Companion.LOG_TAG
-import com.likeminds.feedsampleapp.pushnotification.LMFeedNotificationHandler
+import com.likeminds.feedsx.pushnotification.LMFeedNotificationHandler
 
 class FeedSXMessagingService : FirebaseMessagingService() {
 

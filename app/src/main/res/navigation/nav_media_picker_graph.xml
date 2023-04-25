@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/media_picker_folder_fragment"
-        android:name="com.likeminds.feedsampleapp.media.view.MediaPickerFolderFragment"
+        android:name="com.likeminds.feedsx.media.view.MediaPickerFolderFragment"
         android:label="MediaPickerFolderFragment"
         tools:layout="@layout/fragment_media_picker_folder">
         <action
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/media_picker_item_fragment"
-        android:name="com.likeminds.feedsampleapp.media.view.MediaPickerItemFragment"
+        android:name="com.likeminds.feedsx.media.view.MediaPickerItemFragment"
         android:label="MediaPickerItemFragment"
         tools:layout="@layout/fragment_media_picker_item">
         <argument
@@ -28,7 +28,7 @@
     </fragment>
     <fragment
         android:id="@+id/media_picker_document_fragment"
-        android:name="com.likeminds.feedsampleapp.media.view.MediaPickerDocumentFragment"
+        android:name="com.likeminds.feedsx.media.view.MediaPickerDocumentFragment"
         android:label="MediaPickerDocumentFragment"
         tools:layout="@layout/fragment_media_picker_document">
         <argument

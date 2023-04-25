@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/post_comments_separator"
+            android:layout_width="match_parent"
+            android:layout_height="12dp"
+            android:background="@color/cultured"
+            app:layout_constraintTop_toTopOf="parent"/>
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_comments_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginHorizontal="16dp"
+            android:lineSpacingExtra="1sp"
+            android:textColor="@color/raisin_black"
+            android:textSize="14sp"
+            app:fontType="medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/post_comments_separator"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:fontFamily="@font/roboto_medium"
+            tools:text="13 Comments" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

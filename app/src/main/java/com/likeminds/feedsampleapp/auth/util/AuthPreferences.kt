@@ -1,7 +1,6 @@
 package com.likeminds.feedsampleapp.auth.util
 
 import android.content.Context
-import com.likeminds.feedsampleapp.utils.sharedpreferences.BasePreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -9,7 +8,7 @@ import javax.inject.Singleton
 @Singleton
 class AuthPreferences @Inject constructor(
     @ApplicationContext private val context: Context
-) : BasePreferences(AUTH_PREFS, context) {
+) : com.likeminds.feedsx.utils.sharedpreferences.BasePreferences(AUTH_PREFS, context) {
 
     companion object {
         const val AUTH_PREFS = "auth_prefs"
