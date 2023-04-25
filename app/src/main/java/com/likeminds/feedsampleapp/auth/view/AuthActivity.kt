@@ -5,6 +5,8 @@ import com.likeminds.feedsampleapp.MainActivity
 import com.likeminds.feedsampleapp.R
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
 import com.likeminds.feedsampleapp.databinding.ActivityAuthBinding
+import com.likeminds.feedsx.feed.model.FeedExtras
+import com.likeminds.feedsx.utils.Route
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -40,7 +42,7 @@ class AuthActivity : com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
     // parses deep link to start corresponding activity
     private fun parseDeepLink() {
         //get intent for route
-        val intent = com.likeminds.feedsx.utils.Route.handleDeepLink(
+        val intent = Route.handleDeepLink(
             this,
             intent.data.toString()
         )
@@ -50,7 +52,13 @@ class AuthActivity : com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
     // navigates user to [MainActivity]
     private fun navigateToMain() {
-        val intent = MainActivity.getIntent(this)
+        val feedExtras = FeedExtras.Builder()
+            .apiKey(authPreferences.getApiKey())
+            .userId(authPreferences.getUserId())
+            .userName(authPreferences.getUserName())
+            .isLoggedIn(true)
+            .build()
+        val intent = MainActivity.getIntent(this, feedExtras)
         startActivity(intent)
         finish()
     }
@@ -66,17 +74,26 @@ class AuthActivity : com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
                 val userId = binding.etUserId.text.toString().trim()
 
                 if (apiKey.isEmpty()) {
-                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(context, getString(R.string.enter_api_key))
+                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(
+                        context,
+                        getString(R.string.enter_api_key)
+                    )
                     return@setOnClickListener
                 }
 
                 if (userName.isEmpty()) {
-                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(context, getString(R.string.enter_user_name))
+                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(
+                        context,
+                        getString(R.string.enter_user_name)
+                    )
                     return@setOnClickListener
                 }
 
                 if (userId.isEmpty()) {
-                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(context, getString(R.string.enter_user_id))
+                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(
+                        context,
+                        getString(R.string.enter_user_id)
+                    )
                     return@setOnClickListener
                 }
 

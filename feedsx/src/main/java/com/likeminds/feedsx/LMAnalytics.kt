@@ -1,7 +1,7 @@
 package com.likeminds.feedsx
 
 import android.util.Log
-import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
+import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 
 object LMAnalytics {
     /*

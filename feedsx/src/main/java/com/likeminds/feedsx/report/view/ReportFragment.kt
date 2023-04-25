@@ -8,8 +8,8 @@ import androidx.fragment.app.viewModels
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
-import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.databinding.FragmentReportBinding
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter

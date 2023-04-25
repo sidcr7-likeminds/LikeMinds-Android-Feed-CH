@@ -6,9 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
-import com.likeminds.feedsx.auth.util.AuthPreferences
+import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.utils.SDKAuthPreferences
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -22,7 +23,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InitiateViewModel @Inject constructor(
-    private val authPreferences: AuthPreferences,
+    private val authPreferences: SDKAuthPreferences,
     private val userPreferences: UserPreferences,
     private val userWithRightsRepository: UserWithRightsRepository,
 ) : ViewModel() {
@@ -152,7 +153,7 @@ class InitiateViewModel @Inject constructor(
         FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
             if (!task.isSuccessful) {
                 Log.w(
-                    FeedSXApplication.LOG_TAG,
+                    LOG_TAG,
                     "Fetching FCM registration token failed",
                     task.exception
                 )

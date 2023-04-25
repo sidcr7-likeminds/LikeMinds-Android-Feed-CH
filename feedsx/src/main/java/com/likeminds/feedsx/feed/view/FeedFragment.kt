@@ -20,16 +20,17 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.StyledPlayerView
-import com.likeminds.feedsx.FeedSXApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.InitiateViewModel
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
+import com.likeminds.feedsx.feed.model.FeedExtras
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.feed.util.PostEvent.PostObserver
 import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
@@ -80,7 +81,13 @@ class FeedFragment :
     LMExoplayerListener,
     PostObserver {
 
+    companion object {
+        const val FEED_EXTRAS = "FEED_EXTRAS"
+    }
+
     private val viewModel: FeedViewModel by viewModels()
+
+    private lateinit var feedExtras: FeedExtras
 
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
     private val postActionsViewModel: PostActionsViewModel by activityViewModels()
@@ -100,6 +107,15 @@ class FeedFragment :
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
+    }
+
+    override fun receiveExtras() {
+        super.receiveExtras()
+        if (arguments == null || arguments?.containsKey(FEED_EXTRAS) == false) {
+            requireActivity().supportFragmentManager.popBackStack()
+            return
+        }
+        feedExtras = arguments?.getParcelable(FEED_EXTRAS)!!
     }
 
     override fun setUpViews() {

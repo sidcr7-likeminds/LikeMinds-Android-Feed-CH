@@ -1,15 +1,15 @@
-package com.likeminds.feedsampleapp.auth.util
+package com.likeminds.feedsx.utils
 
 import android.content.Context
-import android.content.SharedPreferences
+import com.likeminds.feedsx.utils.sharedpreferences.BasePreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthPreferences @Inject constructor(
+class SDKAuthPreferences @Inject constructor(
     @ApplicationContext private val context: Context
-) {
+) : BasePreferences(AUTH_PREFS, context) {
 
     companion object {
         const val AUTH_PREFS = "auth_prefs"
@@ -19,39 +19,36 @@ class AuthPreferences @Inject constructor(
         const val IS_LOGGED_IN = "is_logged_in"
     }
 
-    private val preferences: SharedPreferences =
-        context.getSharedPreferences(AUTH_PREFS, Context.MODE_PRIVATE)
-
     fun getApiKey(): String {
-        return preferences.getString(API_KEY, "") ?: ""
+        return getPreference(API_KEY, "") ?: ""
     }
 
     fun saveApiKey(apiKey: String) {
-        preferences.edit().putString(API_KEY, apiKey).apply()
+        putPreference(API_KEY, apiKey)
     }
 
     fun getUserName(): String {
-        return preferences.getString(USER_NAME, "") ?: ""
+        return getPreference(USER_NAME, "") ?: ""
     }
 
     fun saveUserName(userName: String) {
-        preferences.edit().putString(USER_NAME, userName).apply()
+        putPreference(USER_NAME, userName)
     }
 
     fun getUserId(): String {
-        return preferences.getString(USER_ID, "") ?: ""
+        return getPreference(USER_ID, "") ?: ""
     }
 
     fun saveUserId(userId: String) {
-        preferences.edit().putString(USER_ID, userId).apply()
+        putPreference(USER_ID, userId)
     }
 
     fun getIsLoggedIn(): Boolean {
-        return preferences.getBoolean(IS_LOGGED_IN, false)
+        return getPreference(IS_LOGGED_IN, false)
     }
 
     fun saveIsLoggedIn(isLoggedIn: Boolean) {
-        preferences.edit().putBoolean(IS_LOGGED_IN, isLoggedIn).apply()
+        putPreference(IS_LOGGED_IN, isLoggedIn)
     }
 
     fun clearPrefs() {

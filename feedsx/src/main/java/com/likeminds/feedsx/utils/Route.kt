@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.MainActivity
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
@@ -17,7 +16,6 @@ object Route {
     const val PARAM_POST_ID = "post_id"
     const val ROUTE_BROWSER = "browser"
     const val PARAM_COMMENT_ID = "comment_id"
-    const val ROUTE_MAIN = "main"
 
     private const val DEEP_LINK_POST = "post"
 
@@ -50,8 +48,6 @@ object Route {
             ROUTE_BROWSER -> {
                 intent = getRouteToBrowser(route)
             }
-            ROUTE_MAIN ->
-                intent = getRouteToMain(context)
         }
         if (intent != null) {
             intent.flags = flags
@@ -151,14 +147,5 @@ object Route {
         source: String?
     ): Intent {
         return CreatePostActivity.getIntent(context, source)
-    }
-
-    //route://main
-    fun getRouteToMain(
-        context: Context,
-    ): Intent {
-        return MainActivity.getIntent(
-            context
-        )
     }
 }

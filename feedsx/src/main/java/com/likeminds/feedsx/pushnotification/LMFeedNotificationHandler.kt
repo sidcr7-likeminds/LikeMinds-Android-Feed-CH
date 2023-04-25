@@ -5,8 +5,6 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -177,13 +175,6 @@ class LMFeedNotificationHandler {
             LMAnalytics.Source.NOTIFICATION
         )
 
-        //get intent for main activity
-        val mainIntent = Route.getRouteIntent(
-            context,
-            mainRoute(),
-            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK,
-        )
-
         if (intent?.getBundleExtra("bundle") != null) {
             intent.getBundleExtra("bundle")!!.putParcelable(
                 NOTIFICATION_DATA,
@@ -211,22 +202,13 @@ class LMFeedNotificationHandler {
 
         var resultPendingIntent: PendingIntent? = null
         if (intent != null) {
-            resultPendingIntent = PendingIntent.getActivities(
+            resultPendingIntent = PendingIntent.getActivity(
                 context,
                 notificationId,
-                arrayOf(mainIntent, intent),
+                intent,
                 PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
         }
         return resultPendingIntent
     }
-
-    private fun mainRoute(): String {
-        return Uri.Builder()
-            .scheme("route")
-            .authority(Route.ROUTE_MAIN)
-            .build()
-            .toString()
-    }
-
 }

@@ -5,7 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
-import com.likeminds.feedsx.FeedSXApplication
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.utils.getIntOrNull
 import com.likeminds.feedsx.utils.getLongOrNull
@@ -24,8 +24,9 @@ abstract class MediaUploadWorker(
     private val params: WorkerParameters
 ) : CoroutineWorker(appContext, params) {
 
-    protected val transferUtility by lazy { (appContext.applicationContext as FeedSXApplication).transferUtility }
-    protected val postRepository by lazy { (appContext.applicationContext as FeedSXApplication).postWithAttachmentsRepository }
+    private val sdkApplication = SDKApplication.getInstance()
+    protected val transferUtility by lazy { sdkApplication.transferUtility }
+    protected val postRepository by lazy { sdkApplication.postWithAttachmentsRepository }
 
     private val progressMap by lazy { HashMap<Int, Pair<Long, Long>>() }
     protected var uploadedCount = 0

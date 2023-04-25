@@ -36,11 +36,11 @@ object ViewDataConverter {
         val attachmentType: Int?
         val viewType = when (singleUriData.fileType) {
             IMAGE -> {
-                attachmentType = IMAGE
+                attachmentType = com.likeminds.feedsx.posttypes.model.IMAGE
                 ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
             }
             VIDEO -> {
-                attachmentType = VIDEO
+                attachmentType = com.likeminds.feedsx.posttypes.model.VIDEO
                 ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
             }
             else -> {
@@ -606,10 +606,10 @@ object ViewDataConverter {
     ): AttachmentEntity {
         val attachmentType = when (singleUriData.fileType) {
             IMAGE -> {
-                IMAGE
+                com.likeminds.feedsx.posttypes.model.IMAGE
             }
             VIDEO -> {
-                VIDEO
+                com.likeminds.feedsx.posttypes.model.VIDEO
             }
             else -> {
                 DOCUMENT
