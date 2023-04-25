@@ -238,20 +238,19 @@ object PostTypeUtil {
                 ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
             }
 
-            likesCount.text =
-                if (data.likesCount == 0) context.getString(R.string.like)
-                else
+            if (data.likesCount == 0) {
+                likesCount.text =
+                    context.getString(R.string.like)
+            } else {
+                likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
                         data.likesCount,
                         data.likesCount
                     )
-
-            likesCount.setOnClickListener {
-                if (data.likesCount == 0) {
-                    return@setOnClickListener
+                likesCount.setOnClickListener {
+                    listener.showLikesScreen(data.id)
                 }
-                listener.showLikesScreen(data.id)
             }
 
             commentsCount.text =
@@ -462,7 +461,7 @@ object PostTypeUtil {
         data: LinkOGTagsViewData
     ) {
         binding.apply {
-            root.setOnClickListener {
+            cvLinkPreview.setOnClickListener {
                 // creates a route and returns an intent to handle the link
                 val intent = Route.handleDeepLink(root.context, data.url)
                 if (intent != null) {
