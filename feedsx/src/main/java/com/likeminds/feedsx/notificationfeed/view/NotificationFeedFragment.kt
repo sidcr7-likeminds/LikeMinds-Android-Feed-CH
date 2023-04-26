@@ -3,6 +3,7 @@ package com.likeminds.feedsx.notificationfeed.view
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
@@ -27,6 +28,11 @@ class NotificationFeedFragment :
 
     override fun getViewBinding(): FragmentNotificationFeedBinding {
         return FragmentNotificationFeedBinding.inflate(layoutInflater)
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().notificationFeedComponent()?.inject(this)
     }
 
     override fun setUpViews() {

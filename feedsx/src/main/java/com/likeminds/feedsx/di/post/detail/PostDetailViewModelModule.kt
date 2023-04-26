@@ -2,8 +2,6 @@ package com.likeminds.feedsx.di.post.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.likeminds.feedsx.di.post.create.CreatePostViewModelKey
-import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
 import dagger.Binds
 import dagger.Module
@@ -16,7 +14,7 @@ abstract class PostDetailViewModelModule {
 
     @Binds
     @IntoMap
-    @CreatePostViewModelKey(CreatePostViewModel::class)
+    @PostDetailViewModelKey(PostDetailViewModel::class)
     abstract fun bindPostDetailViewModel(postDetailViewModel: PostDetailViewModel): ViewModel
 
 }

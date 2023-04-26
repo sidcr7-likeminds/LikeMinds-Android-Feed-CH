@@ -71,6 +71,8 @@ class MediaPickerDocumentFragment :
 
     override fun setUpViews() {
         super.setUpViews()
+
+        binding.toolbarColor = LMBranding.getToolbarColor()
         setHasOptionsMenu(true)
         initializeUI()
         initializeListeners()

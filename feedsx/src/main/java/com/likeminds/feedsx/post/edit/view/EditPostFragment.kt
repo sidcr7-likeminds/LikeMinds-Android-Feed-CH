@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentEditPostBinding
 import com.likeminds.feedsx.feed.util.PostEvent
@@ -75,6 +76,11 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
 
     override fun getViewModelClass(): Class<EditPostViewModel> {
         return EditPostViewModel::class.java
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().editPostComponent()?.inject(this)
     }
 
     override fun getViewBinding(): FragmentEditPostBinding {

@@ -27,13 +27,13 @@ class LikesFragment : BaseFragment<FragmentLikesBinding, LikesViewModel>() {
         return LikesViewModel::class.java
     }
 
-    override fun getViewBinding(): FragmentLikesBinding {
-        return FragmentLikesBinding.inflate(layoutInflater)
-    }
-
     override fun attachDagger() {
         super.attachDagger()
         SDKApplication.getInstance().likesComponent()?.inject(this)
+    }
+
+    override fun getViewBinding(): FragmentLikesBinding {
+        return FragmentLikesBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {

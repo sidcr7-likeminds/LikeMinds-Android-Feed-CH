@@ -13,6 +13,7 @@ import com.likeminds.feedsx.di.LikeMindsFeedComponent
 import com.likeminds.feedsx.di.feed.FeedComponent
 import com.likeminds.feedsx.di.likes.LikesComponent
 import com.likeminds.feedsx.di.media.MediaComponent
+import com.likeminds.feedsx.di.moderation.report.ReportComponent
 import com.likeminds.feedsx.di.notificationfeed.NotificationFeedComponent
 import com.likeminds.feedsx.di.post.create.CreatePostComponent
 import com.likeminds.feedsx.di.post.detail.PostDetailComponent
@@ -36,6 +37,7 @@ class SDKApplication {
     private var createPostComponent: CreatePostComponent? = null
     private var postDetailComponent: PostDetailComponent? = null
     private var editPostComponent: EditPostComponent? = null
+    private var reportComponent: ReportComponent? = null
 
     companion object {
         const val LOG_TAG = "LikeMinds"
@@ -175,5 +177,15 @@ class SDKApplication {
             editPostComponent = likeMindsFeedComponent?.editPostComponent()?.create()
         }
         return editPostComponent
+    }
+
+    /**
+     * initiate and return ReportComponent: All dependencies required for report package
+     * */
+    fun reportComponent(): ReportComponent? {
+        if (reportComponent == null) {
+            reportComponent = likeMindsFeedComponent?.reportComponent()?.create()
+        }
+        return reportComponent
     }
 }

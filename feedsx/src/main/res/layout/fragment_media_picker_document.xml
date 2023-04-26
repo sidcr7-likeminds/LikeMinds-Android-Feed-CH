@@ -3,6 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="toolbarColor"
+            type="int" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,11 +41,11 @@
                     android:layout_marginTop="18dp"
                     android:layout_marginBottom="19dp"
                     android:background="?selectableItemBackgroundBorderless"
+                    android:tint="@{toolbarColor}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
-                    app:tint="@color/black"
                     tools:ignore="ContentDescription" />
 
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView
@@ -52,7 +59,6 @@
                     android:includeFontPadding="false"
                     android:singleLine="true"
                     android:text="@string/documents"
-                    android:textColor="@color/black"
                     android:textSize="20sp"
                     app:fontType="medium"
                     app:layout_constraintBottom_toTopOf="@+id/tv_selected_count"

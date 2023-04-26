@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentMediaPickerItemBinding
 import com.likeminds.feedsx.media.model.MEDIA_RESULT_PICKED
 import com.likeminds.feedsx.media.model.MediaPickerItemExtras
@@ -53,6 +55,11 @@ class MediaPickerItemFragment :
         return MediaViewModel::class.java
     }
 
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().mediaComponent()?.inject(this)
+    }
+
     override fun getViewBinding(): FragmentMediaPickerItemBinding {
         return FragmentMediaPickerItemBinding.inflate(layoutInflater)
     }
@@ -65,6 +72,7 @@ class MediaPickerItemFragment :
 
     override fun setUpViews() {
         super.setUpViews()
+        binding.toolbarColor = LMBranding.getToolbarColor()
         if (mediaPickerItemExtras.allowMultipleSelect) {
             setHasOptionsMenu(true)
         }

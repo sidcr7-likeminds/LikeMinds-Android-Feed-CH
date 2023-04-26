@@ -111,13 +111,13 @@ class FeedFragment :
         return FeedViewModel::class.java
     }
 
-    override fun getViewBinding(): FragmentFeedBinding {
-        return FragmentFeedBinding.inflate(layoutInflater)
-    }
-
     override fun attachDagger() {
         super.attachDagger()
         SDKApplication.getInstance().feedComponent()?.inject(this)
+    }
+
+    override fun getViewBinding(): FragmentFeedBinding {
+        return FragmentFeedBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {
@@ -248,10 +248,12 @@ class FeedFragment :
                         if (post.thumbnail.isNullOrEmpty()) {
                             ivPostThumbnail.hide()
                         } else {
+                            val shimmer = ViewUtils.getShimmer()
                             ivPostThumbnail.show()
                             ImageBindingUtil.loadImage(
                                 ivPostThumbnail,
-                                Uri.parse(post.thumbnail)
+                                Uri.parse(post.thumbnail),
+                                shimmer
                             )
                         }
                         postingProgress.progress = 0

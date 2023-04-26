@@ -11,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.likeminds.feedsx.InitiateViewModel
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.*
@@ -100,6 +101,11 @@ class PostDetailFragment :
 
     override fun getViewModelClass(): Class<PostDetailViewModel> {
         return PostDetailViewModel::class.java
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().postDetailComponent()?.inject(this)
     }
 
     override fun getViewBinding(): FragmentPostDetailBinding {

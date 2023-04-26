@@ -12,6 +12,7 @@ import androidx.appcompat.view.menu.MenuBuilder
 import androidx.navigation.fragment.findNavController
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentMediaPickerFolderBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
@@ -69,6 +70,8 @@ class MediaPickerFolderFragment :
 
     override fun setUpViews() {
         super.setUpViews()
+
+        binding.toolbarColor = LMBranding.getToolbarColor()
         setHasOptionsMenu(true)
         initializeUI()
         initializeListeners()
