@@ -8,19 +8,22 @@ import com.likeminds.feedsx.databinding.FragmentNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
+import com.likeminds.feedsx.notificationfeed.viewmodel.NotificationFeedViewModel
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class NotificationFeedFragment :
-    BaseFragment<FragmentNotificationFeedBinding>(),
+    BaseFragment<FragmentNotificationFeedBinding, NotificationFeedViewModel>(),
     NotificationFeedAdapterListener {
 
     private lateinit var mNotificationFeedAdapter: NotificationFeedAdapter
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
+
+    override fun getViewModelClass(): Class<NotificationFeedViewModel> {
+        return NotificationFeedViewModel::class.java
+    }
 
     override fun getViewBinding(): FragmentNotificationFeedBinding {
         return FragmentNotificationFeedBinding.inflate(layoutInflater)
@@ -174,7 +177,10 @@ class NotificationFeedFragment :
     }
 
     //attach scroll listener for pagination
-    private fun attachScrollListener(recyclerView: RecyclerView, layoutManager: LinearLayoutManager) {
+    private fun attachScrollListener(
+        recyclerView: RecyclerView,
+        layoutManager: LinearLayoutManager
+    ) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 // TODO: add logic

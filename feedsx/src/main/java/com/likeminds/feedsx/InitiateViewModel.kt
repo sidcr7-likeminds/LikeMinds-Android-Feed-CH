@@ -1,9 +1,10 @@
 package com.likeminds.feedsx
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
@@ -18,15 +19,14 @@ import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.helper.model.RegisterDeviceRequest
 import com.likeminds.likemindsfeed.initiateUser.model.InitiateUserRequest
 import com.likeminds.likemindsfeed.sdk.model.User
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-@HiltViewModel
 class InitiateViewModel @Inject constructor(
     private val authPreferences: SDKAuthPreferences,
     private val userPreferences: UserPreferences,
     private val userWithRightsRepository: UserWithRightsRepository,
-) : ViewModel() {
+    applicationContext: Application
+) : AndroidViewModel(applicationContext) {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 

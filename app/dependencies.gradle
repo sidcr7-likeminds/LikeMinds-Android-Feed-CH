@@ -43,10 +43,6 @@ dependencies {
     // gson
     implementation deps.gson.main
 
-    //aws
-    implementation deps.aws.s3
-    implementation(deps.aws.mobile_client) { transitive = true }
-
     //testing
     testImplementation deps.testing.junit
     androidTestImplementation deps.testing.android_junit

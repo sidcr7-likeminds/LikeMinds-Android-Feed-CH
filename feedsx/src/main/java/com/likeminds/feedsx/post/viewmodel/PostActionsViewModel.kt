@@ -1,8 +1,9 @@
 package com.likeminds.feedsx.post.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -14,15 +15,14 @@ import com.likeminds.likemindsfeed.post.model.DeletePostRequest
 import com.likeminds.likemindsfeed.post.model.LikePostRequest
 import com.likeminds.likemindsfeed.post.model.PinPostRequest
 import com.likeminds.likemindsfeed.post.model.SavePostRequest
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-@HiltViewModel
 class PostActionsViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
-) : ViewModel() {
+    private val userPreferences: UserPreferences,
+    applicationContext: Application
+) : AndroidViewModel(applicationContext) {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 

@@ -16,10 +16,8 @@ import com.likeminds.likemindsfeed.comment.model.GetCommentLikesRequest
 import com.likeminds.likemindsfeed.comment.model.GetCommentLikesResponse
 import com.likeminds.likemindsfeed.post.model.GetPostLikesRequest
 import com.likeminds.likemindsfeed.post.model.GetPostLikesResponse
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-@HiltViewModel
 class LikesViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()

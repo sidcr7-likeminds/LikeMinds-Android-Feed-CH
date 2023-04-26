@@ -28,7 +28,8 @@ versions.photoview = '2.3.0'
 versions.drawable_toolbox = '1.0.7'
 versions.dotsindicator = '4.2'
 versions.swiperefreshlayout = '1.1.0'
-versions.hilt = "2.42"
+versions.hilt = '2.42'
+versions.dagger = '2.42'
 versions.stream = '1.2.1'
 versions.work_manager = '2.7.1'
 versions.gson = '2.8.6'
@@ -70,6 +71,11 @@ def hilt = [:]
 hilt.main = "com.google.dagger:hilt-android:$versions.hilt"
 hilt.compiler = "com.google.dagger:hilt-compiler:$versions.hilt"
 deps.hilt = hilt
+
+def dagger = [:]
+dagger.main = "com.google.dagger:dagger:$versions.dagger"
+dagger.compiler = "com.google.dagger:dagger-compiler:$versions.dagger"
+deps.dagger = dagger
 
 def glide = [:]
 glide.core = "com.github.bumptech.glide:glide:$versions.glide"

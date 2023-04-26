@@ -1,8 +1,9 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
@@ -19,16 +20,15 @@ import com.likeminds.likemindsfeed.helper.model.DecodeUrlRequest
 import com.likeminds.likemindsfeed.helper.model.DecodeUrlResponse
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-@HiltViewModel
 class HelperViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
-    private val userPreferences: UserPreferences
-) : ViewModel() {
+    private val userPreferences: UserPreferences,
+    applicationContext: Application
+) : AndroidViewModel(applicationContext) {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 

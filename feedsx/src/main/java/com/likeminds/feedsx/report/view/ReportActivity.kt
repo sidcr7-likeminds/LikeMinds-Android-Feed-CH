@@ -6,9 +6,7 @@ import android.os.Bundle
 import com.likeminds.feedsx.databinding.ActivityReportBinding
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class ReportActivity : BaseAppCompatActivity() {
 
 

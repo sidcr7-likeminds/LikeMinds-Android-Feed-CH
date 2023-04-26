@@ -4,8 +4,6 @@ import android.app.Activity
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SimpleItemAnimator
@@ -53,24 +51,23 @@ import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import com.likeminds.feedsx.utils.model.BaseViewType
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-@AndroidEntryPoint
 class PostDetailFragment :
-    BaseFragment<FragmentPostDetailBinding>(),
+    BaseFragment<FragmentPostDetailBinding, PostDetailViewModel>(),
     PostAdapterListener,
     PostDetailAdapterListener,
     PostDetailReplyAdapterListener,
     SelfDeleteDialogFragment.DeleteAlertDialogListener,
     AdminDeleteDialogFragment.DeleteDialogListener {
 
-    private val viewModel: PostDetailViewModel by viewModels()
-
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
-    private val postActionsViewModel: PostActionsViewModel by activityViewModels()
+    @Inject
+    lateinit var postActionsViewModel: PostActionsViewModel
 
-    private val initiateViewModel: InitiateViewModel by activityViewModels()
+    @Inject
+    lateinit var initiateViewModel: InitiateViewModel
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -96,6 +93,13 @@ class PostDetailFragment :
     companion object {
         const val TAG = "PostDetailFragment"
         const val REPLIES_THRESHOLD = 5
+    }
+
+    override val useSharedViewModel: Boolean
+        get() = true
+
+    override fun getViewModelClass(): Class<PostDetailViewModel> {
+        return PostDetailViewModel::class.java
     }
 
     override fun getViewBinding(): FragmentPostDetailBinding {

@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.likes.view
 
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
@@ -12,20 +11,20 @@ import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
-class LikesFragment : BaseFragment<FragmentLikesBinding>() {
+class LikesFragment : BaseFragment<FragmentLikesBinding, LikesViewModel>() {
 
     companion object {
         private const val TAG = "Likes Screen"
     }
 
-    private val viewModel: LikesViewModel by viewModels()
-
     private lateinit var mLikesScreenAdapter: LikesScreenAdapter
 
     private lateinit var likesScreenExtras: LikesScreenExtras
+
+    override fun getViewModelClass(): Class<LikesViewModel> {
+        return LikesViewModel::class.java
+    }
 
     override fun getViewBinding(): FragmentLikesBinding {
         return FragmentLikesBinding.inflate(layoutInflater)

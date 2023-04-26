@@ -1,19 +1,16 @@
 package com.likeminds.feedsampleapp.auth.view
 
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsampleapp.MainActivity
 import com.likeminds.feedsampleapp.R
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
 import com.likeminds.feedsampleapp.databinding.ActivityAuthBinding
 import com.likeminds.feedsx.feed.model.FeedExtras
 import com.likeminds.feedsx.utils.Route
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
-@AndroidEntryPoint
-class AuthActivity : com.likeminds.feedsx.utils.customview.BaseAppCompatActivity() {
+class AuthActivity : AppCompatActivity() {
 
-    @Inject
     lateinit var authPreferences: AuthPreferences
 
     lateinit var binding: ActivityAuthBinding
@@ -21,6 +18,7 @@ class AuthActivity : com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        authPreferences = AuthPreferences(this)
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

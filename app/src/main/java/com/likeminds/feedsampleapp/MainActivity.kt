@@ -3,16 +3,15 @@ package com.likeminds.feedsampleapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsampleapp.databinding.ActivityMainBinding
 import com.likeminds.feedsx.feed.model.FeedExtras
 import com.likeminds.feedsx.feed.view.FeedFragment
 import com.likeminds.feedsx.utils.ViewUtils
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
-class MainActivity : com.likeminds.feedsx.utils.customview.BaseAppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
 

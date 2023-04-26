@@ -13,8 +13,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -48,18 +46,17 @@ import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import com.likeminds.feedsx.utils.model.*
 import com.likeminds.feedsx.utils.observeInLifecycle
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import java.util.*
+import javax.inject.Inject
 
-@AndroidEntryPoint
-class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
+class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel>() {
 
-    private val viewModel: EditPostViewModel by viewModels()
-    private val helperViewModel: HelperViewModel by activityViewModels()
+    @Inject
+    lateinit var helperViewModel: HelperViewModel
 
     private lateinit var editPostExtras: EditPostExtras
 
@@ -72,6 +69,13 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding>() {
 
     // [postPublisher] to publish changes in the post
     private val postEvent = PostEvent.getPublisher()
+
+    override val useSharedViewModel: Boolean
+        get() = true
+
+    override fun getViewModelClass(): Class<EditPostViewModel> {
+        return EditPostViewModel::class.java
+    }
 
     override fun getViewBinding(): FragmentEditPostBinding {
         return FragmentEditPostBinding.inflate(layoutInflater)

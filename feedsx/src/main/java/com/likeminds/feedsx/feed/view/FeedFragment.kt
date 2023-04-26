@@ -9,8 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -66,15 +64,13 @@ import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
 import java.util.*
 import javax.inject.Inject
 
 
-@AndroidEntryPoint
 class FeedFragment :
-    BaseFragment<FragmentFeedBinding>(),
+    BaseFragment<FragmentFeedBinding, FeedViewModel>(),
     PostAdapterListener,
     AdminDeleteDialogFragment.DeleteDialogListener,
     SelfDeleteDialogFragment.DeleteAlertDialogListener,
@@ -85,14 +81,14 @@ class FeedFragment :
         const val FEED_EXTRAS = "FEED_EXTRAS"
     }
 
-    private val viewModel: FeedViewModel by viewModels()
-
     private lateinit var feedExtras: FeedExtras
 
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
-    private val postActionsViewModel: PostActionsViewModel by activityViewModels()
+    @Inject
+    lateinit var postActionsViewModel: PostActionsViewModel
 
-    private val initiateViewModel: InitiateViewModel by activityViewModels()
+    @Inject
+    lateinit var initiateViewModel: InitiateViewModel
 
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
@@ -104,6 +100,13 @@ class FeedFragment :
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
     private val workersMap by lazy { ArrayList<UUID>() }
+
+    override val useSharedViewModel: Boolean
+        get() = true
+
+    override fun getViewModelClass(): Class<FeedViewModel> {
+        return FeedViewModel::class.java
+    }
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)

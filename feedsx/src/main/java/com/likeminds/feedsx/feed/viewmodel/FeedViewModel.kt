@@ -27,12 +27,10 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-@HiltViewModel
 class FeedViewModel @Inject constructor(
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val postPreferences: PostPreferences

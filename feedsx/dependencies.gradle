@@ -14,9 +14,9 @@ dependencies {
     implementation deps.ui.swiperefreshlayout
     implementation deps.ui.flexbox
 
-    //hilt
-    implementation deps.hilt.main
-    kapt deps.hilt.compiler
+    //dagger
+    implementation deps.dagger.main
+    kapt deps.dagger.compiler
 
     //exoplayer
     implementation deps.exo_player.main

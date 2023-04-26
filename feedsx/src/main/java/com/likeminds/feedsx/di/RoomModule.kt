@@ -9,18 +9,14 @@ import com.likeminds.feedsx.db.utils.DbConstants
 import com.likeminds.feedsx.db.utils.DbMigration
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
 class RoomModule {
 
     @Provides
     @Singleton
-    fun provideFeedSXDatabase(@ApplicationContext context: Context): FeedSXDatabase {
+    fun provideFeedSXDatabase(context: Context): FeedSXDatabase {
         return Room.databaseBuilder(context, FeedSXDatabase::class.java, DbConstants.FEED_SX_DB)
             .addMigrations(DbMigration.MIGRATION_1_2)
             .build()

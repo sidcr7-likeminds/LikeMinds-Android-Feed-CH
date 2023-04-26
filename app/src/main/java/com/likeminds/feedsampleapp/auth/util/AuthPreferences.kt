@@ -2,14 +2,10 @@ package com.likeminds.feedsampleapp.auth.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthPreferences @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
+class AuthPreferences(context: Context) {
 
     companion object {
         const val AUTH_PREFS = "auth_prefs"
@@ -17,6 +13,8 @@ class AuthPreferences @Inject constructor(
         const val USER_NAME = "user_name"
         const val USER_ID = "user_id"
         const val IS_LOGGED_IN = "is_logged_in"
+
+
     }
 
     private val preferences: SharedPreferences =

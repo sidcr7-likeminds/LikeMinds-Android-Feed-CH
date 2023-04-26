@@ -11,9 +11,7 @@ import com.likeminds.feedsx.databinding.ActivityLikesBinding
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class LikesActivity : BaseAppCompatActivity() {
 
     lateinit var binding: ActivityLikesBinding

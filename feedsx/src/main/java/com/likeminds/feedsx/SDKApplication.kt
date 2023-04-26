@@ -8,6 +8,11 @@ import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
+import com.likeminds.feedsx.di.AppComponent
+import com.likeminds.feedsx.di.feed.FeedComponent
+import com.likeminds.feedsx.di.likes.LikesComponent
+import com.likeminds.feedsx.di.media.MediaComponent
+import com.likeminds.feedsx.di.notificationfeed.NotificationFeedComponent
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import javax.inject.Inject
 
@@ -18,6 +23,12 @@ class SDKApplication {
 
     @Inject
     lateinit var postWithAttachmentsRepository: PostWithAttachmentsRepository
+
+    private var appComponent: AppComponent? = null
+    private var feedComponent: FeedComponent? = null
+    private var likesComponent: LikesComponent? = null
+    private var mediaComponent: MediaComponent? = null
+    private var notificationFeedComponent: NotificationFeedComponent? = null
 
     companion object {
         const val LOG_TAG = "LikeMinds"
@@ -43,6 +54,7 @@ class SDKApplication {
     ) {
         setupBranding(brandingRequest)
         setupDomain()
+        initAppComponent(application)
         initAWSMobileClient(application)
     }
 
@@ -71,5 +83,59 @@ class SDKApplication {
                 override fun onError(e: java.lang.Exception?) {
                 }
             })
+    }
+
+    /**
+     * initiate dagger for the sdk
+     *
+     * @param application : The client will pass instance application to the function
+     * */
+    private fun initAppComponent(application: Application) {
+        if (appComponent == null) {
+            appComponent = DaggerAppComponent.builder()
+                .application(application)
+                .build()
+        }
+        appComponent!!.inject(this)
+    }
+
+    /**
+     * initiate and return FeedComponent: All dependencies required for feed package
+     * */
+    fun feedComponent(): FeedComponent? {
+        if (feedComponent == null) {
+            feedComponent = appComponent?.feedComponent()?.create()
+        }
+        return feedComponent
+    }
+
+    /**
+     * initiate and return LikesComponent: All dependencies required for likes package
+     * */
+    fun likesComponent(): LikesComponent? {
+        if (likesComponent == null) {
+            likesComponent = appComponent?.likesComponent()?.create()
+        }
+        return likesComponent
+    }
+
+    /**
+     * initiate and return MediaComponent: All dependencies required for media package
+     * */
+    fun mediaComponent(): MediaComponent? {
+        if (mediaComponent == null) {
+            mediaComponent = appComponent?.mediaComponent()?.create()
+        }
+        return mediaComponent
+    }
+
+    /**
+     * initiate and return NotificationFeedComponent: All dependencies required for notificationfeed package
+     * */
+    fun notificationFeedComponent(): NotificationFeedComponent? {
+        if (notificationFeedComponent == null) {
+            notificationFeedComponent = appComponent?.notificationFeedComponent()?.create()
+        }
+        return notificationFeedComponent
     }
 }

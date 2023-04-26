@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import com.google.android.flexbox.FlexDirection
 import com.google.android.flexbox.FlexboxLayoutManager
 import com.google.android.flexbox.JustifyContent
@@ -18,14 +17,13 @@ import com.likeminds.feedsx.report.viewmodel.ReportViewModel
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
-class ReportFragment : BaseFragment<FragmentReportBinding>(),
+class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
     ReportAdapterListener {
 
-    private val viewModel: ReportViewModel by viewModels()
-    private lateinit var reasonOrTag: String
+    override fun getViewModelClass(): Class<ReportViewModel> {
+        return ReportViewModel::class.java
+    }
 
     override fun getViewBinding(): FragmentReportBinding {
         return FragmentReportBinding.inflate(layoutInflater)
@@ -39,6 +37,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding>(),
     private lateinit var extras: ReportExtras
     private lateinit var mAdapter: ReportAdapter
     private var tagSelected: ReportTagViewData? = null
+    private lateinit var reasonOrTag: String
 
     override fun receiveExtras() {
         super.receiveExtras()

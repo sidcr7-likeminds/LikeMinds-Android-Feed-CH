@@ -6,11 +6,8 @@ import com.likeminds.feedsx.branding.model.LMFonts
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
 import com.likeminds.likemindsfeed.LMCallback
 import com.likeminds.likemindsfeed.LMFeedClient
-import dagger.hilt.android.HiltAndroidApp
-import javax.inject.Inject
 
-@HiltAndroidApp
-class FeedSXApplication @Inject constructor() : Application(), LMCallback {
+class FeedSXApplication : Application(), LMCallback {
 
     companion object {
         const val LOG_TAG = "LikeMinds"
