@@ -8,11 +8,15 @@ import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
-import com.likeminds.feedsx.di.AppComponent
+import com.likeminds.feedsx.di.DaggerLikeMindsFeedComponent
+import com.likeminds.feedsx.di.LikeMindsFeedComponent
 import com.likeminds.feedsx.di.feed.FeedComponent
 import com.likeminds.feedsx.di.likes.LikesComponent
 import com.likeminds.feedsx.di.media.MediaComponent
 import com.likeminds.feedsx.di.notificationfeed.NotificationFeedComponent
+import com.likeminds.feedsx.di.post.create.CreatePostComponent
+import com.likeminds.feedsx.di.post.detail.PostDetailComponent
+import com.likeminds.feedsx.di.post.edit.EditPostComponent
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import javax.inject.Inject
 
@@ -24,11 +28,14 @@ class SDKApplication {
     @Inject
     lateinit var postWithAttachmentsRepository: PostWithAttachmentsRepository
 
-    private var appComponent: AppComponent? = null
+    private var likeMindsFeedComponent: LikeMindsFeedComponent? = null
     private var feedComponent: FeedComponent? = null
     private var likesComponent: LikesComponent? = null
     private var mediaComponent: MediaComponent? = null
     private var notificationFeedComponent: NotificationFeedComponent? = null
+    private var createPostComponent: CreatePostComponent? = null
+    private var postDetailComponent: PostDetailComponent? = null
+    private var editPostComponent: EditPostComponent? = null
 
     companion object {
         const val LOG_TAG = "LikeMinds"
@@ -91,12 +98,12 @@ class SDKApplication {
      * @param application : The client will pass instance application to the function
      * */
     private fun initAppComponent(application: Application) {
-        if (appComponent == null) {
-            appComponent = DaggerAppComponent.builder()
+        if (likeMindsFeedComponent == null) {
+            likeMindsFeedComponent = DaggerLikeMindsFeedComponent.builder()
                 .application(application)
                 .build()
         }
-        appComponent!!.inject(this)
+        likeMindsFeedComponent!!.inject(this)
     }
 
     /**
@@ -104,7 +111,7 @@ class SDKApplication {
      * */
     fun feedComponent(): FeedComponent? {
         if (feedComponent == null) {
-            feedComponent = appComponent?.feedComponent()?.create()
+            feedComponent = likeMindsFeedComponent?.feedComponent()?.create()
         }
         return feedComponent
     }
@@ -114,7 +121,7 @@ class SDKApplication {
      * */
     fun likesComponent(): LikesComponent? {
         if (likesComponent == null) {
-            likesComponent = appComponent?.likesComponent()?.create()
+            likesComponent = likeMindsFeedComponent?.likesComponent()?.create()
         }
         return likesComponent
     }
@@ -124,7 +131,7 @@ class SDKApplication {
      * */
     fun mediaComponent(): MediaComponent? {
         if (mediaComponent == null) {
-            mediaComponent = appComponent?.mediaComponent()?.create()
+            mediaComponent = likeMindsFeedComponent?.mediaComponent()?.create()
         }
         return mediaComponent
     }
@@ -134,8 +141,39 @@ class SDKApplication {
      * */
     fun notificationFeedComponent(): NotificationFeedComponent? {
         if (notificationFeedComponent == null) {
-            notificationFeedComponent = appComponent?.notificationFeedComponent()?.create()
+            notificationFeedComponent =
+                likeMindsFeedComponent?.notificationFeedComponent()?.create()
         }
         return notificationFeedComponent
+    }
+
+    /**
+     * initiate and return CreatePostComponent: All dependencies required for createpost package
+     * */
+    fun createPostComponent(): CreatePostComponent? {
+        if (createPostComponent == null) {
+            createPostComponent = likeMindsFeedComponent?.createPostComponent()?.create()
+        }
+        return createPostComponent
+    }
+
+    /**
+     * initiate and return PostDetailComponent: All dependencies required for postdetail package
+     * */
+    fun postDetailComponent(): PostDetailComponent? {
+        if (postDetailComponent == null) {
+            postDetailComponent = likeMindsFeedComponent?.postDetailComponent()?.create()
+        }
+        return postDetailComponent
+    }
+
+    /**
+     * initiate and return EditPostComponent: All dependencies required for editpost package
+     * */
+    fun editPostComponent(): EditPostComponent? {
+        if (editPostComponent == null) {
+            editPostComponent = likeMindsFeedComponent?.editPostComponent()?.create()
+        }
+        return editPostComponent
     }
 }

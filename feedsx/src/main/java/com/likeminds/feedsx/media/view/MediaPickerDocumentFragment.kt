@@ -10,9 +10,9 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentMediaPickerDocumentBinding
 import com.likeminds.feedsx.media.model.*
@@ -22,14 +22,10 @@ import com.likeminds.feedsx.media.viewmodel.MediaViewModel
 import com.likeminds.feedsx.search.util.CustomSearchBar
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MediaPickerDocumentFragment :
-    BaseFragment<FragmentMediaPickerDocumentBinding>(),
+    BaseFragment<FragmentMediaPickerDocumentBinding, MediaViewModel>(),
     MediaPickerAdapterListener {
-
-    private val viewModel: MediaViewModel by viewModels()
 
     private lateinit var mediaPickerAdapter: MediaPickerAdapter
 
@@ -52,6 +48,15 @@ class MediaPickerDocumentFragment :
             fragment.arguments = bundle
             return fragment
         }
+    }
+
+    override fun getViewModelClass(): Class<MediaViewModel> {
+        return MediaViewModel::class.java
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().mediaComponent()?.inject(this)
     }
 
     override fun getViewBinding(): FragmentMediaPickerDocumentBinding {

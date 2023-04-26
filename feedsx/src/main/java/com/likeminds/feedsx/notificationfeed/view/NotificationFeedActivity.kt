@@ -9,9 +9,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ActivityNotificationFeedBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class NotificationFeedActivity : BaseAppCompatActivity() {
 
     private lateinit var binding: ActivityNotificationFeedBinding

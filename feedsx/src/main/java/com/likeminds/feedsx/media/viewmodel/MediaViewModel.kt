@@ -11,10 +11,8 @@ import com.likeminds.feedsx.media.model.MediaHeaderViewData
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.utils.ValueUtils.filterThenMap
 import com.likeminds.feedsx.utils.model.BaseViewType
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-@HiltViewModel
 class MediaViewModel @Inject constructor(
     private val mediaRepository: MediaRepository
 ) : ViewModel() {

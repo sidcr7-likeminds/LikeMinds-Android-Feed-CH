@@ -1,7 +1,7 @@
 package com.likeminds.feedsampleapp
 
 import android.app.Application
-import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.LikeMindsFeedUI
 import com.likeminds.feedsx.branding.model.LMFonts
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
 import com.likeminds.likemindsfeed.LMCallback
@@ -41,8 +41,8 @@ class FeedSXApplication : Application(), LMCallback {
                     .build()
             )
             .build()
-        val sdkApplication = SDKApplication.getInstance()
-        sdkApplication.initSDKApplication(
+
+        LikeMindsFeedUI.initLikeMindsFeedUI(
             this,
             brandingRequest
         )

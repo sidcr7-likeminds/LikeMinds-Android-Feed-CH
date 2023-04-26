@@ -3,7 +3,6 @@ package com.likeminds.feedsx.delete.view
 import android.graphics.Color
 import android.view.View
 import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.viewModels
 import com.likeminds.feedsx.databinding.DialogReasonChooseBinding
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter
@@ -11,11 +10,10 @@ import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter.ReasonChoose
 import com.likeminds.feedsx.delete.viewmodel.ReasonChooseViewModel
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseBottomSheetFragment
-import dagger.hilt.android.AndroidEntryPoint
 
 // bottom sheet dialog to show the reasons list
-@AndroidEntryPoint
-class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
+class ReasonChooseDialog :
+    BaseBottomSheetFragment<DialogReasonChooseBinding, ReasonChooseViewModel>(),
     ReasonChooseAdapterListener {
 
     companion object {
@@ -26,11 +24,13 @@ class ReasonChooseDialog : BaseBottomSheetFragment<DialogReasonChooseBinding>(),
             ReasonChooseDialog().show(fragmentManager, TAG)
     }
 
-    private val viewModel: ReasonChooseViewModel by viewModels()
-
     private lateinit var reasonChooseAdapter: ReasonChooseAdapter
 
     private var reasonChooseDialogListener: ReasonChooseDialogListener? = null
+
+    override fun getViewModelClass(): Class<ReasonChooseViewModel> {
+        return ReasonChooseViewModel::class.java
+    }
 
     override fun getViewBinding(): DialogReasonChooseBinding {
         return DialogReasonChooseBinding.inflate(layoutInflater)

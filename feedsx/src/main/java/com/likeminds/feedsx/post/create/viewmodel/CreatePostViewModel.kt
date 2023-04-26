@@ -21,12 +21,10 @@ import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-@HiltViewModel
 class CreatePostViewModel @Inject constructor(
     private val userPreferences: UserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,

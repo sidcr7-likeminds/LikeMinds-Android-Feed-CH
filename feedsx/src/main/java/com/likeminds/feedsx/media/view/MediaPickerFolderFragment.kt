@@ -9,9 +9,9 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.databinding.FragmentMediaPickerFolderBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
@@ -21,14 +21,10 @@ import com.likeminds.feedsx.media.viewmodel.MediaViewModel
 import com.likeminds.feedsx.utils.AndroidUtils
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.recyclerview.GridSpacingItemDecoration
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MediaPickerFolderFragment :
-    BaseFragment<FragmentMediaPickerFolderBinding>(),
+    BaseFragment<FragmentMediaPickerFolderBinding, MediaViewModel>(),
     MediaPickerAdapterListener {
-
-    private val viewModel: MediaViewModel by viewModels()
 
     private lateinit var mediaPickerAdapter: MediaPickerAdapter
 
@@ -49,6 +45,15 @@ class MediaPickerFolderFragment :
             fragment.arguments = bundle
             return fragment
         }
+    }
+
+    override fun getViewModelClass(): Class<MediaViewModel> {
+        return MediaViewModel::class.java
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().mediaComponent()?.inject(this)
     }
 
     override fun getViewBinding(): FragmentMediaPickerFolderBinding {

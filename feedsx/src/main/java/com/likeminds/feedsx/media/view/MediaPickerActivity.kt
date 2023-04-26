@@ -16,9 +16,7 @@ import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import com.likeminds.feedsx.utils.permissions.Permission
 import com.likeminds.feedsx.utils.permissions.PermissionDeniedCallback
 import com.likeminds.feedsx.utils.permissions.PermissionManager
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MediaPickerActivity : BaseAppCompatActivity() {
 
     private lateinit var mediaPickerExtras: MediaPickerExtras

@@ -1,15 +1,14 @@
 package com.likeminds.feedsx.utils
 
-import android.content.Context
+import android.app.Application
 import com.likeminds.feedsx.utils.sharedpreferences.BasePreferences
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SDKAuthPreferences @Inject constructor(
-    @ApplicationContext private val context: Context
-) : BasePreferences(AUTH_PREFS, context) {
+    application: Application
+) : BasePreferences(AUTH_PREFS, application) {
 
     companion object {
         const val AUTH_PREFS = "auth_prefs"

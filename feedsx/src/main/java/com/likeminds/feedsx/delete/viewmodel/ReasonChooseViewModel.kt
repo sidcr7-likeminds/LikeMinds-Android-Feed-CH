@@ -11,10 +11,8 @@ import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.moderation.model.GetReportTagsRequest
 import com.likeminds.likemindsfeed.moderation.model.GetReportTagsResponse
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-@HiltViewModel
 class ReasonChooseViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()

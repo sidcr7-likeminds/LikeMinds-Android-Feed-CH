@@ -5,6 +5,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
+import android.view.View
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -21,6 +23,7 @@ import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.InitiateViewModel
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
@@ -110,6 +113,11 @@ class FeedFragment :
 
     override fun getViewBinding(): FragmentFeedBinding {
         return FragmentFeedBinding.inflate(layoutInflater)
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().feedComponent()?.inject(this)
     }
 
     override fun receiveExtras() {
@@ -482,9 +490,19 @@ class FeedFragment :
     private fun initUI() {
         binding.toolbarColor = LMBranding.getToolbarColor()
 
+        setStatusBarColor()
         initRecyclerView()
         initNewPostClick(true)
         initSwipeRefreshLayout()
+    }
+
+    private fun setStatusBarColor() {
+        requireActivity().window.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            statusBarColor = LMBranding.getHeaderColor()
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
     }
 
     // initializes new post fab

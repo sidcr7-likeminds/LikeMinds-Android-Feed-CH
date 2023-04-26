@@ -10,9 +10,7 @@ import com.likeminds.feedsx.databinding.ActivityEditPostBinding
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class EditPostActivity : BaseAppCompatActivity() {
 
     lateinit var binding: ActivityEditPostBinding

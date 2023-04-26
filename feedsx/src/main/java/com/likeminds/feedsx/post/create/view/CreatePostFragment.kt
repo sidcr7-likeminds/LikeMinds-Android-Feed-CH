@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.InitiateViewModel
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.media.model.*
@@ -82,6 +83,11 @@ class CreatePostFragment :
 
     override fun getViewModelClass(): Class<CreatePostViewModel> {
         return CreatePostViewModel::class.java
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().createPostComponent()?.inject(this)
     }
 
     override fun getViewBinding(): FragmentCreatePostBinding {

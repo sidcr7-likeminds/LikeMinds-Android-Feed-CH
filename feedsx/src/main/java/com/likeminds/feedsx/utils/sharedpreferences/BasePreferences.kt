@@ -1,11 +1,12 @@
 package com.likeminds.feedsx.utils.sharedpreferences
 
+import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
 
 abstract class BasePreferences protected constructor(
     prefName: String,
-    applicationContext: Context
+    application: Application
 ) {
 
     companion object {
@@ -15,13 +16,13 @@ abstract class BasePreferences protected constructor(
 
     init {
         val masterPref: SharedPreferences =
-            applicationContext.getSharedPreferences(MASTER_PREF, Context.MODE_PRIVATE)
+            application.getSharedPreferences(MASTER_PREF, Context.MODE_PRIVATE)
         val list = masterPref.getStringSet(ALL_PREFS_SET, emptySet())
         masterPref.edit().putStringSet(ALL_PREFS_SET, list!!.plus(prefName)).apply()
     }
 
     private val preferences: SharedPreferences =
-        applicationContext.getSharedPreferences(prefName, Context.MODE_PRIVATE)
+        application.getSharedPreferences(prefName, Context.MODE_PRIVATE)
 
     fun putPreference(key: String, value: String) {
         preferences.edit().putString(key, value).apply()

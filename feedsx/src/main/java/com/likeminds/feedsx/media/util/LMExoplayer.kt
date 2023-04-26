@@ -1,15 +1,14 @@
 package com.likeminds.feedsx.media.util
 
-import android.content.Context
+import android.app.Application
 import android.util.Log
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
-class LMExoplayer @Inject constructor(@ApplicationContext private val context: Context) :
+class LMExoplayer @Inject constructor(private val application: Application) :
     Player.Listener {
 
     lateinit var exoplayer: ExoPlayer
@@ -28,7 +27,7 @@ class LMExoplayer @Inject constructor(@ApplicationContext private val context: C
             .setBufferDurationsMs(32 * 1024, 64 * 1024, 32 * 1024, 1024)
             .build()
 
-        exoplayer = ExoPlayer.Builder(context)
+        exoplayer = ExoPlayer.Builder(application.applicationContext)
             .setLoadControl(defaultLoadControl)
             .build()
 

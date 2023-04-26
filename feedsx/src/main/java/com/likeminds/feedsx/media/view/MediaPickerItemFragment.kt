@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.likeminds.feedsx.R
@@ -23,15 +22,11 @@ import com.likeminds.feedsx.utils.actionmode.ActionModeCallback
 import com.likeminds.feedsx.utils.actionmode.ActionModeListener
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_HEADER
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class MediaPickerItemFragment :
-    BaseFragment<FragmentMediaPickerItemBinding>(),
+    BaseFragment<FragmentMediaPickerItemBinding, MediaViewModel>(),
     MediaPickerAdapterListener,
     ActionModeListener<Nothing> {
-
-    private val viewModel: MediaViewModel by viewModels()
 
     private var actionModeCallback: ActionModeCallback<Nothing>? = null
 
@@ -52,6 +47,10 @@ class MediaPickerItemFragment :
             fragment.arguments = bundle
             return fragment
         }
+    }
+
+    override fun getViewModelClass(): Class<MediaViewModel> {
+        return MediaViewModel::class.java
     }
 
     override fun getViewBinding(): FragmentMediaPickerItemBinding {

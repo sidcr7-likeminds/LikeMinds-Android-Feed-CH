@@ -1,15 +1,14 @@
 package com.likeminds.feedsx.post.create.util
 
-import android.content.Context
+import android.app.Application
 import com.likeminds.feedsx.utils.sharedpreferences.BasePreferences
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class PostPreferences @Inject constructor(
-    @ApplicationContext private val context: Context
-) : BasePreferences(POST_PREFS, context) {
+    application: Application
+) : BasePreferences(POST_PREFS, application) {
 
     companion object {
         const val POST_PREFS = "post_prefs"

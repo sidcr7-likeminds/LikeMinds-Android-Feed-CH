@@ -20,12 +20,10 @@ import com.likeminds.likemindsfeed.comment.model.*
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
 import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
 import com.likeminds.likemindsfeed.post.model.GetPostRequest
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-@HiltViewModel
 class PostDetailViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
     private val userPreferences: UserPreferences

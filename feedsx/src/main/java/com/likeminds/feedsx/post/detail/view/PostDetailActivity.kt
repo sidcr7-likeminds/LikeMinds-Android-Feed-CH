@@ -11,9 +11,7 @@ import com.likeminds.feedsx.databinding.ActivityPostDetailBinding
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class PostDetailActivity : BaseAppCompatActivity() {
 
     lateinit var binding: ActivityPostDetailBinding

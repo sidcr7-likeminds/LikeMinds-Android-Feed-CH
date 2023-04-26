@@ -3,6 +3,7 @@ package com.likeminds.feedsx.likes.view
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.databinding.FragmentLikesBinding
 import com.likeminds.feedsx.likes.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
@@ -28,6 +29,11 @@ class LikesFragment : BaseFragment<FragmentLikesBinding, LikesViewModel>() {
 
     override fun getViewBinding(): FragmentLikesBinding {
         return FragmentLikesBinding.inflate(layoutInflater)
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().likesComponent()?.inject(this)
     }
 
     override fun receiveExtras() {
