@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
 class OverflowMenuItemViewData private constructor(
     @OverflowMenuItemId
     val id: Int,
-    var title: String
+    val title: String
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_OVERFLOW_MENU_ITEM

@@ -8,11 +8,11 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class LikeViewData private constructor(
-    var id: String,
-    var userId: String,
-    var createdAt: Long,
-    var updatedAt: Long,
-    var user: UserViewData
+    val id: String,
+    val userId: String,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val user: UserViewData
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int

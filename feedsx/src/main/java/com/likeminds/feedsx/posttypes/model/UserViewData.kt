@@ -7,14 +7,14 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class UserViewData private constructor(
-    var id: Int,
-    var name: String,
-    var imageUrl: String,
-    var userUniqueId: String,
-    var customTitle: String?,
-    var isGuest: Boolean,
-    var isDeleted: Boolean?,
-    var updatedAt: Long
+    val id: Int,
+    val name: String,
+    val imageUrl: String,
+    val userUniqueId: String,
+    val customTitle: String?,
+    val isGuest: Boolean,
+    val isDeleted: Boolean?,
+    val updatedAt: Long
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_USER

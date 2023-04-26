@@ -5,9 +5,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class PostDetailExtras private constructor(
-    var postId: String,
-    var commentId: String?,
-    var isEditTextFocused: Boolean,
+    val postId: String,
+    val commentId: String?,
+    val isEditTextFocused: Boolean,
     val source: String?
 ) : Parcelable {
 

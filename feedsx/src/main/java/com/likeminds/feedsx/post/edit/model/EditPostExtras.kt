@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class EditPostExtras private constructor(
-    var postId: String
+    val postId: String
 ) : Parcelable {
     class Builder {
         private var postId: String = ""

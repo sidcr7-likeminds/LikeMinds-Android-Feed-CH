@@ -9,21 +9,21 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class NotificationFeedViewData private constructor(
-    var id: String,
+    val id: String,
     val isRead: Boolean,
-    var actionBy: String,
-    var actionOn: List<String>,
-    var communityId: Int,
+    val actionBy: String,
+    val actionOn: List<String>,
+    val communityId: Int,
     @NotificationEntityType
-    var entityType: String,
-    var entityId: String,
-    var action: String,
-    var cta: String,
-    var activityMessage: String,
-    var user: UserViewData,
-    var menuItems: List<OverflowMenuItemViewData>,
-    var createdAt: Long,
-    var updatedAt: Long
+    val entityType: String,
+    val entityId: String,
+    val action: String,
+    val cta: String,
+    val activityMessage: String,
+    val user: UserViewData,
+    val menuItems: List<OverflowMenuItemViewData>,
+    val createdAt: Long,
+    val updatedAt: Long
 ) : Parcelable, BaseViewType {
 
     //TODO: isRead, menuItems not there in ED

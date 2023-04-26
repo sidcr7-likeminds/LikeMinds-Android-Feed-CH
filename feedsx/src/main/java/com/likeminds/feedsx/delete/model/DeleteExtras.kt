@@ -6,10 +6,10 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class DeleteExtras private constructor(
     @DeleteType
-    var entityType: Int,
-    var postId: String,
-    var commentId: String?,
-    var parentCommentId: String?
+    val entityType: Int,
+    val postId: String,
+    val commentId: String?,
+    val parentCommentId: String?
 ) : Parcelable {
 
     class Builder {

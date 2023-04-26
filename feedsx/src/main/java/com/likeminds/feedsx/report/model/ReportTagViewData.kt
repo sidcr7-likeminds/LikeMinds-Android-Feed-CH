@@ -7,9 +7,9 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class ReportTagViewData private constructor(
-    var id: Int,
-    var name: String,
-    var isSelected: Boolean
+    val id: Int,
+    val name: String,
+    val isSelected: Boolean
 ) : BaseViewType, Parcelable {
 
     override val viewType: Int

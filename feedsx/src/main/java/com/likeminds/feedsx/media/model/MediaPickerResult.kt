@@ -5,13 +5,13 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class MediaPickerResult private constructor(
-    var isResultOk: Boolean,
+    val isResultOk: Boolean,
     @MediaPickerResultType
-    var mediaPickerResultType: Int,
-    var mediaTypes: List<String>,
-    var medias: List<MediaViewData>?,
-    var browseClassName: Pair<String, String>?,
-    var allowMultipleSelect: Boolean
+    val mediaPickerResultType: Int,
+    val mediaTypes: List<String>,
+    val medias: List<MediaViewData>?,
+    val browseClassName: Pair<String, String>?,
+    val allowMultipleSelect: Boolean
 ) : Parcelable {
 
     class Builder {

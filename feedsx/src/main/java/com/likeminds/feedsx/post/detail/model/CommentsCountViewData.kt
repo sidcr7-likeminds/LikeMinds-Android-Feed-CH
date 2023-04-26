@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class CommentsCountViewData private constructor(
-    var commentsCount: Int
+    val commentsCount: Int
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int

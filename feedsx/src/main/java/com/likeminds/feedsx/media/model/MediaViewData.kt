@@ -8,18 +8,18 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class MediaViewData private constructor(
-    var uri: Uri,
-    var mimeType: String?,
-    var mediaType: String,
-    var date: Long,
-    var size: Long,
-    var duration: Int?,
-    var bucketId: String?,
-    var dateTimeStampHeader: String,
-    var mediaName: String?,
-    var dynamicViewType: Int?,
-    var filteredKeywords: List<String>?,
-    var pdfPageCount: Int?
+    val uri: Uri,
+    val mimeType: String?,
+    val mediaType: String,
+    val date: Long,
+    val size: Long,
+    val duration: Int?,
+    val bucketId: String?,
+    val dateTimeStampHeader: String,
+    val mediaName: String?,
+    val dynamicViewType: Int?,
+    val filteredKeywords: List<String>?,
+    val pdfPageCount: Int?
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = dynamicViewType ?: ITEM_MEDIA_PICKER_SINGLE

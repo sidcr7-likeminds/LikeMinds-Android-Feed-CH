@@ -8,10 +8,10 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class MediaFolderViewData private constructor(
-    var thumbnailUri: Uri?,
-    var title: String,
-    var itemCount: Int,
-    var bucketId: String,
+    val thumbnailUri: Uri?,
+    val title: String,
+    val itemCount: Int,
+    val bucketId: String,
     val folderType: MediaFolderType
 ) : Parcelable, BaseViewType {
     override val viewType: Int

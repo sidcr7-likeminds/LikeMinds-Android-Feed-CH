@@ -9,25 +9,25 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class CommentViewData private constructor(
-    var id: String,
-    var postId: String,
-    var isLiked: Boolean,
-    var isEdited: Boolean,
-    var userId: String,
-    var text: String,
-    var level: Int,
-    var likesCount: Int,
-    var repliesCount: Int,
-    var user: UserViewData,
-    var createdAt: Long,
-    var updatedAt: Long,
-    var menuItems: List<OverflowMenuItemViewData>,
-    var replies: MutableList<CommentViewData>,
-    var parentId: String?,
-    var parentComment: CommentViewData?,
-    var alreadySeenFullContent: Boolean?,
-    var fromCommentLiked: Boolean,
-    var fromCommentEdited: Boolean
+    val id: String,
+    val postId: String,
+    val isLiked: Boolean,
+    val isEdited: Boolean,
+    val userId: String,
+    val text: String,
+    val level: Int,
+    val likesCount: Int,
+    val repliesCount: Int,
+    val user: UserViewData,
+    val createdAt: Long,
+    val updatedAt: Long,
+    val menuItems: List<OverflowMenuItemViewData>,
+    val replies: MutableList<CommentViewData>,
+    val parentId: String?,
+    val parentComment: CommentViewData?,
+    val alreadySeenFullContent: Boolean?,
+    val fromCommentLiked: Boolean,
+    val fromCommentEdited: Boolean
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = when (level) {

@@ -11,15 +11,15 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class AttachmentViewData private constructor(
     @AttachmentType var attachmentType: Int,
-    var attachmentMeta: AttachmentMetaViewData,
-    var dynamicViewType: Int?,
+    val attachmentMeta: AttachmentMetaViewData,
+    val dynamicViewType: Int?,
     @MediaActions var mediaActions: String
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
         get() = when {
             dynamicViewType != null -> {
-                dynamicViewType!!
+                dynamicViewType
             }
             attachmentType == DOCUMENT -> {
                 ITEM_POST_DOCUMENTS_ITEM

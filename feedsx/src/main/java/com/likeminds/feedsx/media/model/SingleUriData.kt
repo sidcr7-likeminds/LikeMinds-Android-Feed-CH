@@ -6,18 +6,18 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 class SingleUriData private constructor(
-    var uri: Uri,
-    var fileType: String,
-    var width: Int?,
-    var height: Int?,
-    var thumbnailUri: Uri?,
-    var size: Long,
-    var mediaName: String?,
-    var pdfPageCount: Int?,
-    var duration: Int?,
-    var awsFolderPath: String?,
-    var localFilePath: String?,
-    var format: String?
+    val uri: Uri,
+    val fileType: String,
+    val width: Int?,
+    val height: Int?,
+    val thumbnailUri: Uri?,
+    val size: Long,
+    val mediaName: String?,
+    val pdfPageCount: Int?,
+    val duration: Int?,
+    val awsFolderPath: String?,
+    val localFilePath: String?,
+    val format: String?
 ) : Parcelable {
 
     class Builder {

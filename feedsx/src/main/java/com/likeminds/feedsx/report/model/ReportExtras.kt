@@ -6,12 +6,12 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class ReportExtras private constructor(
     @ReportType
-    var entityType: Int,
-    var entityCreatorId: String,
-    var entityId: String,
+    val entityType: Int,
+    val entityCreatorId: String,
+    val entityId: String,
     val parentCommentId: String?,
-    var postId: String,
-    var postViewType: Int?,
+    val postId: String,
+    val postViewType: Int?,
 ) : Parcelable {
     class Builder {
         @ReportType

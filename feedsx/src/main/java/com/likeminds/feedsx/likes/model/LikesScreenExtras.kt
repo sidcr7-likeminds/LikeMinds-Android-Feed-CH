@@ -6,9 +6,9 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 class LikesScreenExtras private constructor(
     @LikesScreenEntityType
-    var entityType: Int,
-    var postId: String,
-    var commentId: String?,
+    val entityType: Int,
+    val postId: String,
+    val commentId: String?,
 ) : Parcelable {
 
     class Builder {
