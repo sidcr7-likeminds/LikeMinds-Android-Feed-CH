@@ -632,7 +632,7 @@ class PostDetailFragment :
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
-        }
+        }.observeInLifecycle(viewLifecycleOwner)
 
         postActionsViewModel.errorMessageEventFlow.onEach { response ->
             when (response) {
@@ -696,7 +696,7 @@ class PostDetailFragment :
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
             }
-        }
+        }.observeInLifecycle(viewLifecycleOwner)
     }
 
 
