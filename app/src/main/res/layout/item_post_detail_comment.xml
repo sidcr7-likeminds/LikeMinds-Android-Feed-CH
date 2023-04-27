@@ -156,6 +156,35 @@
             tools:visibility="visible" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_edited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="@string/edited"
+            android:textColor="@color/maastricht_blue_40"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="@id/tv_reply"
+            app:layout_constraintEnd_toStartOf="@+id/view_dot_edited"
+            app:layout_constraintTop_toTopOf="@id/tv_reply"
+            tools:fontFamily="@font/roboto_regular"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/view_dot_edited"
+            android:layout_width="3dp"
+            android:layout_height="3dp"
+            android:background="@drawable/shape_dot_grey"
+            android:backgroundTint="@color/maastricht_blue_40"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_comment_time"
+            app:layout_constraintEnd_toStartOf="@id/tv_comment_time"
+            app:layout_constraintTop_toTopOf="@+id/tv_comment_time"
+            tools:visibility="visible" />
+
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_comment_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
