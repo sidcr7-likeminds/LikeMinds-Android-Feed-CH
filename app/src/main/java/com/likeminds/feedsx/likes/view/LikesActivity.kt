@@ -83,9 +83,8 @@ class LikesActivity : BaseAppCompatActivity() {
     }
 
     private fun redirectActivity(isError: Boolean) {
-        //TODO Change error message.
         if (isError) {
-            ViewUtils.showShortToast(this, getString(R.string.request_not_processed))
+            ViewUtils.showSomethingWentWrongToast(this)
         }
         supportFragmentManager.popBackStack()
         super.onBackPressed()

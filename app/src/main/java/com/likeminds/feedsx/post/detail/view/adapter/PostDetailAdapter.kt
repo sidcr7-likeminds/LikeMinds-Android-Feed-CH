@@ -80,7 +80,7 @@ class PostDetailAdapter constructor(
             postId: String,
             commentId: String,
             creatorId: String,
-            title: String
+            menuId: Int
         )
 
         fun showLikesScreen(postId: String, commentId: String)

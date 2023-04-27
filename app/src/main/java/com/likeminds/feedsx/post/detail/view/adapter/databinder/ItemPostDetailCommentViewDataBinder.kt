@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
+import android.view.Menu
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
@@ -72,6 +73,15 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
             tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
+            if (data.isEdited) {
+                viewDotEdited.show()
+                tvEdited.show()
+            } else {
+                viewDotEdited.hide()
+                tvEdited.hide()
+            }
+
+
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_comment_filled)
             } else {
@@ -103,7 +113,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 postDetailAdapterListener.likeComment(data.id)
             }
 
-            if (data.fromCommentLiked) {
+            if (data.fromCommentLiked || data.fromCommentEdited) {
                 return
             } else {
                 if (data.repliesCount == 0) {
@@ -183,7 +193,12 @@ class ItemPostDetailCommentViewDataBinder constructor(
     ) {
         val popup = PopupMenu(view.context, view)
         menuItems.forEach { menuItem ->
-            popup.menu.add(menuItem.title)
+            popup.menu.add(
+                Menu.NONE,
+                menuItem.id,
+                Menu.NONE,
+                menuItem.title
+            )
         }
 
         popup.setOnMenuItemClickListener { menuItem ->
@@ -191,7 +206,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 postId,
                 commentId,
                 creatorId,
-                menuItem.title.toString()
+                menuItem.itemId
             )
             true
         }

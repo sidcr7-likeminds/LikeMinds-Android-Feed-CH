@@ -1,6 +1,8 @@
 package com.likeminds.feedsx.feed.view
 
 import android.app.Activity
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import androidx.activity.result.contract.ActivityResultContracts
@@ -40,13 +42,12 @@ import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
 import com.likeminds.feedsx.media.util.LMExoplayer
 import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
-import com.likeminds.feedsx.overflowmenu.model.DELETE_POST_MENU_ITEM
-import com.likeminds.feedsx.overflowmenu.model.PIN_POST_MENU_ITEM
-import com.likeminds.feedsx.overflowmenu.model.REPORT_POST_MENU_ITEM
-import com.likeminds.feedsx.overflowmenu.model.UNPIN_POST_MENU_ITEM
+import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
+import com.likeminds.feedsx.post.edit.model.EditPostExtras
+import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -61,6 +62,7 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import dagger.hilt.android.AndroidEntryPoint
@@ -114,6 +116,11 @@ class FeedFragment :
         // observes userResponse LiveData
         initiateViewModel.userResponse.observe(viewLifecycleOwner) { response ->
             observeUserResponse(response)
+        }
+
+        // observes hasCreatePostRights LiveData
+        initiateViewModel.hasCreatePostRights.observe(viewLifecycleOwner) {
+            initNewPostClick(it)
         }
 
         // observes logoutResponse LiveData
@@ -174,7 +181,6 @@ class FeedFragment :
         viewModel.getUniversalFeed(1)
     }
 
-
     //observe feed response
     private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
         //hide progress bar
@@ -216,7 +222,10 @@ class FeedFragment :
                             ivPostThumbnail.hide()
                         } else {
                             ivPostThumbnail.show()
-                            ivPostThumbnail.setImageURI(Uri.parse(post.thumbnail))
+                            ImageBindingUtil.loadImage(
+                                ivPostThumbnail,
+                                Uri.parse(post.thumbnail)
+                            )
                         }
                         postingProgress.progress = 0
                         postingProgress.show()
@@ -240,14 +249,12 @@ class FeedFragment :
     // checks if there is any post or not
     private fun checkForNoPost(feed: List<BaseViewType>) {
         if (feed.isNotEmpty()) {
-            Log.d("PUI", "checkForNoPost: ")
             binding.apply {
                 layoutNoPost.root.hide()
                 newPostButton.show()
                 recyclerView.show()
             }
         } else {
-            Log.d("PUI", "checkForNoPost:1 ")
             binding.apply {
                 layoutNoPost.root.show()
                 newPostButton.hide()
@@ -457,38 +464,60 @@ class FeedFragment :
         binding.toolbarColor = LMBranding.getToolbarColor()
 
         initRecyclerView()
+        initNewPostClick(true)
         initSwipeRefreshLayout()
-        initNewPostClick()
+    }
+
+    // initializes new post fab
+    private fun initNewPostClick(hasCreatePostRights: Boolean) {
+        binding.apply {
+            // sets color of fab button as per user rights
+            if (hasCreatePostRights) {
+                layoutNoPost.fabNewPost.backgroundTintList =
+                    ColorStateList.valueOf(LMBranding.getButtonsColor())
+                newPostButton.backgroundTintList =
+                    ColorStateList.valueOf(LMBranding.getButtonsColor())
+            } else {
+                layoutNoPost.fabNewPost.backgroundTintList =
+                    ColorStateList.valueOf(Color.GRAY)
+                newPostButton.backgroundTintList =
+                    ColorStateList.valueOf(Color.GRAY)
+            }
+
+            layoutNoPost.fabNewPost.setOnClickListener {
+                handleNewPostClick(hasCreatePostRights)
+            }
+
+            newPostButton.setOnClickListener {
+                handleNewPostClick(hasCreatePostRights)
+            }
+        }
     }
 
     // handles new post fab click
-    private fun initNewPostClick() {
-        binding.layoutNoPost.fabNewPost.setOnClickListener {
-            // sends post creation started event
-            viewModel.sendPostCreationStartedEvent()
+    private fun handleNewPostClick(hasCreatePostRights: Boolean) {
+        binding.apply {
+            if (hasCreatePostRights) {
+                if (alreadyPosting) {
+                    ViewUtils.showShortToast(
+                        requireContext(),
+                        getString(R.string.a_post_is_already_uploading)
+                    )
+                } else {
+                    // sends post creation started event
+                    viewModel.sendPostCreationStartedEvent()
 
-            val intent = CreatePostActivity.getIntent(
-                requireContext(),
-                LMAnalytics.Source.UNIVERSAL_FEED
-            )
-            createPostLauncher.launch(intent)
-        }
-
-        binding.newPostButton.setOnClickListener {
-            if (alreadyPosting) {
-                ViewUtils.showShortToast(
-                    requireContext(),
-                    getString(R.string.a_post_is_already_uploading)
-                )
+                    val intent = CreatePostActivity.getIntent(
+                        requireContext(),
+                        LMAnalytics.Source.UNIVERSAL_FEED
+                    )
+                    createPostLauncher.launch(intent)
+                }
             } else {
-                // sends post creation started event
-                viewModel.sendPostCreationStartedEvent()
-
-                val intent = CreatePostActivity.getIntent(
-                    requireContext(),
-                    LMAnalytics.Source.UNIVERSAL_FEED
+                ViewUtils.showShortSnack(
+                    root,
+                    getString(R.string.you_do_not_have_permission_to_create_a_post)
                 )
-                createPostLauncher.launch(intent)
             }
         }
     }
@@ -725,19 +754,26 @@ class FeedFragment :
     override fun onPostMenuItemClicked(
         postId: String,
         creatorId: String,
-        title: String
+        menuId: Int
     ) {
-        when (title) {
-            DELETE_POST_MENU_ITEM -> {
+        when (menuId) {
+            EDIT_POST_MENU_ITEM_ID -> {
+                val editPostExtras = EditPostExtras.Builder()
+                    .postId(postId)
+                    .build()
+                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                startActivity(intent)
+            }
+            DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(postId, creatorId)
             }
-            REPORT_POST_MENU_ITEM -> {
+            REPORT_POST_MENU_ITEM_ID -> {
                 reportPost(postId, creatorId)
             }
-            PIN_POST_MENU_ITEM -> {
+            PIN_POST_MENU_ITEM_ID -> {
                 pinPost(postId)
             }
-            UNPIN_POST_MENU_ITEM -> {
+            UNPIN_POST_MENU_ITEM_ID -> {
                 unpinPost(postId)
             }
         }
@@ -803,6 +839,11 @@ class FeedFragment :
         mPostAdapter.updateWithoutNotifyingRV(position, postData)
     }
 
+    // callback when user clicks to share the post
+    override fun sharePost(postId: String) {
+        ShareUtils.sharePost(requireContext(), postId)
+    }
+
     // processes delete post request
     private fun deletePost(postId: String, creatorId: String) {
         val deleteExtras = DeleteExtras.Builder()
@@ -865,7 +906,7 @@ class FeedFragment :
         //get pin menu item
         val menuItems = post.menuItems.toMutableList()
         val pinPostIndex = menuItems.indexOfFirst {
-            (it.title == PIN_POST_MENU_ITEM)
+            (it.id == PIN_POST_MENU_ITEM_ID)
         }
 
         //if pin item doesn't exist
@@ -873,7 +914,10 @@ class FeedFragment :
 
         //update pin menu item
         val pinPostMenuItem = menuItems[pinPostIndex]
-        val newPinPostMenuItem = pinPostMenuItem.toBuilder().title(UNPIN_POST_MENU_ITEM).build()
+        val newPinPostMenuItem =
+            pinPostMenuItem.toBuilder().id(UNPIN_POST_MENU_ITEM_ID)
+                .title(getString(R.string.unpin_this_post))
+                .build()
         menuItems[pinPostIndex] = newPinPostMenuItem
 
         //update the post view data
@@ -899,7 +943,7 @@ class FeedFragment :
         //get unpin menu item
         val menuItems = post.menuItems.toMutableList()
         val unPinPostIndex = menuItems.indexOfFirst {
-            (it.title == UNPIN_POST_MENU_ITEM)
+            (it.id == UNPIN_POST_MENU_ITEM_ID)
         }
 
         //if unpin item doesn't exist
@@ -907,7 +951,10 @@ class FeedFragment :
 
         //update unpin menu item
         val unPinPostMenuItem = menuItems[unPinPostIndex]
-        val newUnPinPostMenuItem = unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
+        val newUnPinPostMenuItem =
+            unPinPostMenuItem.toBuilder().id(PIN_POST_MENU_ITEM_ID)
+                .title(getString(R.string.pin_this_post))
+                .build()
         menuItems[unPinPostIndex] = newUnPinPostMenuItem
 
         //update the post view data
@@ -1039,6 +1086,7 @@ class FeedFragment :
         } else {
             // Post was updated
             mPostAdapter.update(postIndex, updatedPost)
+            scrollToPositionWithOffset(postIndex)
         }
     }
 

@@ -5,6 +5,7 @@ import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
+import android.view.Menu.NONE
 import android.view.View
 import android.widget.ImageView
 import android.widget.PopupMenu
@@ -37,7 +38,7 @@ import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
 import java.util.*
 
 object PostTypeUtil {
-    private const val SHOW_MORE_COUNT = 2
+    const val SHOW_MORE_COUNT = 2
 
     // initializes author data frame on the post
     private fun initAuthorFrame(
@@ -52,6 +53,14 @@ object PostTypeUtil {
                 ivPin.show()
             } else {
                 ivPin.hide()
+            }
+
+            if (data.isEdited) {
+                viewDotEdited.show()
+                tvEdited.show()
+            } else {
+                viewDotEdited.hide()
+                tvEdited.hide()
             }
 
             ivPostMenu.setOnClickListener { view ->
@@ -80,9 +89,6 @@ object PostTypeUtil {
                 memberImage,
                 showRoundImage = true
             )
-
-            viewDotEdited.hide()
-            tvEdited.hide()
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
         }
     }
@@ -97,14 +103,19 @@ object PostTypeUtil {
     ) {
         val popup = PopupMenu(view.context, view)
         menuItems.forEach { menuItem ->
-            popup.menu.add(menuItem.title)
+            popup.menu.add(
+                NONE,
+                menuItem.id,
+                NONE,
+                menuItem.title
+            )
         }
 
         popup.setOnMenuItemClickListener { menuItem ->
             listener.onPostMenuItemClicked(
                 postId,
                 creatorId,
-                menuItem.title.toString()
+                menuItem.itemId
             )
             true
         }
@@ -134,6 +145,10 @@ object PostTypeUtil {
             rvDocuments.apply {
                 adapter = mDocumentsAdapter
                 layoutManager = LinearLayoutManager(root.context)
+                // if separator is not there already, then only add
+                if (itemDecorationCount < 1) {
+                    addItemDecoration(dividerItemDecorator)
+                }
             }
 
             val documents = postData.attachments
@@ -223,20 +238,19 @@ object PostTypeUtil {
                 ivBookmark.setImageResource(R.drawable.ic_bookmark_unfilled)
             }
 
-            likesCount.text =
-                if (data.likesCount == 0) context.getString(R.string.like)
-                else
+            if (data.likesCount == 0) {
+                likesCount.text =
+                    context.getString(R.string.like)
+            } else {
+                likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
                         data.likesCount,
                         data.likesCount
                     )
-
-            likesCount.setOnClickListener {
-                if (data.likesCount == 0) {
-                    return@setOnClickListener
+                likesCount.setOnClickListener {
+                    listener.showLikesScreen(data.id)
                 }
-                listener.showLikesScreen(data.id)
             }
 
             commentsCount.text =
@@ -261,7 +275,7 @@ object PostTypeUtil {
             }
 
             ivShare.setOnClickListener {
-                listener.sharePost()
+                listener.sharePost(data.id)
             }
 
             commentsCount.setOnClickListener {
@@ -447,7 +461,7 @@ object PostTypeUtil {
         data: LinkOGTagsViewData
     ) {
         binding.apply {
-            root.setOnClickListener {
+            cvLinkPreview.setOnClickListener {
                 // creates a route and returns an intent to handle the link
                 val intent = Route.handleDeepLink(root.context, data.url)
                 if (intent != null) {

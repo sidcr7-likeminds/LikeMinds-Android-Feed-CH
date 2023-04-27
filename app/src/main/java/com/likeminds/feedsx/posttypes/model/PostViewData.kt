@@ -16,6 +16,7 @@ class PostViewData private constructor(
     var isPinned: Boolean,
     var isSaved: Boolean,
     var isLiked: Boolean,
+    var isEdited: Boolean,
     var userId: String,
     var likesCount: Int,
     var commentsCount: Int,
@@ -67,6 +68,7 @@ class PostViewData private constructor(
         private var isPinned: Boolean = false
         private var isSaved: Boolean = false
         private var isLiked: Boolean = false
+        private var isEdited: Boolean = false
         private var userId: String = ""
         private var likesCount: Int = 0
         private var commentsCount: Int = 0
@@ -99,6 +101,7 @@ class PostViewData private constructor(
         fun isPinned(isPinned: Boolean) = apply { this.isPinned = isPinned }
         fun isSaved(isSaved: Boolean) = apply { this.isSaved = isSaved }
         fun isLiked(isLiked: Boolean) = apply { this.isLiked = isLiked }
+        fun isEdited(isEdited: Boolean) = apply { this.isEdited = isEdited }
         fun userId(userId: String) = apply { this.userId = userId }
         fun likesCount(likesCount: Int) = apply { this.likesCount = likesCount }
         fun commentsCount(commentsCount: Int) = apply { this.commentsCount = commentsCount }
@@ -129,6 +132,7 @@ class PostViewData private constructor(
             isPinned,
             isSaved,
             isLiked,
+            isEdited,
             userId,
             likesCount,
             commentsCount,
@@ -157,6 +161,7 @@ class PostViewData private constructor(
             .isPinned(isPinned)
             .isSaved(isSaved)
             .isLiked(isLiked)
+            .isEdited(isEdited)
             .userId(userId)
             .likesCount(likesCount)
             .commentsCount(commentsCount)
