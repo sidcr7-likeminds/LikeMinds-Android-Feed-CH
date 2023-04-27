@@ -1,0 +1,107 @@
+package com.likeminds.feedsampleapp.auth.view
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import com.likeminds.feedsampleapp.MainActivity
+import com.likeminds.feedsampleapp.R
+import com.likeminds.feedsampleapp.auth.util.AuthPreferences
+import com.likeminds.feedsampleapp.databinding.ActivityAuthBinding
+import com.likeminds.feedsx.feed.model.FeedExtras
+import com.likeminds.feedsx.utils.Route
+
+class AuthActivity : AppCompatActivity() {
+
+    lateinit var authPreferences: AuthPreferences
+
+    lateinit var binding: ActivityAuthBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        authPreferences = AuthPreferences(this)
+        binding = ActivityAuthBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        val isLoggedIn = authPreferences.getIsLoggedIn()
+
+        if (isLoggedIn) {
+            // user already logged in, navigate using deep linking or to [MainActivity]
+            if (intent.data != null) {
+                parseDeepLink()
+            } else {
+                navigateToMain()
+            }
+        } else {
+            // user is not logged in, ask login details.
+            loginUser()
+        }
+    }
+
+    // parses deep link to start corresponding activity
+    private fun parseDeepLink() {
+        //get intent for route
+        val intent = Route.handleDeepLink(
+            this,
+            intent.data.toString()
+        )
+        startActivity(intent)
+        finish()
+    }
+
+    // navigates user to [MainActivity]
+    private fun navigateToMain() {
+        val feedExtras = FeedExtras.Builder()
+            .apiKey(authPreferences.getApiKey())
+            .userId(authPreferences.getUserId())
+            .userName(authPreferences.getUserName())
+            .isLoggedIn(true)
+            .build()
+        val intent = MainActivity.getIntent(this, feedExtras)
+        startActivity(intent)
+        finish()
+    }
+
+    // validates user input and save login details
+    private fun loginUser() {
+        binding.apply {
+            val context = root.context
+
+            btnLogin.setOnClickListener {
+                val apiKey = binding.etApiKey.text.toString().trim()
+                val userName = binding.etUserName.text.toString().trim()
+                val userId = binding.etUserId.text.toString().trim()
+
+                if (apiKey.isEmpty()) {
+                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(
+                        context,
+                        getString(R.string.enter_api_key)
+                    )
+                    return@setOnClickListener
+                }
+
+                if (userName.isEmpty()) {
+                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(
+                        context,
+                        getString(R.string.enter_user_name)
+                    )
+                    return@setOnClickListener
+                }
+
+                if (userId.isEmpty()) {
+                    com.likeminds.feedsx.utils.ViewUtils.showShortToast(
+                        context,
+                        getString(R.string.enter_user_id)
+                    )
+                    return@setOnClickListener
+                }
+
+                // save login details to auth prefs
+                authPreferences.saveIsLoggedIn(true)
+                authPreferences.saveApiKey(apiKey)
+                authPreferences.saveUserName(userName)
+                authPreferences.saveUserId(userId)
+                navigateToMain()
+            }
+        }
+    }
+}
