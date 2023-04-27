@@ -254,13 +254,15 @@ object PostTypeUtil {
             }
 
             commentsCount.text =
-                if (data.commentsCount == 0) context.getString(R.string.add_comment)
-                else
+                if (data.commentsCount == 0) {
+                    context.getString(R.string.add_comment)
+                } else {
                     context.resources.getQuantityString(
                         R.plurals.comments,
                         data.commentsCount,
                         data.commentsCount
                     )
+                }
 
             ivLike.setOnClickListener { view ->
                 // bounce animation for like button

@@ -1125,7 +1125,6 @@ class FeedFragment :
         } else {
             // Post was updated
             mPostAdapter.update(postIndex, updatedPost)
-            scrollToPositionWithOffset(postIndex)
         }
     }
 
