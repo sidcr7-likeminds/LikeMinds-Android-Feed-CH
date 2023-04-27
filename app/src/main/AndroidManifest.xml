@@ -30,6 +30,20 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="www.sampleapp.com"
+                    android:scheme="https" />
+                <data
+                    android:host="sampleapp.com"
+                    android:scheme="https" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".media.view.MediaPickerActivity"
@@ -39,8 +53,11 @@
             android:exported="false" />
         <activity
             android:name=".post.create.view.CreatePostActivity"
-            android:exported="true"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".post.edit.view.EditPostActivity"
+            android:exported="false" />
         <activity
             android:name=".likes.view.LikesActivity"
             android:exported="false" />

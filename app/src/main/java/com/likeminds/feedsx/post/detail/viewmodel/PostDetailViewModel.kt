@@ -5,10 +5,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -23,12 +26,18 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class PostDetailViewModel @Inject constructor() : ViewModel() {
+class PostDetailViewModel @Inject constructor(
+    private val userWithRightsRepository: UserWithRightsRepository,
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
     private val _addCommentResponse = MutableLiveData<CommentViewData>()
     val addCommentResponse: LiveData<CommentViewData> = _addCommentResponse
+
+    private val _editCommentResponse = MutableLiveData<CommentViewData>()
+    val editCommentResponse: LiveData<CommentViewData> = _editCommentResponse
 
     // it holds pair of [parentCommentId] and [replyComment]
     private val _addReplyResponse = MutableLiveData<Pair<String, CommentViewData>>()
@@ -57,6 +66,9 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
     private val _taggingData = MutableLiveData<Pair<Int, ArrayList<UserTagViewData>>?>()
     val taggingData: LiveData<Pair<Int, ArrayList<UserTagViewData>>?> = _taggingData
 
+    private val _hasCommentRights = MutableLiveData(true)
+    val hasCommentRights: LiveData<Boolean> = _hasCommentRights
+
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()
         data class GetTaggingList(val errorMessage: String?) : ErrorMessageEvent()
@@ -66,6 +78,7 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
         ) : ErrorMessageEvent()
 
         data class AddComment(val errorMessage: String?) : ErrorMessageEvent()
+        data class EditComment(val errorMessage: String?) : ErrorMessageEvent()
         data class DeleteComment(val errorMessage: String?) : ErrorMessageEvent()
         data class GetComment(val errorMessage: String?) : ErrorMessageEvent()
     }
@@ -171,6 +184,40 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
                 LMAnalytics.Keys.COMMENT_ID to commentId
             )
         )
+    }
+
+    // for editing comment on post
+    fun editComment(
+        postId: String,
+        commentId: String,
+        text: String
+    ) {
+        viewModelScope.launchIO {
+            // builds api request
+            val request = EditCommentRequest.Builder()
+                .postId(postId)
+                .commentId(commentId)
+                .text(text)
+                .build()
+
+            // calls api
+            val response = lmFeedClient.editComment(request)
+            if (response.success) {
+                val data = response.data ?: return@launchIO
+                val comment = data.comment
+                val users = data.users
+
+                _editCommentResponse.postValue(
+                    ViewDataConverter.convertComment(
+                        comment,
+                        users,
+                        postId
+                    )
+                )
+            } else {
+                errorMessageChannel.send(ErrorMessageEvent.EditComment(response.errorMessage))
+            }
+        }
     }
 
     // for replying on a comment on the post
@@ -370,6 +417,25 @@ class PostDetailViewModel @Inject constructor() : ViewModel() {
             } else {
                 errorMessageChannel.send(ErrorMessageEvent.GetTaggingList(response.errorMessage))
             }
+        }
+    }
+
+    // gets user from db and check if it has comment rights or not
+    fun checkCommentRights() {
+        viewModelScope.launchIO {
+            val userId = userPreferences.getUserUniqueId()
+
+            // fetches user with rights from DB with user.id
+            val userWithRights = userWithRightsRepository.getUserWithRights(userId)
+            val memberState = userWithRights.user.state
+            val memberRights = userWithRights.memberRights
+
+            _hasCommentRights.postValue(
+                MemberRightUtil.hasCommentRight(
+                    memberState,
+                    memberRights
+                )
+            )
         }
     }
 }

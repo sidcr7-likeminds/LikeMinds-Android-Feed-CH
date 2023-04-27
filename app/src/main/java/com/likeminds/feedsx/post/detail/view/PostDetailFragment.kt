@@ -32,6 +32,8 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
+import com.likeminds.feedsx.post.edit.model.EditPostExtras
+import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -46,6 +48,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
@@ -77,6 +80,8 @@ class PostDetailFragment :
 
     private var parentCommentIdToReply: String? = null
     private var toFindComment: Boolean = false
+
+    private var editCommentId: String? = null
 
     private lateinit var memberTagging: MemberTaggingView
 
@@ -123,6 +128,7 @@ class PostDetailFragment :
 
         binding.buttonColor = LMBranding.getButtonsColor()
         fetchPostData()
+        checkCommentsRight()
         initRecyclerView()
         initMemberTaggingView()
         initSwipeRefreshLayout()
@@ -136,12 +142,19 @@ class PostDetailFragment :
             // show progress bar
             ProgressHelper.showProgress(binding.progressBar)
         }
-        //if source is notification, then call initiate first and then other apis
-        if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION) {
+        //if source is notification/deep link, then call initiate first and then other apis
+        if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
+            postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+        ) {
             initiateViewModel.initiateUser()
         } else {
             viewModel.getPost(postDetailExtras.postId, 1)
         }
+    }
+
+    // check if user has comment rights or not
+    private fun checkCommentsRight() {
+        viewModel.checkCommentRights()
     }
 
     // initializes the post detail screen recycler view
@@ -220,21 +233,34 @@ class PostDetailFragment :
                 val text = etComment.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 val postId = postDetailExtras.postId
-                if (parentCommentIdToReply != null) {
-                    // input text is reply to a comment
-                    val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
-                    val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
-                        ?: return@setOnClickListener
-                    viewModel.replyComment(
-                        parentComment.userId,
-                        postDetailExtras.postId,
-                        parentCommentId,
-                        updatedText
-                    )
-                    hideReplyingToView()
-                } else {
-                    // input text is a comment
-                    viewModel.addComment(postId, updatedText)
+                when {
+                    parentCommentIdToReply != null -> {
+                        // input text is reply to a comment
+                        val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
+                        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
+                            ?: return@setOnClickListener
+                        viewModel.replyComment(
+                            parentComment.userId,
+                            postDetailExtras.postId,
+                            parentCommentId,
+                            updatedText
+                        )
+                        hideReplyingToView()
+                    }
+                    editCommentId != null -> {
+                        // when an existing comment is edited
+                        val commentId = editCommentId ?: return@setOnClickListener
+                        viewModel.editComment(
+                            postId,
+                            commentId,
+                            updatedText
+                        )
+                        editCommentId = null
+                    }
+                    else -> {
+                        // input text is a comment
+                        viewModel.addComment(postId, updatedText)
+                    }
                 }
                 ViewUtils.hideKeyboard(this.root)
                 etComment.text = null
@@ -253,8 +279,21 @@ class PostDetailFragment :
         observeInitiateResponse()
         observePostData()
         observeCommentData()
+        observeCommentsRightData()
         observeMembersTaggingList()
         observeErrors()
+    }
+
+    // observes hasCommentRights live data
+    private fun observeCommentsRightData() {
+        viewModel.hasCommentRights.observe(viewLifecycleOwner) {
+            //if source is notification/deep link, don't update comments right from here
+            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION &&
+                postDetailExtras.source != LMAnalytics.Source.DEEP_LINK
+            ) {
+                handleCommentRights(it)
+            }
+        }
     }
 
     private fun observeInitiateResponse() {
@@ -273,6 +312,30 @@ class PostDetailFragment :
         initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
             ProgressHelper.hideProgress(binding.progressBar)
             ViewUtils.showErrorMessageToast(requireContext(), it)
+        }
+
+        initiateViewModel.hasCommentRights.observe(viewLifecycleOwner) {
+            //if source is notification/deep link, update comments right from Initiate call
+            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
+                postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+            ) {
+                handleCommentRights(it)
+            }
+        }
+    }
+
+    // shows restricted text view or comment edit text as per comment rights
+    private fun handleCommentRights(hasCommentRights: Boolean) {
+        binding.apply {
+            if (hasCommentRights) {
+                etComment.show()
+                ivCommentSend.show()
+                tvRestricted.hide()
+            } else {
+                etComment.hide()
+                ivCommentSend.hide()
+                tvRestricted.show()
+            }
         }
     }
 
@@ -386,6 +449,11 @@ class PostDetailFragment :
             mPostDetailAdapter.update(postDataPosition, post)
         }
 
+        // observes editCommentResponse LiveData
+        viewModel.editCommentResponse.observe(viewLifecycleOwner) { comment ->
+            editCommentInAdapter(comment)
+        }
+
         // observes addReplyResponse LiveData
         viewModel.addReplyResponse.observe(viewLifecycleOwner) { pair ->
             // [parentCommentId] for the reply
@@ -421,6 +489,47 @@ class PostDetailFragment :
 
             // adds paginated replies to adapter
             addReplies(comment, page)
+        }
+    }
+
+    // finds and edits comment/reply in the adapter
+    private fun editCommentInAdapter(comment: CommentViewData) {
+        val parentComment = comment.parentComment
+        if (parentComment == null) {
+            // edited comment is of level-0
+
+            val commentPosition = getIndexAndCommentFromAdapter(comment.id)?.first ?: return
+
+            //update comment view data
+            val updatedComment = comment.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(true)
+                .build()
+
+            mPostDetailAdapter.update(commentPosition, updatedComment)
+        } else {
+            // edited comment is of level-1 (reply)
+
+            val parentCommentId = parentComment.id
+            val pair = getIndexAndCommentFromAdapter(parentCommentId) ?: return
+            val parentIndex = pair.first
+            val parentCommentInAdapter = pair.second
+
+            // finds index of the reply inside the comment
+            val index =
+                getIndexAndReplyFromComment(parentCommentInAdapter, comment.id)?.first ?: return
+
+            if (index == -1) return
+
+            parentCommentInAdapter.replies[index] = comment
+
+            val newViewData = parentCommentInAdapter.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(false)
+                .build()
+
+            // updates the parentComment with edited reply
+            mPostDetailAdapter.update(parentIndex, newViewData)
         }
     }
 
@@ -490,6 +599,7 @@ class PostDetailFragment :
                     val updatedComment = comment.toBuilder()
                         .isLiked(false)
                         .fromCommentLiked(true)
+                        .fromCommentEdited(false)
                         .likesCount(comment.likesCount - 1)
                         .build()
 
@@ -506,6 +616,9 @@ class PostDetailFragment :
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
                 is PostDetailViewModel.ErrorMessageEvent.GetComment -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+                is PostDetailViewModel.ErrorMessageEvent.EditComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
@@ -623,6 +736,33 @@ class PostDetailFragment :
             .build()
 
         showDeleteDialog(creatorId, deleteExtras)
+    }
+
+    // processes edit comment request
+    private fun editComment(commentId: String, parentCommentId: String? = null) {
+        // gets text of the comment/reply
+        val commentText =
+            if (parentCommentId == null) {
+                val comment = getIndexAndCommentFromAdapter(commentId)?.second ?: return
+                comment.text
+            } else {
+                val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second ?: return
+                val reply = getIndexAndReplyFromComment(parentComment, commentId) ?: return
+                reply.second.text
+            }
+
+        // updates the edittext with the comment to be edited
+        binding.apply {
+            editCommentId = commentId
+            // decodes the comment text and sets to the edit text
+            MemberTaggingDecoder.decode(
+                etComment,
+                commentText,
+                LMBranding.getTextLinkColor()
+            )
+            etComment.setSelection(etComment.length())
+            etComment.focusAndShowKeyboard()
+        }
     }
 
     // processes delete comment request
@@ -874,6 +1014,7 @@ class PostDetailFragment :
             val newViewData = item.toBuilder()
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .fromCommentLiked(false)
+                .fromCommentEdited(false)
                 .build()
             mPostDetailAdapter.update(position, newViewData)
         }
@@ -890,6 +1031,8 @@ class PostDetailFragment :
         parentCommentViewData.replies.add(0, reply)
 
         val newCommentViewData = parentCommentViewData.toBuilder()
+            .fromCommentLiked(false)
+            .fromCommentEdited(false)
             .repliesCount(parentCommentViewData.repliesCount + 1)
             .build()
 
@@ -916,10 +1059,14 @@ class PostDetailFragment :
             val index = parentCommentViewData.replies.indexOfFirst {
                 it.id == replyId
             }
+            if (index == -1) return
+
             parentCommentViewData.replies.removeAt(index)
         }
 
         val newCommentViewData = parentCommentViewData.toBuilder()
+            .fromCommentLiked(false)
+            .fromCommentEdited(false)
             .repliesCount(parentCommentViewData.repliesCount - 1)
             .build()
 
@@ -974,6 +1121,7 @@ class PostDetailFragment :
         //update comment view data
         val newViewData = comment.toBuilder()
             .fromCommentLiked(true)
+            .fromCommentEdited(false)
             .isLiked(!comment.isLiked)
             .likesCount(newLikesCount)
             .build()
@@ -992,7 +1140,7 @@ class PostDetailFragment :
         val parentComment = parentIndexAndComment.second
 
         // gets reply from the comment
-        val reply = getIndexAndReplyFromComment(parentComment, replyId)
+        val reply = getIndexAndReplyFromComment(parentComment, replyId) ?: return
         val replyIndex = reply.first
         val replyViewData = reply.second
 
@@ -1013,6 +1161,8 @@ class PostDetailFragment :
 
         //update comment view data
         val newViewData = parentComment.toBuilder()
+            .fromCommentLiked(false)
+            .fromCommentEdited(false)
             .replies(parentComment.replies)
             .build()
 
@@ -1050,16 +1200,23 @@ class PostDetailFragment :
     override fun onPostMenuItemClicked(
         postId: String,
         creatorId: String,
-        title: String
+        menuId: Int
     ) {
-        when (title) {
-            DELETE_POST_MENU_ITEM -> {
+        when (menuId) {
+            EDIT_POST_MENU_ITEM_ID -> {
+                val editPostExtras = EditPostExtras.Builder()
+                    .postId(postId)
+                    .build()
+                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                editPostLauncher.launch(intent)
+            }
+            DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(
                     postId,
                     creatorId
                 )
             }
-            REPORT_POST_MENU_ITEM -> {
+            REPORT_POST_MENU_ITEM_ID -> {
                 val postData = mPostDetailAdapter[postDataPosition] as PostViewData
                 val postViewType = postData.viewType
                 reportEntity(
@@ -1070,14 +1227,24 @@ class PostDetailFragment :
                     postViewType = postViewType
                 )
             }
-            PIN_POST_MENU_ITEM -> {
+            PIN_POST_MENU_ITEM_ID -> {
                 pinPost()
             }
-            UNPIN_POST_MENU_ITEM -> {
+            UNPIN_POST_MENU_ITEM_ID -> {
                 unpinPost()
             }
         }
     }
+
+    // launcher for [EditPostActivity]
+    private val editPostLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            when (result.resultCode) {
+                Activity.RESULT_OK -> {
+                    refreshPostData()
+                }
+            }
+        }
 
     private fun pinPost() {
         //get item
@@ -1086,7 +1253,7 @@ class PostDetailFragment :
         //get pin menu item
         val menuItems = post.menuItems.toMutableList()
         val pinPostIndex = menuItems.indexOfFirst {
-            (it.title == PIN_POST_MENU_ITEM)
+            (it.id == PIN_POST_MENU_ITEM_ID)
         }
 
         //if pin item doesn't exist
@@ -1094,7 +1261,11 @@ class PostDetailFragment :
 
         //update pin menu item
         val pinPostMenuItem = menuItems[pinPostIndex]
-        val newPinPostMenuItem = pinPostMenuItem.toBuilder().title(UNPIN_POST_MENU_ITEM).build()
+        val newPinPostMenuItem =
+            pinPostMenuItem.toBuilder()
+                .id(UNPIN_POST_MENU_ITEM_ID)
+                .title(getString(R.string.unpin_this_post))
+                .build()
         menuItems[pinPostIndex] = newPinPostMenuItem
 
         //update the post view data
@@ -1120,7 +1291,7 @@ class PostDetailFragment :
         //get unpin menu item
         val menuItems = post.menuItems.toMutableList()
         val unPinPostIndex = menuItems.indexOfFirst {
-            (it.title == UNPIN_POST_MENU_ITEM)
+            (it.id == UNPIN_POST_MENU_ITEM_ID)
         }
 
         //if unpin item doesn't exist
@@ -1129,7 +1300,9 @@ class PostDetailFragment :
         //update unpin menu item
         val unPinPostMenuItem = menuItems[unPinPostIndex]
         val newUnPinPostMenuItem =
-            unPinPostMenuItem.toBuilder().title(PIN_POST_MENU_ITEM).build()
+            unPinPostMenuItem.toBuilder().id(PIN_POST_MENU_ITEM_ID)
+                .title(getString(R.string.pin_this_post))
+                .build()
         menuItems[unPinPostIndex] = newUnPinPostMenuItem
 
         //update the post view data
@@ -1165,17 +1338,20 @@ class PostDetailFragment :
         postId: String,
         commentId: String,
         creatorId: String,
-        title: String
+        menuId: Int
     ) {
-        when (title) {
-            DELETE_COMMENT_MENU_ITEM -> {
+        when (menuId) {
+            EDIT_COMMENT_MENU_ITEM_ID -> {
+                editComment(commentId)
+            }
+            DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
                     commentId,
                     creatorId
                 )
             }
-            REPORT_COMMENT_MENU_ITEM -> {
+            REPORT_COMMENT_MENU_ITEM_ID -> {
                 reportEntity(
                     commentId,
                     creatorId,
@@ -1205,10 +1381,13 @@ class PostDetailFragment :
         parentCommentId: String,
         replyId: String,
         creatorId: String,
-        title: String
+        menuId: Int
     ) {
-        when (title) {
-            DELETE_COMMENT_MENU_ITEM -> {
+        when (menuId) {
+            EDIT_COMMENT_MENU_ITEM_ID -> {
+                editComment(replyId, parentCommentId)
+            }
+            DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
                     replyId,
@@ -1216,7 +1395,7 @@ class PostDetailFragment :
                     parentCommentId
                 )
             }
-            REPORT_COMMENT_MENU_ITEM -> {
+            REPORT_COMMENT_MENU_ITEM_ID -> {
                 reportEntity(
                     replyId,
                     creatorId,
@@ -1290,6 +1469,11 @@ class PostDetailFragment :
         mPostDetailAdapter.updateWithoutNotifyingRV(position, postData)
     }
 
+    // callback when user clicks to share the post
+    override fun sharePost(postId: String) {
+        ShareUtils.sharePost(requireContext(), postId)
+    }
+
     //get index and post from the adapter using postId
     private fun getIndexAndCommentFromAdapter(commentId: String): Pair<Int, CommentViewData>? {
         val index = mPostDetailAdapter.items().indexOfFirst {
@@ -1313,9 +1497,13 @@ class PostDetailFragment :
     private fun getIndexAndReplyFromComment(
         parentComment: CommentViewData,
         replyId: String
-    ): Pair<Int, CommentViewData> {
+    ): Pair<Int, CommentViewData>? {
         val index = parentComment.replies.indexOfFirst {
             it.id == replyId
+        }
+
+        if (index == -1) {
+            return null
         }
 
         val reply = parentComment.replies[index]

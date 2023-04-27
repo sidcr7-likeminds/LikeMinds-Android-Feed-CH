@@ -123,4 +123,10 @@
     <string name="enter_user_id">Enter user id</string>
     <string name="no_posts_to_show">No posts to show</string>
     <string name="be_the_first_one_to_post_here">Be the first one to post here</string>
+    <string name="pin_this_post">Pin this Post</string>
+    <string name="unpin_this_post">Unpin this Post</string>
+    <string name="you_do_not_have_permission_to_create_a_post">You do not have permission to create a post</string>
+    <string name="you_do_not_have_permission_to_comment">You do not have permission to comment</string>
+    <string name="share_post">Share Post</string>
+    <string name="edit_post">Edit Post</string>
 </resources>

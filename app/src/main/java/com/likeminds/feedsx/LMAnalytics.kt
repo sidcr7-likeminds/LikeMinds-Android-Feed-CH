@@ -54,6 +54,7 @@ object LMAnalytics {
      * Source keys variables
      **/
     object Source {
+        const val DEEP_LINK = "deep_link"
         const val NOTIFICATION = "notification"
         const val UNIVERSAL_FEED = "universal_feed"
         const val POST_DETAIL = "post_detail"

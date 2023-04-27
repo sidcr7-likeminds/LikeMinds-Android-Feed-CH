@@ -5,6 +5,7 @@ object DbConstants {
     const val USER_TABLE = "user_table"
     const val POST_TABLE = "post_table"
     const val ATTACHMENT_TABLE = "attachment_table"
+    const val MEMBER_RIGHTS_TABLE = "member_rights_table"
 
     const val LATEST_POST_LIMIT = 1
 }

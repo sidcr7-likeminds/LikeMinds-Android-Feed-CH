@@ -20,6 +20,7 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.helper.model.TagMember
+import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
@@ -223,6 +224,7 @@ object ViewDataConverter {
             .isPinned(post.isPinned)
             .isSaved(post.isSaved)
             .isLiked(post.isLiked)
+            .isEdited(post.isEdited)
             .menuItems(convertOverflowMenuItems(post.menuItems))
             .replies(
                 convertComments(
@@ -275,6 +277,7 @@ object ViewDataConverter {
         val userId = comment.userId
         val user = usersMap[userId]
         val replies = comment.replies?.toMutableList()
+        val parentId = parentCommentId ?: comment.parentComment?.id
 
         val userViewData = if (user == null) {
             createDeletedUser()
@@ -286,6 +289,7 @@ object ViewDataConverter {
             .id(comment.id)
             .postId(postId)
             .isLiked(comment.isLiked)
+            .isEdited(comment.isEdited)
             .userId(userId)
             .text(comment.text)
             .level(comment.level)
@@ -303,7 +307,7 @@ object ViewDataConverter {
                     comment.id
                 )
             )
-            .parentId(parentCommentId)
+            .parentId(parentId)
             .parentComment(
                 comment.parentComment?.let {
                     convertComment(
@@ -331,6 +335,7 @@ object ViewDataConverter {
     ): List<OverflowMenuItemViewData> {
         return menuItems.map { menuItem ->
             OverflowMenuItemViewData.Builder()
+                .id(menuItem.id)
                 .title(menuItem.title)
                 .build()
         }
@@ -480,11 +485,50 @@ object ViewDataConverter {
             .build()
     }
 
+    /**
+     * converts list of [ManagementRightPermissionData] to list of [MemberRightsEntity]
+     * @param userUniqueId: unique id of the user
+     * @param memberRights: list of [ManagementRightPermissionData]
+     * */
+    fun createMemberRightsEntity(
+        userUniqueId: String,
+        memberRights: List<ManagementRightPermissionData>
+    ): List<MemberRightsEntity> {
+        return memberRights.map {
+            createMemberRightEntity(
+                userUniqueId,
+                it
+            )
+        }
+    }
+
+    /**
+     * converts [ManagementRightPermissionData] to [MemberRightsEntity]
+     * @param userUniqueId: unique id of the user
+     * @param memberRight: network model of member right [ManagementRightPermissionData]
+     * */
+    private fun createMemberRightEntity(
+        userUniqueId: String,
+        memberRight: ManagementRightPermissionData
+    ): MemberRightsEntity {
+        return MemberRightsEntity.Builder()
+            .id(memberRight.id)
+            .isLocked(memberRight.isLocked)
+            .isSelected(memberRight.isSelected)
+            .state(memberRight.state)
+            .title(memberRight.title)
+            .subtitle(memberRight.subtitle)
+            .userUniqueId(userUniqueId)
+            .build()
+    }
+
     /**--------------------------------
      * Db Model -> View Data Model
     --------------------------------*/
 
-    fun convertUser(user: UserEntity): UserViewData {
+    fun convertUser(
+        user: UserEntity
+    ): UserViewData {
         return UserViewData.Builder()
             .id(user.id)
             .imageUrl(user.imageUrl)
