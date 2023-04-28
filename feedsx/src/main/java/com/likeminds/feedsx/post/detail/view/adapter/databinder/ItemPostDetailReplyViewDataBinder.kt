@@ -73,6 +73,14 @@ class ItemPostDetailReplyViewDataBinder constructor(
 
             tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
+            if (data.isEdited) {
+                viewDotEdited.show()
+                tvEdited.show()
+            } else {
+                viewDotEdited.hide()
+                tvEdited.hide()
+            }
+
             if (data.likesCount == 0) {
                 likesCount.hide()
             } else {

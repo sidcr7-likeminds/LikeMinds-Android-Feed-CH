@@ -73,6 +73,14 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
             tvCommentTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
+            if (data.isEdited) {
+                viewDotEdited.show()
+                tvEdited.show()
+            } else {
+                viewDotEdited.hide()
+                tvEdited.hide()
+            }
+
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_comment_filled)
             } else {
