@@ -1,0 +1,233 @@
+package com.likeminds.feedsx.media.util
+
+import android.graphics.Rect
+import android.net.Uri
+import android.util.Log
+import androidx.core.view.get
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
+import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
+import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
+import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
+import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
+import com.likeminds.feedsx.utils.customview.DataBoundViewHolder
+import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
+import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
+import javax.inject.Singleton
+
+@Singleton
+class VideoAutoPlayHelper private constructor(private val recyclerView: RecyclerView) {
+    companion object {
+        private var videoAutoPlayHelper: VideoAutoPlayHelper? = null
+
+        fun getInstance(recyclerView: RecyclerView): VideoAutoPlayHelper {
+            if (videoAutoPlayHelper == null) {
+                videoAutoPlayHelper = VideoAutoPlayHelper(recyclerView)
+            }
+            return videoAutoPlayHelper!!
+        }
+
+        fun getInstance(): VideoAutoPlayHelper? {
+            return videoAutoPlayHelper
+        }
+    }
+
+    private var lastPlayerView: LikeMindsVideoPlayerView? = null
+
+    // When playerView will be less than [MIN_LIMIT_VISIBILITY]% visible than it will stop the player
+    private val MIN_LIMIT_VISIBILITY = 20
+
+    private var currentPlayingVideoItemPos = -1 // -1 indicates nothing playing
+
+    private fun attachVideoPlayerAt(pos: Int) {
+        val adapter = recyclerView.adapter as PostAdapter
+        Log.d("PUI", "attachVideoPlayerAt: ${adapter[pos]?.viewType}")
+
+        when (adapter[pos]?.viewType) {
+            ITEM_POST_SINGLE_VIDEO -> {
+                val itemPostSingleVideoBinding =
+                    (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
+                        ?.binding as? ItemPostSingleVideoBinding ?: return
+
+                /** in case its only video **/
+                if (lastPlayerView == null || lastPlayerView != itemPostSingleVideoBinding.videoPost) {
+                    val data = adapter[pos] as PostViewData
+                    val videoUri = Uri.parse(data.attachments.first().attachmentMeta.url)
+                    itemPostSingleVideoBinding.videoPost.startPlaying(videoUri)
+                    // stop last player
+                    lastPlayerView?.removePlayer()
+                }
+                lastPlayerView = itemPostSingleVideoBinding.videoPost
+            }
+            ITEM_POST_MULTIPLE_MEDIA -> {
+                val itemMultipleMediaBinding =
+                    (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
+                        ?.binding as? ItemPostMultipleMediaBinding ?: return
+
+                val viewPager = itemMultipleMediaBinding.viewpagerMultipleMedia
+                Log.d(
+                    "PUI",
+                    "attachVideoPlayerAt: ITEM_POST_MULTIPLE_MEDIA ${viewPager.currentItem}"
+                )
+
+                val itemMultipleMediaVideoBinding =
+                    ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager.currentItem) as? DataBoundViewHolder<*>)
+                        ?.binding as? ItemMultipleMediaVideoBinding
+
+                if (itemMultipleMediaVideoBinding == null) {
+                    // stop last player
+                    lastPlayerView?.removePlayer()
+                    lastPlayerView = null
+                } else {
+                    /** in case its only video **/
+                    if (lastPlayerView == null || lastPlayerView != itemMultipleMediaVideoBinding.videoPost) {
+                        val data = adapter[pos] as PostViewData
+                        val videoUri =
+                            Uri.parse(data.attachments[viewPager.currentItem].attachmentMeta.url)
+                        itemMultipleMediaVideoBinding.videoPost.startPlaying(videoUri)
+                        // stop last player
+                        lastPlayerView?.removePlayer()
+                    }
+                    lastPlayerView = itemMultipleMediaVideoBinding.videoPost
+                }
+            }
+            else -> {
+                /** in case its a image **/
+                if (lastPlayerView != null) {
+                    // stop last player
+                    lastPlayerView?.removePlayer()
+                    lastPlayerView = null
+                }
+            }
+        }
+    }
+
+    private fun getMostVisibleItem(firstVisiblePosition: Int, lastVisiblePosition: Int) {
+        var maxPercentage = -1
+        var pos = 0
+        recyclerView.post {
+            for (i in firstVisiblePosition..lastVisiblePosition) {
+                Log.d(
+                    "PUI",
+                    "getMostVisibleItem: ${recyclerView.findViewHolderForAdapterPosition(i)}"
+                )
+
+                val viewHolder: RecyclerView.ViewHolder =
+                    recyclerView.findViewHolderForAdapterPosition(i) ?: return@post
+
+                val currentPercentage = getVisiblePercentage(viewHolder)
+                if (currentPercentage > maxPercentage) {
+                    maxPercentage = currentPercentage.toInt()
+                    pos = i
+                }
+            }
+            if (maxPercentage == -1 || maxPercentage < MIN_LIMIT_VISIBILITY) {
+                pos = -1
+            }
+            Log.d("PUI", "maxPercentage: $pos")
+            if (pos == -1) {
+                /*check if current view is more than MIN_LIMIT_VISIBILITY*/
+                if (currentPlayingVideoItemPos != -1) {
+                    val viewHolder: RecyclerView.ViewHolder =
+                        recyclerView.findViewHolderForAdapterPosition(currentPlayingVideoItemPos)!!
+
+                    val currentVisibility = getVisiblePercentage(viewHolder)
+                    if (currentVisibility < MIN_LIMIT_VISIBILITY) {
+                        lastPlayerView?.removePlayer()
+                    }
+                    currentPlayingVideoItemPos = -1
+                }
+            } else {
+//                if (currentPlayingVideoItemPos != pos) {
+                currentPlayingVideoItemPos = pos
+                attachVideoPlayerAt(pos)
+//                }
+            }
+        }
+    }
+
+    private fun getVisiblePercentage(
+        holder: RecyclerView.ViewHolder
+    ): Float {
+        val rect_parent = Rect()
+        recyclerView.getGlobalVisibleRect(rect_parent)
+        val location = IntArray(2)
+        holder.itemView.getLocationOnScreen(location)
+
+        val rect_child = Rect(
+            location[0],
+            location[1],
+            location[0] + holder.itemView.width,
+            location[1] + holder.itemView.height
+        )
+
+        val rect_parent_area =
+            ((rect_child.right - rect_child.left) * (rect_child.bottom - rect_child.top)).toFloat()
+        val x_overlap = Math.max(
+            0,
+            Math.min(
+                rect_child.right,
+                rect_parent.right
+            ) - Math.max(
+                rect_child.left,
+                rect_parent.left
+            )
+        ).toFloat()
+
+        val y_overlap = Math.max(
+            0,
+            Math.min(
+                rect_child.bottom,
+                rect_parent.bottom
+            ) - Math.max(
+                rect_child.top,
+                rect_parent.top
+            )
+        ).toFloat()
+
+        val overlapArea = x_overlap * y_overlap
+        val percent = overlapArea / rect_parent_area * 100.0f
+        return percent
+    }
+
+
+    private fun findFirstVisibleItemPosition(): Int {
+        if (recyclerView.layoutManager is LinearLayoutManager) {
+            return (recyclerView.layoutManager as LinearLayoutManager).findFirstVisibleItemPosition()
+        }
+        return -1
+    }
+
+    private fun findLastVisibleItemPosition(): Int {
+        if (recyclerView.layoutManager is LinearLayoutManager) {
+            return (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+        }
+        return -1
+    }
+
+    fun startObserving() {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                logic()
+            }
+        })
+    }
+
+    fun logic() {
+        val firstVisiblePosition: Int = findFirstVisibleItemPosition()
+        val lastVisiblePosition: Int = findLastVisibleItemPosition()
+
+        getMostVisibleItem(firstVisiblePosition, lastVisiblePosition)
+    }
+
+    fun removePlayer() {
+        if (lastPlayerView != null) {
+            // stop last player
+            lastPlayerView?.removePlayer()
+            lastPlayerView = null
+        }
+    }
+}

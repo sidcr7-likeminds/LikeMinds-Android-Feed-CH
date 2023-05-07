@@ -134,7 +134,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            app:constraint_referenced_ids="layout_add_image, layout_attach_files, video_file_separator" />
+            app:constraint_referenced_ids="layout_add_image, layout_add_video, layout_attach_files, video_image_separator, video_file_separator" />
 
         <LinearLayout
             android:id="@+id/layout_attach_files"
@@ -182,7 +182,6 @@
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
             android:paddingVertical="10dp"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/video_file_separator">
 
             <ImageView
@@ -209,7 +208,6 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/cloudy_blue_50"
-            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/layout_add_video" />
 
         <LinearLayout
@@ -217,7 +215,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            android:elevation="4dp"
             android:foreground="?selectableItemBackground"
             android:gravity="center_vertical"
             android:paddingHorizontal="16dp"
@@ -241,6 +238,5 @@
                 app:fontType="regular" />
 
         </LinearLayout>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -30,9 +30,9 @@ class FeedSXApplication : Application(), LMCallback {
             .lmCallback(this)
             .build()
         val brandingRequest = SetBrandingRequest.Builder()
-            .headerColor("#9B26AF")
-            .buttonsColor("#E81D62")
-            .textLinkColor("#4BAE4F")
+            .headerColor("#02A8F3")
+            .buttonsColor("#4BAE4F")
+            .textLinkColor("#FE9700")
             .fonts(
                 LMFonts.Builder()
                     .bold("fonts/montserrat-bold.ttf")

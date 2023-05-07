@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
@@ -31,11 +30,11 @@ class ItemMultipleMediaVideoViewDataBinder :
         val video: Uri =
             Uri.parse(attachment.attachmentMeta.url)
 
-        binding.videoPost.setVideoURI(video)
-        binding.videoPost.setOnPreparedListener { mp ->
-            mp.isLooping = true
-            binding.iconVideoPlay.hide()
-            binding.videoPost.start()
-        }
+//        binding.videoPost.setVideoURI(video)
+//        binding.videoPost.setOnPreparedListener { mp ->
+//            mp.isLooping = true
+//            binding.iconVideoPlay.hide()
+//            binding.videoPost.start()
+//        }
     }
 }

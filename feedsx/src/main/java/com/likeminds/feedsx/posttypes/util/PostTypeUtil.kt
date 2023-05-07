@@ -5,6 +5,7 @@ import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
+import android.util.Log
 import android.view.Menu.NONE
 import android.view.View
 import android.widget.ImageView
@@ -16,10 +17,12 @@ import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
+import com.likeminds.feedsx.media.util.VideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
@@ -307,6 +310,29 @@ object PostTypeUtil {
             viewpagerMultipleMedia.isSaveEnabled = false
             val multipleMediaPostAdapter = MultipleMediaPostAdapter()
             viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
+
+            viewpagerMultipleMedia.registerOnPageChangeCallback(object :
+                ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    Log.d("PUI", "onPageSelected: $position")
+                    val videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
+                    videoAutoPlayHelper?.logic()
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                }
+
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
+                }
+            })
+
             dotsIndicator.setViewPager2(viewpagerMultipleMedia)
             multipleMediaPostAdapter.replace(attachments)
         }

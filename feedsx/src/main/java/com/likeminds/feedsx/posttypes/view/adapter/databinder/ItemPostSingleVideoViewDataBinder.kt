@@ -3,8 +3,6 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.google.android.exoplayer2.MediaItem
-import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
 import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
@@ -29,10 +27,10 @@ class ItemPostSingleVideoViewDataBinder constructor(
             false
         )
 
-        binding.iconVideoPlay.setOnClickListener {
-            val position = binding.position ?: return@setOnClickListener
-            listener.playPauseOnVideo(position)
-        }
+//        binding.iconVideoPlay.setOnClickListener {
+//            val position = binding.position ?: return@setOnClickListener
+//            listener.playPauseOnVideo(position)
+//        }
 
         return binding
     }
@@ -55,13 +53,13 @@ class ItemPostSingleVideoViewDataBinder constructor(
         val attachment = data.attachments.first()
         when (attachment.mediaActions) {
             MEDIA_ACTION_NONE -> {
-                binding.iconVideoPlay.setImageResource(R.drawable.ic_play)
+//                binding.iconVideoPlay.setImageResource(R.drawable.ic_play)
             }
             MEDIA_ACTION_PLAY -> {
-                binding.iconVideoPlay.setImageResource(R.drawable.ic_pause)
+//                binding.iconVideoPlay.setImageResource(R.drawable.ic_pause)
             }
             MEDIA_ACTION_PAUSE -> {
-                binding.iconVideoPlay.setImageResource(R.drawable.ic_play)
+//                binding.iconVideoPlay.setImageResource(R.drawable.ic_play)
             }
         }
 
@@ -76,8 +74,11 @@ class ItemPostSingleVideoViewDataBinder constructor(
                 return@initPostTypeBindData
             }, executeBinder = {
                 val videoUri = Uri.parse(data.attachments.first().attachmentMeta.url)
-                val mediaItem = MediaItem.fromUri(videoUri)
-                listener.sendMediaItemToExoPlayer(position, binding.videoPost, mediaItem)
+                binding.videoPost.reset()
+                // Set separate ID for each player view, to prevent it being overlapped by other player's changes
+//                binding.videoPost.id = View.generateViewId()
+
+//                listener.sendMediaItemToExoPlayer(position, binding.videoPost, mediaItem)
 //                binding.videoPost.setVideoURI(video)
 //                binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
 //                    mp.isLooping = true

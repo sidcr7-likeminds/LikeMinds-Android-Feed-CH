@@ -41,28 +41,28 @@
             tools:fontFamily="@font/roboto_regular"
             tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
 
-        <com.google.android.exoplayer2.ui.StyledPlayerView
+        <com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
             android:id="@+id/video_post"
             android:layout_width="0dp"
-            android:layout_height="296dp"
+            android:layout_height="0dp"
             android:layout_marginTop="16dp"
-            android:keepScreenOn="true"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_post_content"
-            app:use_controller="false" />
+            app:layout_constraintTop_toBottomOf="@id/tv_post_content" />
 
-        <ImageView
-            android:id="@+id/icon_video_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:src="@drawable/ic_play"
-            app:layout_constraintBottom_toBottomOf="@id/video_post"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/video_post"
-            tools:ignore="ContentDescription" />
+        <!--        <ImageView-->
+        <!--            android:id="@+id/icon_video_play"-->
+        <!--            android:layout_width="wrap_content"-->
+        <!--            android:layout_height="wrap_content"-->
+        <!--            android:padding="12dp"-->
+        <!--            android:src="@drawable/ic_play"-->
+        <!--            app:layout_constraintBottom_toBottomOf="@id/video_post"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintStart_toStartOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="@id/video_post"-->
+        <!--            tools:ignore="ContentDescription" />-->
 
         <include
             android:id="@+id/post_actions_layout"
