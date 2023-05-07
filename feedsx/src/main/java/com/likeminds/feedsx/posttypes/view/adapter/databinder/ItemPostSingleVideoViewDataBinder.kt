@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
-import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
@@ -73,7 +72,6 @@ class ItemPostSingleVideoViewDataBinder constructor(
             returnBinder = {
                 return@initPostTypeBindData
             }, executeBinder = {
-                val videoUri = Uri.parse(data.attachments.first().attachmentMeta.url)
                 binding.videoPost.reset()
                 // Set separate ID for each player view, to prevent it being overlapped by other player's changes
 //                binding.videoPost.id = View.generateViewId()

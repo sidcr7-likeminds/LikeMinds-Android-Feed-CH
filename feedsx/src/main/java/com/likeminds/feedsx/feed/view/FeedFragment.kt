@@ -458,18 +458,16 @@ class FeedFragment :
             removePostingView()
             viewModel.fetchPendingPostFromDB()
         }
-        Log.d("PUI", "onResume: ")
-        /*Helper class to provide AutoPlay feature inside cell*/
-        videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
+
+        videoAutoPlayHelper = VideoAutoPlayHelper.getInstance(binding.recyclerView)
         videoAutoPlayHelper?.startObserving()
         videoAutoPlayHelper?.logic()
     }
 
-    override fun onStop() {
-        super.onStop()
-        //release player
-//        lmExoplayer.release
+    override fun onPause() {
+        super.onPause()
         videoAutoPlayHelper?.removePlayer()
+        VideoAutoPlayHelper.destroy()
     }
 
     override fun onDestroy() {
@@ -598,17 +596,12 @@ class FeedFragment :
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             addItemDecoration(dividerItemDecorator)
             show()
+
+            attachScrollListener(
+                this,
+                linearLayoutManager
+            )
         }
-
-        /*Helper class to provide AutoPlay feature inside cell*/
-        videoAutoPlayHelper =
-            VideoAutoPlayHelper.getInstance(binding.recyclerView)
-        videoAutoPlayHelper?.startObserving()
-
-        attachScrollListener(
-            binding.recyclerView,
-            linearLayoutManager
-        )
     }
 
     // initializes swipe refresh layout and sets refresh listener

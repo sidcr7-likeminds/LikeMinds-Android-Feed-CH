@@ -10,12 +10,15 @@ import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
 import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
 import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
+import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.utils.customview.DataBoundViewHolder
 import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 import javax.inject.Singleton
+import kotlin.math.max
+import kotlin.math.min
 
 @Singleton
 class VideoAutoPlayHelper private constructor(private val recyclerView: RecyclerView) {
@@ -32,6 +35,10 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
         fun getInstance(): VideoAutoPlayHelper? {
             return videoAutoPlayHelper
         }
+
+        fun destroy() {
+            videoAutoPlayHelper = null
+        }
     }
 
     private var lastPlayerView: LikeMindsVideoPlayerView? = null
@@ -42,10 +49,38 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
     private var currentPlayingVideoItemPos = -1 // -1 indicates nothing playing
 
     private fun attachVideoPlayerAt(pos: Int) {
-        val adapter = recyclerView.adapter as PostAdapter
-        Log.d("PUI", "attachVideoPlayerAt: ${adapter[pos]?.viewType}")
+        recyclerView.adapter.apply {
+            when (this) {
+                is PostAdapter -> {
+                    val item = this[pos]
+                    handleVideoPlay(
+                        pos,
+                        (item?.viewType ?: 0),
+                        item as PostViewData
+                    )
+                }
+                is PostDetailAdapter -> {
+                    Log.d("PUI", "attachVideoPlayerAt: $pos")
+                    if (pos != 0) {
+                        return
+                    }
+                    val item = this[pos]
+                    handleVideoPlay(
+                        pos,
+                        (item?.viewType ?: 0),
+                        item as PostViewData
+                    )
+                }
+            }
+        }
+    }
 
-        when (adapter[pos]?.viewType) {
+    private fun handleVideoPlay(
+        pos: Int,
+        viewType: Int,
+        data: PostViewData
+    ) {
+        when (viewType) {
             ITEM_POST_SINGLE_VIDEO -> {
                 val itemPostSingleVideoBinding =
                     (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
@@ -53,7 +88,6 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
 
                 /** in case its only video **/
                 if (lastPlayerView == null || lastPlayerView != itemPostSingleVideoBinding.videoPost) {
-                    val data = adapter[pos] as PostViewData
                     val videoUri = Uri.parse(data.attachments.first().attachmentMeta.url)
                     itemPostSingleVideoBinding.videoPost.startPlaying(videoUri)
                     // stop last player
@@ -67,30 +101,25 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
                         ?.binding as? ItemPostMultipleMediaBinding ?: return
 
                 val viewPager = itemMultipleMediaBinding.viewpagerMultipleMedia
-                Log.d(
-                    "PUI",
-                    "attachVideoPlayerAt: ITEM_POST_MULTIPLE_MEDIA ${viewPager.currentItem}"
-                )
 
                 val itemMultipleMediaVideoBinding =
                     ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager.currentItem) as? DataBoundViewHolder<*>)
                         ?.binding as? ItemMultipleMediaVideoBinding
 
-                if (itemMultipleMediaVideoBinding == null) {
+                lastPlayerView = if (itemMultipleMediaVideoBinding == null) {
                     // stop last player
                     lastPlayerView?.removePlayer()
-                    lastPlayerView = null
+                    null
                 } else {
                     /** in case its only video **/
                     if (lastPlayerView == null || lastPlayerView != itemMultipleMediaVideoBinding.videoPost) {
-                        val data = adapter[pos] as PostViewData
                         val videoUri =
                             Uri.parse(data.attachments[viewPager.currentItem].attachmentMeta.url)
                         itemMultipleMediaVideoBinding.videoPost.startPlaying(videoUri)
                         // stop last player
                         lastPlayerView?.removePlayer()
                     }
-                    lastPlayerView = itemMultipleMediaVideoBinding.videoPost
+                    itemMultipleMediaVideoBinding.videoPost
                 }
             }
             else -> {
@@ -104,16 +133,14 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
         }
     }
 
-    private fun getMostVisibleItem(firstVisiblePosition: Int, lastVisiblePosition: Int) {
+    private fun getMostVisibleItem() {
+        val firstVisiblePosition: Int = findFirstVisibleItemPosition()
+        val lastVisiblePosition: Int = findLastVisibleItemPosition()
+
         var maxPercentage = -1
         var pos = 0
         recyclerView.post {
             for (i in firstVisiblePosition..lastVisiblePosition) {
-                Log.d(
-                    "PUI",
-                    "getMostVisibleItem: ${recyclerView.findViewHolderForAdapterPosition(i)}"
-                )
-
                 val viewHolder: RecyclerView.ViewHolder =
                     recyclerView.findViewHolderForAdapterPosition(i) ?: return@post
 
@@ -126,7 +153,6 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
             if (maxPercentage == -1 || maxPercentage < MIN_LIMIT_VISIBILITY) {
                 pos = -1
             }
-            Log.d("PUI", "maxPercentage: $pos")
             if (pos == -1) {
                 /*check if current view is more than MIN_LIMIT_VISIBILITY*/
                 if (currentPlayingVideoItemPos != -1) {
@@ -151,45 +177,44 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
     private fun getVisiblePercentage(
         holder: RecyclerView.ViewHolder
     ): Float {
-        val rect_parent = Rect()
-        recyclerView.getGlobalVisibleRect(rect_parent)
+        val rectParent = Rect()
+        recyclerView.getGlobalVisibleRect(rectParent)
         val location = IntArray(2)
         holder.itemView.getLocationOnScreen(location)
 
-        val rect_child = Rect(
+        val rectChild = Rect(
             location[0],
             location[1],
             location[0] + holder.itemView.width,
             location[1] + holder.itemView.height
         )
 
-        val rect_parent_area =
-            ((rect_child.right - rect_child.left) * (rect_child.bottom - rect_child.top)).toFloat()
-        val x_overlap = Math.max(
+        val rectParentArea =
+            ((rectChild.right - rectChild.left) * (rectChild.bottom - rectChild.top)).toFloat()
+        val xOverlap = max(
             0,
-            Math.min(
-                rect_child.right,
-                rect_parent.right
-            ) - Math.max(
-                rect_child.left,
-                rect_parent.left
+            min(
+                rectChild.right,
+                rectParent.right
+            ) - max(
+                rectChild.left,
+                rectParent.left
             )
         ).toFloat()
 
-        val y_overlap = Math.max(
+        val yOverlap = max(
             0,
-            Math.min(
-                rect_child.bottom,
-                rect_parent.bottom
-            ) - Math.max(
-                rect_child.top,
-                rect_parent.top
+            min(
+                rectChild.bottom,
+                rectParent.bottom
+            ) - max(
+                rectChild.top,
+                rectParent.top
             )
         ).toFloat()
 
-        val overlapArea = x_overlap * y_overlap
-        val percent = overlapArea / rect_parent_area * 100.0f
-        return percent
+        val overlapArea = xOverlap * yOverlap
+        return (overlapArea / rectParentArea * 100.0f)
     }
 
 
@@ -211,16 +236,42 @@ class VideoAutoPlayHelper private constructor(private val recyclerView: Recycler
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-                logic()
+                when (recyclerView.adapter) {
+                    is PostAdapter -> {
+                        getMostVisibleItem()
+                    }
+
+                    is PostDetailAdapter -> {
+                        getVisibilityOfPost()
+                    }
+                }
             }
         })
     }
 
-    fun logic() {
-        val firstVisiblePosition: Int = findFirstVisibleItemPosition()
-        val lastVisiblePosition: Int = findLastVisibleItemPosition()
+    private fun getVisibilityOfPost() {
+        recyclerView.post {
+            val viewHolder: RecyclerView.ViewHolder =
+                recyclerView.findViewHolderForAdapterPosition(0) ?: return@post
 
-        getMostVisibleItem(firstVisiblePosition, lastVisiblePosition)
+            if (getVisiblePercentage(viewHolder) > MIN_LIMIT_VISIBILITY) {
+                attachVideoPlayerAt(0)
+            } else {
+                if (lastPlayerView != null) {
+                    // stop last player
+                    lastPlayerView?.removePlayer()
+                    lastPlayerView = null
+                }
+            }
+        }
+    }
+
+    fun logic() {
+        getMostVisibleItem()
+    }
+
+    fun logic1() {
+        getVisibilityOfPost()
     }
 
     fun removePlayer() {

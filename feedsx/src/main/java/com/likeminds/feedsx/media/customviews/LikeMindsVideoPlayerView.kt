@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.*
 import android.widget.FrameLayout
 import com.google.android.exoplayer2.DefaultLoadControl
@@ -12,6 +11,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.upstream.DefaultAllocator
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.util.Assertions
@@ -29,7 +29,21 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     private var player: Player? = null
     private var isTouching = false
 
-    private var lastPos: Long? = 0
+    private var lastPos: Long = 0
+
+    private val cacheDataSourceFactory = CacheDataSource.Factory()
+        .setCache(VideoCache.getInstance(context))
+        .setUpstreamDataSourceFactory(
+            DefaultHttpDataSource.Factory()
+                .setUserAgent(
+                    Util.getUserAgent(
+                        context, context.getString(
+                            R.string.app_name
+                        )
+                    )
+                )
+        )
+        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
 
     init {
         if (isInEditMode) {
@@ -44,12 +58,14 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
         }
     }
 
+    // initializes the exoplayer and sets player
     fun init() {
         reset()
-        setupForPreCaching()
 
         val defaultLoadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(3000, 8000, 500, 1500)
+            .setAllocator(DefaultAllocator(true, 16))
+            .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
         val exoPlayer = ExoPlayer.Builder(context)
@@ -57,12 +73,11 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
             .build()
 
         exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+
         exoPlayer.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
                 if (playbackState == Player.STATE_READY) {
-                    Log.d("PUI", "onPlaybackStateChanged: ")
-//                    exoPlayer.seekTo(lastPos!!)
                     alpha = 1f
                 }
             }
@@ -72,35 +87,17 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
         setPlayer(exoPlayer)
     }
 
-    private fun setupForPreCaching() {
-        VideoCache.getInstance(context)
-    }
 
+    // Prevents surface view to show black screen, will make it visible once video is loaded
     fun reset() {
-        // This will prevent surface view to show black screen,
-        // and we will make it visible when it will be loaded
         alpha = 0f
     }
 
     /**
-     * Returns the player currently set on this view, or null if no player is set.
-     */
-    fun getPlayer(): Player? {
-        return player
-    }
-
-    /**
      * Set the [Player] to use.
-     *
-     *
-     * To transition a [Player] from targeting one view to another, it's recommended to use
-     * [.switchTargetView] rather than this method. If you do
-     * wish to use this method directly, be sure to attach the player to the new view *before*
-     * calling `setPlayer(null)` to detach it from the old one. This ordering is significantly
-     * more efficient and may allow for more seamless transitions.
-     *
-     * @param player The [Player] to use, or `null` to detach the current player. Only
-     * players which are accessed on the main thread are supported (`player.getApplicationLooper() == Looper.getMainLooper()`).
+     * @param player The [Player] to use, or `null` to detach the current player.
+     * Only players which are accessed on the main thread are supported
+     * (`player.getApplicationLooper() == Looper.getMainLooper()`).
      */
     private fun setPlayer(player: Player?) {
         Assertions.checkState(Looper.myLooper() == Looper.getMainLooper())
@@ -111,9 +108,9 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
             return
         }
         val oldPlayer = this.player
-        oldPlayer?.clearVideoSurfaceView(videoSurfaceView as SurfaceView?)
+        oldPlayer?.clearVideoSurfaceView(videoSurfaceView as SurfaceView)
         this.player = player
-        player?.setVideoSurfaceView(videoSurfaceView as SurfaceView?)
+        player?.setVideoSurfaceView(videoSurfaceView as SurfaceView)
     }
 
     override fun setVisibility(visibility: Int) {
@@ -122,10 +119,9 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     }
 
     override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (player != null && player!!.isPlayingAd) {
+        if (player != null) {
             return super.dispatchKeyEvent(event)
         }
-        // TODO: check
         return false
     }
 
@@ -154,33 +150,15 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
         return false
     }
 
-    private val cacheDataSourceFactory = CacheDataSource.Factory()
-        .setCache(VideoCache.getInstance(context))
-        .setUpstreamDataSourceFactory(
-            DefaultHttpDataSource.Factory()
-                .setUserAgent(
-                    Util.getUserAgent(
-                        context, context.getString(
-                            R.string.app_name
-                        )
-                    )
-                )
-        )
-        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
-
     /**
      * This will reuse the player and will play new URI we have provided
      */
     fun startPlaying(videoUri: Uri) {
-        Log.d("PUI", "startPlaying: $videoUri")
-//        if (videoUri == null) {
-//            return
-//        }
         val mediaSource =
             ProgressiveMediaSource.Factory(cacheDataSourceFactory)
                 .createMediaSource(MediaItem.fromUri(videoUri))
         (player as ExoPlayer).setMediaSource(mediaSource)
-        player?.seekTo(lastPos!!)
+        player?.seekTo(lastPos)
         player?.playWhenReady = true
         (player as ExoPlayer).prepare()
     }
@@ -190,14 +168,14 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
      * so to cover that we set alpha to 0 of player
      * and lastFrame of player using imageView over player to make it look like paused player
      *
-     * (If we will not stop the player, only pause , then it can cause memory issue due to overload of player
-     * and paused player can not be payed with new URL, after stopping the player we can reuse that with new URL
+     * If we will not stop the player, only pause it, then it can cause memory issue due to overload of player
+     * and paused player can not be played with new URL, after stopping the player we can reuse that with new URL
      *
      */
     fun removePlayer() {
-        getPlayer()?.playWhenReady = false
-        lastPos = getPlayer()?.currentPosition
+        player?.playWhenReady = false
+        lastPos = player?.currentPosition ?: 0
         reset()
-        getPlayer()?.stop(true)
+        player?.stop()
     }
 }

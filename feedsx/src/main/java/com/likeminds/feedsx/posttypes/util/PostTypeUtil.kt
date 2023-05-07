@@ -5,7 +5,6 @@ import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
-import android.util.Log
 import android.view.Menu.NONE
 import android.view.View
 import android.widget.ImageView
@@ -315,21 +314,8 @@ object PostTypeUtil {
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    Log.d("PUI", "onPageSelected: $position")
                     val videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
                     videoAutoPlayHelper?.logic()
-                }
-
-                override fun onPageScrollStateChanged(state: Int) {
-                    super.onPageScrollStateChanged(state)
-                }
-
-                override fun onPageScrolled(
-                    position: Int,
-                    positionOffset: Float,
-                    positionOffsetPixels: Int
-                ) {
-                    super.onPageScrolled(position, positionOffset, positionOffsetPixels)
                 }
             })
 
