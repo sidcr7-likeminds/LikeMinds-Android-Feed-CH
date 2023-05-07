@@ -85,6 +85,8 @@ class CreatePostFragment :
     private lateinit var memberTagging: MemberTaggingView
     private var source = ""
 
+    private val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+
     override val useSharedViewModel: Boolean
         get() = true
 
@@ -518,7 +520,6 @@ class CreatePostFragment :
                     initiateMediaPicker(listOf(IMAGE, VIDEO))
                 }
 
-                val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
                 draftVideoAutoPlayHelper.logic(
                     layoutSingleVideoPost.videoPost,
                     selectedMediaUris.first().uri
@@ -595,54 +596,35 @@ class CreatePostFragment :
                 convertSingleDataUri(it)
             }
 
-            if (multiMediaAdapter == null) {
-                multipleMediaAttachment.apply {
-                    multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
-                    viewpagerMultipleMedia.adapter = multiMediaAdapter
-                    dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
-                }
-                multipleMediaAttachment.viewpagerMultipleMedia.registerOnPageChangeCallback(object :
-                    ViewPager2.OnPageChangeCallback() {
-                    override fun onPageSelected(position: Int) {
-                        super.onPageSelected(position)
-                        Log.d("PUI", "onPageSelected: $position")
-                        val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
-                        val createPostSingleVideoBinding =
-                            ((multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
-                                position
-                            ) as? DataBoundViewHolder<*>)
-                                ?.binding as? ItemCreatePostSingleVideoBinding
+            multipleMediaAttachment.apply {
+                multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
+                viewpagerMultipleMedia.adapter = multiMediaAdapter
+                dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+            }
+            multipleMediaAttachment.viewpagerMultipleMedia.registerOnPageChangeCallback(object :
+                ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+                    Log.d("PUI", "onPageSelected: $position")
+                    val createPostSingleVideoBinding =
+                        ((multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
+                            position
+                        ) as? DataBoundViewHolder<*>)
+                            ?.binding as? ItemCreatePostSingleVideoBinding
 
-                        Log.d("PUI", "onPageSelected-1: $createPostSingleVideoBinding")
+                    Log.d("PUI", "onPageSelected-1: $createPostSingleVideoBinding")
 
-                        if (createPostSingleVideoBinding == null) {
-                            draftVideoAutoPlayHelper.removePlayer()
-                        } else {
-                            Log.d("PUI", "onPageSelected-3: ${selectedMediaUris[position].uri}")
-                            draftVideoAutoPlayHelper.logic(
-                                createPostSingleVideoBinding.videoPost,
-                                selectedMediaUris[position].uri
-                            )
-                        }
+                    if (createPostSingleVideoBinding == null) {
+                        draftVideoAutoPlayHelper.removePlayer()
+                    } else {
+                        Log.d("PUI", "onPageSelected-3: ${selectedMediaUris[position].uri}")
+                        draftVideoAutoPlayHelper.logic(
+                            createPostSingleVideoBinding.videoPost,
+                            selectedMediaUris[position].uri
+                        )
                     }
-                })
-            }
-            val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
-            val position = binding.multipleMediaAttachment.viewpagerMultipleMedia.currentItem
-            val createPostSingleVideoBinding =
-                ((binding.multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
-                    position
-                ) as? DataBoundViewHolder<*>)
-                    ?.binding as? ItemCreatePostSingleVideoBinding
-
-            if (createPostSingleVideoBinding == null) {
-                draftVideoAutoPlayHelper.removePlayer()
-            } else {
-                draftVideoAutoPlayHelper.logic(
-                    createPostSingleVideoBinding.videoPost,
-                    selectedMediaUris[position].uri
-                )
-            }
+                }
+            })
             multiMediaAdapter!!.replace(attachments)
         }
     }
@@ -696,30 +678,11 @@ class CreatePostFragment :
 
     override fun onResume() {
         super.onResume()
-        if (multiMediaAdapter != null) {
-            val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
-            val position = binding.multipleMediaAttachment.viewpagerMultipleMedia.currentItem
-            val createPostSingleVideoBinding =
-                ((binding.multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
-                    position
-                ) as? DataBoundViewHolder<*>)
-                    ?.binding as? ItemCreatePostSingleVideoBinding
-
-            if (createPostSingleVideoBinding == null) {
-                draftVideoAutoPlayHelper.removePlayer()
-            } else {
-                draftVideoAutoPlayHelper.logic(
-                    createPostSingleVideoBinding.videoPost,
-                    selectedMediaUris[position].uri
-                )
-            }
-        }
         showPostMedia()
     }
 
     override fun onPause() {
         super.onPause()
-        val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
         draftVideoAutoPlayHelper.removePlayer()
     }
 
@@ -845,7 +808,6 @@ class CreatePostFragment :
             if (documentsAdapter?.itemCount == 0) binding.documentsAttachment.root.hide()
         } else {
             multiMediaAdapter?.removeIndex(position)
-            val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
             draftVideoAutoPlayHelper.removePlayer()
         }
         showPostMedia()
