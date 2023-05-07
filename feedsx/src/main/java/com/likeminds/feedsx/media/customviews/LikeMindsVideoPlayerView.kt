@@ -149,7 +149,7 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     }
 
     /**
-     * This will reuse the player and will play new URI we have provided
+     * This will reuse the player and will play new URI (remote url) we have provided
      */
     fun startPlaying(videoUri: Uri) {
         val mediaSource =
@@ -162,7 +162,7 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     }
 
     /**
-     * This will reuse the player and will play new URI we have provided
+     * This will reuse the player and will play new URI (local uri) we have provided
      */
     fun startPlayingLocal(videoUri: Uri) {
         val mediaSource = MediaItem.fromUri(videoUri)
@@ -184,12 +184,6 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     fun removePlayer() {
         player?.playWhenReady = false
         lastPos = player?.currentPosition ?: 0
-        reset()
-        player?.stop()
-    }
-
-    fun resetPlayer() {
-        player?.playWhenReady = false
         reset()
         player?.stop()
     }

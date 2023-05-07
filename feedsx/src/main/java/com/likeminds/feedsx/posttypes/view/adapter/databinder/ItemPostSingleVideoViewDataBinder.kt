@@ -72,7 +72,6 @@ class ItemPostSingleVideoViewDataBinder constructor(
             returnBinder = {
                 return@initPostTypeBindData
             }, executeBinder = {
-                binding.videoPost.reset()
             })
     }
 }

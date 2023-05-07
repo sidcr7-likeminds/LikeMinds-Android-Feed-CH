@@ -314,8 +314,10 @@ object PostTypeUtil {
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
+
+                    // processes the current video whenever view pager's page is changed
                     val postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
-                    postVideoAutoPlayHelper?.logic()
+                    postVideoAutoPlayHelper?.playMostVisibleItem()
                 }
             })
 

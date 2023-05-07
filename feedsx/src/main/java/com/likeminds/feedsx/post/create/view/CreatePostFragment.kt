@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -513,25 +512,25 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
-            singleVideoAttachment.apply {
-                btnAddMore.setOnClickListener {
-                    // sends clicked on attachment event for image and video
-                    viewModel.sendClickedOnAttachmentEvent("image, video")
-                    initiateMediaPicker(listOf(IMAGE, VIDEO))
-                }
+            singleVideoAttachment.btnAddMore.setOnClickListener {
+                // sends clicked on attachment event for image and video
+                viewModel.sendClickedOnAttachmentEvent("image, video")
+                initiateMediaPicker(listOf(IMAGE, VIDEO))
+            }
 
-                draftVideoAutoPlayHelper.logic(
-                    layoutSingleVideoPost.videoPost,
-                    selectedMediaUris.first().uri
-                )
-                layoutSingleVideoPost.ivCross.setOnClickListener {
-                    selectedMediaUris.clear()
-                    root.hide()
-                    handleAddAttachmentLayouts(true)
-                    val text = etPostContent.text?.trim()
-                    handlePostButton(clickable = !text.isNullOrEmpty())
-                    draftVideoAutoPlayHelper.removePlayer()
-                }
+            val layoutSingleVideoPost = singleVideoAttachment.layoutSingleVideoPost
+            draftVideoAutoPlayHelper.playVideo(
+                layoutSingleVideoPost.videoPost,
+                selectedMediaUris.first().uri
+            )
+
+            layoutSingleVideoPost.ivCross.setOnClickListener {
+                selectedMediaUris.clear()
+                root.hide()
+                handleAddAttachmentLayouts(true)
+                val text = etPostContent.text?.trim()
+                handlePostButton(clickable = !text.isNullOrEmpty())
+                draftVideoAutoPlayHelper.removePlayer()
             }
         }
     }
@@ -596,36 +595,34 @@ class CreatePostFragment :
                 convertSingleDataUri(it)
             }
 
-            multipleMediaAttachment.apply {
-                multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
-                viewpagerMultipleMedia.adapter = multiMediaAdapter
-                dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
-            }
-            multipleMediaAttachment.viewpagerMultipleMedia.registerOnPageChangeCallback(object :
+            val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
+            multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
+            viewPager.adapter = multiMediaAdapter
+            multipleMediaAttachment.dotsIndicator.setViewPager2(viewPager)
+            multiMediaAdapter!!.replace(attachments)
+
+            viewPager.registerOnPageChangeCallback(object :
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    Log.d("PUI", "onPageSelected: $position")
+
+                    // processes the current video whenever view pager's page is changed
                     val createPostSingleVideoBinding =
-                        ((multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
-                            position
-                        ) as? DataBoundViewHolder<*>)
+                        ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
                             ?.binding as? ItemCreatePostSingleVideoBinding
 
-                    Log.d("PUI", "onPageSelected-1: $createPostSingleVideoBinding")
-
                     if (createPostSingleVideoBinding == null) {
+                        // in case the item is not a video
                         draftVideoAutoPlayHelper.removePlayer()
                     } else {
-                        Log.d("PUI", "onPageSelected-3: ${selectedMediaUris[position].uri}")
-                        draftVideoAutoPlayHelper.logic(
+                        // processes the current video item
+                        draftVideoAutoPlayHelper.playVideo(
                             createPostSingleVideoBinding.videoPost,
                             selectedMediaUris[position].uri
                         )
                     }
                 }
             })
-            multiMediaAdapter!!.replace(attachments)
         }
     }
 

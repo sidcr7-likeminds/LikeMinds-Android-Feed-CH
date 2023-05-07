@@ -138,14 +138,12 @@ class PostDetailFragment :
 
     override fun onResume() {
         super.onResume()
-        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.rvPostDetails)
-        postVideoAutoPlayHelper?.startObserving()
-        postVideoAutoPlayHelper?.logic1()
+        initiateAutoPlayer()
     }
 
     override fun onPause() {
         super.onPause()
-        postVideoAutoPlayHelper?.removePlayer()
+        // removes the player and destroys the [postVideoAutoPlayHelper]
         PostVideoAutoPlayHelper.destroy()
     }
 
@@ -716,6 +714,32 @@ class PostDetailFragment :
     }
 
 
+    /**
+     * Initializes the [postVideoAutoPlayHelper] with the recyclerView
+     * And starts observing
+     **/
+    private fun initiateAutoPlayer() {
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.rvPostDetails)
+        postVideoAutoPlayHelper?.attachScrollListenerForVideo()
+        postVideoAutoPlayHelper?.playIfPostVisible()
+    }
+
+    // removes the old player and refreshes auto play
+    private fun refreshAutoPlayer() {
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
+        postVideoAutoPlayHelper?.removePlayer()
+        postVideoAutoPlayHelper?.playIfPostVisible()
+    }
+
+    /**
+     * Removes the player and
+     * Destroys the [postVideoAutoPlayHelper]
+     **/
+    private fun destroyVideoAutoPlayer() {
+        postVideoAutoPlayHelper?.removePlayer()
+        PostVideoAutoPlayHelper.destroy()
+    }
+
     /*
     * UI Block
     */
@@ -943,9 +967,7 @@ class PostDetailFragment :
         } else {
             binding.rvPostDetails.scrollToPosition(postDataPosition)
         }
-        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
-        postVideoAutoPlayHelper?.removePlayer()
-        postVideoAutoPlayHelper?.logic1()
+        refreshAutoPlayer()
     }
 
     // updates the post and add comments to adapter
@@ -958,9 +980,7 @@ class PostDetailFragment :
         // adds the paginated comments
         mPostDetailAdapter.addAll(post.replies.toList())
 
-        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
-        postVideoAutoPlayHelper?.removePlayer()
-        postVideoAutoPlayHelper?.logic1()
+        refreshAutoPlayer()
     }
 
     // refreshes the whole post detail screen
@@ -1497,7 +1517,6 @@ class PostDetailFragment :
         postData = postData.toBuilder()
             .fromPostLiked(false)
             .fromPostSaved(false)
-            .fromVideoAction(false)
             .build()
         mPostDetailAdapter.updateWithoutNotifyingRV(position, postData)
     }

@@ -19,7 +19,16 @@ class DraftVideoAutoPlayHelper {
 
     private var lastPlayerView: LikeMindsVideoPlayerView? = null
 
-    fun logic(videoPost: LikeMindsVideoPlayerView, uri: Uri? = null, url: String? = null) {
+    /**
+     * @param [videoPost] - Player view in which the provided video is played
+     * @param [uri] - If the video is local, then provided [uri] is used to play locally
+     * @param [url] - If the video is remote, then provided [url] is used to play locally
+     */
+    fun playVideo(
+        videoPost: LikeMindsVideoPlayerView,
+        uri: Uri? = null,
+        url: String? = null
+    ) {
         if (uri == null && url == null) {
             return
         }
@@ -37,7 +46,10 @@ class DraftVideoAutoPlayHelper {
     }
 
     fun removePlayer() {
-        lastPlayerView?.resetPlayer()
-        lastPlayerView = null
+        if (lastPlayerView != null) {
+            // stop last player
+            lastPlayerView?.removePlayer()
+            lastPlayerView = null
+        }
     }
 }

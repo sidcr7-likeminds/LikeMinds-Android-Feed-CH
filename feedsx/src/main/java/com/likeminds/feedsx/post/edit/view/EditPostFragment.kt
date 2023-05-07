@@ -502,9 +502,10 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
         val videoAttachment = fileAttachments?.first()
         binding.singleVideoAttachment.apply {
             root.show()
-            draftVideoAutoPlayHelper.logic(
+            val meta = videoAttachment?.attachmentMeta
+            draftVideoAutoPlayHelper.playVideo(
                 videoPost,
-                url = videoAttachment?.attachmentMeta?.url
+                url = meta?.url
             )
         }
     }
@@ -582,16 +583,20 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
 
+                    // processes the current video whenever view pager's page is changed
                     val itemMultipleMediaVideoBinding =
-                        ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager.currentItem) as? DataBoundViewHolder<*>)
+                        ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
                             ?.binding as? ItemMultipleMediaVideoBinding
 
                     if (itemMultipleMediaVideoBinding == null) {
+                        // in case the item is not a video
                         draftVideoAutoPlayHelper.removePlayer()
                     } else {
-                        draftVideoAutoPlayHelper.logic(
+                        // processes the current video item
+                        val meta = attachments[position].attachmentMeta
+                        draftVideoAutoPlayHelper.playVideo(
                             itemMultipleMediaVideoBinding.videoPost,
-                            url = attachments[position].attachmentMeta.url
+                            url = meta.url
                         )
                     }
                 }
