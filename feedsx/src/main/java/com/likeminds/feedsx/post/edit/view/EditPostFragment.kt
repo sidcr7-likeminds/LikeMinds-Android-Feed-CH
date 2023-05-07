@@ -11,16 +11,21 @@ import android.widget.EditText
 import androidx.annotation.CheckResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentEditPostBinding
+import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.feed.util.PostEvent
+import com.likeminds.feedsx.media.util.DraftVideoAutoPlayHelper
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
 import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
@@ -37,6 +42,7 @@ import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.customview.DataBoundViewHolder
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.util.LinkUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
@@ -71,6 +77,10 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
     // [postPublisher] to publish changes in the post
     private val postEvent = PostEvent.getPublisher()
 
+    private var post: PostViewData? = null
+
+    private val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+
     override val useSharedViewModel: Boolean
         get() = true
 
@@ -94,6 +104,26 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
             return
         }
         editPostExtras = arguments?.getParcelable(EDIT_POST_EXTRAS)!!
+    }
+
+    override fun onResume() {
+        super.onResume()
+        when (post?.viewType) {
+            ITEM_POST_SINGLE_VIDEO -> {
+                showSingleVideoPreview()
+            }
+            ITEM_POST_MULTIPLE_MEDIA -> {
+                showMultimediaPreview()
+            }
+            else -> {
+                return
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        draftVideoAutoPlayHelper.removePlayer()
     }
 
     override fun setUpViews() {
@@ -347,9 +377,8 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
                 }
                 is EditPostViewModel.PostDataEvent.GetPost -> {
                     // post from getPost response
-
-                    val post = response.post
-                    setPostData(post)
+                    setPostData(response.post)
+                    post = response.post
                 }
             }
         }.observeInLifecycle(viewLifecycleOwner)
@@ -470,7 +499,14 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
 
     // shows single video preview
     private fun showSingleVideoPreview() {
-        // TODO: exo player
+        val videoAttachment = fileAttachments?.first()
+        binding.singleVideoAttachment.apply {
+            root.show()
+            draftVideoAutoPlayHelper.logic(
+                videoPost,
+                url = videoAttachment?.attachmentMeta?.url
+            )
+        }
     }
 
     // shows documents preview
@@ -524,7 +560,8 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
             multipleMediaAttachment.root.show()
             multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
             val multiMediaAdapter = MultipleMediaPostAdapter()
-            multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
+            val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
+            viewPager.adapter = multiMediaAdapter
             multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
             val attachments = fileAttachments?.map {
                 when (it.attachmentType) {
@@ -540,6 +577,25 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
                 }
             } ?: return
             multiMediaAdapter.replace(attachments)
+            viewPager.registerOnPageChangeCallback(object :
+                ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+
+                    val itemMultipleMediaVideoBinding =
+                        ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(viewPager.currentItem) as? DataBoundViewHolder<*>)
+                            ?.binding as? ItemMultipleMediaVideoBinding
+
+                    if (itemMultipleMediaVideoBinding == null) {
+                        draftVideoAutoPlayHelper.removePlayer()
+                    } else {
+                        draftVideoAutoPlayHelper.logic(
+                            itemMultipleMediaVideoBinding.videoPost,
+                            url = attachments[position].attachmentMeta.url
+                        )
+                    }
+                }
+            })
         }
     }
 

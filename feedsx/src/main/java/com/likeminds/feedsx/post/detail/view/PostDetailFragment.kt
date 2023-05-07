@@ -22,7 +22,7 @@ import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
-import com.likeminds.feedsx.media.util.VideoAutoPlayHelper
+import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.NoCommentsViewData
@@ -84,7 +84,7 @@ class PostDetailFragment :
 
     private lateinit var memberTagging: MemberTaggingView
 
-    private var videoAutoPlayHelper: VideoAutoPlayHelper? = null
+    private var postVideoAutoPlayHelper: PostVideoAutoPlayHelper? = null
 
     // fixed position of viewTypes in adapter
     private val postDataPosition = 0
@@ -138,15 +138,15 @@ class PostDetailFragment :
 
     override fun onResume() {
         super.onResume()
-        videoAutoPlayHelper = VideoAutoPlayHelper.getInstance(binding.rvPostDetails)
-        videoAutoPlayHelper?.startObserving()
-        videoAutoPlayHelper?.logic1()
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.rvPostDetails)
+        postVideoAutoPlayHelper?.startObserving()
+        postVideoAutoPlayHelper?.logic1()
     }
 
     override fun onPause() {
         super.onPause()
-        videoAutoPlayHelper?.removePlayer()
-        VideoAutoPlayHelper.destroy()
+        postVideoAutoPlayHelper?.removePlayer()
+        PostVideoAutoPlayHelper.destroy()
     }
 
     override fun setUpViews() {
@@ -943,9 +943,9 @@ class PostDetailFragment :
         } else {
             binding.rvPostDetails.scrollToPosition(postDataPosition)
         }
-        videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
-        videoAutoPlayHelper?.removePlayer()
-        videoAutoPlayHelper?.logic1()
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
+        postVideoAutoPlayHelper?.removePlayer()
+        postVideoAutoPlayHelper?.logic1()
     }
 
     // updates the post and add comments to adapter
@@ -958,9 +958,9 @@ class PostDetailFragment :
         // adds the paginated comments
         mPostDetailAdapter.addAll(post.replies.toList())
 
-        videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
-        videoAutoPlayHelper?.removePlayer()
-        videoAutoPlayHelper?.logic1()
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
+        postVideoAutoPlayHelper?.removePlayer()
+        postVideoAutoPlayHelper?.logic1()
     }
 
     // refreshes the whole post detail screen

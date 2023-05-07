@@ -164,6 +164,17 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     }
 
     /**
+     * This will reuse the player and will play new URI we have provided
+     */
+    fun startPlayingLocal(videoUri: Uri) {
+        val mediaSource = MediaItem.fromUri(videoUri)
+        (player as ExoPlayer).setMediaItem(mediaSource)
+        player?.seekTo(lastPos)
+        player?.playWhenReady = true
+        (player as ExoPlayer).prepare()
+    }
+
+    /**
      * This will stop the player, but stopping the player shows black screen
      * so to cover that we set alpha to 0 of player
      * and lastFrame of player using imageView over player to make it look like paused player
@@ -175,6 +186,12 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     fun removePlayer() {
         player?.playWhenReady = false
         lastPos = player?.currentPosition ?: 0
+        reset()
+        player?.stop()
+    }
+
+    fun resetPlayer() {
+        player?.playWhenReady = false
         reset()
         player?.stop()
     }

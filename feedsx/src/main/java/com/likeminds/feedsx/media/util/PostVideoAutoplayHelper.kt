@@ -21,30 +21,30 @@ import kotlin.math.max
 import kotlin.math.min
 
 @Singleton
-class VideoAutoPlayHelper private constructor(private val recyclerView: RecyclerView) {
+class PostVideoAutoPlayHelper private constructor(private val recyclerView: RecyclerView) {
     companion object {
-        private var videoAutoPlayHelper: VideoAutoPlayHelper? = null
+        private var postVideoAutoPlayHelper: PostVideoAutoPlayHelper? = null
 
-        fun getInstance(recyclerView: RecyclerView): VideoAutoPlayHelper {
-            if (videoAutoPlayHelper == null) {
-                videoAutoPlayHelper = VideoAutoPlayHelper(recyclerView)
+        // When playerView will be less than [MIN_LIMIT_VISIBILITY]% visible than it will stop the player
+        private const val MIN_LIMIT_VISIBILITY = 20
+
+        fun getInstance(recyclerView: RecyclerView): PostVideoAutoPlayHelper {
+            if (postVideoAutoPlayHelper == null) {
+                postVideoAutoPlayHelper = PostVideoAutoPlayHelper(recyclerView)
             }
-            return videoAutoPlayHelper!!
+            return postVideoAutoPlayHelper!!
         }
 
-        fun getInstance(): VideoAutoPlayHelper? {
-            return videoAutoPlayHelper
+        fun getInstance(): PostVideoAutoPlayHelper? {
+            return postVideoAutoPlayHelper
         }
 
         fun destroy() {
-            videoAutoPlayHelper = null
+            postVideoAutoPlayHelper = null
         }
     }
 
     private var lastPlayerView: LikeMindsVideoPlayerView? = null
-
-    // When playerView will be less than [MIN_LIMIT_VISIBILITY]% visible than it will stop the player
-    private val MIN_LIMIT_VISIBILITY = 20
 
     private var currentPlayingVideoItemPos = -1 // -1 indicates nothing playing
 

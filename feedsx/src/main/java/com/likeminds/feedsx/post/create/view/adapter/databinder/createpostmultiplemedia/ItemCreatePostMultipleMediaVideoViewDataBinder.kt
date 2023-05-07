@@ -25,16 +25,6 @@ class ItemCreatePostMultipleMediaVideoViewDataBinder constructor(
         data: AttachmentViewData,
         position: Int
     ) {
-//        val video: Uri =
-//            data.attachmentMeta.uri!!
-//
-//        binding.vvSingleVideoPost.setVideoURI(video)
-//        binding.vvSingleVideoPost.setOnPreparedListener(MediaPlayer.OnPreparedListener { mp ->
-//            mp.isLooping = true
-//            binding.iconVideoPlay.hide()
-//            binding.vvSingleVideoPost.start()
-//        })
-
         binding.ivCross.setOnClickListener {
             listener.onMediaRemoved(position, VIDEO)
         }

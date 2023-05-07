@@ -21,7 +21,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
-import com.likeminds.feedsx.media.util.VideoAutoPlayHelper
+import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
@@ -314,8 +314,8 @@ object PostTypeUtil {
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    val videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
-                    videoAutoPlayHelper?.logic()
+                    val postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
+                    postVideoAutoPlayHelper?.logic()
                 }
             })
 

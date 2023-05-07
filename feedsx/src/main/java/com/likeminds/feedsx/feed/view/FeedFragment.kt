@@ -37,7 +37,7 @@ import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.media.util.LMExoplayerListener
-import com.likeminds.feedsx.media.util.VideoAutoPlayHelper
+import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
@@ -224,8 +224,8 @@ class FeedFragment :
             setFeedAndScrollToTop(feed)
         } else {
             mPostAdapter.addAll(feed)
-            videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
-            videoAutoPlayHelper?.logic()
+            postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
+            postVideoAutoPlayHelper?.logic()
         }
     }
 
@@ -459,15 +459,15 @@ class FeedFragment :
             viewModel.fetchPendingPostFromDB()
         }
 
-        videoAutoPlayHelper = VideoAutoPlayHelper.getInstance(binding.recyclerView)
-        videoAutoPlayHelper?.startObserving()
-        videoAutoPlayHelper?.logic()
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.recyclerView)
+        postVideoAutoPlayHelper?.startObserving()
+        postVideoAutoPlayHelper?.logic()
     }
 
     override fun onPause() {
         super.onPause()
-        videoAutoPlayHelper?.removePlayer()
-        VideoAutoPlayHelper.destroy()
+        postVideoAutoPlayHelper?.removePlayer()
+        PostVideoAutoPlayHelper.destroy()
     }
 
     override fun onDestroy() {
@@ -574,7 +574,7 @@ class FeedFragment :
             }
         }
 
-    private var videoAutoPlayHelper: VideoAutoPlayHelper? = null
+    private var postVideoAutoPlayHelper: PostVideoAutoPlayHelper? = null
 
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
@@ -620,9 +620,9 @@ class FeedFragment :
     private fun setFeedAndScrollToTop(feed: List<PostViewData>) {
         mPostAdapter.replace(feed)
         binding.recyclerView.scrollToPosition(0)
-        videoAutoPlayHelper = VideoAutoPlayHelper.getInstance()
-        videoAutoPlayHelper?.removePlayer()
-        videoAutoPlayHelper?.logic()
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
+        postVideoAutoPlayHelper?.removePlayer()
+        postVideoAutoPlayHelper?.logic()
     }
 
     //refresh the whole feed

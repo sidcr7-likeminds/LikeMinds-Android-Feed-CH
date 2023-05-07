@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -13,18 +14,23 @@ import android.widget.EditText
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.CheckResult
 import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.InitiateViewModel
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
+import com.likeminds.feedsx.databinding.ItemCreatePostSingleVideoBinding
 import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.DraftVideoAutoPlayHelper
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
@@ -43,6 +49,7 @@ import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.customview.DataBoundViewHolder
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.util.LinkUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
@@ -504,23 +511,27 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
-            singleVideoAttachment.btnAddMore.setOnClickListener {
-                // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent("image, video")
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
-            singleVideoAttachment.layoutSingleVideoPost.ivCross.setOnClickListener {
-                selectedMediaUris.clear()
-                singleVideoAttachment.root.hide()
-                handleAddAttachmentLayouts(true)
-                val text = etPostContent.text?.trim()
-                handlePostButton(clickable = !text.isNullOrEmpty())
-            }
+            singleVideoAttachment.apply {
+                btnAddMore.setOnClickListener {
+                    // sends clicked on attachment event for image and video
+                    viewModel.sendClickedOnAttachmentEvent("image, video")
+                    initiateMediaPicker(listOf(IMAGE, VIDEO))
+                }
 
-            //TODO: Use exo player
-            singleVideoAttachment.layoutSingleVideoPost.vvSingleVideoPost.setVideoURI(
-                selectedMediaUris.first().uri
-            )
+                val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+                draftVideoAutoPlayHelper.logic(
+                    layoutSingleVideoPost.videoPost,
+                    selectedMediaUris.first().uri
+                )
+                layoutSingleVideoPost.ivCross.setOnClickListener {
+                    selectedMediaUris.clear()
+                    root.hide()
+                    handleAddAttachmentLayouts(true)
+                    val text = etPostContent.text?.trim()
+                    handlePostButton(clickable = !text.isNullOrEmpty())
+                    draftVideoAutoPlayHelper.removePlayer()
+                }
+            }
         }
     }
 
@@ -585,10 +596,52 @@ class CreatePostFragment :
             }
 
             if (multiMediaAdapter == null) {
-                multipleMediaAttachment.viewpagerMultipleMedia.isSaveEnabled = false
-                multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
-                multipleMediaAttachment.viewpagerMultipleMedia.adapter = multiMediaAdapter
-                multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+                multipleMediaAttachment.apply {
+                    multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
+                    viewpagerMultipleMedia.adapter = multiMediaAdapter
+                    dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
+                }
+                multipleMediaAttachment.viewpagerMultipleMedia.registerOnPageChangeCallback(object :
+                    ViewPager2.OnPageChangeCallback() {
+                    override fun onPageSelected(position: Int) {
+                        super.onPageSelected(position)
+                        Log.d("PUI", "onPageSelected: $position")
+                        val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+                        val createPostSingleVideoBinding =
+                            ((multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
+                                position
+                            ) as? DataBoundViewHolder<*>)
+                                ?.binding as? ItemCreatePostSingleVideoBinding
+
+                        Log.d("PUI", "onPageSelected-1: $createPostSingleVideoBinding")
+
+                        if (createPostSingleVideoBinding == null) {
+                            draftVideoAutoPlayHelper.removePlayer()
+                        } else {
+                            Log.d("PUI", "onPageSelected-3: ${selectedMediaUris[position].uri}")
+                            draftVideoAutoPlayHelper.logic(
+                                createPostSingleVideoBinding.videoPost,
+                                selectedMediaUris[position].uri
+                            )
+                        }
+                    }
+                })
+            }
+            val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+            val position = binding.multipleMediaAttachment.viewpagerMultipleMedia.currentItem
+            val createPostSingleVideoBinding =
+                ((binding.multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
+                    position
+                ) as? DataBoundViewHolder<*>)
+                    ?.binding as? ItemCreatePostSingleVideoBinding
+
+            if (createPostSingleVideoBinding == null) {
+                draftVideoAutoPlayHelper.removePlayer()
+            } else {
+                draftVideoAutoPlayHelper.logic(
+                    createPostSingleVideoBinding.videoPost,
+                    selectedMediaUris[position].uri
+                )
             }
             multiMediaAdapter!!.replace(attachments)
         }
@@ -641,6 +694,34 @@ class CreatePostFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (multiMediaAdapter != null) {
+            val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+            val position = binding.multipleMediaAttachment.viewpagerMultipleMedia.currentItem
+            val createPostSingleVideoBinding =
+                ((binding.multipleMediaAttachment.viewpagerMultipleMedia[0] as RecyclerView).findViewHolderForAdapterPosition(
+                    position
+                ) as? DataBoundViewHolder<*>)
+                    ?.binding as? ItemCreatePostSingleVideoBinding
+
+            if (createPostSingleVideoBinding == null) {
+                draftVideoAutoPlayHelper.removePlayer()
+            } else {
+                draftVideoAutoPlayHelper.logic(
+                    createPostSingleVideoBinding.videoPost,
+                    selectedMediaUris[position].uri
+                )
+            }
+        }
+        showPostMedia()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+        draftVideoAutoPlayHelper.removePlayer()
+    }
 
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
@@ -762,7 +843,11 @@ class CreatePostFragment :
         if (mediaType == PDF) {
             documentsAdapter?.removeIndex(position)
             if (documentsAdapter?.itemCount == 0) binding.documentsAttachment.root.hide()
-        } else multiMediaAdapter?.removeIndex(position)
+        } else {
+            multiMediaAdapter?.removeIndex(position)
+            val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+            draftVideoAutoPlayHelper.removePlayer()
+        }
         showPostMedia()
     }
 
