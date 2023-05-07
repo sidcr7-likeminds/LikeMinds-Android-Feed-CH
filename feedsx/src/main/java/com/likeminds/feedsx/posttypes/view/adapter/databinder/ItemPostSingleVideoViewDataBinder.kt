@@ -73,16 +73,6 @@ class ItemPostSingleVideoViewDataBinder constructor(
                 return@initPostTypeBindData
             }, executeBinder = {
                 binding.videoPost.reset()
-                // Set separate ID for each player view, to prevent it being overlapped by other player's changes
-//                binding.videoPost.id = View.generateViewId()
-
-//                listener.sendMediaItemToExoPlayer(position, binding.videoPost, mediaItem)
-//                binding.videoPost.setVideoURI(video)
-//                binding.videoPost.setOnPreparedListener(OnPreparedListener { mp ->
-//                    mp.isLooping = true
-//                    binding.iconVideoPlay.hide()
-//                    binding.videoPost.start()
-//                })
             })
     }
 }

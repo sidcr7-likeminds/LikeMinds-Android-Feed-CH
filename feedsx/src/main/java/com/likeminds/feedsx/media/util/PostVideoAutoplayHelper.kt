@@ -2,7 +2,6 @@ package com.likeminds.feedsx.media.util
 
 import android.graphics.Rect
 import android.net.Uri
-import android.util.Log
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -60,7 +59,6 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                     )
                 }
                 is PostDetailAdapter -> {
-                    Log.d("PUI", "attachVideoPlayerAt: $pos")
                     if (pos != 0) {
                         return
                     }
@@ -166,10 +164,8 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                     currentPlayingVideoItemPos = -1
                 }
             } else {
-//                if (currentPlayingVideoItemPos != pos) {
                 currentPlayingVideoItemPos = pos
                 attachVideoPlayerAt(pos)
-//                }
             }
         }
     }
@@ -255,6 +251,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 recyclerView.findViewHolderForAdapterPosition(0) ?: return@post
 
             if (getVisiblePercentage(viewHolder) > MIN_LIMIT_VISIBILITY) {
+                currentPlayingVideoItemPos = 0
                 attachVideoPlayerAt(0)
             } else {
                 if (lastPlayerView != null) {

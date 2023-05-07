@@ -22,6 +22,5 @@ class ItemMultipleMediaVideoViewDataBinder :
         data: BaseViewType,
         position: Int
     ) {
-        binding.videoPost.reset()
     }
 }

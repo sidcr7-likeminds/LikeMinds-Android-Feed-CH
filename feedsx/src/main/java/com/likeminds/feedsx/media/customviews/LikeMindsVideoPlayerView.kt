@@ -6,10 +6,7 @@ import android.os.Looper
 import android.util.AttributeSet
 import android.view.*
 import android.widget.FrameLayout
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultAllocator
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
@@ -73,6 +70,7 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
             .build()
 
         exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
+        exoPlayer.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
 
         exoPlayer.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -89,7 +87,7 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
 
 
     // Prevents surface view to show black screen, will make it visible once video is loaded
-    fun reset() {
+    private fun reset() {
         alpha = 0f
     }
 
