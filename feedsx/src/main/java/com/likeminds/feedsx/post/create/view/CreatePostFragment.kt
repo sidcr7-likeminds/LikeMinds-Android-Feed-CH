@@ -526,7 +526,7 @@ class CreatePostFragment :
 
             layoutSingleVideoPost.ivCross.setOnClickListener {
                 selectedMediaUris.clear()
-                root.hide()
+                singleVideoAttachment.root.hide()
                 handleAddAttachmentLayouts(true)
                 val text = etPostContent.text?.trim()
                 handlePostButton(clickable = !text.isNullOrEmpty())
