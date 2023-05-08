@@ -92,7 +92,9 @@ class PostDetailFragment :
     private val commentsStartPosition = 2
 
     // [postPublisher] to publish changes in the post
-    private val postEvent = PostEvent.getPublisher()
+    private val postEvent by lazy {
+        PostEvent.getPublisher()
+    }
 
     companion object {
         const val TAG = "PostDetailFragment"
