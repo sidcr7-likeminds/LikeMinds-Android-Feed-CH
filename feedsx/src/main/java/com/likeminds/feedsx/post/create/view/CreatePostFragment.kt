@@ -523,6 +523,7 @@ class CreatePostFragment :
             val layoutSingleVideoPost = singleVideoAttachment.layoutSingleVideoPost
             videoPreviewAutoPlayHelper.playVideo(
                 layoutSingleVideoPost.videoPost,
+                layoutSingleVideoPost.pbVideoLoader,
                 selectedMediaUris.first().uri
             )
 
@@ -620,6 +621,7 @@ class CreatePostFragment :
                         // processes the current video item
                         videoPreviewAutoPlayHelper.playVideo(
                             createPostSingleVideoBinding.videoPost,
+                            createPostSingleVideoBinding.pbVideoLoader,
                             selectedMediaUris[position].uri
                         )
                     }
