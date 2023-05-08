@@ -66,8 +66,6 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
 
     // initializes the exoplayer and sets player
     fun init() {
-        reset()
-
         // used to configure ms of media to buffer before starting playback
         val defaultLoadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
@@ -109,11 +107,6 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
                 }
             }
         })
-    }
-
-    // Prevents surface view to show black screen, will make it visible once video is loaded
-    private fun reset() {
-        alpha = 0f
     }
 
     override fun setVisibility(visibility: Int) {
@@ -159,7 +152,6 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     fun removePlayer() {
         exoPlayer.playWhenReady = false
         lastPos = exoPlayer.currentPosition
-        reset()
         exoPlayer.stop()
     }
 }
