@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.media.util
 
 import android.net.Uri
+import android.widget.ProgressBar
 import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
 import javax.inject.Singleton
 
@@ -26,6 +27,7 @@ class VideoPreviewAutoPlayHelper {
      */
     fun playVideo(
         videoPost: LikeMindsVideoPlayerView,
+        progressBar: ProgressBar,
         uri: Uri? = null,
         url: String? = null
     ) {
@@ -34,10 +36,10 @@ class VideoPreviewAutoPlayHelper {
         }
         if (lastPlayerView == null || lastPlayerView != videoPost) {
             if (uri != null) {
-                videoPost.startPlayingLocalUri(uri)
+                videoPost.startPlayingLocalUri(uri, progressBar)
             } else {
                 val updatedUri = Uri.parse(url)
-                videoPost.startPlayingRemoteUri(updatedUri)
+                videoPost.startPlayingRemoteUri(updatedUri, progressBar)
             }
             // stop last player
             removePlayer()

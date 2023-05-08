@@ -10,18 +10,20 @@ object ProgressHelper {
         progressBarBinding: ProgressBarBinding,
         enableBackground: Boolean = false
     ) {
-        if (enableBackground) {
-            progressBarBinding.root.setBackgroundColor(
-                ContextCompat.getColor(
-                    progressBarBinding.root.context,
-                    R.color.background
+        progressBarBinding.root.apply {
+            if (enableBackground) {
+                setBackgroundColor(
+                    ContextCompat.getColor(
+                        progressBarBinding.root.context,
+                        R.color.background
+                    )
                 )
-            )
-        } else {
-            progressBarBinding.root.background = null
+            } else {
+                background = null
+            }
+            visibility = View.VISIBLE
+            setOnClickListener { }
         }
-        progressBarBinding.root.visibility = View.VISIBLE
-        progressBarBinding.root.setOnClickListener { }
     }
 
     fun isVisible(progressBarBinding: ProgressBarBinding): Boolean {

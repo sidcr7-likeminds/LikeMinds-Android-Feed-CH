@@ -6,6 +6,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
+import android.widget.ProgressBar
 import com.google.android.exoplayer2.DefaultLoadControl
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -18,6 +19,8 @@ import com.google.android.exoplayer2.upstream.cache.CacheDataSource
 import com.google.android.exoplayer2.util.Util
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.util.VideoCache
+import com.likeminds.feedsx.utils.ViewUtils.hide
+import com.likeminds.feedsx.utils.ViewUtils.show
 
 class LikeMindsVideoPlayerView @JvmOverloads constructor(
     context: Context,
@@ -25,8 +28,9 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : StyledPlayerView(context, attrs, defStyleAttr) {
 
-    private var videoSurfaceView: View? = null
+    private var videoPlayerSurfaceView: View? = null
     private lateinit var exoPlayer: ExoPlayer
+    private var progressBar: ProgressBar? = null
 
     private var lastPos: Long = 0
 
@@ -49,13 +53,13 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
 
     init {
         if (isInEditMode) {
-            videoSurfaceView = null
+            videoPlayerSurfaceView = null
         } else {
             LayoutInflater.from(context).inflate(R.layout.exo_player_view, this, true)
             descendantFocusability = FOCUS_AFTER_DESCENDANTS
 
             // Content frame.
-            videoSurfaceView = findViewById(R.id.surface_view)
+            videoPlayerSurfaceView = findViewById(R.id.surface_view)
             init()
         }
     }
@@ -67,10 +71,10 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
         // used to configure ms of media to buffer before starting playback
         val defaultLoadControl = DefaultLoadControl.Builder()
             .setBufferDurationsMs(
-                5000,
-                10000,
-                500,
-                1500
+                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                DefaultLoadControl.DEFAULT_MAX_BUFFER_MS,
+                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS,
+                DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS
             )
             .setAllocator(DefaultAllocator(true, 16))
             .setPrioritizeTimeOverSizeThresholds(true)
@@ -82,17 +86,29 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
 
         exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
         exoPlayer.playWhenReady = false
-        exoPlayer.setVideoSurfaceView(videoSurfaceView as SurfaceView)
+        exoPlayer.setVideoSurfaceView(videoPlayerSurfaceView as SurfaceView)
+        player = exoPlayer
 
         exoPlayer.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
-                if (playbackState == Player.STATE_READY) {
-                    alpha = 1f
+                when (playbackState) {
+                    Player.STATE_READY -> {
+                        alpha = 1f
+                        progressBar?.hide()
+                    }
+                    Player.STATE_BUFFERING -> {
+                        progressBar?.show()
+                    }
+                    Player.STATE_IDLE -> {
+                        progressBar?.hide()
+                    }
+                    Player.STATE_ENDED -> {
+                        progressBar?.hide()
+                    }
                 }
             }
         })
-        player = exoPlayer
     }
 
     // Prevents surface view to show black screen, will make it visible once video is loaded
@@ -102,13 +118,14 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
 
     override fun setVisibility(visibility: Int) {
         super.setVisibility(visibility)
-        videoSurfaceView?.visibility = visibility
+        videoPlayerSurfaceView?.visibility = visibility
     }
 
     /**
      * This will reuse the player and will play new URI (remote url) we have provided
      */
-    fun startPlayingRemoteUri(videoUri: Uri) {
+    fun startPlayingRemoteUri(videoUri: Uri, progressBar: ProgressBar) {
+        this.progressBar = progressBar
         val mediaSource =
             ProgressiveMediaSource.Factory(cacheDataSourceFactory)
                 .createMediaSource(MediaItem.fromUri(videoUri))
@@ -121,7 +138,8 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     /**
      * This will reuse the player and will play new URI (local uri) we have provided
      */
-    fun startPlayingLocalUri(videoUri: Uri) {
+    fun startPlayingLocalUri(videoUri: Uri, progressBar: ProgressBar) {
+        this.progressBar = progressBar
         val mediaSource = MediaItem.fromUri(videoUri)
         exoPlayer.setMediaItem(mediaSource)
         exoPlayer.seekTo(lastPos)

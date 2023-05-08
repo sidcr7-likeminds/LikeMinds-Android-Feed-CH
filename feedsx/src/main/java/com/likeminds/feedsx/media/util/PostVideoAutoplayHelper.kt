@@ -2,6 +2,7 @@ package com.likeminds.feedsx.media.util
 
 import android.graphics.Rect
 import android.net.Uri
+import android.widget.ProgressBar
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +13,7 @@ import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
+import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.DataBoundViewHolder
 import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
@@ -229,7 +231,11 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
 
                 if (lastPlayerView == null || lastPlayerView != itemPostSingleVideoBinding.videoPost) {
                     val meta = data.attachments.first().attachmentMeta
-                    startNewPlayer(itemPostSingleVideoBinding.videoPost, meta.url)
+                    startNewPlayer(
+                        itemPostSingleVideoBinding.videoPost,
+                        itemPostSingleVideoBinding.pbVideoLoader,
+                        meta.url
+                    )
                 }
                 lastPlayerView = itemPostSingleVideoBinding.videoPost
             }
@@ -253,7 +259,11 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 } else {
                     if (lastPlayerView == null || lastPlayerView != itemMultipleMediaVideoBinding.videoPost) {
                         val meta = data.attachments[currentItem].attachmentMeta
-                        startNewPlayer(itemMultipleMediaVideoBinding.videoPost, meta.url)
+                        startNewPlayer(
+                            itemMultipleMediaVideoBinding.videoPost,
+                            itemMultipleMediaVideoBinding.pbVideoLoader,
+                            meta.url
+                        )
                     }
                     lastPlayerView = itemMultipleMediaVideoBinding.videoPost
                 }
@@ -268,10 +278,12 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
     // starts player in new player view and stops last player
     private fun startNewPlayer(
         videoPost: LikeMindsVideoPlayerView,
+        progressBar: ProgressBar,
         url: String?
     ) {
+        progressBar.show()
         val videoUri = Uri.parse(url)
-        videoPost.startPlayingRemoteUri(videoUri)
+        videoPost.startPlayingRemoteUri(videoUri, progressBar)
         removePlayer()
     }
 

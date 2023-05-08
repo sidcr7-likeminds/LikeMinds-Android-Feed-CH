@@ -510,6 +510,7 @@ class EditPostFragment :
             val meta = videoAttachment?.attachmentMeta
             videoPreviewAutoPlayHelper.playVideo(
                 videoPost,
+                pbVideoLoader,
                 url = meta?.url
             )
         }
@@ -601,6 +602,7 @@ class EditPostFragment :
                         val meta = attachments[position].attachmentMeta
                         videoPreviewAutoPlayHelper.playVideo(
                             itemMultipleMediaVideoBinding.videoPost,
+                            itemMultipleMediaVideoBinding.pbVideoLoader,
                             url = meta.url
                         )
                     }
