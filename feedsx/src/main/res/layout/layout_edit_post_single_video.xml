@@ -16,8 +16,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:player_layout_id="@layout/exo_player_view"
-            app:shutter_background_color="@android:color/white" />
+            app:shutter_background_color="@android:color/white"
+            app:use_artwork="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
