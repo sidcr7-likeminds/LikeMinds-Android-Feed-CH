@@ -36,7 +36,6 @@ import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
-import com.likeminds.feedsx.media.util.LMExoplayerListener
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
@@ -72,7 +71,6 @@ class FeedFragment :
     PostAdapterListener,
     AdminDeleteDialogFragment.DeleteDialogListener,
     SelfDeleteDialogFragment.DeleteAlertDialogListener,
-    LMExoplayerListener,
     PostObserver {
 
     companion object {
