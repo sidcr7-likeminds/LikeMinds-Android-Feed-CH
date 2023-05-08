@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Looper
 import android.util.AttributeSet
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
@@ -79,12 +78,7 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
                 if (playbackState == Player.STATE_READY) {
-                    Log.d("PUI", "onPlaybackStateChanged: STATE_READY")
                     alpha = 1f
-                }
-
-                if (playbackState == Player.STATE_BUFFERING) {
-                    alpha = 0f
                 }
             }
         })
