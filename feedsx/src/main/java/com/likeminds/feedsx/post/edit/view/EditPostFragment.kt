@@ -25,7 +25,7 @@ import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentEditPostBinding
 import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.feed.util.PostEvent
-import com.likeminds.feedsx.media.util.DraftVideoAutoPlayHelper
+import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
 import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
@@ -82,7 +82,9 @@ class EditPostFragment :
 
     private var post: PostViewData? = null
 
-    private val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+    private val videoPreviewAutoPlayHelper by lazy {
+        VideoPreviewAutoPlayHelper.getInstance()
+    }
 
     override val useSharedViewModel: Boolean
         get() = true
@@ -126,7 +128,7 @@ class EditPostFragment :
 
     override fun onPause() {
         super.onPause()
-        draftVideoAutoPlayHelper.removePlayer()
+        videoPreviewAutoPlayHelper.removePlayer()
     }
 
     override fun setUpViews() {
@@ -506,7 +508,7 @@ class EditPostFragment :
         binding.singleVideoAttachment.apply {
             root.show()
             val meta = videoAttachment?.attachmentMeta
-            draftVideoAutoPlayHelper.playVideo(
+            videoPreviewAutoPlayHelper.playVideo(
                 videoPost,
                 url = meta?.url
             )
@@ -593,11 +595,11 @@ class EditPostFragment :
 
                     if (itemMultipleMediaVideoBinding == null) {
                         // in case the item is not a video
-                        draftVideoAutoPlayHelper.removePlayer()
+                        videoPreviewAutoPlayHelper.removePlayer()
                     } else {
                         // processes the current video item
                         val meta = attachments[position].attachmentMeta
-                        draftVideoAutoPlayHelper.playVideo(
+                        videoPreviewAutoPlayHelper.playVideo(
                             itemMultipleMediaVideoBinding.videoPost,
                             url = meta.url
                         )

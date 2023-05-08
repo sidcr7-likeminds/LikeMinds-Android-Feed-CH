@@ -37,11 +37,6 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
         fun getInstance(): PostVideoAutoPlayHelper? {
             return postVideoAutoPlayHelper
         }
-
-        fun destroy() {
-            postVideoAutoPlayHelper?.removePlayer()
-            postVideoAutoPlayHelper = null
-        }
     }
 
     private var lastPlayerView: LikeMindsVideoPlayerView? = null
@@ -276,8 +271,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
         url: String?
     ) {
         val videoUri = Uri.parse(url)
-        videoPost.startPlaying(videoUri)
-//        videoPost.
+        videoPost.startPlayingRemoteUri(videoUri)
         removePlayer()
     }
 
@@ -288,5 +282,10 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
             lastPlayerView?.removePlayer()
             lastPlayerView = null
         }
+    }
+
+    fun destroy() {
+        removePlayer()
+        postVideoAutoPlayHelper = null
     }
 }

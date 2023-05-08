@@ -5,7 +5,9 @@ import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
 import com.google.android.exoplayer2.upstream.cache.LeastRecentlyUsedCacheEvictor
 import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import java.io.File
+import javax.inject.Singleton
 
+@Singleton
 class VideoCache {
     companion object {
         private var sDownloadCache: SimpleCache? = null

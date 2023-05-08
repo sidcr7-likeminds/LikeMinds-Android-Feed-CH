@@ -2,18 +2,19 @@ package com.likeminds.feedsx.media.customviews
 
 import android.content.Context
 import android.net.Uri
-import android.os.Looper
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
-import android.widget.FrameLayout
-import com.google.android.exoplayer2.*
+import com.google.android.exoplayer2.DefaultLoadControl
+import com.google.android.exoplayer2.ExoPlayer
+import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultAllocator
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.upstream.cache.CacheDataSource
-import com.google.android.exoplayer2.util.Assertions
 import com.google.android.exoplayer2.util.Util
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.util.VideoCache
@@ -22,27 +23,29 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr) {
+) : StyledPlayerView(context, attrs, defStyleAttr) {
 
-    private var videoSurfaceView: View?
-    private var player: Player? = null
-    private var isTouching = false
+    private var videoSurfaceView: View? = null
+    private lateinit var exoPlayer: ExoPlayer
 
     private var lastPos: Long = 0
 
-    private val cacheDataSourceFactory = CacheDataSource.Factory()
-        .setCache(VideoCache.getInstance(context))
-        .setUpstreamDataSourceFactory(
-            DefaultHttpDataSource.Factory()
-                .setUserAgent(
-                    Util.getUserAgent(
-                        context, context.getString(
-                            R.string.app_name
+    // creates an instance with DataSourceFactory for reading and writing cache
+    private val cacheDataSourceFactory by lazy {
+        CacheDataSource.Factory()
+            .setCache(VideoCache.getInstance(context))
+            .setUpstreamDataSourceFactory(
+                DefaultHttpDataSource.Factory()
+                    .setUserAgent(
+                        Util.getUserAgent(
+                            context, context.getString(
+                                R.string.app_name
+                            )
                         )
                     )
-                )
-        )
-        .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+            )
+            .setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR)
+    }
 
     init {
         if (isInEditMode) {
@@ -61,18 +64,25 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     fun init() {
         reset()
 
+        // used to configure ms of media to buffer before starting playback
         val defaultLoadControl = DefaultLoadControl.Builder()
-            .setBufferDurationsMs(3000, 8000, 500, 1500)
+            .setBufferDurationsMs(
+                5000,
+                10000,
+                500,
+                1500
+            )
             .setAllocator(DefaultAllocator(true, 16))
             .setPrioritizeTimeOverSizeThresholds(true)
             .build()
 
-        val exoPlayer = ExoPlayer.Builder(context)
+        exoPlayer = ExoPlayer.Builder(context)
             .setLoadControl(defaultLoadControl)
             .build()
 
         exoPlayer.repeatMode = Player.REPEAT_MODE_ONE
-        exoPlayer.videoScalingMode = C.VIDEO_SCALING_MODE_SCALE_TO_FIT_WITH_CROPPING
+        exoPlayer.playWhenReady = false
+        exoPlayer.setVideoSurfaceView(videoSurfaceView as SurfaceView)
 
         exoPlayer.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -82,35 +92,12 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
                 }
             }
         })
-
-        exoPlayer.playWhenReady = false
-        setPlayer(exoPlayer)
+        player = exoPlayer
     }
-
 
     // Prevents surface view to show black screen, will make it visible once video is loaded
     private fun reset() {
         alpha = 0f
-    }
-
-    /**
-     * Set the [Player] to use.
-     * @param player The [Player] to use, or `null` to detach the current player.
-     * Only players which are accessed on the main thread are supported
-     * (`player.getApplicationLooper() == Looper.getMainLooper()`).
-     */
-    private fun setPlayer(player: Player?) {
-        Assertions.checkState(Looper.myLooper() == Looper.getMainLooper())
-        Assertions.checkArgument(
-            player == null || player.applicationLooper == Looper.getMainLooper()
-        )
-        if (this.player === player) {
-            return
-        }
-        val oldPlayer = this.player
-        oldPlayer?.clearVideoSurfaceView(videoSurfaceView as SurfaceView)
-        this.player = player
-        player?.setVideoSurfaceView(videoSurfaceView as SurfaceView)
     }
 
     override fun setVisibility(visibility: Int) {
@@ -121,25 +108,25 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     /**
      * This will reuse the player and will play new URI (remote url) we have provided
      */
-    fun startPlaying(videoUri: Uri) {
+    fun startPlayingRemoteUri(videoUri: Uri) {
         val mediaSource =
             ProgressiveMediaSource.Factory(cacheDataSourceFactory)
                 .createMediaSource(MediaItem.fromUri(videoUri))
-        (player as ExoPlayer).setMediaSource(mediaSource)
-        player?.seekTo(lastPos)
-        player?.playWhenReady = true
-        (player as ExoPlayer).prepare()
+        exoPlayer.setMediaSource(mediaSource)
+        exoPlayer.seekTo(lastPos)
+        exoPlayer.playWhenReady = true
+        exoPlayer.prepare()
     }
 
     /**
      * This will reuse the player and will play new URI (local uri) we have provided
      */
-    fun startPlayingLocal(videoUri: Uri) {
+    fun startPlayingLocalUri(videoUri: Uri) {
         val mediaSource = MediaItem.fromUri(videoUri)
-        (player as ExoPlayer).setMediaItem(mediaSource)
-        player?.seekTo(lastPos)
-        player?.playWhenReady = true
-        (player as ExoPlayer).prepare()
+        exoPlayer.setMediaItem(mediaSource)
+        exoPlayer.seekTo(lastPos)
+        exoPlayer.playWhenReady = true
+        exoPlayer.prepare()
     }
 
     /**
@@ -152,9 +139,9 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
      *
      */
     fun removePlayer() {
-        player?.playWhenReady = false
-        lastPos = player?.currentPosition ?: 0
+        exoPlayer.playWhenReady = false
+        lastPos = exoPlayer.currentPosition
         reset()
-        player?.stop()
+        exoPlayer.stop()
     }
 }

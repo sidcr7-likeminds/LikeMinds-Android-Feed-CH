@@ -5,15 +5,15 @@ import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
 import javax.inject.Singleton
 
 @Singleton
-class DraftVideoAutoPlayHelper {
+class VideoPreviewAutoPlayHelper {
     companion object {
-        private var draftVideoAutoPlayHelper: DraftVideoAutoPlayHelper? = null
+        private var videoPreviewAutoPlayHelper: VideoPreviewAutoPlayHelper? = null
 
-        fun getInstance(): DraftVideoAutoPlayHelper {
-            if (draftVideoAutoPlayHelper == null) {
-                draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper()
+        fun getInstance(): VideoPreviewAutoPlayHelper {
+            if (videoPreviewAutoPlayHelper == null) {
+                videoPreviewAutoPlayHelper = VideoPreviewAutoPlayHelper()
             }
-            return draftVideoAutoPlayHelper!!
+            return videoPreviewAutoPlayHelper!!
         }
     }
 
@@ -34,10 +34,10 @@ class DraftVideoAutoPlayHelper {
         }
         if (lastPlayerView == null || lastPlayerView != videoPost) {
             if (uri != null) {
-                videoPost.startPlayingLocal(uri)
+                videoPost.startPlayingLocalUri(uri)
             } else {
                 val updatedUri = Uri.parse(url)
-                videoPost.startPlaying(updatedUri)
+                videoPost.startPlayingRemoteUri(updatedUri)
             }
             // stop last player
             removePlayer()

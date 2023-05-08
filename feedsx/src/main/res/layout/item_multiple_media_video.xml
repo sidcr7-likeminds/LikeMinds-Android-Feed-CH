@@ -9,7 +9,7 @@
         <com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
             android:id="@+id/video_post"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_marginTop="16dp"
             android:scaleType="centerCrop"
             app:layout_constraintDimensionRatio="1:1"

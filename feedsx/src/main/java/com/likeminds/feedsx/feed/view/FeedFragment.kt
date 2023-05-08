@@ -89,6 +89,7 @@ class FeedFragment :
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
+    private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -439,11 +440,6 @@ class FeedFragment :
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-//        initializeExoplayer()
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -461,7 +457,7 @@ class FeedFragment :
     override fun onPause() {
         super.onPause()
         // removes the player and destroys the [postVideoAutoPlayHelper]
-        PostVideoAutoPlayHelper.destroy()
+        postVideoAutoPlayHelper.destroy()
     }
 
     override fun onDestroy() {
@@ -567,8 +563,6 @@ class FeedFragment :
                 }
             }
         }
-
-    private var postVideoAutoPlayHelper: PostVideoAutoPlayHelper? = null
 
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
@@ -1013,15 +1007,14 @@ class FeedFragment :
      **/
     private fun initiateAutoPlayer() {
         postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.recyclerView)
-        postVideoAutoPlayHelper?.attachScrollListenerForVideo()
-        postVideoAutoPlayHelper?.playMostVisibleItem()
+        postVideoAutoPlayHelper.attachScrollListenerForVideo()
+        postVideoAutoPlayHelper.playMostVisibleItem()
     }
 
     // removes the old player and refreshes auto play
     private fun refreshAutoPlayer() {
-        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
-        postVideoAutoPlayHelper?.removePlayer()
-        postVideoAutoPlayHelper?.playMostVisibleItem()
+        postVideoAutoPlayHelper.removePlayer()
+        postVideoAutoPlayHelper.playMostVisibleItem()
     }
 
     // shows all attachment documents in list view and updates [isExpanded]

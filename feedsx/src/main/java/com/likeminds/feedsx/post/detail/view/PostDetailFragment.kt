@@ -84,7 +84,7 @@ class PostDetailFragment :
 
     private lateinit var memberTagging: MemberTaggingView
 
-    private var postVideoAutoPlayHelper: PostVideoAutoPlayHelper? = null
+    private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
 
     // fixed position of viewTypes in adapter
     private val postDataPosition = 0
@@ -144,7 +144,7 @@ class PostDetailFragment :
     override fun onPause() {
         super.onPause()
         // removes the player and destroys the [postVideoAutoPlayHelper]
-        PostVideoAutoPlayHelper.destroy()
+        postVideoAutoPlayHelper.destroy()
     }
 
     override fun setUpViews() {
@@ -720,25 +720,16 @@ class PostDetailFragment :
      **/
     private fun initiateAutoPlayer() {
         postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.rvPostDetails)
-        postVideoAutoPlayHelper?.attachScrollListenerForVideo()
-        postVideoAutoPlayHelper?.playIfPostVisible()
+        postVideoAutoPlayHelper.attachScrollListenerForVideo()
+        postVideoAutoPlayHelper.playIfPostVisible()
     }
 
     // removes the old player and refreshes auto play
     private fun refreshAutoPlayer() {
-        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
-        postVideoAutoPlayHelper?.removePlayer()
-        postVideoAutoPlayHelper?.playIfPostVisible()
+        postVideoAutoPlayHelper.removePlayer()
+        postVideoAutoPlayHelper.playIfPostVisible()
     }
 
-    /**
-     * Removes the player and
-     * Destroys the [postVideoAutoPlayHelper]
-     **/
-    private fun destroyVideoAutoPlayer() {
-        postVideoAutoPlayHelper?.removePlayer()
-        PostVideoAutoPlayHelper.destroy()
-    }
 
     /*
     * UI Block

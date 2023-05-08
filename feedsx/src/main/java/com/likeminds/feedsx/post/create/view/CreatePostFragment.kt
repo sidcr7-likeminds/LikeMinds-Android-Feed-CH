@@ -29,8 +29,8 @@ import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.databinding.ItemCreatePostSingleVideoBinding
 import com.likeminds.feedsx.media.model.*
-import com.likeminds.feedsx.media.util.DraftVideoAutoPlayHelper
 import com.likeminds.feedsx.media.util.MediaUtils
+import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
 import com.likeminds.feedsx.media.view.MediaPickerActivity
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.post.create.util.CreatePostListener
@@ -84,7 +84,9 @@ class CreatePostFragment :
     private lateinit var memberTagging: MemberTaggingView
     private var source = ""
 
-    private val draftVideoAutoPlayHelper = DraftVideoAutoPlayHelper.getInstance()
+    private val videoPreviewAutoPlayHelper by lazy {
+        VideoPreviewAutoPlayHelper.getInstance()
+    }
 
     override val useSharedViewModel: Boolean
         get() = true
@@ -519,7 +521,7 @@ class CreatePostFragment :
             }
 
             val layoutSingleVideoPost = singleVideoAttachment.layoutSingleVideoPost
-            draftVideoAutoPlayHelper.playVideo(
+            videoPreviewAutoPlayHelper.playVideo(
                 layoutSingleVideoPost.videoPost,
                 selectedMediaUris.first().uri
             )
@@ -530,7 +532,7 @@ class CreatePostFragment :
                 handleAddAttachmentLayouts(true)
                 val text = etPostContent.text?.trim()
                 handlePostButton(clickable = !text.isNullOrEmpty())
-                draftVideoAutoPlayHelper.removePlayer()
+                videoPreviewAutoPlayHelper.removePlayer()
             }
         }
     }
@@ -613,10 +615,10 @@ class CreatePostFragment :
 
                     if (createPostSingleVideoBinding == null) {
                         // in case the item is not a video
-                        draftVideoAutoPlayHelper.removePlayer()
+                        videoPreviewAutoPlayHelper.removePlayer()
                     } else {
                         // processes the current video item
-                        draftVideoAutoPlayHelper.playVideo(
+                        videoPreviewAutoPlayHelper.playVideo(
                             createPostSingleVideoBinding.videoPost,
                             selectedMediaUris[position].uri
                         )
@@ -680,7 +682,7 @@ class CreatePostFragment :
 
     override fun onPause() {
         super.onPause()
-        draftVideoAutoPlayHelper.removePlayer()
+        videoPreviewAutoPlayHelper.removePlayer()
     }
 
     // shows link preview for link post type
@@ -805,7 +807,7 @@ class CreatePostFragment :
             if (documentsAdapter?.itemCount == 0) binding.documentsAttachment.root.hide()
         } else {
             multiMediaAdapter?.removeIndex(position)
-            draftVideoAutoPlayHelper.removePlayer()
+            videoPreviewAutoPlayHelper.removePlayer()
         }
         showPostMedia()
     }
