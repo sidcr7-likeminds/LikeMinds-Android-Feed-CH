@@ -22,6 +22,7 @@ import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
+import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.post.detail.model.NoCommentsViewData
@@ -83,6 +84,8 @@ class PostDetailFragment :
 
     private lateinit var memberTagging: MemberTaggingView
 
+    private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
+
     // fixed position of viewTypes in adapter
     private val postDataPosition = 0
     private val commentsCountPosition = 1
@@ -133,6 +136,17 @@ class PostDetailFragment :
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        initiateAutoPlayer()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // removes the player and destroys the [postVideoAutoPlayHelper]
+        postVideoAutoPlayHelper.destroy()
+    }
+
     override fun setUpViews() {
         super.setUpViews()
 
@@ -177,12 +191,12 @@ class PostDetailFragment :
             if (itemAnimator is SimpleItemAnimator)
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             show()
-        }
 
-        attachScrollListener(
-            binding.rvPostDetails,
-            linearLayoutManager
-        )
+            attachScrollListener(
+                this,
+                linearLayoutManager
+            )
+        }
     }
 
     /**
@@ -700,6 +714,23 @@ class PostDetailFragment :
     }
 
 
+    /**
+     * Initializes the [postVideoAutoPlayHelper] with the recyclerView
+     * And starts observing
+     **/
+    private fun initiateAutoPlayer() {
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.rvPostDetails)
+        postVideoAutoPlayHelper.attachScrollListenerForVideo()
+        postVideoAutoPlayHelper.playIfPostVisible()
+    }
+
+    // removes the old player and refreshes auto play
+    private fun refreshAutoPlayer() {
+        postVideoAutoPlayHelper.removePlayer()
+        postVideoAutoPlayHelper.playIfPostVisible()
+    }
+
+
     /*
     * UI Block
     */
@@ -927,6 +958,7 @@ class PostDetailFragment :
         } else {
             binding.rvPostDetails.scrollToPosition(postDataPosition)
         }
+        refreshAutoPlayer()
     }
 
     // updates the post and add comments to adapter
@@ -938,6 +970,8 @@ class PostDetailFragment :
         mPostDetailAdapter.update(postDataPosition, post)
         // adds the paginated comments
         mPostDetailAdapter.addAll(post.replies.toList())
+
+        refreshAutoPlayer()
     }
 
     // refreshes the whole post detail screen
@@ -1474,7 +1508,6 @@ class PostDetailFragment :
         postData = postData.toBuilder()
             .fromPostLiked(false)
             .fromPostSaved(false)
-            .fromVideoAction(false)
             .build()
         mPostDetailAdapter.updateWithoutNotifyingRV(position, postData)
     }

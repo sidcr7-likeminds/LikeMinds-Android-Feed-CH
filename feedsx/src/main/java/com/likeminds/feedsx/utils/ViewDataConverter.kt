@@ -233,7 +233,7 @@ object ViewDataConverter {
                     postId
                 )
             )
-            .attachments(convertAttachments(post.attachments))
+            .attachments(convertAttachments(post.attachments, postId))
             .userId(postCreator)
             .likesCount(post.likesCount)
             .commentsCount(post.commentsCount)
@@ -345,12 +345,16 @@ object ViewDataConverter {
      * convert list of [Attachment] to list of [AttachmentViewData]
      * @param attachments: list of [Attachment]
      **/
-    private fun convertAttachments(attachments: List<Attachment>?): List<AttachmentViewData> {
+    private fun convertAttachments(
+        attachments: List<Attachment>?,
+        postId: String
+    ): List<AttachmentViewData> {
         if (attachments == null) return emptyList()
         return attachments.map { attachment ->
             AttachmentViewData.Builder()
                 .attachmentType(attachment.attachmentType)
                 .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+                .postId(postId)
                 .build()
         }
     }
@@ -564,6 +568,7 @@ object ViewDataConverter {
         return AttachmentViewData.Builder()
             .attachmentType(attachment.attachmentType)
             .attachmentMeta(convertAttachmentMeta(attachment.attachmentMeta))
+            .postId(attachment.postId)
             .build()
     }
 

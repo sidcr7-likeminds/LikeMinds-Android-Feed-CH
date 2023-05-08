@@ -5,11 +5,12 @@ import android.view.ViewGroup
 import com.likeminds.feedsx.databinding.ItemMultipleMediaImageBinding
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 
-class ItemMultipleMediaImageViewDataBinder :
+class ItemMultipleMediaImageViewDataBinder(val listener: PostAdapterListener) :
     ViewDataBinder<ItemMultipleMediaImageBinding, BaseViewType>() {
 
     override val viewType: Int
@@ -34,6 +35,7 @@ class ItemMultipleMediaImageViewDataBinder :
         PostTypeUtil.initMultipleMediaImage(
             binding.ivPost,
             attachment,
+            listener
         )
     }
 }

@@ -4,7 +4,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
             android:id="@+id/video_post"
@@ -16,7 +16,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:shutter_background_color="@color/white"
+            app:shutter_background_color="@android:color/white"
             app:use_artwork="true" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

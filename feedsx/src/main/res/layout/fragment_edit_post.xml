@@ -174,7 +174,7 @@
 
                 <include
                     android:id="@+id/single_video_attachment"
-                    layout="@layout/item_post_single_video"
+                    layout="@layout/layout_edit_post_single_video"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_marginTop="16dp"

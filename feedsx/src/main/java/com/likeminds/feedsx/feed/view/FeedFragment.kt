@@ -18,8 +18,6 @@ import androidx.recyclerview.widget.SimpleItemAnimator
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.InitiateViewModel
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.R
@@ -38,11 +36,7 @@ import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LikesActivity
-import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
-import com.likeminds.feedsx.media.model.MEDIA_ACTION_PAUSE
-import com.likeminds.feedsx.media.model.MEDIA_ACTION_PLAY
-import com.likeminds.feedsx.media.util.LMExoplayer
-import com.likeminds.feedsx.media.util.LMExoplayerListener
+import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.view.CreatePostActivity
@@ -77,7 +71,6 @@ class FeedFragment :
     PostAdapterListener,
     AdminDeleteDialogFragment.DeleteDialogListener,
     SelfDeleteDialogFragment.DeleteAlertDialogListener,
-    LMExoplayerListener,
     PostObserver {
 
     companion object {
@@ -96,9 +89,7 @@ class FeedFragment :
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
-
-    @Inject
-    lateinit var lmExoplayer: LMExoplayer
+    private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -232,6 +223,7 @@ class FeedFragment :
             setFeedAndScrollToTop(feed)
         } else {
             mPostAdapter.addAll(feed)
+            refreshAutoPlayer()
         }
     }
 
@@ -448,11 +440,6 @@ class FeedFragment :
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        initializeExoplayer()
-    }
-
     override fun onResume() {
         super.onResume()
 
@@ -464,12 +451,13 @@ class FeedFragment :
             removePostingView()
             viewModel.fetchPendingPostFromDB()
         }
+        initiateAutoPlayer()
     }
 
-    override fun onStop() {
-        super.onStop()
-        //release player
-        lmExoplayer.release()
+    override fun onPause() {
+        super.onPause()
+        // removes the player and destroys the [postVideoAutoPlayHelper]
+        postVideoAutoPlayHelper.destroy()
     }
 
     override fun onDestroy() {
@@ -596,11 +584,12 @@ class FeedFragment :
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             addItemDecoration(dividerItemDecorator)
             show()
+
+            attachScrollListener(
+                this,
+                linearLayoutManager
+            )
         }
-        attachScrollListener(
-            binding.recyclerView,
-            linearLayoutManager
-        )
     }
 
     // initializes swipe refresh layout and sets refresh listener
@@ -619,6 +608,7 @@ class FeedFragment :
     private fun setFeedAndScrollToTop(feed: List<PostViewData>) {
         mPostAdapter.replace(feed)
         binding.recyclerView.scrollToPosition(0)
+        refreshAutoPlayer()
     }
 
     //refresh the whole feed
@@ -738,7 +728,6 @@ class FeedFragment :
                 .alreadySeenFullContent(alreadySeenFullContent)
                 .fromPostSaved(false)
                 .fromPostLiked(false)
-                .fromVideoAction(false)
                 .build()
             mPostAdapter.update(position, newViewData)
         }
@@ -842,14 +831,14 @@ class FeedFragment :
     }
 
     //opens post detail screen when post content is clicked
-    override fun postDetail(postData: PostViewData) {
+    override fun postDetail(postId: String) {
         PostEvent.getPublisher().subscribe(this)
 
         // sends comment list open event
         viewModel.sendCommentListOpenEvent()
 
         val postDetailExtras = PostDetailExtras.Builder()
-            .postId(postData.id)
+            .postId(postId)
             .isEditTextFocused(false)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)
@@ -873,7 +862,6 @@ class FeedFragment :
         postData = postData.toBuilder()
             .fromPostLiked(false)
             .fromPostSaved(false)
-            .fromVideoAction(false)
             .build()
         mPostAdapter.updateWithoutNotifyingRV(position, postData)
     }
@@ -1013,82 +1001,20 @@ class FeedFragment :
      * Media Block
      **/
 
-    //initialize exo player
-    private fun initializeExoplayer() {
-        lmExoplayer.initialize(this)
+    /**
+     * Initializes the [postVideoAutoPlayHelper] with the recyclerView
+     * And starts observing
+     **/
+    private fun initiateAutoPlayer() {
+        postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.recyclerView)
+        postVideoAutoPlayHelper.attachScrollListenerForVideo()
+        postVideoAutoPlayHelper.playMostVisibleItem()
     }
 
-    override fun videoEnded(positionOfItemInAdapter: Int) {
-        super.videoEnded(positionOfItemInAdapter)
-//        if (positionOfItemInAdapter == -1) return
-//
-//        val post = getPostFromAdapter(positionOfItemInAdapter)
-//        val attachment = post.attachments.first()
-//        val newAttachments = attachment.toBuilder()
-//            .mediaActions(MEDIA_ACTION_NONE)
-//            .build()
-//        val newPost = post.toBuilder()
-//            .attachments(listOf(newAttachments))
-//            .fromVideoAction(true)
-//            .build()
-//        mPostAdapter.update(positionOfItemInAdapter, newPost)
-    }
-
-    override fun sendMediaItemToExoPlayer(
-        position: Int,
-        playerView: StyledPlayerView,
-        item: MediaItem
-    ) {
-        super.sendMediaItemToExoPlayer(position, playerView, item)
-        Log.d("PUI", "setting player to view")
-        playerView.player = lmExoplayer.exoplayer
-        lmExoplayer.setMediaItem(position, item)
-    }
-
-    override fun playPauseOnVideo(position: Int) {
-        super.playPauseOnVideo(position)
-        val post = getPostFromAdapter(position)
-        val attachment = post.attachments.first()
-        when (attachment.mediaActions) {
-            MEDIA_ACTION_PLAY -> {
-                Log.d("PUI", "state play")
-                lmExoplayer.pause()
-                val newAttachments = attachment.toBuilder()
-                    .mediaActions(MEDIA_ACTION_PAUSE)
-                    .build()
-                val newPost = post.toBuilder()
-                    .attachments(listOf(newAttachments))
-                    .fromVideoAction(true)
-                    .build()
-                mPostAdapter.update(position, newPost)
-            }
-            MEDIA_ACTION_NONE -> {
-                Log.d("PUI", "state none")
-                val newAttachments = attachment.toBuilder()
-                    .mediaActions(MEDIA_ACTION_PLAY)
-                    .build()
-                val newPost = post.toBuilder()
-                    .attachments(listOf(newAttachments))
-                    .fromVideoAction(true)
-                    .build()
-                Log.d("PUI", "play")
-                lmExoplayer.play()
-                Log.d("PUI", "update rv")
-                mPostAdapter.update(position, newPost)
-            }
-            MEDIA_ACTION_PAUSE -> {
-                Log.d("PUI", "state pause")
-                val newAttachments = attachment.toBuilder()
-                    .mediaActions(MEDIA_ACTION_PLAY)
-                    .build()
-                val newPost = post.toBuilder()
-                    .attachments(listOf(newAttachments))
-                    .fromVideoAction(true)
-                    .build()
-                mPostAdapter.update(position, newPost)
-                lmExoplayer.play()
-            }
-        }
+    // removes the old player and refreshes auto play
+    private fun refreshAutoPlayer() {
+        postVideoAutoPlayHelper.removePlayer()
+        postVideoAutoPlayHelper.playMostVisibleItem()
     }
 
     // shows all attachment documents in list view and updates [isExpanded]
@@ -1105,7 +1031,6 @@ class FeedFragment :
                 .isExpanded(true)
                 .fromPostSaved(false)
                 .fromPostLiked(false)
-                .fromVideoAction(false)
                 .build()
         )
     }

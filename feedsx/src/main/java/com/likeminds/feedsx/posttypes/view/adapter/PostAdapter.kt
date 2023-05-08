@@ -1,7 +1,5 @@
 package com.likeminds.feedsx.posttypes.view.adapter
 
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
 import com.likeminds.feedsx.utils.ValueUtils.getItemInList
@@ -47,27 +45,20 @@ class PostAdapter constructor(
 }
 
 interface PostAdapterListener {
-    fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean)
-    fun savePost(position: Int)
-    fun likePost(position: Int)
-    fun sharePost(postId: String)
-    fun comment(postId: String)
+    fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {}
+    fun savePost(position: Int) {}
+    fun likePost(position: Int) {}
+    fun sharePost(postId: String) {}
+    fun comment(postId: String) {}
     fun onPostMenuItemClicked(
         postId: String,
         creatorId: String,
         menuId: Int
-    )
-
-    fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int)
-    fun showLikesScreen(postId: String)
-    fun postDetail(postData: PostViewData) {}
-    fun updateFromLikedSaved(position: Int)
-    fun sendMediaItemToExoPlayer(
-        position: Int,
-        playerView: StyledPlayerView,
-        item: MediaItem
     ) {
     }
 
-    fun playPauseOnVideo(position: Int) {}
+    fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {}
+    fun showLikesScreen(postId: String) {}
+    fun postDetail(postId: String) {}
+    fun updateFromLikedSaved(position: Int) {}
 }

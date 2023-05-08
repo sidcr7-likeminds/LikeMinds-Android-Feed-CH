@@ -48,7 +48,11 @@ class ItemPostMultipleMediaViewDataBinder constructor(
                 return@initPostTypeBindData
             }, executeBinder = {
                 // sets the view pager for multiple medias in the post
-                PostTypeUtil.initViewPager(binding, data)
+                PostTypeUtil.initViewPager(
+                    binding,
+                    data,
+                    listener
+                )
             })
     }
 }

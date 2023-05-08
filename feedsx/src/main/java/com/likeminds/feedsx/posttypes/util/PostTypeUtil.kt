@@ -16,10 +16,12 @@ import androidx.core.text.util.LinkifyCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
+import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
@@ -287,7 +289,11 @@ object PostTypeUtil {
     }
 
     // initializes view pager for multiple media post
-    fun initViewPager(binding: ItemPostMultipleMediaBinding, data: PostViewData) {
+    fun initViewPager(
+        binding: ItemPostMultipleMediaBinding,
+        data: PostViewData,
+        listener: PostAdapterListener
+    ) {
         binding.apply {
             // sets button color variable in xml
             buttonColor = LMBranding.getButtonsColor()
@@ -305,8 +311,20 @@ object PostTypeUtil {
                 }
             }
             viewpagerMultipleMedia.isSaveEnabled = false
-            val multipleMediaPostAdapter = MultipleMediaPostAdapter()
+            val multipleMediaPostAdapter = MultipleMediaPostAdapter(listener)
             viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
+
+            viewpagerMultipleMedia.registerOnPageChangeCallback(object :
+                ViewPager2.OnPageChangeCallback() {
+                override fun onPageSelected(position: Int) {
+                    super.onPageSelected(position)
+
+                    // processes the current video whenever view pager's page is changed
+                    val postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance()
+                    postVideoAutoPlayHelper?.playMostVisibleItem()
+                }
+            })
+
             dotsIndicator.setViewPager2(viewpagerMultipleMedia)
             multipleMediaPostAdapter.replace(attachments)
         }
@@ -362,7 +380,7 @@ object PostTypeUtil {
         // post is used here to get lines count in the text view
         tvPostContent.post {
             tvPostContent.setOnClickListener {
-                adapterListener.postDetail(data)
+                adapterListener.postDetail(data.id)
             }
             MemberTaggingDecoder.decode(
                 tvPostContent,
@@ -438,18 +456,22 @@ object PostTypeUtil {
         )
 
         ivPost.setOnClickListener {
-            adapterListener.postDetail(data)
+            adapterListener.postDetail(data.id)
         }
     }
 
     // sets image in the multiple media image view
     fun initMultipleMediaImage(
         ivPost: ImageView,
-        data: AttachmentViewData
+        data: AttachmentViewData,
+        listener: PostAdapterListener
     ) {
+        ivPost.setOnClickListener {
+            listener.postDetail(data.postId)
+        }
+
         // gets the shimmer drawable for placeholder
         val shimmerDrawable = ViewUtils.getShimmer()
-
         ImageBindingUtil.loadImage(
             ivPost,
             data.attachmentMeta.url,

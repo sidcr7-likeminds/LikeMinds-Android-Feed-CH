@@ -15,26 +15,33 @@
     <application>
         <activity
             android:name="com.likeminds.feedsx.media.view.MediaPickerActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.likeminds.feedsx.report.view.ReportActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.likeminds.feedsx.post.create.view.CreatePostActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.likeminds.feedsx.post.edit.view.EditPostActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.likeminds.feedsx.likes.view.LikesActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name="com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.likeminds.feedsx.post.detail.view.PostDetailActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>
