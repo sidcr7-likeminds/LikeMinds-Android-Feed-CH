@@ -95,6 +95,10 @@ class FeedFragment :
     private var alreadyPosting: Boolean = false
     private val workersMap by lazy { ArrayList<UUID>() }
 
+    private val postPublisher by lazy {
+        PostEvent.getPublisher()
+    }
+
     override val useSharedViewModel: Boolean
         get() = true
 
@@ -440,6 +444,11 @@ class FeedFragment :
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        postPublisher.subscribe(this)
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -463,7 +472,7 @@ class FeedFragment :
     override fun onDestroy() {
         super.onDestroy()
         // unsubscribes itself from the [PostPublisher]
-        PostEvent.getPublisher().unsubscribe(this)
+        postPublisher.unsubscribe(this)
     }
 
     // initiates SDK
@@ -818,8 +827,6 @@ class FeedFragment :
 
     //opens post detail screen when add comment/comments count is clicked
     override fun comment(postId: String) {
-        PostEvent.getPublisher().subscribe(this)
-
         // sends comment list open event
         viewModel.sendCommentListOpenEvent()
 
@@ -832,8 +839,6 @@ class FeedFragment :
 
     //opens post detail screen when post content is clicked
     override fun postDetail(postId: String) {
-        PostEvent.getPublisher().subscribe(this)
-
         // sends comment list open event
         viewModel.sendCommentListOpenEvent()
 
