@@ -837,14 +837,14 @@ class FeedFragment :
     }
 
     //opens post detail screen when post content is clicked
-    override fun postDetail(postData: PostViewData) {
+    override fun postDetail(postId: String) {
         PostEvent.getPublisher().subscribe(this)
 
         // sends comment list open event
         viewModel.sendCommentListOpenEvent()
 
         val postDetailExtras = PostDetailExtras.Builder()
-            .postId(postData.id)
+            .postId(postId)
             .isEditTextFocused(false)
             .build()
         PostDetailActivity.start(requireContext(), postDetailExtras)

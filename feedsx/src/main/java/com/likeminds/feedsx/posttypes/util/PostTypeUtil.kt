@@ -289,7 +289,11 @@ object PostTypeUtil {
     }
 
     // initializes view pager for multiple media post
-    fun initViewPager(binding: ItemPostMultipleMediaBinding, data: PostViewData) {
+    fun initViewPager(
+        binding: ItemPostMultipleMediaBinding,
+        data: PostViewData,
+        listener: PostAdapterListener
+    ) {
         binding.apply {
             // sets button color variable in xml
             buttonColor = LMBranding.getButtonsColor()
@@ -307,7 +311,7 @@ object PostTypeUtil {
                 }
             }
             viewpagerMultipleMedia.isSaveEnabled = false
-            val multipleMediaPostAdapter = MultipleMediaPostAdapter()
+            val multipleMediaPostAdapter = MultipleMediaPostAdapter(listener)
             viewpagerMultipleMedia.adapter = multipleMediaPostAdapter
 
             viewpagerMultipleMedia.registerOnPageChangeCallback(object :
@@ -376,7 +380,7 @@ object PostTypeUtil {
         // post is used here to get lines count in the text view
         tvPostContent.post {
             tvPostContent.setOnClickListener {
-                adapterListener.postDetail(data)
+                adapterListener.postDetail(data.id)
             }
             MemberTaggingDecoder.decode(
                 tvPostContent,
@@ -452,18 +456,22 @@ object PostTypeUtil {
         )
 
         ivPost.setOnClickListener {
-            adapterListener.postDetail(data)
+            adapterListener.postDetail(data.id)
         }
     }
 
     // sets image in the multiple media image view
     fun initMultipleMediaImage(
         ivPost: ImageView,
-        data: AttachmentViewData
+        data: AttachmentViewData,
+        listener: PostAdapterListener
     ) {
+        ivPost.setOnClickListener {
+            listener.postDetail(data.postId)
+        }
+
         // gets the shimmer drawable for placeholder
         val shimmerDrawable = ViewUtils.getShimmer()
-
         ImageBindingUtil.loadImage(
             ivPost,
             data.attachmentMeta.url,

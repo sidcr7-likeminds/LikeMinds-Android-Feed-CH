@@ -53,7 +53,6 @@ class ItemPostSingleImageViewDataBinder constructor(
                     data,
                     listener
                 )
-
             })
     }
 }

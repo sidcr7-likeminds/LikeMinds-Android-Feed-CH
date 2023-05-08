@@ -4,7 +4,10 @@ import android.content.Context
 import android.net.Uri
 import android.os.Looper
 import android.util.AttributeSet
-import android.view.*
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.SurfaceView
+import android.view.View
 import android.widget.FrameLayout
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
@@ -76,7 +79,12 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
             override fun onPlaybackStateChanged(playbackState: Int) {
                 super.onPlaybackStateChanged(playbackState)
                 if (playbackState == Player.STATE_READY) {
+                    Log.d("PUI", "onPlaybackStateChanged: STATE_READY")
                     alpha = 1f
+                }
+
+                if (playbackState == Player.STATE_BUFFERING) {
+                    alpha = 0f
                 }
             }
         })
@@ -114,38 +122,6 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
     override fun setVisibility(visibility: Int) {
         super.setVisibility(visibility)
         videoSurfaceView?.visibility = visibility
-    }
-
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
-        if (player != null) {
-            return super.dispatchKeyEvent(event)
-        }
-        return false
-    }
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        return if (player == null) {
-            false
-        } else when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                isTouching = true
-                true
-            }
-            MotionEvent.ACTION_UP -> {
-                if (isTouching) {
-                    isTouching = false
-                    performClick()
-                    return true
-                }
-                false
-            }
-            else -> false
-        }
-    }
-
-    override fun performClick(): Boolean {
-        super.performClick()
-        return false
     }
 
     /**

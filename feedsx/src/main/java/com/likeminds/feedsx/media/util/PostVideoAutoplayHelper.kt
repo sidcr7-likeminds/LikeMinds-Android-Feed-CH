@@ -277,6 +277,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
     ) {
         val videoUri = Uri.parse(url)
         videoPost.startPlaying(videoUri)
+//        videoPost.
         removePlayer()
     }
 

@@ -34,6 +34,7 @@ import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
+import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.ProgressHelper
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
@@ -60,7 +61,9 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
 
-class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel>() {
+class EditPostFragment :
+    BaseFragment<FragmentEditPostBinding, EditPostViewModel>(),
+    PostAdapterListener {
 
     @Inject
     lateinit var helperViewModel: HelperViewModel
@@ -560,7 +563,7 @@ class EditPostFragment : BaseFragment<FragmentEditPostBinding, EditPostViewModel
         binding.apply {
             multipleMediaAttachment.root.show()
             multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
-            val multiMediaAdapter = MultipleMediaPostAdapter()
+            val multiMediaAdapter = MultipleMediaPostAdapter(this@EditPostFragment)
             val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
             viewPager.adapter = multiMediaAdapter
             multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)

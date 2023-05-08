@@ -29,26 +29,31 @@ class ItemPostSingleVideoViewDataBinder constructor(
         data: PostViewData,
         position: Int
     ) {
-        binding.position = position
+        binding.apply {
+            this.position = position
 
-        // handles various actions for the post
-        PostTypeUtil.initActionsLayout(
-            binding.postActionsLayout,
-            data,
-            listener,
-            position
-        )
+            // handles various actions for the post
+            PostTypeUtil.initActionsLayout(
+                postActionsLayout,
+                data,
+                listener,
+                position
+            )
 
-        // checks whether to bind complete data or not and execute corresponding lambda function
-        PostTypeUtil.initPostTypeBindData(
-            binding.authorFrame,
-            binding.tvPostContent,
-            data,
-            position,
-            listener,
-            returnBinder = {
-                return@initPostTypeBindData
-            }, executeBinder = {
-            })
+            // checks whether to bind complete data or not and execute corresponding lambda function
+            PostTypeUtil.initPostTypeBindData(
+                authorFrame,
+                tvPostContent,
+                data,
+                position,
+                listener,
+                returnBinder = {
+                    return@initPostTypeBindData
+                }, executeBinder = {
+                    videoPost.setOnClickListener {
+                        listener.postDetail(data.id)
+                    }
+                })
+        }
     }
 }

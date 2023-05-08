@@ -1,8 +1,6 @@
 package com.likeminds.feedsx.posttypes.model
 
 import android.os.Parcelable
-import com.likeminds.feedsx.media.model.MEDIA_ACTION_NONE
-import com.likeminds.feedsx.media.model.MediaActions
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_ATTACHMENT
 import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS_ITEM
@@ -13,7 +11,7 @@ class AttachmentViewData private constructor(
     @AttachmentType var attachmentType: Int,
     val attachmentMeta: AttachmentMetaViewData,
     val dynamicViewType: Int?,
-    @MediaActions var mediaActions: String
+    val postId: String
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -35,7 +33,7 @@ class AttachmentViewData private constructor(
         private var attachmentMeta: AttachmentMetaViewData =
             AttachmentMetaViewData.Builder().build()
         private var dynamicViewType: Int? = null
-        private var mediaActions: String = MEDIA_ACTION_NONE
+        private var postId: String = ""
 
         fun attachmentType(@AttachmentType attachmentType: Int) =
             apply { this.attachmentType = attachmentType }
@@ -46,14 +44,14 @@ class AttachmentViewData private constructor(
         fun dynamicViewType(dynamicViewType: Int?) =
             apply { this.dynamicViewType = dynamicViewType }
 
-        fun mediaActions(@MediaActions mediaActions: String) =
-            apply { this.mediaActions = mediaActions }
+        fun postId(postId: String) =
+            apply { this.postId = postId }
 
         fun build() = AttachmentViewData(
             attachmentType,
             attachmentMeta,
             dynamicViewType,
-            mediaActions
+            postId
         )
     }
 
@@ -61,7 +59,7 @@ class AttachmentViewData private constructor(
         return Builder().attachmentType(attachmentType)
             .attachmentMeta(attachmentMeta)
             .dynamicViewType(dynamicViewType)
-            .mediaActions(mediaActions)
+            .postId(postId)
     }
 
 }
