@@ -96,9 +96,9 @@ abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
             return
         }
         viewModel = if (useSharedViewModel) {
-            ViewModelProvider(requireActivity(), viewModelFactory).get(getViewModelClass()!!)
+            ViewModelProvider(requireActivity(), viewModelFactory)[getViewModelClass()!!]
         } else {
-            ViewModelProvider(this, viewModelFactory).get(getViewModelClass()!!)
+            ViewModelProvider(this, viewModelFactory)[getViewModelClass()!!]
         }
     }
 }

@@ -3,6 +3,7 @@ package com.likeminds.feedsx.delete.view
 import android.graphics.Color
 import android.view.View
 import androidx.fragment.app.FragmentManager
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.databinding.DialogReasonChooseBinding
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter
@@ -30,6 +31,11 @@ class ReasonChooseDialog :
 
     override fun getViewModelClass(): Class<ReasonChooseViewModel> {
         return ReasonChooseViewModel::class.java
+    }
+
+    override fun attachDagger() {
+        super.attachDagger()
+        SDKApplication.getInstance().reasonChooseComponent()?.inject(this)
     }
 
     override fun getViewBinding(): DialogReasonChooseBinding {
