@@ -9,6 +9,7 @@ import com.likeminds.feedsx.di.likes.LikesComponentModule
 import com.likeminds.feedsx.di.media.MediaComponent
 import com.likeminds.feedsx.di.media.MediaComponentModule
 import com.likeminds.feedsx.di.moderation.ModerationComponentModule
+import com.likeminds.feedsx.di.moderation.reasonchoose.ReasonChooseComponent
 import com.likeminds.feedsx.di.moderation.report.ReportComponent
 import com.likeminds.feedsx.di.notificationfeed.NotificationFeedComponent
 import com.likeminds.feedsx.di.notificationfeed.NotificationFeedComponentModule
@@ -43,6 +44,7 @@ interface LikeMindsFeedComponent {
     fun postDetailComponent(): PostDetailComponent.Factory
     fun editPostComponent(): EditPostComponent.Factory
     fun reportComponent(): ReportComponent.Factory
+    fun reasonChooseComponent(): ReasonChooseComponent.Factory
 
     @Component.Builder
     interface Builder {

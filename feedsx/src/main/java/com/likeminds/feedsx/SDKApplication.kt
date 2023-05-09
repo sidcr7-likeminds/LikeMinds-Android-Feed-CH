@@ -13,6 +13,7 @@ import com.likeminds.feedsx.di.LikeMindsFeedComponent
 import com.likeminds.feedsx.di.feed.FeedComponent
 import com.likeminds.feedsx.di.likes.LikesComponent
 import com.likeminds.feedsx.di.media.MediaComponent
+import com.likeminds.feedsx.di.moderation.reasonchoose.ReasonChooseComponent
 import com.likeminds.feedsx.di.moderation.report.ReportComponent
 import com.likeminds.feedsx.di.notificationfeed.NotificationFeedComponent
 import com.likeminds.feedsx.di.post.create.CreatePostComponent
@@ -38,6 +39,7 @@ class SDKApplication {
     private var postDetailComponent: PostDetailComponent? = null
     private var editPostComponent: EditPostComponent? = null
     private var reportComponent: ReportComponent? = null
+    private var reasonChooseComponent: ReasonChooseComponent? = null
 
     companion object {
         const val LOG_TAG = "LikeMinds"
@@ -187,5 +189,15 @@ class SDKApplication {
             reportComponent = likeMindsFeedComponent?.reportComponent()?.create()
         }
         return reportComponent
+    }
+
+    /**
+     * initiate and return ReasonChooseComponent: All dependencies required for reason choose fragment
+     * */
+    fun reasonChooseComponent(): ReasonChooseComponent? {
+        if (reasonChooseComponent == null) {
+            reasonChooseComponent = likeMindsFeedComponent?.reasonChooseComponent()?.create()
+        }
+        return reasonChooseComponent
     }
 }
