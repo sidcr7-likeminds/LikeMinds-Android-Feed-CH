@@ -169,6 +169,7 @@ class FeedFragment :
             val indexToRemove = getIndexAndPostFromAdapter(postId)?.first ?: return@observe
             mPostAdapter.removeIndex(indexToRemove)
             checkForNoPost(mPostAdapter.items())
+            refreshAutoPlayer()
             ViewUtils.showShortToast(
                 requireContext(),
                 getString(R.string.post_deleted)

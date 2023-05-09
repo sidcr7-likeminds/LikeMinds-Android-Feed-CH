@@ -18,7 +18,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:show_buffering="always"
             app:shutter_background_color="@color/white"
             app:use_artwork="true"
             app:use_controller="false" />
