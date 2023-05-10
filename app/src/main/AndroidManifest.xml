@@ -2,29 +2,21 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-
     <application
         android:name=".FeedSXApplication"
         android:allowBackup="false"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_app_icon"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_app_icon_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar"
         tools:targetApi="31">
         <activity
             android:name=".auth.view.AuthActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -46,31 +38,9 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".media.view.MediaPickerActivity"
-            android:exported="false" />
-        <activity
-            android:name=".report.view.ReportActivity"
-            android:exported="false" />
-        <activity
-            android:name=".post.create.view.CreatePostActivity"
+            android:name=".MainActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".post.edit.view.EditPostActivity"
-            android:exported="false" />
-        <activity
-            android:name=".likes.view.LikesActivity"
-            android:exported="false" />
-        <activity
-            android:name=".notificationfeed.view.NotificationFeedActivity"
-            android:exported="false" />
-
-        <activity
-            android:name=".post.detail.view.PostDetailActivity"
-            android:exported="false" />
-        <activity
-            android:name=".feed.view.MainActivity"
-            android:exported="false" />
+            android:screenOrientation="portrait" />
 
         <service
             android:name=".FeedSXMessagingService"
