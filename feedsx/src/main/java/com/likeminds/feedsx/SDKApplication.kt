@@ -81,7 +81,7 @@ class SDKApplication : LMCallback {
     }
 
     // sets branding to the app
-    private fun setupBranding(setBrandingRequest: SetBrandingRequest) {
+    fun setupBranding(setBrandingRequest: SetBrandingRequest) {
         LMBranding.setBranding(setBrandingRequest)
     }
 

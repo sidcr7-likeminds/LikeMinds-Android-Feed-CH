@@ -34,5 +34,7 @@ dependencies {
     implementation platform(deps.firebase.bom)
     implementation deps.firebase.messaging
 
+    implementation 'com.github.Dhaval2404:ColorPicker:2.3'
+
     implementation project(":feedsx")
 }
