@@ -42,44 +42,56 @@ class PermissionManager {
                                 }
 
                                 override fun onDeny() {
-                                    if (showDeniedPopup) {
-                                        val permissionDialog = PermissionDialog(
-                                            activity,
-                                            settingsPermissionLauncher,
-                                            task,
-                                            permission,
-                                            PermissionDialog.Mode.DENIED,
-                                            permissionDeniedCallback
-                                        )
-                                        permissionDialog.setCanceledOnTouchOutside(
-                                            setDeniedPopupDismissible
-                                        )
-                                        permissionDialog.setCancelable(setDeniedPopupDismissible)
-                                        permissionDialog.show()
-                                    } else {
-                                        permissionDeniedCallback?.onDeny()
-                                    }
+                                    showDeniedDialog(
+                                        activity,
+                                        settingsPermissionLauncher,
+                                        showDeniedPopup,
+                                        task,
+                                        permission,
+                                        setDeniedPopupDismissible,
+                                        permissionDeniedCallback
+                                    )
                                 }
                             })
                         }
                     } else {
-                        if (showDeniedPopup) {
-                            val permissionDialog = PermissionDialog(
-                                activity,
-                                settingsPermissionLauncher,
-                                task,
-                                permission,
-                                PermissionDialog.Mode.DENIED,
-                                permissionDeniedCallback
-                            )
-                            permissionDialog.setCanceledOnTouchOutside(setDeniedPopupDismissible)
-                            permissionDialog.setCancelable(setDeniedPopupDismissible)
-                            permissionDialog.show()
-                        } else {
-                            permissionDeniedCallback?.onDeny()
-                        }
+                        showDeniedDialog(
+                            activity,
+                            settingsPermissionLauncher,
+                            showDeniedPopup,
+                            task,
+                            permission,
+                            setDeniedPopupDismissible,
+                            permissionDeniedCallback
+                        )
                     }
                 }
+            }
+        }
+
+        private fun showDeniedDialog(
+            activity: BaseAppCompatActivity,
+            settingsPermissionLauncher: ActivityResultLauncher<Intent>,
+            showDeniedPopup: Boolean,
+            task: PermissionTask,
+            permission: Permission,
+            setDeniedPopupDismissible: Boolean,
+            permissionDeniedCallback: PermissionDeniedCallback?,
+        ) {
+            if (showDeniedPopup) {
+                val permissionDialog = PermissionDialog(
+                    activity,
+                    settingsPermissionLauncher,
+                    task,
+                    permission,
+                    PermissionDialog.Mode.DENIED,
+                    permissionDeniedCallback
+                )
+                permissionDialog.setCanceledOnTouchOutside(setDeniedPopupDismissible)
+                permissionDialog.setCancelable(setDeniedPopupDismissible)
+                permissionDialog.show()
+            } else {
+                permissionDeniedCallback?.onDeny()
             }
         }
     }

@@ -38,13 +38,8 @@ object FileUtil {
         val file = File(pathTempFile)
         val returnedPath = getPath(context, uri)
         return when {
-            //Cloud
-            uri.isCloudFile -> {
-                downloadFile(contentResolver, file, uri)
-                pathTempFile
-            }
-            //Third Party App or Unknown Provider or unknown mime type
-            returnedPath.isBlank() || uri.isUnknownProvider(returnedPath, contentResolver) -> {
+            //Cloud or Third Party App or Unknown Provider or unknown mime type
+            uri.isCloudFile ||  returnedPath.isBlank() || uri.isUnknownProvider(returnedPath, contentResolver)->  {
                 downloadFile(contentResolver, file, uri)
                 pathTempFile
             }

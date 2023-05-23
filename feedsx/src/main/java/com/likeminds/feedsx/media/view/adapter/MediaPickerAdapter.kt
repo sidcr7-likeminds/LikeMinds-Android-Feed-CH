@@ -39,9 +39,15 @@ class MediaPickerAdapter constructor(
 }
 
 interface MediaPickerAdapterListener {
-    fun onFolderClicked(folderData: MediaFolderViewData) {}
-    fun onMediaItemClicked(mediaViewData: MediaViewData, itemPosition: Int) {}
-    fun onMediaItemLongClicked(mediaViewData: MediaViewData, itemPosition: Int) {}
+    fun onFolderClicked(folderData: MediaFolderViewData) {
+        //triggered when a folder is clicked and opened
+    }
+    fun onMediaItemClicked(mediaViewData: MediaViewData, itemPosition: Int) {
+        //triggered when a single media is selected
+    }
+    fun onMediaItemLongClicked(mediaViewData: MediaViewData, itemPosition: Int) {
+        //triggered when a single media is selected with long press
+    }
     fun isMediaSelectionEnabled(): Boolean {
         return false
     }
@@ -50,7 +56,9 @@ interface MediaPickerAdapterListener {
         return false
     }
 
-    fun browseDocumentClicked() {}
+    fun browseDocumentClicked() {
+        //triggered when a user wants to open a default media browser
+    }
     fun isMultiSelectionAllowed(): Boolean {
         return false
     }

@@ -1,5 +1,7 @@
 package com
 
 interface LMUICallback {
-    fun login() {}
+    fun login() {
+        //to implement whenever refresh token is expired
+    }
 }
