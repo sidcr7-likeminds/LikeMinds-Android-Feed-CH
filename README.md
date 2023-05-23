@@ -9,7 +9,7 @@ and driving user engagement. <br> Go through this readme file to integrate Feed-
 
 Firstly, import the module into your project to get started.
 
-1. Clone the master branch of LikeMinds-Android-Feed-SX repository.
+1. Clone the master branch of LikeMinds-Android-Feed-SX repository to get access to the most stable version of Feed SX.
 2. Import the `feedsx` module in your Android Project.
 3. Open your build.gradle file and make sure that the module is now listed under `dependencies.implementation project(":feedsx")`
 
@@ -46,6 +46,19 @@ Create `fonts` using `LMFonts.Builder` class by passing all the required paramet
 | **bold**     	| String      	| Path of font with bold typeface. 	     |                  | 
 | **medium**     | String      	| Path of font with medium typeface. 	     |                  | 
 | **regular**     | String      	| Path of font with medium regular. 	     |                  | 
+
+#### LMUICallback (Optional)
+
+Implement this callback to redirect guest user to your appropriate login screen.
+
+```kotlin
+interface LMUICallback {
+	// This method is called when the user is not logged in or guest
+  	// It is called when the user tries to perform an action that requires login
+  	// The user should be redirected to your appropriate login screen
+    fun login() {}
+}
+```
 
 
 
