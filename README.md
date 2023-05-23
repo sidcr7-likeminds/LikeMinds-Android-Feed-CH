@@ -13,8 +13,6 @@ Firstly, import the module into your project to get started.
 2. Import the `feedsx` module in your Android Project.
 3. Open your build.gradle file and make sure that the module is now listed under `dependencies.implementation project(":feedsx")`
 
-<br>
-
 ### 2. Initiate `LikeMindsFeedUI`
 
 Once you have imported the module, initiate the Feed UI calling `LikeMindsFeedUI.initLikeMindsFeedUI()` with necessary parameters. This will initate the SDK application along with your own branding.
@@ -61,7 +59,6 @@ interface LMUICallback {
 }
 ```
 
-
-
+Congrats! You have successfully integrated Feed-SX in your application. Now let's inflate `FeedFragment` to watch Feed in action. 
 
 
