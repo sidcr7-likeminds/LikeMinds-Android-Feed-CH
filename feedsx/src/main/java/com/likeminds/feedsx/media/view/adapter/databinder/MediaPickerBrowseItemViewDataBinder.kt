@@ -28,5 +28,6 @@ class MediaPickerBrowseItemViewDataBinder constructor(
     override fun bindData(
         binding: ItemMediaPickerBrowseBinding, data: MediaBrowserViewData, position: Int
     ) {
+        //showing static data
     }
 }

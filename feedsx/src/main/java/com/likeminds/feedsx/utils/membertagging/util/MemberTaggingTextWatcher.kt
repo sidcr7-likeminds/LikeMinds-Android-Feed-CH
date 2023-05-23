@@ -155,7 +155,7 @@ class MemberTaggingTextWatcher(
     }
 
     override fun afterTextChanged(s: Editable) {
-
+        //necessary function to implement
     }
 
     @JvmSynthetic

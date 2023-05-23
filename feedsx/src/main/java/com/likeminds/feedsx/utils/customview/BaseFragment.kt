@@ -35,35 +35,31 @@ abstract class BaseFragment<B : ViewBinding, VM : ViewModel> : Fragment() {
      */
     protected open val keepBindingRetained = false
 
-    /**
-     * Only use to receive extras in fragment
-     */
-    protected open fun receiveExtras() {}
+    protected open fun receiveExtras() {
+        //implement this to receive all the extras from source screen
+    }
 
-    /**
-     * attachs to the component
-     */
-    protected open fun attachDagger() {}
+    protected open fun attachDagger() {
+        //implement this to attach screen to dagger sub-component
+    }
 
-    /**
-     * Only use to handle fragment result listeners
-     */
-    protected open fun handleResultListener() {}
+    protected open fun handleResultListener() {
+        //implement this to listener to results coming from another fragment on same activity
+    }
 
-    /**
-     * Only use to create/initialise views
-     */
-    protected open fun setUpViews() {}
 
-    /**
-     * Only use to register observers
-     */
-    protected open fun observeData() {}
+    protected open fun setUpViews() {
+        //implement this to setup initial views related things
+    }
 
-    /**
-     * This function can be called in case to clearing any view or listener or observer in fragment
-     */
-    protected open fun doCleanup() {}
+
+    protected open fun observeData() {
+        //implement this to add observers of all live data or flows
+    }
+
+    protected open fun doCleanup() {
+        //This function can be called in case to clearing any view or listener or observer in fragment
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

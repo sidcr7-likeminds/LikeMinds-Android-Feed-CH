@@ -126,16 +126,6 @@ class PostDetailFragment :
         postDetailExtras =
             arguments?.getParcelable(POST_DETAIL_EXTRAS)
                 ?: throw emptyExtrasException(TAG)
-        // add route for replies
-//        checkForComments()
-    }
-
-    //to check for source of the follow trigger
-    private fun checkForComments() {
-        //if extras contains commentId: redirect to comment
-        if (!postDetailExtras.commentId.isNullOrEmpty()) {
-            toFindComment = true
-        }
     }
 
     override fun onResume() {

@@ -15,5 +15,7 @@ abstract class ViewDataBinder<V : ViewDataBinding, T : BaseViewType> {
 
     abstract fun bindData(binding: V, data: T, position: Int)
 
-    fun bindData(binding: V, data: Bundle, position: Int) {}
+    fun bindData(binding: V, data: Bundle, position: Int) {
+        //This function can be called in case to handle inflation of data dependent on `data`
+    }
 }

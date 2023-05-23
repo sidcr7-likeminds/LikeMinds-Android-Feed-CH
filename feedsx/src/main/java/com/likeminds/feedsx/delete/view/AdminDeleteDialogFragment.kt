@@ -25,8 +25,7 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
 
         @JvmStatic
         fun showDialog(
-            supportFragmentManager: FragmentManager,
-            deleteExtras: DeleteExtras
+            supportFragmentManager: FragmentManager, deleteExtras: DeleteExtras
         ) {
             AdminDeleteDialogFragment().apply {
                 arguments = Bundle().apply {
@@ -90,15 +89,12 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
             val reason = tag.ifEmpty {
                 binding.etOtherReason.text.toString()
             }
-            if (data.value.isNotEmpty()) {
-                if (tag == "Others" && reason.isEmpty()) {
-                    return@setOnClickListener
-                }
+            if (data.value.isNotEmpty() && isTagOthersAndReasonIsEmpty(tag, reason)) {
+                return@setOnClickListener
             }
 
             deleteDialogListener?.adminDelete(
-                deleteExtras,
-                reason
+                deleteExtras, reason
             )
             dismiss()
         }
@@ -115,6 +111,10 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
         }
     }
 
+    //checks whether a tag is selected and "Others" and reason is also Empty
+    private fun isTagOthersAndReasonIsEmpty(tag: String, reason: String): Boolean {
+        return tag == "Others" && reason.isEmpty()
+    }
     // handles confirm button (enabled/disabled)
     private fun handleConfirmButton(isEnabled: Boolean) {
         binding.tvConfirm.isEnabled = isEnabled
@@ -123,13 +123,11 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
         } else {
             binding.tvConfirm.setTextColor(
                 ContextCompat.getColor(
-                    requireContext(),
-                    R.color.black_20
+                    requireContext(), R.color.black_20
                 )
             )
         }
     }
-
     // callback when a reason is selected from bottom sheet
     override fun onReasonSelected(viewData: ReasonChooseViewData) {
         binding.reasonData = viewData
@@ -147,8 +145,7 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
 
     interface DeleteDialogListener {
         fun adminDelete(
-            deleteExtras: DeleteExtras,
-            reason: String
+            deleteExtras: DeleteExtras, reason: String
         )
     }
 }
