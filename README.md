@@ -59,6 +59,16 @@ interface LMUICallback {
 }
 ```
 
-Congrats! You have successfully integrated Feed-SX in your application. Now let's inflate `FeedFragment` to watch Feed in action. 
+Congrats! You have successfully integrated Feed-SX in your application. Now let's inflate `FeedFragment` to see Feed in action. 
 
+### 3. Feed Fragment
 
+Finally to see the magic of Feed inside your application, add `FeedFragment` navigation graph and pass the `FeedExtras` in arguments.
+
+#### `FeedExtras`
+
+| **VARIABLE** 	    | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	|
+|:-----------------	|:------------	|:-------------------------------------  |:---------------: |
+| **apiKey**     	| String      	| Api key of your community. 	     |                  | 
+| **userName**     | String      	| Name of the logged in user. 	     |                  | 
+| **userId**     | String      	| Unique id of logged in user. 	     |                  | 
