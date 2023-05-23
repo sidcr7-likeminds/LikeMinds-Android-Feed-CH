@@ -1,17 +1,17 @@
 package com.likeminds.feedsx.utils.permissions
 
+import android.content.Intent
 import android.os.Build
-import androidx.annotation.NonNull
+import androidx.activity.result.ActivityResultLauncher
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class PermissionManager {
 
     companion object {
-        const val REQUEST_CODE_SETTINGS_PERMISSION = 100
-
         fun performTaskWithPermission(
-            @NonNull activity: BaseAppCompatActivity,
-            @NonNull task: PermissionTask,
+            activity: BaseAppCompatActivity,
+            settingsPermissionLauncher: ActivityResultLauncher<Intent>,
+            task: PermissionTask,
             permission: Permission,
             showInitialPopup: Boolean,
             showDeniedPopup: Boolean,
@@ -27,6 +27,7 @@ class PermissionManager {
                         if (showInitialPopup) {
                             val permissionDialog = PermissionDialog(
                                 activity,
+                                settingsPermissionLauncher,
                                 task,
                                 permission,
                                 PermissionDialog.Mode.INIT,
@@ -44,6 +45,7 @@ class PermissionManager {
                                     if (showDeniedPopup) {
                                         val permissionDialog = PermissionDialog(
                                             activity,
+                                            settingsPermissionLauncher,
                                             task,
                                             permission,
                                             PermissionDialog.Mode.DENIED,
@@ -64,6 +66,7 @@ class PermissionManager {
                         if (showDeniedPopup) {
                             val permissionDialog = PermissionDialog(
                                 activity,
+                                settingsPermissionLauncher,
                                 task,
                                 permission,
                                 PermissionDialog.Mode.DENIED,

@@ -1,12 +1,9 @@
 package com.likeminds.feedsx.media.model
 
-import android.os.Parcelable
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_BROWSE
-import kotlinx.parcelize.Parcelize
 
-@Parcelize
-class MediaBrowserViewData private constructor() : Parcelable, BaseViewType {
+class MediaBrowserViewData private constructor() : BaseViewType {
     override val viewType: Int
         get() = ITEM_MEDIA_PICKER_BROWSE
 

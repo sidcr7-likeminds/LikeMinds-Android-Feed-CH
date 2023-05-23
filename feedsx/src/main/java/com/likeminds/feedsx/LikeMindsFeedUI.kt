@@ -2,6 +2,7 @@ package com.likeminds.feedsx
 
 import android.app.Application
 import android.util.Log
+import com.LMUICallback
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
 
 object LikeMindsFeedUI {
@@ -14,6 +15,7 @@ object LikeMindsFeedUI {
      **/
     fun initLikeMindsFeedUI(
         application: Application,
+        lmUICallback: LMUICallback,
         brandingRequest: SetBrandingRequest
     ) {
         Log.d(SDKApplication.LOG_TAG, "initiate LikeMindsFeedUI called")
@@ -24,6 +26,7 @@ object LikeMindsFeedUI {
         //call initSDKApplication to initialise sdk
         sdk.initSDKApplication(
             application,
+            lmUICallback,
             brandingRequest
         )
     }

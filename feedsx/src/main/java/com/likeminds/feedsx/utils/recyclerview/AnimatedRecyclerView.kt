@@ -142,6 +142,7 @@ class AnimatedRecyclerView : RecyclerView {
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Throws(Exception::class)
     fun notifyDataSetChanged() {
         if (adapter != null) {

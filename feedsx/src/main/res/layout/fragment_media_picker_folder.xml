@@ -46,7 +46,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
                     app:tint="@color/black"
-                    tools:ignore="ContentDescription" />
+                    tools:ignore="ContentDescription,UseAppTint" />
 
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_toolbar_title"

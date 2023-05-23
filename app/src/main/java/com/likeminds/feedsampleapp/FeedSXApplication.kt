@@ -1,13 +1,12 @@
 package com.likeminds.feedsampleapp
 
 import android.app.Application
+import com.LMUICallback
 import com.likeminds.feedsx.LikeMindsFeedUI
 import com.likeminds.feedsx.branding.model.LMFonts
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
-import com.likeminds.likemindsfeed.LMCallback
-import com.likeminds.likemindsfeed.LMFeedClient
 
-class FeedSXApplication : Application(), LMCallback {
+class FeedSXApplication : Application(), LMUICallback {
 
     companion object {
         const val LOG_TAG = "LikeMinds"
@@ -25,10 +24,6 @@ class FeedSXApplication : Application(), LMCallback {
     override fun onCreate() {
         super.onCreate()
 
-        // extras to instantiate LMFeedClient
-        val extra = LMFeedClient.Builder(this)
-            .lmCallback(this)
-            .build()
         val brandingRequest = SetBrandingRequest.Builder()
             .headerColor("#02A8F3")
             .buttonsColor("#4BAE4F")
@@ -43,6 +38,7 @@ class FeedSXApplication : Application(), LMCallback {
             .build()
 
         LikeMindsFeedUI.initLikeMindsFeedUI(
+            this,
             this,
             brandingRequest
         )

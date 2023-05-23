@@ -40,7 +40,7 @@ class ItemCreatePostMultipleMediaImageViewDataBinder constructor(
             placeholder = shimmerDrawable
         )
 
-        binding.ivCross.setOnClickListener {
+        binding.ivCrossImage.setOnClickListener {
             listener.onMediaRemoved(position, IMAGE)
         }
     }

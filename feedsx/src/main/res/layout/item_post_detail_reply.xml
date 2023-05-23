@@ -57,7 +57,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_overflow_menu"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,UnusedAttribute" />
 
         <ImageView
             android:id="@+id/iv_like"
@@ -88,6 +88,7 @@
             app:layout_constraintTop_toTopOf="@id/iv_like"
             tools:fontFamily="@font/roboto_regular"
             tools:text="39 likes"
+            tools:ignore="UnusedAttribute"
             tools:visibility="visible" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView

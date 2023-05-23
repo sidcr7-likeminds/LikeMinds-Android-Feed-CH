@@ -15,7 +15,6 @@ import javax.inject.Singleton
 
 @Module
 class AWSModule {
-
     @Provides
     @Singleton
     fun provideFinalTransferUtility(

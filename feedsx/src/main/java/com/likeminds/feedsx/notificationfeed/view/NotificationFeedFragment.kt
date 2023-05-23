@@ -6,11 +6,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentNotificationFeedBinding
-import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
 import com.likeminds.feedsx.notificationfeed.viewmodel.NotificationFeedViewModel
-import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -56,130 +54,6 @@ class NotificationFeedFragment :
             binding.rvNotifications,
             linearLayoutManager
         )
-
-        //TODO: testing data
-        addTestingData()
-    }
-
-    //TODO: testing data
-    private fun addTestingData() {
-        val user = UserViewData.Builder()
-            .name("Sid")
-            .customTitle("Admin")
-            .build()
-
-        var text = "Nishkarsh Kaushik commented on your post with photo."
-        mNotificationFeedAdapter.add(
-            NotificationFeedViewData.Builder()
-                .id("1")
-                .user(user)
-//                .menuItems(
-//                    listOf(
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("1")
-//                            .title("Delete")
-//                            .build(),
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("2")
-//                            .title("Mute")
-//                            .build()
-//                    )
-//                )
-                .cta("route://post_detail?post_id=1&comment_id=2")
-                .createdAt(1675721450000)
-                .activityMessage(text)
-                .build()
-        )
-
-        text = "Nishkarsh Kaushik liked your post with document."
-
-        mNotificationFeedAdapter.add(
-            NotificationFeedViewData.Builder()
-                .id("2")
-                .user(user)
-//                .menuItems(
-//                    listOf(
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("1")
-//                            .title("Delete")
-//                            .build(),
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("2")
-//                            .title("Mute")
-//                            .build()
-//                    )
-//                )
-                .createdAt(1675717850000)
-                .cta("route://create_post")
-                .activityMessage(text)
-                .build()
-        )
-
-        mNotificationFeedAdapter.add(
-            NotificationFeedViewData.Builder()
-                .id("3")
-                .user(user)
-                .isRead(true)
-//                .menuItems(
-//                    listOf(
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("1")
-//                            .title("Delete")
-//                            .build(),
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("2")
-//                            .title("Mute")
-//                            .build()
-//                    )
-//                )
-                .createdAt(1675458650000)
-                .activityMessage(text)
-                .build()
-        )
-
-        mNotificationFeedAdapter.add(
-            NotificationFeedViewData.Builder()
-                .id("4")
-                .user(user)
-                .isRead(true)
-//                .menuItems(
-//                    listOf(
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("1")
-//                            .title("Delete")
-//                            .build(),
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("2")
-//                            .title("Mute")
-//                            .build()
-//                    )
-//                )
-                .createdAt(1670274650000)
-                .activityMessage(text)
-                .build()
-        )
-
-        mNotificationFeedAdapter.add(
-            NotificationFeedViewData.Builder()
-                .id("5")
-                .user(user)
-                .isRead(true)
-//                .menuItems(
-//                    listOf(
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("1")
-//                            .title("Delete")
-//                            .build(),
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("2")
-//                            .title("Mute")
-//                            .build()
-//                    )
-//                )
-                .createdAt(1638738650000)
-                .activityMessage(text)
-                .build()
-        )
     }
 
     //attach scroll listener for pagination
@@ -189,7 +63,7 @@ class NotificationFeedFragment :
     ) {
         recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
-                // TODO: add logic
+                // logic  for pagination goes here
             }
         })
     }
@@ -207,40 +81,12 @@ class NotificationFeedFragment :
         }
     }
 
-    //TODO: Call api and refresh the notification data
     private fun fetchRefreshedData() {
-        val user = UserViewData.Builder()
-            .name("Sid")
-            .customTitle("Admin")
-            .build()
-
-        val text = "Nishkarsh Kaushik commented on your post with photo."
-        mNotificationFeedAdapter.add(
-            0,
-            NotificationFeedViewData.Builder()
-                .id("1")
-                .user(user)
-//                .menuItems(
-//                    listOf(
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("1")
-//                            .title("Delete")
-//                            .build(),
-//                        OverflowMenuItemViewData.Builder()
-//                            .postId("2")
-//                            .title("Mute")
-//                            .build()
-//                    )
-//                )
-                .cta("route://post_detail?post_id=1&comment_id=2")
-                .createdAt(1675721450000)
-                .activityMessage(text)
-                .build()
-        )
+        // fetch refreshed data here
         mSwipeRefreshLayout.isRefreshing = false
     }
 
     override fun onPostMenuItemClicked(postId: String, title: String) {
-        //TODO: handle menu clicks
+        // handle the click on post menu
     }
 }

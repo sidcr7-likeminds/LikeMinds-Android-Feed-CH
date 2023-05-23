@@ -1,18 +1,16 @@
 package com.likeminds.feedsx.utils.customview;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.likeminds.feedsx.feed.util.FeedDiffUtilCallback;
-import com.likeminds.feedsx.notificationfeed.util.NotificationFeedDiffUtilCallback;
-import com.likeminds.feedsx.post.detail.util.PostDetailDiffUtilCallback;
 import com.likeminds.feedsx.utils.model.BaseViewType;
 import com.likeminds.feedsx.utils.model.ViewType;
 
@@ -24,7 +22,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
 
     private static final String TAG = "BaseRecyclerAdapter";
     private List<T> dataList;
-    private SparseArray<ViewDataBinder> supportedViewBinderResolverMap;
+    private final SparseArray<ViewDataBinder> supportedViewBinderResolverMap;
 
     public BaseRecyclerAdapter() {
         dataList = new ArrayList<>(1);
@@ -64,7 +62,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
     }
 
     @Override
-    public void onBindViewHolder(DataBoundViewHolder holder, int position, List<Object> payloads) {
+    public void onBindViewHolder(@NonNull DataBoundViewHolder holder, int position, List<Object> payloads) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position);
         } else {
@@ -103,32 +101,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         this.dataList = items;
     }
 
-    public void setItemsViaDiffUtilForFeed(List<T> items) {
-        FeedDiffUtilCallback feedDiffUtilCallback = new FeedDiffUtilCallback(dataList, items);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(feedDiffUtilCallback);
-        dataList.clear();
-        dataList.addAll(items);
-        diffResult.dispatchUpdatesTo(this);
-    }
-
-    // TODO: call this while observing post detail data
-    public void setItemsViaDiffUtilForPostDetail(List<T> items) {
-        PostDetailDiffUtilCallback postDetailDiffUtilCallback = new PostDetailDiffUtilCallback(dataList, items);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(postDetailDiffUtilCallback);
-        dataList.clear();
-        dataList.addAll(items);
-        diffResult.dispatchUpdatesTo(this);
-    }
-
-    // TODO: call this while observing notifications
-    public void setItemsViaDiffUtilForNotification(List<T> items) {
-        NotificationFeedDiffUtilCallback notificationFeedDiffUtilCallback = new NotificationFeedDiffUtilCallback(dataList, items);
-        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(notificationFeedDiffUtilCallback);
-        dataList.clear();
-        dataList.addAll(items);
-        diffResult.dispatchUpdatesTo(this);
-    }
-
+    @SuppressLint("NotifyDataSetChanged")
     public void notifyAllItems() {
         notifyDataSetChanged();
     }
@@ -158,6 +131,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         dataList.set(position, baseViewType);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void replace(List<T> dataList) {
         this.dataList = dataList;
         notifyDataSetChanged();
@@ -186,6 +160,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         notifyItemRangeRemoved(startIndex, count);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void removeIndexWithNotifyDataSetChanged(int index) {
         dataList.remove(index);
         notifyDataSetChanged();
@@ -196,6 +171,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         removeIndex(lastIndex);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void removeViewType(@ViewType int viewType) {
         dataList.removeIf(item -> item.getViewType() == viewType);
@@ -206,6 +182,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
         dataList.clear();
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     public void clearAndNotify() {
         dataList.clear();
         notifyDataSetChanged();

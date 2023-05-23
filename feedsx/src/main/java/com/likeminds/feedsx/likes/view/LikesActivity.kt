@@ -68,7 +68,7 @@ class LikesActivity : BaseAppCompatActivity() {
             //Toolbar
             initActionBar()
 
-            navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.label) {
                     LikesFragment::class.simpleName -> {
                         binding.toolbar.setTitle(R.string.likes)

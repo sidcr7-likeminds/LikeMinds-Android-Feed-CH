@@ -34,8 +34,6 @@ class PostViewData private constructor(
     val temporaryId: Long?
 ) : Parcelable, BaseViewType {
 
-    //TODO: add post id while adding menu item
-
     override val viewType: Int
         get() = when {
             (attachments.size == 1 && attachments.first().attachmentType == IMAGE) -> {
