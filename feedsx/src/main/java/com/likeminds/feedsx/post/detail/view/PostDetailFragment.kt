@@ -126,7 +126,7 @@ class PostDetailFragment :
         postDetailExtras =
             arguments?.getParcelable(POST_DETAIL_EXTRAS)
                 ?: throw emptyExtrasException(TAG)
-        // TODO: route for replies
+        // add route for replies
 //        checkForComments()
     }
 

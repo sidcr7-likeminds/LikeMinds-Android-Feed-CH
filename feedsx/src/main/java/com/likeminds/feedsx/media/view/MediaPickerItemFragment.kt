@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.media.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -161,6 +162,7 @@ class MediaPickerItemFragment :
         }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onActionModeDestroyed() {
         selectedMedias.clear()
         mediaPickerAdapter.notifyDataSetChanged()

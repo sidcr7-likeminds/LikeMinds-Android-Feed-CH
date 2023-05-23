@@ -514,7 +514,7 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
-            singleVideoAttachment.btnAddMore.setOnClickListener {
+            singleVideoAttachment.btnAddMoreMediaVideo.setOnClickListener {
                 // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
@@ -527,7 +527,7 @@ class CreatePostFragment :
                 selectedMediaUris.first().uri
             )
 
-            layoutSingleVideoPost.ivCross.setOnClickListener {
+            layoutSingleVideoPost.ivCrossVideo.setOnClickListener {
                 selectedMediaUris.clear()
                 singleVideoAttachment.root.hide()
                 handleAddAttachmentLayouts(true)
@@ -548,12 +548,12 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
-            singleImageAttachment.btnAddMore.setOnClickListener {
+            singleImageAttachment.btnAddMoreMedia.setOnClickListener {
                 // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
-            singleImageAttachment.layoutSingleImagePost.ivCross.setOnClickListener {
+            singleImageAttachment.layoutSingleImagePost.ivCrossImage.setOnClickListener {
                 selectedMediaUris.clear()
                 singleImageAttachment.root.hide()
                 handleAddAttachmentLayouts(true)
@@ -582,13 +582,13 @@ class CreatePostFragment :
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.show()
             multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
-            multipleMediaAttachment.btnAddMore.visibility =
+            multipleMediaAttachment.btnAddMoreMultipleMedia.visibility =
                 if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
                     View.GONE
                 } else {
                     View.VISIBLE
                 }
-            multipleMediaAttachment.btnAddMore.setOnClickListener {
+            multipleMediaAttachment.btnAddMoreMultipleMedia.setOnClickListener {
                 // sends clicked on attachment event for image and video
                 viewModel.sendClickedOnAttachmentEvent("image, video")
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
@@ -640,13 +640,13 @@ class CreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.show()
             multipleMediaAttachment.root.hide()
-            documentsAttachment.btnAddMore.visibility =
+            documentsAttachment.btnAddMoreDoc.visibility =
                 if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
                     View.GONE
                 } else {
                     View.VISIBLE
                 }
-            documentsAttachment.btnAddMore.setOnClickListener {
+            documentsAttachment.btnAddMoreDoc.setOnClickListener {
                 // sends clicked on attachment event for file
                 viewModel.sendClickedOnAttachmentEvent("file")
                 initiateMediaPicker(listOf(PDF))
@@ -743,7 +743,7 @@ class CreatePostFragment :
             }
 
             tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
-            ivCross.setOnClickListener {
+            ivCrossLink.setOnClickListener {
                 binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
                 clearPreviewLink()
             }
@@ -784,6 +784,7 @@ class CreatePostFragment :
                 }
             }
         }
+
     }
 
     // shows toast and removes extra items if attachments limit is exceeded

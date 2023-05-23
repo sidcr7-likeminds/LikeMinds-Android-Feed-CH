@@ -38,7 +38,6 @@ import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
 import java.util.*
-
 object PostTypeUtil {
     const val SHOW_MORE_COUNT = 2
 
@@ -192,8 +191,10 @@ object PostTypeUtil {
             val mediaType = attachmentMeta.format
             if (noOfPage > 0) {
                 tvMeta1.show()
-                tvMeta1.text = context.getString(
-                    R.string.placeholder_pages, noOfPage
+                tvMeta1.text = context.resources.getQuantityString(
+                    R.plurals.placeholder_pages,
+                    noOfPage,
+                    noOfPage
                 )
             }
             if (attachmentMeta.size != null) {
@@ -366,7 +367,7 @@ object PostTypeUtil {
         val seeMoreClickableSpan = object : ClickableSpan() {
             override fun onClick(view: View) {
                 tvPostContent.setOnClickListener {
-                    null
+                    return@setOnClickListener
                 }
                 alreadySeenFullContent = true
                 adapterListener.updatePostSeenFullContent(itemPosition, true)
@@ -387,7 +388,7 @@ object PostTypeUtil {
                 textForLinkify,
                 enableClick = true,
                 LMBranding.getTextLinkColor()
-            ) { tag ->
+            ) {
                 onMemberTagClicked()
             }
 
@@ -424,7 +425,7 @@ object PostTypeUtil {
             LinkifyCompat.addLinks(tvPostContent, Linkify.ALL)
             tvPostContent.movementMethod = CustomLinkMovementMethod { url ->
                 tvPostContent.setOnClickListener {
-                    null
+                    return@setOnClickListener
                 }
                 // creates a route and returns an intent to handle the link
                 val intent = Route.handleDeepLink(context, url)
@@ -524,7 +525,7 @@ object PostTypeUtil {
 
     // performs action when member tag is clicked
     private fun onMemberTagClicked() {
-        // TODO: Change Implementation
+        // member tag is clicked, open profile
     }
 
     // checks if binder is called from liking/saving post or not

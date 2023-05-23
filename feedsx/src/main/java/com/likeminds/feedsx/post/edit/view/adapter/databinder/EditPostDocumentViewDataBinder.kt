@@ -54,8 +54,10 @@ class EditPostDocumentViewDataBinder : ViewDataBinder<ItemDocumentBinding, Attac
             val mediaType = attachmentMeta.format
             if (noOfPage > 0) {
                 tvMeta1.show()
-                tvMeta1.text = binding.root.context.getString(
-                    R.string.placeholder_pages, noOfPage
+                tvMeta1.text = root.context.resources.getQuantityString(
+                    R.plurals.placeholder_pages,
+                    noOfPage,
+                    noOfPage
                 )
             }
             if (attachmentMeta.size != null) {

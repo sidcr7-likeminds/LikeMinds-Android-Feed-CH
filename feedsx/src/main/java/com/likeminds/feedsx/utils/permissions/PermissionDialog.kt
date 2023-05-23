@@ -9,15 +9,16 @@ import android.os.Build
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.DialogPermissionBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import com.likeminds.feedsx.utils.permissions.PermissionManager.Companion.REQUEST_CODE_SETTINGS_PERMISSION
 
 class PermissionDialog(
     private val activity: BaseAppCompatActivity,
+    private val settingsPermissionLauncher: ActivityResultLauncher<Intent>,
     private val task: PermissionTask,
     private val permission: Permission,
     private val mode: Mode,
@@ -80,7 +81,7 @@ class PermissionDialog(
                             Uri.fromParts("package", activity.packageName, null)
                         )
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        activity.startActivityForResult(intent, REQUEST_CODE_SETTINGS_PERMISSION)
+                        settingsPermissionLauncher.launch(intent)
                     }
                 }
                 dismiss()

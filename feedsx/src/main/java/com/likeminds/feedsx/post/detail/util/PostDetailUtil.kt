@@ -79,7 +79,7 @@ object PostDetailUtil {
                 textForLinkify,
                 enableClick = true,
                 LMBranding.getTextLinkColor()
-            ) { tag ->
+            ) {
                 onMemberTagClicked()
             }
 
@@ -118,7 +118,7 @@ object PostDetailUtil {
             LinkifyCompat.addLinks(tvCommentContent, Linkify.WEB_URLS)
             tvCommentContent.movementMethod = CustomLinkMovementMethod { url ->
                 tvCommentContent.setOnClickListener {
-                    null
+                    return@setOnClickListener
                 }
                 // creates a route and returns an intent to handle the link
                 val intent = Route.handleDeepLink(context, url)
@@ -137,6 +137,6 @@ object PostDetailUtil {
 
     // performs action when member tag is clicked
     private fun onMemberTagClicked() {
-        // TODO: Change Implementation
+        // open user profile on tag click
     }
 }

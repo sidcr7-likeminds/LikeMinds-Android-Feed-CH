@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.media.model.MEDIA_RESULT_BROWSE
@@ -21,13 +22,12 @@ class MediaPickerActivity : BaseAppCompatActivity() {
 
     private lateinit var mediaPickerExtras: MediaPickerExtras
 
-    companion object {
-        const val PICK_MEDIA = 5001
-        const val BROWSE_MEDIA = 5002
-        const val BROWSE_DOCUMENT = 5003
-        const val PICK_CAMERA = 5004
-        const val CROP_IMAGE = 5005
+    private val settingsPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            checkStoragePermission()
+        }
 
+    companion object {
         private const val ARG_MEDIA_PICKER_EXTRAS = "mediaPickerExtras"
         const val ARG_MEDIA_PICKER_RESULT = "mediaPickerResult"
 
@@ -66,6 +66,7 @@ class MediaPickerActivity : BaseAppCompatActivity() {
     private fun checkStoragePermission() {
         PermissionManager.performTaskWithPermission(
             this,
+            settingsPermissionLauncher,
             { startMediaPickerFragment() },
             Permission.getStoragePermissionData(),
             showInitialPopup = true,
@@ -129,13 +130,6 @@ class MediaPickerActivity : BaseAppCompatActivity() {
             }
             setResult(Activity.RESULT_OK, intent)
             finish()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == PermissionManager.REQUEST_CODE_SETTINGS_PERMISSION) {
-            checkStoragePermission()
         }
     }
 

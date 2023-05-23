@@ -26,8 +26,6 @@ class NotificationFeedViewData private constructor(
     val updatedAt: Long
 ) : Parcelable, BaseViewType {
 
-    //TODO: isRead, menuItems not there in ED
-
     override val viewType: Int
         get() = ITEM_NOTIFICATION_FEED
 

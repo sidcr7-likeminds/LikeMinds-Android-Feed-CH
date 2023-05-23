@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.content.Context
 import android.graphics.pdf.PdfRenderer
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -19,7 +18,6 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.utils.DateUtil
 import com.likeminds.feedsx.utils.ValueUtils.getMediaType
-import com.likeminds.feedsx.utils.ValueUtils.getMimeType
 import com.likeminds.feedsx.utils.ValueUtils.getOrDefault
 import com.likeminds.feedsx.utils.file.isLargeFile
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
@@ -63,15 +61,6 @@ class MediaRepository @Inject constructor() {
      */
     fun getLocalDocumentFiles(context: Context, callback: (medias: List<MediaViewData>) -> Unit) {
         callback(getAllDocumentFiles(context))
-    }
-
-    /**
-     * Retrieves basic details of shared Uri from local storage.
-     */
-    fun getLocalUriDetail(
-        context: Context, contentUri: Uri, callback: (media: MediaViewData?) -> Unit,
-    ) {
-        callback(getUriDetail(context, contentUri))
     }
 
     /**
@@ -428,8 +417,10 @@ class MediaRepository @Inject constructor() {
                     cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE))
                 val mediaName =
                     cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
+                val mediaType = mimetype.getMediaType() ?: contentUri.getMediaType(context)
+                ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(mediaName).getMediaType()
                 val duration =
-                    if (MediaType.isVideo(media?.mediaType)) {
+                    if (MediaType.isVideo(mediaType)) {
                         if (!cursor.isNull(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DURATION))) {
                             cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DURATION)) / 1000
                         } else {
@@ -438,9 +429,6 @@ class MediaRepository @Inject constructor() {
                     } else {
                         null
                     }
-
-                val mediaType = mimetype.getMediaType() ?: contentUri.getMediaType(context)
-                ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(mediaName).getMediaType()
 
                 if (mediaType != null) {
                     media = MediaViewData.Builder()
@@ -456,65 +444,6 @@ class MediaRepository @Inject constructor() {
             }
         }
         return media
-    }
-
-    fun getExternallySharedUriDetail(context: Context, contentUri: Uri?): SingleUriData? {
-        if (contentUri == null) {
-            return null
-        }
-        context.contentResolver.query(contentUri, null, null, null, null).use { cursor ->
-            if (cursor != null && cursor.moveToNext()) {
-                val mimetypeIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE)
-                val mimetype = if (mimetypeIndex != -1) {
-                    cursor.getString(mimetypeIndex)
-                } else {
-                    contentUri.getMimeType(context)
-                }
-                val size =
-                    cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE))
-                val mediaName =
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
-                val durationIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DURATION)
-                val duration = if (durationIndex != -1 && !cursor.isNull(durationIndex)) {
-                    cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DURATION)) / 1000
-                } else {
-                    getDuration(context, contentUri, mimetype)
-                }
-                val mediaType = mimetype.getMediaType() ?: contentUri.getMediaType(context)
-                ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(mediaName).getMediaType()
-
-                if (mediaType != null) {
-                    return SingleUriData.Builder()
-                        .uri(contentUri)
-                        .fileType(mediaType)
-                        .size(size)
-                        .mediaName(mediaName)
-                        .duration(duration)
-                        .pdfPageCount(getPdfPageCount(context, contentUri, mimetype))
-                        .build()
-                }
-            }
-        }
-        return null
-    }
-
-    private fun getDuration(context: Context, uri: Uri, mimeType: String?): Int? {
-        if (MediaUtils.isVideoType(mimeType)) {
-            try {
-                val retriever = MediaMetadataRetriever()
-                val fd = context.contentResolver.openFileDescriptor(uri, "r")?.fileDescriptor
-                    ?: return null
-                retriever.setDataSource(fd)
-                val duration = retriever.extractMetadata(
-                    MediaMetadataRetriever.METADATA_KEY_DURATION
-                )?.toInt() ?: return null
-                retriever.release()
-                return duration / 1000
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        return null
     }
 
     private fun getPdfPageCount(context: Context, uri: Uri, mimeType: String?): Int? {
@@ -534,7 +463,11 @@ class MediaRepository @Inject constructor() {
     }
 
     private val isNotPending: String
-        get() = if (Build.VERSION.SDK_INT <= 28) Images.Media.DATA + " NOT NULL" else MediaStore.MediaColumns.IS_PENDING + " != 1"
+        get() = if (Build.VERSION.SDK_INT <= 28) {
+            Images.Media._ID + " NOT NULL"
+        } else {
+            MediaStore.MediaColumns.IS_PENDING + " != 1"
+        }
 
     private class FolderResult(
         val cameraBucketId: String?,

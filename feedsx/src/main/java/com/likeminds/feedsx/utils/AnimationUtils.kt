@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.utils
 
 import android.animation.AnimatorListenerAdapter
-import android.annotation.TargetApi
 import android.view.View
 import android.view.ViewAnimationUtils
 import kotlin.math.hypot
@@ -9,12 +8,8 @@ import kotlin.math.hypot
 object AnimationUtils {
 
     @JvmStatic
-    val ANIMATION_DURATION_SHORTEST = 150
+    private val ANIMATION_DURATION_SHORT = 250
 
-    @JvmStatic
-    val ANIMATION_DURATION_SHORT = 250
-
-    @TargetApi(21)
     @JvmStatic
     @JvmOverloads
     fun circleRevealView(view: View, duration: Int = ANIMATION_DURATION_SHORT) {
@@ -35,13 +30,11 @@ object AnimationUtils {
         anim.start()
     }
 
-    @TargetApi(21)
     @JvmStatic
     fun circleHideView(view: View, listenerAdapter: AnimatorListenerAdapter) {
         circleHideView(view, ANIMATION_DURATION_SHORT, listenerAdapter)
     }
 
-    @TargetApi(21)
     @JvmStatic
     fun circleHideView(view: View, duration: Int, listenerAdapter: AnimatorListenerAdapter) {
         // get the center for the clipping circle
