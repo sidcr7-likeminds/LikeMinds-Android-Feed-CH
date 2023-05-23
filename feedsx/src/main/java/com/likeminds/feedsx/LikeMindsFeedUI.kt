@@ -30,4 +30,9 @@ object LikeMindsFeedUI {
             brandingRequest
         )
     }
+
+    fun setBranding(brandingRequest: SetBrandingRequest) {
+        val sdk = SDKApplication.getInstance()
+        sdk.setupBranding(brandingRequest)
+    }
 }
