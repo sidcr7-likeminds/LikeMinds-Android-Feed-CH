@@ -29,6 +29,7 @@ LikeMindsFeedUI.initLikeMindsFeedUI(
 
 You can setup your own branding in the SDK by passing values of three colors (`headerColor`, `buttonsColor`, `textLinkColor`) and fonts for three different typefaces (`regular`, `medium`, `bold`). 
 <br> Create a `SetBrandingRequest` object using `SetBrandingRequest.Builder` class by passing all the required parameters.
+<br> Below is the model for `SetBrandingRequest`.
 
 | **VARIABLE** 	    | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	|
 |:-----------------	|:------------	|:-------------------------------------  |:---------------: |
@@ -37,7 +38,14 @@ You can setup your own branding in the SDK by passing values of three colors (`h
 | **textLinkColor**     | String      	| Color of text links in Application. 	     |                  | 
 | **fonts**     | LMFonts      	| Fonts used in Application. 	     |                  | 
 
+Create `fonts` using `LMFonts.Builder` class by passing all the required parameters.
+<br> Below is the model for `LMFonts`.
 
+| **VARIABLE** 	    | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	|
+|:-----------------	|:------------	|:-------------------------------------  |:---------------: |
+| **bold**     	| String      	| Path of font with bold typeface. 	     |                  | 
+| **medium**     | String      	| Path of font with medium typeface. 	     |                  | 
+| **regular**     | String      	| Path of font with medium regular. 	     |                  | 
 
 
 
