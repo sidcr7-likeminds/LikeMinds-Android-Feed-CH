@@ -5,7 +5,7 @@ and driving user engagement. <br> Go through this readme file to integrate Feed-
 
 ## Getting started
 
-### Import Feed-SX module
+### 1. Import Feed-SX module
 
 Firstly, import the module into your project to get started.
 
@@ -13,10 +13,9 @@ Firstly, import the module into your project to get started.
 2. Import the `feedsx` module in your Android Project.
 3. Open your build.gradle file and make sure that the module is now listed under `dependencies.implementation project(":feedsx")`
 
+### 2. Initiate `LikeMindsFeedUI`
 
-### Initiate `LikeMindsFeedUI`
-
-Once you have imported the module, initiate the Feed UI calling `LikeMindsFeedUI.initLikeMindsFeedUI()` with necessary parameters.
+Once you have imported the module, initiate the Feed UI calling `LikeMindsFeedUI.initLikeMindsFeedUI()` with necessary parameters. This will initate the SDK application along with your own branding.
 
 ```kotlin
 LikeMindsFeedUI.initLikeMindsFeedUI(
@@ -25,5 +24,22 @@ LikeMindsFeedUI.initLikeMindsFeedUI(
   brandingRequest   // branding data to apply Branding
 )
 ```
+
+#### Set Branding
+
+You can setup your own branding in the SDK by passing values of three colors (`headerColor`, `buttonsColor`, `textLinkColor`) and fonts for three different typefaces (`regular`, `medium`, `bold`). 
+<br> Create a `SetBrandingRequest` object using `SetBrandingRequest.Builder` class by passing all the required parameters.
+
+| **VARIABLE** 	    | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	|
+|:-----------------	|:------------	|:-------------------------------------  |:---------------: |
+| **headerColor**     	| String      	| Header color of Application. 	     |                  | 
+| **buttonsColor**     | String      	| Color of buttons in Application. 	     |                  | 
+| **textLinkColor**     | String      	| Color of text links in Application. 	     |                  | 
+| **fonts**     | LMFonts      	| Fonts used in Application. 	     |                  | 
+
+
+
+
+
 
 
