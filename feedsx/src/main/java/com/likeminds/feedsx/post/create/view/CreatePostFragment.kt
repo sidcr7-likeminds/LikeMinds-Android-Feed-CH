@@ -66,28 +66,20 @@ import javax.inject.Inject
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding, CreatePostViewModel>(),
     CreatePostListener {
-
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
-
     @Inject
     lateinit var helperViewModel: HelperViewModel
-
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
-
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
-
     private lateinit var etPostTextChangeListener: TextWatcher
-
     private lateinit var memberTagging: MemberTaggingView
     private var source = ""
-
     private val videoPreviewAutoPlayHelper by lazy {
         VideoPreviewAutoPlayHelper.getInstance()
     }
-
     override val useSharedViewModel: Boolean
         get() = true
 
@@ -106,6 +98,7 @@ class CreatePostFragment :
 
     companion object {
         const val TAG = "CreatePostFragment"
+        const val TYPE_OF_ATTACHMENT_CLICKED = "image, video"
     }
 
     override fun receiveExtras() {
@@ -118,7 +111,6 @@ class CreatePostFragment :
             ?: throw emptyExtrasException(TAG)
         checkForSource()
     }
-
     //to check for source of the follow trigger
     private fun checkForSource() {
         //if source is notification, then call initiate first in the background
@@ -136,31 +128,25 @@ class CreatePostFragment :
         initPostContentTextListener()
         initPostDoneListener()
     }
-
     // fetches user data from local db
     private fun fetchUserFromDB() {
         helperViewModel.fetchUserFromDB()
     }
-
     // observes data
     override fun observeData() {
         super.observeData()
-
         // observes error message
         observeErrors()
         observeMembersTaggingList()
-
         // observes userData and initializes the user view
         helperViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
-
         // observes decodeUrlResponse and returns link ogTags
         helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
             initLinkView(ogTags)
         }
-
         // observes addPostResponse, once post is created
         viewModel.postAdded.observe(viewLifecycleOwner) { postAdded ->
             requireActivity().apply {
@@ -175,7 +161,6 @@ class CreatePostFragment :
             }
         }
     }
-
     /**
      * Observes for member tagging list, This is a live observer which will update itself on addition of new members
      * [taggingData] contains first -> page called in api
@@ -186,7 +171,6 @@ class CreatePostFragment :
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
-
     // observes error events
     private fun observeErrors() {
         viewModel.errorEventFlow.onEach { response ->
@@ -207,13 +191,13 @@ class CreatePostFragment :
                         clearPreviewLink()
                     }
                 }
+
                 is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
         }.observeInLifecycle(viewLifecycleOwner)
     }
-
     /**
      * initializes the [memberTaggingView] with the edit text
      * also sets listener to the [memberTaggingView]
@@ -243,7 +227,6 @@ class CreatePostFragment :
             }
         })
     }
-
     // adds text watcher on post content edit text
     @SuppressLint("ClickableViewAccessibility")
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -266,7 +249,6 @@ class CreatePostFragment :
                 }
                 false
             })
-
             // text watcher with debounce to add delay in api calls for ogTags
             textChanges()
                 .debounce(500)
@@ -279,7 +261,6 @@ class CreatePostFragment :
                     }
                 }
                 .launchIn(lifecycleScope)
-
             // text watcher to handlePostButton click-ability
             addTextChangedListener {
                 val text = it?.toString()?.trim()
@@ -296,7 +277,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // initializes post done button click listener
     private fun initPostDoneListener() {
         val createPostActivity = requireActivity() as CreatePostActivity
@@ -323,7 +303,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // initializes click listeners on add attachment layouts
     private fun initAddAttachmentsView() {
         binding.apply {
@@ -351,7 +330,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // sets data to the author frame
     private fun initAuthorFrame(user: UserViewData) {
         binding.authorFrame.apply {
@@ -366,7 +344,6 @@ class CreatePostFragment :
             )
         }
     }
-
     /**
      * Adds TextWatcher to edit text with Flow operators
      * **/
@@ -391,18 +368,15 @@ class CreatePostFragment :
             awaitClose { removeTextChangedListener(etPostTextChangeListener) }
         }.onStart { emit(text) }
     }
-
     // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
     private fun initiateMediaPicker(list: List<String>) {
         val extras = MediaPickerExtras.Builder()
             .mediaTypes(list)
             .allowMultipleSelect(true)
             .build()
-
         val intent = MediaPickerActivity.getIntent(requireContext(), extras)
         galleryLauncher.launch(intent)
     }
-
     // process the result obtained from media picker
     private fun checkMediaPickedResult(result: MediaPickerResult?) {
         if (result != null) {
@@ -423,13 +397,13 @@ class CreatePostFragment :
                             mediaBrowseLauncher.launch(intent)
                     }
                 }
+
                 MEDIA_RESULT_PICKED -> {
                     onMediaPicked(result)
                 }
             }
         }
     }
-
     // converts the picked media to SingleUriData and adds to the selected media
     private fun onMediaPicked(result: MediaPickerResult) {
         val data =
@@ -470,7 +444,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // handles the logic to show the type of post
     private fun showPostMedia() {
         attachmentsLimitExceeded()
@@ -479,18 +452,22 @@ class CreatePostFragment :
                 ogTags = null
                 showAttachedDocuments()
             }
+
             selectedMediaUris.size == 1 && MediaType.isImage(selectedMediaUris.first().fileType) -> {
                 ogTags = null
                 showAttachedImage()
             }
+
             selectedMediaUris.size == 1 && MediaType.isVideo(selectedMediaUris.first().fileType) -> {
                 ogTags = null
                 showAttachedVideo()
             }
+
             selectedMediaUris.size >= 1 -> {
                 ogTags = null
                 showMultiMediaAttachments()
             }
+
             else -> {
                 val text = binding.etPostContent.text?.trim()
                 if (selectedMediaUris.size == 0 && text != null) {
@@ -503,7 +480,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // shows attached video in single video post type
     private fun showAttachedVideo() {
         handleAddAttachmentLayouts(false)
@@ -516,10 +492,9 @@ class CreatePostFragment :
             multipleMediaAttachment.root.hide()
             singleVideoAttachment.btnAddMoreMediaVideo.setOnClickListener {
                 // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent("image, video")
+                viewModel.sendClickedOnAttachmentEvent(TYPE_OF_ATTACHMENT_CLICKED)
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
-
             val layoutSingleVideoPost = singleVideoAttachment.layoutSingleVideoPost
             videoPreviewAutoPlayHelper.playVideo(
                 layoutSingleVideoPost.videoPost,
@@ -537,7 +512,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // shows attached image in single image post type
     private fun showAttachedImage() {
         handleAddAttachmentLayouts(false)
@@ -550,7 +524,7 @@ class CreatePostFragment :
             multipleMediaAttachment.root.hide()
             singleImageAttachment.btnAddMoreMedia.setOnClickListener {
                 // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent("image, video")
+                viewModel.sendClickedOnAttachmentEvent(TYPE_OF_ATTACHMENT_CLICKED)
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
             singleImageAttachment.layoutSingleImagePost.ivCrossImage.setOnClickListener {
@@ -570,7 +544,6 @@ class CreatePostFragment :
             )
         }
     }
-
     // shows view pager with multiple media
     private fun showMultiMediaAttachments() {
         handleAddAttachmentLayouts(false)
@@ -590,14 +563,12 @@ class CreatePostFragment :
                 }
             multipleMediaAttachment.btnAddMoreMultipleMedia.setOnClickListener {
                 // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent("image, video")
+                viewModel.sendClickedOnAttachmentEvent(TYPE_OF_ATTACHMENT_CLICKED)
                 initiateMediaPicker(listOf(IMAGE, VIDEO))
             }
-
             val attachments = selectedMediaUris.map {
                 convertSingleDataUri(it)
             }
-
             val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
             multiMediaAdapter = CreatePostMultipleMediaAdapter(this@CreatePostFragment)
             viewPager.adapter = multiMediaAdapter
@@ -608,7 +579,6 @@ class CreatePostFragment :
                 ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-
                     // processes the current video whenever view pager's page is changed
                     val createPostSingleVideoBinding =
                         ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
@@ -629,7 +599,6 @@ class CreatePostFragment :
             })
         }
     }
-
     // shows document recycler view with attached files
     private fun showAttachedDocuments() {
         handleAddAttachmentLayouts(false)
@@ -651,7 +620,6 @@ class CreatePostFragment :
                 viewModel.sendClickedOnAttachmentEvent("file")
                 initiateMediaPicker(listOf(PDF))
             }
-
             val attachments = selectedMediaUris.map {
                 convertSingleDataUri(it)
             }
@@ -686,7 +654,6 @@ class CreatePostFragment :
         super.onPause()
         videoPreviewAutoPlayHelper.removePlayer()
     }
-
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
         binding.linkPreview.apply {
@@ -709,7 +676,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // renders data in the link view
     private fun initLinkView(data: LinkOGTagsViewData) {
         val link = data.url ?: ""
@@ -717,7 +683,6 @@ class CreatePostFragment :
         helperViewModel.sendLinkAttachedEvent(link)
         binding.linkPreview.apply {
             root.show()
-
             val isImageValid = data.image.isImageValid()
             ivLink.isVisible = isImageValid
             LinkUtil.handleLinkPreviewConstraints(
@@ -749,7 +714,6 @@ class CreatePostFragment :
             }
         }
     }
-
     // clears link preview
     private fun clearPreviewLink() {
         ogTags = null
@@ -757,12 +721,10 @@ class CreatePostFragment :
             root.hide()
         }
     }
-
     // handles visibility of add attachment layouts
     private fun handleAddAttachmentLayouts(show: Boolean) {
         binding.groupAddAttachments.isVisible = show
     }
-
     // handles Post Done button click-ability
     private fun handlePostButton(
         clickable: Boolean,
@@ -784,9 +746,7 @@ class CreatePostFragment :
                 }
             }
         }
-
     }
-
     // shows toast and removes extra items if attachments limit is exceeded
     private fun attachmentsLimitExceeded() {
         if (selectedMediaUris.size > 10) {
@@ -801,7 +761,6 @@ class CreatePostFragment :
             selectedMediaUris.subList(POST_ATTACHMENTS_LIMIT, size).clear()
         }
     }
-
     // triggered when a document/media from view pager is removed
     override fun onMediaRemoved(position: Int, mediaType: String) {
         selectedMediaUris.removeAt(position)
@@ -814,7 +773,6 @@ class CreatePostFragment :
         }
         showPostMedia()
     }
-
     // launcher to handle gallery (IMAGE/VIDEO) intent
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -824,21 +782,18 @@ class CreatePostFragment :
                 checkMediaPickedResult(data)
             }
         }
-
     private val mediaBrowseLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 onMediaPickedFromGallery(result.data)
             }
         }
-
     private val documentBrowseLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 onPdfPicked(result.data)
             }
         }
-
     // launcher to handle document (PDF) intent
     private val documentLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->

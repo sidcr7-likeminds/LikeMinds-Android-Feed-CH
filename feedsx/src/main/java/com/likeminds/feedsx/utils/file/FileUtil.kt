@@ -43,13 +43,8 @@ object FileUtil {
                 downloadFile(contentResolver, file, uri)
                 pathTempFile
             }
-            //Third Party App
-            returnedPath.isBlank() -> {
-                downloadFile(contentResolver, file, uri)
-                pathTempFile
-            }
-            //Unknown Provider or unknown mime type
-            uri.isUnknownProvider(returnedPath, contentResolver) -> {
+            //Third Party App or Unknown Provider or unknown mime type
+            returnedPath.isBlank() || uri.isUnknownProvider(returnedPath, contentResolver) -> {
                 downloadFile(contentResolver, file, uri)
                 pathTempFile
             }

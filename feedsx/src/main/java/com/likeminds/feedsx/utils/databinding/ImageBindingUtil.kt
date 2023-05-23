@@ -32,9 +32,11 @@ object ImageBindingUtil {
             url != null -> {
                 Glide.with(view).load(url)
             }
+
             drawable != null -> {
                 Glide.with(view).load(drawable).placeholder(placeholder).error(placeholder)
             }
+
             else -> {
                 return
             }
@@ -123,12 +125,14 @@ object ImageBindingUtil {
         if (context == null) {
             return false
         }
-        if (context is Activity) {
-            if (context.isDestroyed || context.isFinishing) {
-                return false
-            }
+        if (context is Activity && isActivityDestroyedOrFinishing(context)) {
+            return false
         }
         return true
+    }
+
+    private fun isActivityDestroyedOrFinishing(activity: Activity): Boolean {
+        return activity.isDestroyed || activity.isFinishing
     }
 
     private fun createImageFilter(view: View) {

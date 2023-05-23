@@ -49,10 +49,6 @@ internal class ColorGenerator private constructor(private val mColors: List<Int>
         }
     }
 
-    private val mRandom: Random = Random(System.currentTimeMillis())
-    val randomColor: Int
-        get() = mColors[mRandom.nextInt(mColors.size)]
-
     fun getColor(key: Any): Int {
         return mColors[abs(key.hashCode()) % mColors.size]
     }
