@@ -107,8 +107,6 @@ object ViewDataConverter {
             .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .format(attachmentMeta.format)
-            .height(attachmentMeta.height)
-            .width(attachmentMeta.width)
             .build()
     }
 
@@ -375,8 +373,6 @@ object ViewDataConverter {
             .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
-            .width(attachmentMeta.width)
-            .height(attachmentMeta.height)
             .build()
     }
 
