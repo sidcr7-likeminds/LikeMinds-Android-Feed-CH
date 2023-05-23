@@ -13,6 +13,8 @@ Firstly, import the module into your project to get started.
 2. Import the `feedsx` module in your Android Project.
 3. Open your build.gradle file and make sure that the module is now listed under `dependencies.implementation project(":feedsx")`
 
+<br>
+
 ### 2. Initiate `LikeMindsFeedUI`
 
 Once you have imported the module, initiate the Feed UI calling `LikeMindsFeedUI.initLikeMindsFeedUI()` with necessary parameters. This will initate the SDK application along with your own branding.
@@ -24,7 +26,6 @@ LikeMindsFeedUI.initLikeMindsFeedUI(
   brandingRequest   // branding data to apply Branding
 )
 ```
-
 #### Set Branding
 
 You can setup your own branding in the SDK by passing values of three colors (`headerColor`, `buttonsColor`, `textLinkColor`) and fonts for three different typefaces (`regular`, `medium`, `bold`). 
