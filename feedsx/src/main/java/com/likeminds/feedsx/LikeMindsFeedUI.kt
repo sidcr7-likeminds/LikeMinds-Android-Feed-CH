@@ -2,7 +2,6 @@ package com.likeminds.feedsx
 
 import android.app.Application
 import android.util.Log
-import com.LMUICallback
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
 
 object LikeMindsFeedUI {

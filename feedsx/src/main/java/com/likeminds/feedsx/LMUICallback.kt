@@ -1,4 +1,4 @@
-package com
+package com.likeminds.feedsx
 
 interface LMUICallback {
     fun login() {

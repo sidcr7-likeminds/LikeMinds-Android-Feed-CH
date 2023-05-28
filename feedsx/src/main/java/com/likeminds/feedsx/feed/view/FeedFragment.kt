@@ -875,6 +875,8 @@ class FeedFragment :
     // callback when user clicks to share the post
     override fun sharePost(postId: String) {
         ShareUtils.sharePost(requireContext(), postId)
+        val post = getIndexAndPostFromAdapter(postId)?.second ?: return
+        postActionsViewModel.sendPostShared(post)
     }
 
     // processes delete post request

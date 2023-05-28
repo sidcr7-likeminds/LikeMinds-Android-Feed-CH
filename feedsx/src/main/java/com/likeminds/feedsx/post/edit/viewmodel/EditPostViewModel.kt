@@ -2,10 +2,12 @@ package com.likeminds.feedsx.post.edit.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.EditPostRequest
@@ -103,17 +105,31 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
-                postDataEventChannel.send(
-                    PostDataEvent.EditPost(
-                        ViewDataConverter.convertPost(
-                            post,
-                            users
-                        )
-                    )
-                )
+                val postViewData = ViewDataConverter.convertPost(post, users)
+                postDataEventChannel.send(PostDataEvent.EditPost(postViewData))
+
+                // sends post edited event
+                sendPostEditedEvent(postViewData)
             } else {
                 errorEventChannel.send(ErrorMessageEvent.EditPost(response.errorMessage))
             }
         }
+    }
+
+    /**
+     * Triggers when the user edits a post
+     **/
+    private fun sendPostEditedEvent(
+        post: PostViewData
+    ) {
+        val postType = ViewUtils.getPostTypeFromViewType(post.viewType)
+        LMAnalytics.track(
+            LMAnalytics.Events.POST_EDITED,
+            mapOf(
+                "created_by_id" to post.userId,
+                LMAnalytics.Keys.POST_ID to post.id,
+                "post_type" to postType,
+            )
+        )
     }
 }

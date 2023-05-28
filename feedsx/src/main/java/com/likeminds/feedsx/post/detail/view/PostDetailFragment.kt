@@ -1507,6 +1507,8 @@ class PostDetailFragment :
     // callback when user clicks to share the post
     override fun sharePost(postId: String) {
         ShareUtils.sharePost(requireContext(), postId)
+        val post = mPostDetailAdapter[postDataPosition] as PostViewData
+        postActionsViewModel.sendPostShared(post)
     }
 
     //get index and post from the adapter using postId

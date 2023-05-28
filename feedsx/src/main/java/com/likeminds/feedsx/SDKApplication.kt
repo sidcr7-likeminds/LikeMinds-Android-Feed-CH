@@ -2,7 +2,6 @@ package com.likeminds.feedsx
 
 import android.app.Application
 import android.content.Context
-import com.LMUICallback
 import com.amazonaws.mobile.client.AWSMobileClient
 import com.amazonaws.mobile.client.Callback
 import com.amazonaws.mobile.client.UserStateDetails
