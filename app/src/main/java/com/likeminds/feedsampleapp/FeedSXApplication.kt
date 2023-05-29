@@ -1,8 +1,8 @@
 package com.likeminds.feedsampleapp
 
 import android.app.Application
-import com.LMUICallback
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
+import com.likeminds.feedsx.LMUICallback
 import com.likeminds.feedsx.LikeMindsFeedUI
 import com.likeminds.feedsx.branding.model.LMFonts
 import com.likeminds.feedsx.branding.model.SetBrandingRequest

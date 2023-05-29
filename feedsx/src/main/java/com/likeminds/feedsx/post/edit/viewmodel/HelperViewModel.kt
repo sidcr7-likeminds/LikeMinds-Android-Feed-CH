@@ -1,9 +1,8 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
@@ -26,9 +25,8 @@ import javax.inject.Inject
 
 class HelperViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
-    private val userPreferences: UserPreferences,
-    applicationContext: Application
-) : AndroidViewModel(applicationContext) {
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
