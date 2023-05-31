@@ -22,7 +22,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:fontFamily="@font/roboto_medium" />
+            tools:fontFamily="@font/roboto_medium"
+            tools:ignore="UnusedAttribute" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_replies"

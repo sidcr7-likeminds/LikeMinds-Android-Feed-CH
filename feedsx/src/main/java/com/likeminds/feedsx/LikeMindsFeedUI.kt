@@ -14,6 +14,7 @@ object LikeMindsFeedUI {
      **/
     fun initLikeMindsFeedUI(
         application: Application,
+        lmUICallback: LMUICallback,
         brandingRequest: SetBrandingRequest
     ) {
         Log.d(SDKApplication.LOG_TAG, "initiate LikeMindsFeedUI called")
@@ -24,7 +25,13 @@ object LikeMindsFeedUI {
         //call initSDKApplication to initialise sdk
         sdk.initSDKApplication(
             application,
+            lmUICallback,
             brandingRequest
         )
+    }
+
+    fun setBranding(brandingRequest: SetBrandingRequest) {
+        val sdk = SDKApplication.getInstance()
+        sdk.setupBranding(brandingRequest)
     }
 }

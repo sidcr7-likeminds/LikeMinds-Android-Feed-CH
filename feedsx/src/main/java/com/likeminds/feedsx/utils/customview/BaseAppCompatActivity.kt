@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.util.SparseArray
 import android.view.View
 import android.view.WindowManager
-import androidx.annotation.NonNull
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.branding.model.LMBranding
@@ -17,7 +16,6 @@ import com.likeminds.feedsx.utils.permissions.SessionPermission
 import com.likeminds.feedsx.utils.snackbar.CustomSnackBar
 import javax.inject.Inject
 
-//todo add connectivity manager support for no internet
 open class BaseAppCompatActivity : AppCompatActivity() {
     /**
      * Dispatch onResume() to fragments.  Note that for better inter-operation
@@ -32,16 +30,6 @@ open class BaseAppCompatActivity : AppCompatActivity() {
     private val permissionCallbackSparseArray = SparseArray<PermissionCallback>()
 
     private var wasNetworkGone = false
-
-
-    protected open fun drawPrimaryColor(color: Int) {}
-
-    protected open fun drawAdvancedColor(
-        headerColor: Int,
-        buttonsIconsColor: Int,
-        textLinksColor: Int,
-    ) {
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -95,8 +83,8 @@ open class BaseAppCompatActivity : AppCompatActivity() {
 
     override fun onRequestPermissionsResult(
         requestCode: Int,
-        @NonNull permissions: Array<String>,
-        @NonNull grantResults: IntArray,
+        permissions: Array<String>,
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         val callback = permissionCallbackSparseArray.get(requestCode, null) ?: return

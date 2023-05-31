@@ -144,4 +144,9 @@
     <color name="bright_gray">#EFEFEF</color>
 
     <color name="cultured">#F5F5F5</color>
+
+    <!-- Here you can add color of your choice  -->
+    <color name="positiveButtonTextColor">@color/colorPrimary</color>
+    <color name="negativeButtonTextColor">@color/colorPrimary</color>
+    <color name="bottomSheetDividerColor">#F5F5F5</color>
 </resources>

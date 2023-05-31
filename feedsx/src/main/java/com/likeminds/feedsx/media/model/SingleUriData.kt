@@ -19,7 +19,6 @@ class SingleUriData private constructor(
     val localFilePath: String?,
     val format: String?
 ) : Parcelable {
-
     class Builder {
         private var uri: Uri = Uri.parse("")
         private var fileType: String = ""

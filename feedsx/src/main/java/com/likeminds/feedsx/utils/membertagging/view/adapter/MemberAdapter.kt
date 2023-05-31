@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.utils.membertagging.view.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -27,6 +28,7 @@ internal class MemberAdapter(
     /**
      * Updates the member list in the recyclerview adapter
      */
+    @SuppressLint("NotifyDataSetChanged")
     @JvmSynthetic
     internal fun setMembers(users: List<UserTagViewData>) {
         this.members.clear()
@@ -34,12 +36,14 @@ internal class MemberAdapter(
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @JvmSynthetic
     internal fun allMembers(users: List<UserTagViewData>) {
         this.members.addAll(users)
         notifyDataSetChanged()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @JvmSynthetic
     internal fun clear() {
         this.members.clear()

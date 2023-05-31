@@ -1,13 +1,15 @@
 package com.likeminds.feedsampleapp
 
 import android.app.Application
+import com.likeminds.feedsampleapp.auth.util.AuthPreferences
+import com.likeminds.feedsx.LMUICallback
 import com.likeminds.feedsx.LikeMindsFeedUI
 import com.likeminds.feedsx.branding.model.LMFonts
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
-import com.likeminds.likemindsfeed.LMCallback
-import com.likeminds.likemindsfeed.LMFeedClient
 
-class FeedSXApplication : Application(), LMCallback {
+class FeedSXApplication : Application(), LMUICallback {
+
+    private lateinit var authPreferences: AuthPreferences
 
     companion object {
         const val LOG_TAG = "LikeMinds"
@@ -25,14 +27,12 @@ class FeedSXApplication : Application(), LMCallback {
     override fun onCreate() {
         super.onCreate()
 
-        // extras to instantiate LMFeedClient
-        val extra = LMFeedClient.Builder(this)
-            .lmCallback(this)
-            .build()
+        authPreferences = AuthPreferences(this)
+
         val brandingRequest = SetBrandingRequest.Builder()
-            .headerColor("#02A8F3")
-            .buttonsColor("#4BAE4F")
-            .textLinkColor("#FE9700")
+            .headerColor(authPreferences.getHeaderColor())
+            .buttonsColor(authPreferences.getButtonColor())
+            .textLinkColor(authPreferences.getTextLinkColor())
             .fonts(
                 LMFonts.Builder()
                     .bold("fonts/montserrat-bold.ttf")
@@ -43,6 +43,7 @@ class FeedSXApplication : Application(), LMCallback {
             .build()
 
         LikeMindsFeedUI.initLikeMindsFeedUI(
+            this,
             this,
             brandingRequest
         )

@@ -68,7 +68,7 @@ class PostDetailActivity : BaseAppCompatActivity() {
             //Toolbar
             initActionBar()
 
-            navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            navController.addOnDestinationChangedListener { _, destination, _ ->
                 when (destination.label) {
                     PostDetailFragment::class.simpleName -> {
                         binding.toolbar.setTitle(R.string.post)
@@ -76,15 +76,12 @@ class PostDetailActivity : BaseAppCompatActivity() {
                 }
             }
         } else {
-            redirectActivity(true)
+            redirectActivity()
         }
     }
 
-    private fun redirectActivity(isError: Boolean) {
-        //TODO Change error message.
-        if (isError) {
-            ViewUtils.showShortToast(this, getString(R.string.request_not_processed))
-        }
+    private fun redirectActivity() {
+        ViewUtils.showShortToast(this, getString(R.string.request_not_processed))
         supportFragmentManager.popBackStack()
         super.onBackPressed()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)

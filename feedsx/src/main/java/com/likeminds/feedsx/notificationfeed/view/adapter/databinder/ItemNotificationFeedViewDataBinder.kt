@@ -35,12 +35,7 @@ class ItemNotificationFeedViewDataBinder constructor(
         position: Int
     ) {
 
-        // sets items to overflow menu
-        //todo
-//        PostTypeUtil.setOverflowMenuItems(
-//            overflowMenu,
-//            data.menuItems
-//        )
+        // set items to overflow menu
 
         // handles route on notification click
         handleRoute(
@@ -84,11 +79,7 @@ class ItemNotificationFeedViewDataBinder constructor(
             }
 
             ivNotificationMenu.setOnClickListener {
-                //todo
-//                PostTypeUtil.showOverflowMenu(
-//                    ivNotificationMenu,
-//                    overflowMenu
-//                )
+                // show overflow menu
             }
 
             MemberImageUtil.setImage(
@@ -99,7 +90,7 @@ class ItemNotificationFeedViewDataBinder constructor(
                 showRoundImage = true
             )
 
-            //TODO: logic to get post type.
+            // find the type of post and set drawable accordingly
             ivPostType.setImageResource(R.drawable.ic_doc_attachment)
 
             tvNotificationDate.text = getRelativeTime(data.createdAt)
@@ -114,7 +105,6 @@ class ItemNotificationFeedViewDataBinder constructor(
         binding.apply {
             val textForLinkify = data.activityMessage.getValidTextForLinkify()
 
-            // TODO: handle the member name in the text.
             tvNotificationContent.text = textForLinkify
         }
     }

@@ -7,7 +7,6 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 
 object BrandingUtil {
-
     /**
      * @param context - context to retrieve assets
      * @param fontStyle - style of font to be applied

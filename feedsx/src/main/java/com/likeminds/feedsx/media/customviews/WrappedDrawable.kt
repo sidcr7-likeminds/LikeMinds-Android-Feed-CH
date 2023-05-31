@@ -2,7 +2,6 @@ package com.likeminds.feedsx.media.customviews
 
 import android.graphics.Canvas
 import android.graphics.ColorFilter
-import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
 
 internal class WrappedDrawable(private val drawable: Drawable) : Drawable() {
@@ -26,7 +25,7 @@ internal class WrappedDrawable(private val drawable: Drawable) : Drawable() {
 
     override fun getOpacity(): Int {
         val drawable: Drawable = drawable
-        return drawable.opacity ?: PixelFormat.UNKNOWN
+        return drawable.opacity
     }
 
     override fun draw(canvas: Canvas) {
@@ -36,11 +35,11 @@ internal class WrappedDrawable(private val drawable: Drawable) : Drawable() {
 
     override fun getIntrinsicWidth(): Int {
         val drawable: Drawable = drawable
-        return drawable.bounds.width() ?: 0
+        return drawable.bounds.width()
     }
 
     override fun getIntrinsicHeight(): Int {
         val drawable: Drawable = drawable
-        return drawable.bounds.height() ?: 0
+        return drawable.bounds.height()
     }
 }

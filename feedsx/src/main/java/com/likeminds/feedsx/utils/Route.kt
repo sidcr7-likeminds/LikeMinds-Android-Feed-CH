@@ -10,12 +10,12 @@ import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 
 object Route {
 
-    const val ROUTE_POST_DETAIL = "post_detail"
-    const val ROUTE_FEED = "feed"
-    const val ROUTE_CREATE_POST = "create_post"
-    const val PARAM_POST_ID = "post_id"
-    const val ROUTE_BROWSER = "browser"
-    const val PARAM_COMMENT_ID = "comment_id"
+    private const val ROUTE_POST_DETAIL = "post_detail"
+    private const val ROUTE_FEED = "feed"
+    private const val ROUTE_CREATE_POST = "create_post"
+    private const val PARAM_POST_ID = "post_id"
+    private const val ROUTE_BROWSER = "browser"
+    private const val PARAM_COMMENT_ID = "comment_id"
 
     private const val DEEP_LINK_POST = "post"
 
@@ -40,7 +40,7 @@ object Route {
                 )
             }
             ROUTE_FEED -> {
-                //TODO: navigation to feed fragment
+                // navigation to feed
             }
             ROUTE_CREATE_POST -> {
                 intent = getRouteToCreatePost(context, source)
@@ -81,17 +81,6 @@ object Route {
         )
     }
 
-    //TODO: navigation to feed fragment
-
-    // route://feed?type=
-//    private fun getRouteToFeed(
-//        context: Context,
-//        routeString: String,
-//    ): Intent {
-//
-//    }
-
-
     // creates route for url and returns corresponding intent
     fun handleDeepLink(context: Context, url: String?): Intent? {
         val data = Uri.parse(url).normalizeScheme() ?: return null
@@ -106,7 +95,9 @@ object Route {
 
     //create route string as per uri
     private fun getRouteFromDeepLink(data: Uri?): String? {
-        val host = data?.host ?: return null
+        if (data == null) {
+            return null
+        }
         return when (data.pathSegments.firstOrNull()) {
             DEEP_LINK_POST -> {
                 createPostDetailRoute(data)

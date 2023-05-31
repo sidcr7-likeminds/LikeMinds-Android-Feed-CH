@@ -1,10 +1,12 @@
 package com.likeminds.feedsx.post.create.util
 
 import android.content.Context
+import android.util.Log
 import androidx.work.*
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState
 import com.amazonaws.services.s3.model.CannedAccessControlList
+import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.db.models.PostWithAttachments
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.mediauploader.model.AWSFileResponse
@@ -196,12 +198,14 @@ class PostAttachmentUploadWorker(
                 uploadedCount += 1
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }
+
             TransferState.FAILED -> {
                 failedIndex.add(response.index)
                 checkWorkerComplete(totalFilesToUpload, continuation)
             }
-            else -> {
 
+            else -> {
+                Log.d(SDKApplication.LOG_TAG, "state: $state")
             }
         }
     }

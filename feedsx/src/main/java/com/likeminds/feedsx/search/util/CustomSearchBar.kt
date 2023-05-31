@@ -257,15 +257,21 @@ class CustomSearchBar @JvmOverloads constructor(
      * Interface that handles the opening and closing of the SearchView.
      */
     interface SearchViewListener {
-        fun onSearchViewOpened() {}
+        fun onSearchViewOpened() {
+            //triggered when a user clicks on search icon and search view is opened
+        }
 
         fun onSearchViewClosed()
 
         fun crossClicked()
 
-        fun keywordEntered(keyword: String) {}
+        fun keywordEntered(keyword: String) {
+            //triggered when a user enters a text to search
+        }
 
-        fun emptyKeywordEntered() {}
+        fun emptyKeywordEntered() {
+            //triggered when a back-presses till last of the text
+        }
     }
 
 }

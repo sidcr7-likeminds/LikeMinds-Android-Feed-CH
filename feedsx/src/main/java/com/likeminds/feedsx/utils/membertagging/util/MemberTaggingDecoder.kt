@@ -44,7 +44,7 @@ object MemberTaggingDecoder {
                         try {
                             val tagUri = getRouteFromRegex(regex)
                                 ?: return@MemberTaggingClickableSpan
-                            textView.setOnClickListener { null }
+                            textView.setOnClickListener { return@setOnClickListener }
                             listener?.onTagClick(tagUri)
                         } catch (e: Exception) {
                             e.printStackTrace()

@@ -69,7 +69,8 @@
             app:fontType="medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/toolbar" />
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
+            tools:ignore="UnusedAttribute" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_report_sub_header"
@@ -86,7 +87,8 @@
             app:fontType="regular"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tv_report_header" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_report_header"
+            tools:ignore="UnusedAttribute" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_report"
@@ -140,7 +142,8 @@
             app:et_type="special"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_report" />
+            app:layout_constraintTop_toBottomOf="@id/rv_report"
+            tools:ignore="UnusedAttribute" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

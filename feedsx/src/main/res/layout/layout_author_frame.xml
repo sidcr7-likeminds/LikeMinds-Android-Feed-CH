@@ -52,6 +52,7 @@
             app:layout_constraintStart_toEndOf="@+id/member_image"
             app:layout_constraintTop_toTopOf="@+id/member_image"
             tools:fontFamily="@font/roboto_medium"
+            tools:ignore="UnusedAttribute"
             tools:text="sfldsfdsafasdfafsdfdsfdsfdfasfskfldkf" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
@@ -144,7 +145,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_overflow_menu"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,UnusedAttribute" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

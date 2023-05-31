@@ -38,6 +38,7 @@
             app:layout_constraintStart_toEndOf="@id/iv_like"
             app:layout_constraintTop_toTopOf="parent"
             tools:fontFamily="@font/roboto_regular"
+            tools:ignore="UnusedAttribute"
             tools:text="39 Likes" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
@@ -45,7 +46,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="19dp"
-            android:drawableLeft="@drawable/ic_comment"
+            android:drawableStart="@drawable/ic_comment"
             android:drawablePadding="8dp"
             android:foreground="?selectableItemBackground"
             android:gravity="center"
@@ -59,6 +60,7 @@
             app:layout_constraintStart_toEndOf="@id/likes_count"
             app:layout_constraintTop_toTopOf="parent"
             tools:fontFamily="@font/roboto_regular"
+            tools:ignore="UnusedAttribute"
             tools:text="13 Comments" />
 
         <ImageView
@@ -86,7 +88,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_share"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription,UnusedAttribute" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

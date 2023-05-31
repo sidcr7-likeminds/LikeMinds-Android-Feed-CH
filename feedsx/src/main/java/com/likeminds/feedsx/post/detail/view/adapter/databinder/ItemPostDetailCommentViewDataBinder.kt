@@ -24,6 +24,7 @@ import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
 
+@Suppress("UNCHECKED_CAST")
 class ItemPostDetailCommentViewDataBinder constructor(
     private val postDetailAdapterListener: PostDetailAdapterListener,
     private val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener

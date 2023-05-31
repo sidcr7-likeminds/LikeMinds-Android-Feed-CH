@@ -4,13 +4,23 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 
 interface MemberTaggingViewListener {
 
-    fun onMemberTagged(user: UserTagViewData) {}
+    fun onMemberTagged(user: UserTagViewData) {
+        //when a member is tagged from list
+    }
 
-    fun onMemberRemoved(user: UserTagViewData) {}
+    fun onMemberRemoved(user: UserTagViewData) {
+        //when a tagged member is removed from the text
+    }
 
-    fun onShow() {}
+    fun onShow() {
+        //to show suggestion list
+    }
 
-    fun onHide() {}
+    fun onHide() {
+        //to hide suggestion list
+    }
 
-    fun callApi(page: Int, searchName: String) {} //call tagging api
+    fun callApi(page: Int, searchName: String) {
+        //call tagging api
+    }
 }

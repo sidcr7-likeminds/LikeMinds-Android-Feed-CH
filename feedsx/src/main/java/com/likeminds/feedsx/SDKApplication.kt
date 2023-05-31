@@ -20,9 +20,13 @@ import com.likeminds.feedsx.di.post.create.CreatePostComponent
 import com.likeminds.feedsx.di.post.detail.PostDetailComponent
 import com.likeminds.feedsx.di.post.edit.EditPostComponent
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
+import com.likeminds.likemindsfeed.LMCallback
+import com.likeminds.likemindsfeed.LMFeedClient
 import javax.inject.Inject
+import javax.inject.Singleton
 
-class SDKApplication {
+@Singleton
+class SDKApplication : LMCallback {
 
     @Inject
     lateinit var transferUtility: TransferUtility
@@ -44,6 +48,7 @@ class SDKApplication {
     companion object {
         const val LOG_TAG = "LikeMinds"
         private var sdkApplicationInstance: SDKApplication? = null
+        private var lmUICallback: LMUICallback? = null
 
         /**
          * @return Singleton Instance of SDK Application class, which used for injecting dagger in fragments.
@@ -61,17 +66,21 @@ class SDKApplication {
 
     fun initSDKApplication(
         application: Application,
+        lmUICallback: LMUICallback,
         brandingRequest: SetBrandingRequest
     ) {
+        LMFeedClient.Builder(application)
+            .lmCallback(this)
+            .build()
+        SDKApplication.lmUICallback = lmUICallback
         setupBranding(brandingRequest)
         setupDomain()
         initAppComponent(application)
         initAWSMobileClient(application)
     }
 
-    // TODO: testing data
     // sets branding to the app
-    private fun setupBranding(setBrandingRequest: SetBrandingRequest) {
+    fun setupBranding(setBrandingRequest: SetBrandingRequest) {
         LMBranding.setBranding(setBrandingRequest)
     }
 
@@ -199,5 +208,10 @@ class SDKApplication {
             reasonChooseComponent = likeMindsFeedComponent?.reasonChooseComponent()?.create()
         }
         return reasonChooseComponent
+    }
+
+    override fun login() {
+        super.login()
+        lmUICallback?.login()
     }
 }

@@ -53,7 +53,10 @@
     <string name="following">Following</string>
     <string name="scalix">Scalix</string>
     <string name="new_post">New Post</string>
-    <string name="placeholder_pages">%d Pages</string>
+    <plurals name="placeholder_pages">
+        <item quantity="one">1 Page</item>
+        <item quantity="other">%d Pages</item>
+    </plurals>
     <string name="link">Link</string>
     <string name="gallery">Gallery</string>
     <string name="tap_to_select">Tap to select</string>
@@ -80,7 +83,6 @@
     <string name="of"> of </string>
     <string name="type_your_reason">Type your reason</string>
     <string name="cancel">Cancel</string>
-    <string name="cancel_caps">CANCEL</string>
     <string name="confirm">Confirm</string>
     <string name="reason_for_deleting">Reason for deletion</string>
     <string name="delete">Delete</string>
@@ -129,4 +131,9 @@
     <string name="you_do_not_have_permission_to_comment">You do not have permission to comment</string>
     <string name="share_post">Share Post</string>
     <string name="edit_post">Edit Post</string>
+    <string name="header">Header</string>
+    <string name="button">Button</string>
+    <string name="text_links">Text Links</string>
+    <string name="choose_branding">Choose Branding</string>
+    <string name="start">Start</string>
 </resources>

@@ -29,6 +29,8 @@ object LMAnalytics {
         const val REPLY_POSTED = "Reply posted"
         const val REPLY_DELETED = "Reply deleted"
         const val REPLY_REPORTED = "Reply reported"
+        const val POST_EDITED = "Post edited"
+        const val POST_SHARED = "Post shared"
 
         const val NOTIFICATION_RECEIVED = "Notification Received"
         const val NOTIFICATION_CLICKED = "Notification Clicked"
