@@ -27,10 +27,18 @@ abstract class BaseDialogFragment<B : ViewBinding> : DialogFragment() {
     protected open val width = LinearLayout.LayoutParams.MATCH_PARENT
     protected open val height = LinearLayout.LayoutParams.WRAP_CONTENT
 
-    protected open fun setUpViews() {}
-    protected open fun observeData() {}
-    protected open fun attachDagger() {}
-    protected open fun receiveExtras() {}
+    protected open fun setUpViews() {
+        //implement this to setup initial views related things
+    }
+    protected open fun observeData() {
+        //implement this to add observers of all live data or flows
+    }
+    protected open fun attachDagger() {
+        //implement this to attach screen to dagger sub-component
+    }
+    protected open fun receiveExtras() {
+        //implement this to receive all the extras from source screen
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

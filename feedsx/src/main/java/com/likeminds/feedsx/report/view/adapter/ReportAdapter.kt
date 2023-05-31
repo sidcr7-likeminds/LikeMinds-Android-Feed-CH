@@ -21,6 +21,8 @@ class ReportAdapter constructor(
     }
 
     interface ReportAdapterListener {
-        fun reportTagSelected(reportTagViewData: ReportTagViewData) {}
+        fun reportTagSelected(reportTagViewData: ReportTagViewData) {
+            //triggered when a user selects a tag
+        }
     }
 }

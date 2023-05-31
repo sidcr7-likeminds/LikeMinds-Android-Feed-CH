@@ -93,7 +93,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/tv_replying_to"
                 app:srcCompat="@drawable/ic_multiply"
-                tools:ignore="ContentDescription"
+                tools:ignore="ContentDescription,UnusedAttribute"
                 tools:visibility="visible" />
 
             <com.likeminds.feedsx.branding.customview.LikeMindsEditText
@@ -162,7 +162,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@id/et_comment"
                 app:srcCompat="@drawable/ic_comment_send_disable"
-                tools:ignore="ContentDescription"
+                tools:ignore="ContentDescription,UnusedAttribute,UseAppTint"
                 tools:visibility="gone" />
 
             <include

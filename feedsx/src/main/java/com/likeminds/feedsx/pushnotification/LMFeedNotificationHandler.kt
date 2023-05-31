@@ -50,10 +50,8 @@ class LMFeedNotificationHandler {
     fun create(application: Application) {
         mApplication = application
 
-        //TODO change your notification icon
         notificationIcon = R.drawable.ic_notification
 
-        //TODO change your notification icon
         notificationTextColor = LMBranding.getButtonsColor()
 
         createNotificationChannel()

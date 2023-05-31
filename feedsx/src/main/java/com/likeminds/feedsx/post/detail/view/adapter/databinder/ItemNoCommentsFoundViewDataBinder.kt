@@ -26,5 +26,6 @@ class ItemNoCommentsFoundViewDataBinder :
         data: BaseViewType,
         position: Int
     ) {
+        //showing static data
     }
 }

@@ -17,8 +17,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@color/black" />
 
-        <!-- TODO: background as per branding-->
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cv_post_type"
             android:layout_width="26dp"

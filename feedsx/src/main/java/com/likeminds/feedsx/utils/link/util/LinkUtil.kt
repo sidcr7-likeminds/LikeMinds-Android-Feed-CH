@@ -57,7 +57,7 @@ object LinkUtil {
             constraintSet.connect(
                 tvLinkTitle.id,
                 ConstraintSet.END,
-                ivCross.id,
+                ivCrossLink.id,
                 ConstraintSet.START,
                 margin4
             )

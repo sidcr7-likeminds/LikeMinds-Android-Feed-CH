@@ -1,17 +1,17 @@
 package com.likeminds.feedsx.utils.permissions
 
+import android.content.Intent
 import android.os.Build
-import androidx.annotation.NonNull
+import androidx.activity.result.ActivityResultLauncher
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class PermissionManager {
 
     companion object {
-        const val REQUEST_CODE_SETTINGS_PERMISSION = 100
-
         fun performTaskWithPermission(
-            @NonNull activity: BaseAppCompatActivity,
-            @NonNull task: PermissionTask,
+            activity: BaseAppCompatActivity,
+            settingsPermissionLauncher: ActivityResultLauncher<Intent>,
+            task: PermissionTask,
             permission: Permission,
             showInitialPopup: Boolean,
             showDeniedPopup: Boolean,
@@ -27,6 +27,7 @@ class PermissionManager {
                         if (showInitialPopup) {
                             val permissionDialog = PermissionDialog(
                                 activity,
+                                settingsPermissionLauncher,
                                 task,
                                 permission,
                                 PermissionDialog.Mode.INIT,
@@ -41,42 +42,56 @@ class PermissionManager {
                                 }
 
                                 override fun onDeny() {
-                                    if (showDeniedPopup) {
-                                        val permissionDialog = PermissionDialog(
-                                            activity,
-                                            task,
-                                            permission,
-                                            PermissionDialog.Mode.DENIED,
-                                            permissionDeniedCallback
-                                        )
-                                        permissionDialog.setCanceledOnTouchOutside(
-                                            setDeniedPopupDismissible
-                                        )
-                                        permissionDialog.setCancelable(setDeniedPopupDismissible)
-                                        permissionDialog.show()
-                                    } else {
-                                        permissionDeniedCallback?.onDeny()
-                                    }
+                                    showDeniedDialog(
+                                        activity,
+                                        settingsPermissionLauncher,
+                                        showDeniedPopup,
+                                        task,
+                                        permission,
+                                        setDeniedPopupDismissible,
+                                        permissionDeniedCallback
+                                    )
                                 }
                             })
                         }
                     } else {
-                        if (showDeniedPopup) {
-                            val permissionDialog = PermissionDialog(
-                                activity,
-                                task,
-                                permission,
-                                PermissionDialog.Mode.DENIED,
-                                permissionDeniedCallback
-                            )
-                            permissionDialog.setCanceledOnTouchOutside(setDeniedPopupDismissible)
-                            permissionDialog.setCancelable(setDeniedPopupDismissible)
-                            permissionDialog.show()
-                        } else {
-                            permissionDeniedCallback?.onDeny()
-                        }
+                        showDeniedDialog(
+                            activity,
+                            settingsPermissionLauncher,
+                            showDeniedPopup,
+                            task,
+                            permission,
+                            setDeniedPopupDismissible,
+                            permissionDeniedCallback
+                        )
                     }
                 }
+            }
+        }
+
+        private fun showDeniedDialog(
+            activity: BaseAppCompatActivity,
+            settingsPermissionLauncher: ActivityResultLauncher<Intent>,
+            showDeniedPopup: Boolean,
+            task: PermissionTask,
+            permission: Permission,
+            setDeniedPopupDismissible: Boolean,
+            permissionDeniedCallback: PermissionDeniedCallback?,
+        ) {
+            if (showDeniedPopup) {
+                val permissionDialog = PermissionDialog(
+                    activity,
+                    settingsPermissionLauncher,
+                    task,
+                    permission,
+                    PermissionDialog.Mode.DENIED,
+                    permissionDeniedCallback
+                )
+                permissionDialog.setCanceledOnTouchOutside(setDeniedPopupDismissible)
+                permissionDialog.setCancelable(setDeniedPopupDismissible)
+                permissionDialog.show()
+            } else {
+                permissionDeniedCallback?.onDeny()
             }
         }
     }

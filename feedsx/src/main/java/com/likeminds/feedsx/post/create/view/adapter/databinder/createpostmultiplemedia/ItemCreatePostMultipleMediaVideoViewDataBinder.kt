@@ -25,7 +25,7 @@ class ItemCreatePostMultipleMediaVideoViewDataBinder constructor(
         data: AttachmentViewData,
         position: Int
     ) {
-        binding.ivCross.setOnClickListener {
+        binding.ivCrossVideo.setOnClickListener {
             listener.onMediaRemoved(position, VIDEO)
         }
     }

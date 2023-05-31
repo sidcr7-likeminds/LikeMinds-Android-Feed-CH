@@ -4,8 +4,8 @@ import android.graphics.Color
 
 // responsible for all the branding-related things like colors and fonts
 object LMBranding {
-
-    private var headerColor: String = "#FFFFFF"
+    private const val defaultHeaderColor = "#FFFFFF"
+    private var headerColor: String = defaultHeaderColor
     private var buttonsColor: String = "#5046E5"
     private var textLinkColor: String = "#007AFF"
     private var fonts: LMFonts? = null
@@ -38,7 +38,7 @@ object LMBranding {
 
     // returns toolbar color
     fun getToolbarColor(): Int {
-        return if (headerColor == "#FFFFFF") {
+        return if (headerColor == defaultHeaderColor) {
             Color.BLACK
         } else {
             Color.WHITE
@@ -47,7 +47,7 @@ object LMBranding {
 
     // returns color of subtitle text
     fun getSubtitleColor(): Int {
-        return if (headerColor == "#FFFFFF") {
+        return if (headerColor == defaultHeaderColor) {
             Color.GRAY
         } else {
             Color.WHITE

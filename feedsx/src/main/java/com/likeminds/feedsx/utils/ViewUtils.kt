@@ -94,7 +94,7 @@ object ViewUtils {
 
     // shows short toast with error message
     fun showErrorMessageToast(context: Context, errorMessage: String?) {
-        showShortToast(context, errorMessage ?: "Something went wrong!")
+        showShortToast(context, errorMessage ?: context.getString(R.string.something_went_wrong))
     }
 
     fun FragmentManager.currentFragment(navHostId: Int): Fragment? {

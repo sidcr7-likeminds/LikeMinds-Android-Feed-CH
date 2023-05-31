@@ -37,5 +37,6 @@ class LikeMindsSnackbarView @JvmOverloads constructor(
     }
 
     override fun animateContentOut(delay: Int, duration: Int) {
+        //necessary function to implement
     }
 }

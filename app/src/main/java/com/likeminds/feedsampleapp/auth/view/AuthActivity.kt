@@ -1,19 +1,38 @@
 package com.likeminds.feedsampleapp.auth.view
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
+import com.github.dhaval2404.colorpicker.model.ColorShape
+import com.github.dhaval2404.colorpicker.model.ColorSwatch
 import com.likeminds.feedsampleapp.MainActivity
 import com.likeminds.feedsampleapp.R
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
 import com.likeminds.feedsampleapp.databinding.ActivityAuthBinding
+import com.likeminds.feedsx.LikeMindsFeedUI
+import com.likeminds.feedsx.branding.model.LMFonts
+import com.likeminds.feedsx.branding.model.SetBrandingRequest
 import com.likeminds.feedsx.feed.model.FeedExtras
 import com.likeminds.feedsx.utils.Route
+import javax.inject.Singleton
 
+@Singleton
 class AuthActivity : AppCompatActivity() {
 
-    lateinit var authPreferences: AuthPreferences
+    private lateinit var authPreferences: AuthPreferences
 
-    lateinit var binding: ActivityAuthBinding
+    private lateinit var binding: ActivityAuthBinding
+
+    private var headerColor = DEFAULT_HEADER_COLOR
+    private var buttonColor = DEFAULT_BUTTON_COLOR
+    private var textLinkColor = DEFAULT_TEXT_LINK
+
+    companion object {
+        const val DEFAULT_HEADER_COLOR = "#FFFFFF"
+        const val DEFAULT_BUTTON_COLOR = "#6200EE"
+        const val DEFAULT_TEXT_LINK = "#007AFF"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +85,28 @@ class AuthActivity : AppCompatActivity() {
         binding.apply {
             val context = root.context
 
+            ivBrandingButton.setOnClickListener {
+                showColorDialog { colorRes, colorHex ->
+                    buttonColor = colorHex
+                    ivBrandingButton.backgroundTintList = ColorStateList.valueOf(colorRes)
+                }
+            }
+
+            ivBrandingHeader.setOnClickListener {
+                showColorDialog { colorRes, colorHex ->
+                    headerColor = colorHex
+                    ivBrandingHeader.backgroundTintList = ColorStateList.valueOf(colorRes)
+                }
+            }
+
+            ivBrandingTextLink.setOnClickListener {
+                showColorDialog { colorRes, colorHex ->
+                    textLinkColor = colorHex
+                    ivBrandingTextLink.backgroundTintList = ColorStateList.valueOf(colorRes)
+                }
+            }
+
+
             btnLogin.setOnClickListener {
                 val apiKey = binding.etApiKey.text.toString().trim()
                 val userName = binding.etUserName.text.toString().trim()
@@ -100,8 +141,40 @@ class AuthActivity : AppCompatActivity() {
                 authPreferences.saveApiKey(apiKey)
                 authPreferences.saveUserName(userName)
                 authPreferences.saveUserId(userId)
+
+                authPreferences.saveHeaderColor(headerColor)
+                authPreferences.saveButtonColor(buttonColor)
+                authPreferences.saveTextLinkColor(textLinkColor)
+
+                val brandingRequest = SetBrandingRequest.Builder()
+                    .headerColor(headerColor)
+                    .buttonsColor(buttonColor)
+                    .textLinkColor(textLinkColor)
+                    .fonts(
+                        LMFonts.Builder()
+                            .bold("fonts/montserrat-bold.ttf")
+                            .medium("fonts/montserrat-medium.ttf")
+                            .regular("fonts/montserrat-regular.ttf")
+                            .build()
+                    )
+                    .build()
+
+                LikeMindsFeedUI.setBranding(brandingRequest)
+
                 navigateToMain()
             }
         }
+    }
+
+    private fun showColorDialog(cb: (Int, String) -> Unit) {
+        MaterialColorPickerDialog
+            .Builder(this)
+            .setTitle("Pick Theme")
+            .setColorShape(ColorShape.SQAURE)
+            .setColorSwatch(ColorSwatch._300)
+            .setColorListener { colorRes, colorHex ->
+                cb(colorRes, colorHex)
+            }
+            .show()
     }
 }

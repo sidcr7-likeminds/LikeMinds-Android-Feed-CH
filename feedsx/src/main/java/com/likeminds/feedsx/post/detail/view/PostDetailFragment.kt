@@ -126,16 +126,6 @@ class PostDetailFragment :
         postDetailExtras =
             arguments?.getParcelable(POST_DETAIL_EXTRAS)
                 ?: throw emptyExtrasException(TAG)
-        // TODO: route for replies
-//        checkForComments()
-    }
-
-    //to check for source of the follow trigger
-    private fun checkForComments() {
-        //if extras contains commentId: redirect to comment
-        if (!postDetailExtras.commentId.isNullOrEmpty()) {
-            toFindComment = true
-        }
     }
 
     override fun onResume() {
@@ -1517,6 +1507,8 @@ class PostDetailFragment :
     // callback when user clicks to share the post
     override fun sharePost(postId: String) {
         ShareUtils.sharePost(requireContext(), postId)
+        val post = mPostDetailAdapter[postDataPosition] as PostViewData
+        postActionsViewModel.sendPostShared(post)
     }
 
     //get index and post from the adapter using postId

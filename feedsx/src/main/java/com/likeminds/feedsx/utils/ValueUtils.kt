@@ -77,21 +77,13 @@ object ValueUtils {
         return mediaType
     }
 
-    fun Uri.getMimeType(context: Context): String? {
+    private fun Uri.getMimeType(context: Context): String? {
         var type = context.contentResolver.getType(this)
         if (type == null) {
             val fileExtension = MimeTypeMap.getFileExtensionFromUrl(this.toString())
             type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension.lowercase())
         }
         return type
-    }
-
-    fun Int.isValidIndex(items: List<*>? = null): Boolean {
-        return if (items != null) {
-            this > -1 && this < items.size
-        } else {
-            this > -1
-        }
     }
 
     fun String.getUrlIfExist(): String? {

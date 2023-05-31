@@ -150,7 +150,6 @@ object PathUtils {
                 "image" -> MediaStore.Images.Media.EXTERNAL_CONTENT_URI
                 "video" -> MediaStore.Video.Media.EXTERNAL_CONTENT_URI
                 "audio" -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-                //Todo test
                 else -> MediaStore.Files.getContentUri(docId)
             }
         val selection = "_id=?"

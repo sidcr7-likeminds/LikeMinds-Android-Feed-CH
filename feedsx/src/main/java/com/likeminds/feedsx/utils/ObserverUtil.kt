@@ -1,9 +1,11 @@
 package com.likeminds.feedsx.utils
 
+import android.util.Log
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import com.likeminds.feedsx.SDKApplication
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -24,11 +26,15 @@ internal class FlowObserver<T>(
                         flow.collect { collector(it) }
                     }
                 }
+
                 Lifecycle.Event.ON_STOP -> {
                     job?.cancel()
                     job = null
                 }
-                else -> {}
+
+                else -> {
+                    Log.d(SDKApplication.LOG_TAG, "flow lifecycle event: $event")
+                }
             }
         })
     }

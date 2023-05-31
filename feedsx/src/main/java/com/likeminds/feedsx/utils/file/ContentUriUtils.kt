@@ -38,16 +38,15 @@ internal object ContentUriUtils {
                     throw e
                 }
             }
-        } finally {
-            return path
         }
+        return path
     }
 
     /**
      * Helper for get cursor
      *
      */
-    fun getCursor(
+    private fun getCursor(
         contentResolver: ContentResolver,
         uri: Uri,
         projection: Array<String?>? = null,

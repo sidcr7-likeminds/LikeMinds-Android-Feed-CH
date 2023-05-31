@@ -5,6 +5,8 @@ import android.view.MenuItem
 
 internal interface ActionModeListener<T> {
     fun onActionItemClick(item: MenuItem?)
-    fun onActionItemUpdate(item: Menu?, actionModeData: T?) {}
+    fun onActionItemUpdate(item: Menu?, actionModeData: T?) {
+        //triggered when action mode header is updated
+    }
     fun onActionModeDestroyed()
 }

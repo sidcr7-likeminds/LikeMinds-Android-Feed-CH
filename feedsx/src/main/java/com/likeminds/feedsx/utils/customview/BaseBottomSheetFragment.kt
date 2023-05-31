@@ -34,11 +34,19 @@ abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
 
     protected open val useSharedViewModel = false
     protected open val state = BottomSheetBehavior.STATE_COLLAPSED
-    protected open fun setUpViews() {}
-    protected open fun observeData() {}
-    protected open fun receiveExtras() {}
+    protected open fun setUpViews() {
+        //implement this to setup initial views related things
+    }
+    protected open fun observeData() {
+        //implement this to add observers of all live data or flows
+    }
+    protected open fun receiveExtras() {
+        //implement this to receive all the extras from source screen
+    }
 
-    protected open fun attachDagger() {}
+    protected open fun attachDagger() {
+        //implement this to attach screen to dagger sub-component
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

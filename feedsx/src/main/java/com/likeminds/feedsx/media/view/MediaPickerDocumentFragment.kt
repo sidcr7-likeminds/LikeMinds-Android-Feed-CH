@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.media.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
@@ -167,6 +168,7 @@ class MediaPickerDocumentFragment :
         binding.fabSend.isVisible = isMediaSelectionEnabled()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun clearSelectedMedias() {
         selectedMedias.clear()
         mediaPickerAdapter.notifyDataSetChanged()

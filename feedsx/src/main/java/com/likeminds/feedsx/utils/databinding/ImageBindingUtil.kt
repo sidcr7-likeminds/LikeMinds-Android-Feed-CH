@@ -13,7 +13,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.bumptech.glide.signature.ObjectKey
-import com.github.chrisbanes.photoview.PhotoView
 import com.likeminds.feedsx.utils.ViewUtils
 
 object ImageBindingUtil {
@@ -33,9 +32,11 @@ object ImageBindingUtil {
             url != null -> {
                 Glide.with(view).load(url)
             }
+
             drawable != null -> {
                 Glide.with(view).load(drawable).placeholder(placeholder).error(placeholder)
             }
+
             else -> {
                 return
             }
@@ -54,7 +55,6 @@ object ImageBindingUtil {
         }
 
         if (view is ImageView) builder.into(view)
-        else if (view is PhotoView) builder.into(view)
 
         if (showGreyScale == true) {
             createImageFilter(view)
@@ -78,7 +78,6 @@ object ImageBindingUtil {
         isCircle: Boolean = false,
         cornerRadius: Int = 0,
         showGreyScale: Boolean = false,
-        isBlur: Boolean = false,
         objectKey: Any? = null
     ) {
         if ((file == null && placeholder == null)
@@ -106,18 +105,11 @@ object ImageBindingUtil {
                 builder = builder.circleCrop()
             }
 
-            if (cornerRadius > 0 && isBlur) {
+            if (cornerRadius > 0) {
                 builder = builder.transform(
                     CenterCrop(),
-                    BlurTransformation(view.context),
                     RoundedCorners(ViewUtils.dpToPx(cornerRadius))
                 )
-            } else if (cornerRadius > 0) {
-                builder = builder.transform(
-                    CenterCrop(), RoundedCorners(ViewUtils.dpToPx(cornerRadius))
-                )
-            } else if (isBlur) {
-                builder = builder.transform(CenterCrop(), BlurTransformation(view.context))
             }
 
             builder.into(view)
@@ -129,16 +121,18 @@ object ImageBindingUtil {
         }
     }
 
-    fun isValidContextForGlide(context: Context?): Boolean {
+    private fun isValidContextForGlide(context: Context?): Boolean {
         if (context == null) {
             return false
         }
-        if (context is Activity) {
-            if (context.isDestroyed || context.isFinishing) {
-                return false
-            }
+        if (context is Activity && isActivityDestroyedOrFinishing(context)) {
+            return false
         }
         return true
+    }
+
+    private fun isActivityDestroyedOrFinishing(activity: Activity): Boolean {
+        return activity.isDestroyed || activity.isFinishing
     }
 
     private fun createImageFilter(view: View) {
@@ -147,9 +141,6 @@ object ImageBindingUtil {
         })
         if (view is ImageView) {
             view.colorFilter = colorFilter
-        } else if (view is PhotoView) {
-            view.colorFilter = colorFilter
         }
     }
-
 }

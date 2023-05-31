@@ -675,7 +675,7 @@ class FeedFragment :
 
         //click listener -> open profile screen
         binding.memberImage.setOnClickListener {
-            //TODO: On member Image click
+            // open profile on click
         }
 
         binding.ivNotification.setOnClickListener {
@@ -683,10 +683,10 @@ class FeedFragment :
         }
 
         binding.ivSearch.setOnClickListener {
-            //TODO: perform search
+            // perform search in feed
         }
 
-        //TODO: testing data. add this while observing data
+        // testing data
         binding.tvNotificationCount.text = "${10}"
     }
 
@@ -875,6 +875,8 @@ class FeedFragment :
     // callback when user clicks to share the post
     override fun sharePost(postId: String) {
         ShareUtils.sharePost(requireContext(), postId)
+        val post = getIndexAndPostFromAdapter(postId)?.second ?: return
+        postActionsViewModel.sendPostShared(post)
     }
 
     // processes delete post request

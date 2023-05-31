@@ -1,9 +1,8 @@
 package com.likeminds.feedsx.post.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMAnalytics
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -20,9 +19,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 class PostActionsViewModel @Inject constructor(
-    private val userPreferences: UserPreferences,
-    applicationContext: Application
-) : AndroidViewModel(applicationContext) {
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
@@ -183,5 +181,22 @@ class PostActionsViewModel @Inject constructor(
                 map
             )
         }
+    }
+
+    /**
+     * Triggers when the current user shares a post
+     */
+    fun sendPostShared(
+        post: PostViewData
+    ) {
+        val postType = ViewUtils.getPostTypeFromViewType(post.viewType)
+        LMAnalytics.track(
+            LMAnalytics.Events.POST_SHARED,
+            mapOf(
+                "created_by_id" to post.userId,
+                LMAnalytics.Keys.POST_ID to post.id,
+                "post_type" to postType,
+            )
+        )
     }
 }
