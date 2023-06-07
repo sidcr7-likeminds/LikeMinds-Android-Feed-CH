@@ -30,11 +30,12 @@
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cv_post_type"
-            android:layout_width="26dp"
-            android:layout_height="26dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:backgroundTint="@color/majorelle_blue"
             android:translationY="-5dp"
-            app:cardCornerRadius="13dp"
+            android:visibility="gone"
+            app:cardCornerRadius="12dp"
             app:layout_constraintBottom_toBottomOf="@id/member_image"
             app:layout_constraintEnd_toEndOf="@id/member_image"
             app:layout_constraintTop_toBottomOf="@id/member_image">
@@ -46,7 +47,6 @@
                 android:layout_gravity="center"
                 android:scaleType="center"
                 tools:ignore="ContentDescription"
-                android:visibility="gone"
                 tools:src="@drawable/ic_img_attachment" />
 
         </com.google.android.material.card.MaterialCardView>
@@ -81,17 +81,6 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_notification_content"
             tools:fontFamily="@font/roboto_regular"
             tools:text="4 days ago" />
-
-        <ImageView
-            android:id="@+id/iv_notification_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_vertical_overflow_menu"
-            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

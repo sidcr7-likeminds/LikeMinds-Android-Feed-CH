@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.notificationfeed.view.adapter.databinder
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -10,11 +11,13 @@ import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapte
 import com.likeminds.feedsx.posttypes.model.DOCUMENT
 import com.likeminds.feedsx.posttypes.model.IMAGE
 import com.likeminds.feedsx.posttypes.model.VIDEO
+import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil.getRelativeTime
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 
 class ItemNotificationFeedViewDataBinder constructor(
@@ -64,7 +67,7 @@ class ItemNotificationFeedViewDataBinder constructor(
             data
         )
 
-        val user = data.activityEntityData.user
+        val user = data.activityByUser
         binding.apply {
             if (data.isRead) {
                 root.setBackgroundColor(
@@ -82,13 +85,13 @@ class ItemNotificationFeedViewDataBinder constructor(
                 )
             }
 
-//            MemberImageUtil.setImage(
-//                user.imageUrl,
-//                user.name,
-//                data.id,
-//                memberImage,
-//                showRoundImage = true
-//            )
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                data.id,
+                memberImage,
+                showRoundImage = true
+            )
 
             // find the type of post and set drawable accordingly
             updatePostTypeBadge(this, data)
@@ -104,8 +107,14 @@ class ItemNotificationFeedViewDataBinder constructor(
     ) {
         binding.apply {
             val textForLinkify = data.activityText.getValidTextForLinkify()
-
-            tvNotificationContent.text = textForLinkify
+            MemberTaggingDecoder.decode(
+                tvNotificationContent,
+                textForLinkify,
+                enableClick = false,
+                highlightColor = Color.BLACK,
+                hasAtRateSymbol = false,
+                isBold = true
+            )
         }
     }
 
@@ -118,19 +127,19 @@ class ItemNotificationFeedViewDataBinder constructor(
             if (!attachments.isNullOrEmpty()) {
                 when (attachments.first().attachmentType) {
                     IMAGE -> {
-                        ivPostType.show()
-                        ivPostType.setImageResource(R.drawable.ic_add_image)
+                        cvPostType.show()
+                        ivPostType.setImageResource(R.drawable.ic_media_attachment)
                     }
                     VIDEO -> {
-                        ivPostType.show()
-                        ivPostType.setImageResource(R.drawable.ic_add_image)
+                        cvPostType.show()
+                        ivPostType.setImageResource(R.drawable.ic_media_attachment)
                     }
                     DOCUMENT -> {
-                        ivPostType.show()
+                        cvPostType.show()
                         ivPostType.setImageResource(R.drawable.ic_doc_attachment)
                     }
                     else -> {
-                        ivPostType.hide()
+                        cvPostType.hide()
                     }
                 }
             }

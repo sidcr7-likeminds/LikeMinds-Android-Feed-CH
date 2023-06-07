@@ -80,12 +80,13 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toStartOf="@id/member_image"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:ignore="ContentDescription,UseAppTint" />
+                    tools:ignore="ContentDescription,UseAppTint"
+                    tools:visibility="visible" />
 
                 <com.likeminds.feedsx.branding.customview.LikeMindsTextView
                     android:id="@+id/tv_notification_count"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_marginBottom="16dp"
                     android:background="@drawable/notification_badge"
                     android:gravity="center"
@@ -98,7 +99,8 @@
                     app:layout_constraintBottom_toBottomOf="@id/iv_notification"
                     app:layout_constraintEnd_toEndOf="@id/iv_notification"
                     app:layout_constraintTop_toTopOf="@id/iv_notification"
-                    tools:text="99" />
+                    tools:text="1"
+                    tools:visibility="visible" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/member_image"

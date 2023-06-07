@@ -1044,8 +1044,10 @@ class FeedFragment :
 
     // removes the old player and refreshes auto play
     private fun refreshAutoPlayer() {
+//        if (::postVideoAutoPlayHelper.isInitialized) {
         postVideoAutoPlayHelper.removePlayer()
         postVideoAutoPlayHelper.playMostVisibleItem()
+//        }
     }
 
     // shows all attachment documents in list view and updates [isExpanded]

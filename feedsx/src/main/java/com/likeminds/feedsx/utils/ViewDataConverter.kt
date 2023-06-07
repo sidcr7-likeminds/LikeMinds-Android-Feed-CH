@@ -500,6 +500,12 @@ object ViewDataConverter {
         activity: Activity,
         usersMap: Map<String, User>
     ): ActivityViewData {
+        val activityByUser = if (activity.actionBy.isNotEmpty()) {
+            convertUser(usersMap[activity.actionBy.last()])
+        } else {
+            UserViewData.Builder().build()
+        }
+
         return ActivityViewData.Builder()
             .id(activity.id)
             .isRead(activity.isRead)
@@ -517,6 +523,7 @@ object ViewDataConverter {
                     usersMap
                 )
             )
+            .activityByUser(activityByUser)
             .createdAt(activity.createdAt)
             .updatedAt(activity.updatedAt)
             .build()

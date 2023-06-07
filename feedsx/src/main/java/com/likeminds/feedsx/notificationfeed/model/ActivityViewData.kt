@@ -20,6 +20,7 @@ class ActivityViewData private constructor(
     val cta: String,
     val activityText: String,
     val activityEntityData: ActivityEntityViewData,
+    val activityByUser: UserViewData,
     val createdAt: Long,
     val updatedAt: Long
 ) : Parcelable, BaseViewType {
@@ -42,7 +43,7 @@ class ActivityViewData private constructor(
         private var activityText: String = ""
         private var activityEntityData: ActivityEntityViewData =
             ActivityEntityViewData.Builder().build()
-        private var user: UserViewData = UserViewData.Builder().build()
+        private var activityByUser: UserViewData = UserViewData.Builder().build()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
 
@@ -63,6 +64,8 @@ class ActivityViewData private constructor(
         fun activityEntityData(activityEntityData: ActivityEntityViewData) =
             apply { this.activityEntityData = activityEntityData }
 
+        fun activityByUser(activityByUser: UserViewData) =
+            apply { this.activityByUser = activityByUser }
 
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
@@ -79,6 +82,7 @@ class ActivityViewData private constructor(
             cta,
             activityText,
             activityEntityData,
+            activityByUser,
             createdAt,
             updatedAt
         )
@@ -96,6 +100,7 @@ class ActivityViewData private constructor(
             .cta(cta)
             .activityText(activityText)
             .activityEntityData(activityEntityData)
+            .activityByUser(activityByUser)
             .createdAt(createdAt)
             .updatedAt(updatedAt)
     }
