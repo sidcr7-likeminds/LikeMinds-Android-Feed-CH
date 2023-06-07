@@ -670,24 +670,23 @@ class FeedFragment :
     private fun initToolbar() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
-        //if user is guest user hide, profile icon from toolbar
-        binding.memberImage.isVisible = !isGuestUser
+        binding.apply {
+            //if user is guest user hide, profile icon from toolbar
+            memberImage.isVisible = !isGuestUser
 
-        //click listener -> open profile screen
-        binding.memberImage.setOnClickListener {
-            // open profile on click
+            //click listener -> open profile screen
+            memberImage.setOnClickListener {
+                // open profile on click
+            }
+
+            ivNotification.setOnClickListener {
+                NotificationFeedActivity.start(requireContext())
+            }
+
+            ivSearch.setOnClickListener {
+                // perform search in feed
+            }
         }
-
-        binding.ivNotification.setOnClickListener {
-            NotificationFeedActivity.start(requireContext())
-        }
-
-        binding.ivSearch.setOnClickListener {
-            // perform search in feed
-        }
-
-        // testing data
-        binding.tvNotificationCount.text = "${10}"
     }
 
     // shows invalid access error and logs out invalid user

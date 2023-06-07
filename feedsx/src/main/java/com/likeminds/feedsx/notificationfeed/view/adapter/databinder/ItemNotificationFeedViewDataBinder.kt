@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemNotificationFeedBinding
-import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
+import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.Route
@@ -16,7 +16,7 @@ import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 
 class ItemNotificationFeedViewDataBinder constructor(
     val listener: NotificationFeedAdapterListener
-) : ViewDataBinder<ItemNotificationFeedBinding, NotificationFeedViewData>() {
+) : ViewDataBinder<ItemNotificationFeedBinding, ActivityViewData>() {
 
     override val viewType: Int
         get() = ITEM_NOTIFICATION_FEED
@@ -31,7 +31,7 @@ class ItemNotificationFeedViewDataBinder constructor(
 
     override fun bindData(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData,
+        data: ActivityViewData,
         position: Int
     ) {
 
@@ -53,7 +53,7 @@ class ItemNotificationFeedViewDataBinder constructor(
     // initializes notification item
     private fun initNotificationView(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData
+        data: ActivityViewData
     ) {
         initNotificationTextContent(
             binding,
@@ -100,10 +100,10 @@ class ItemNotificationFeedViewDataBinder constructor(
     // handles text content of notification
     private fun initNotificationTextContent(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData
+        data: ActivityViewData
     ) {
         binding.apply {
-            val textForLinkify = data.activityMessage.getValidTextForLinkify()
+            val textForLinkify = data.activityText.getValidTextForLinkify()
 
             tvNotificationContent.text = textForLinkify
         }
@@ -111,7 +111,7 @@ class ItemNotificationFeedViewDataBinder constructor(
 
     private fun handleRoute(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData
+        data: ActivityViewData
     ) {
         binding.root.apply {
             setOnClickListener {
