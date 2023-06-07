@@ -41,12 +41,16 @@ class FeedViewModel @Inject constructor(
     private val _universalFeedResponse = MutableLiveData<Pair<Int, List<PostViewData>>>()
     val universalFeedResponse: LiveData<Pair<Int, List<PostViewData>>> = _universalFeedResponse
 
+    private val _unreadNotificationCount = MutableLiveData<Int>()
+    val unreadNotificationCount: LiveData<Int> = _unreadNotificationCount
+
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
 
     sealed class ErrorMessageEvent {
         data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
+        data class GetUnreadNotificationCount(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     sealed class PostDataEvent {
@@ -180,6 +184,24 @@ class FeedViewModel @Inject constructor(
             postWithAttachmentsRepository.updateUploadWorkerUUID(postId, uploadData.second)
             uploadData.first.enqueue()
             fetchPendingPostFromDB()
+        }
+    }
+
+    //get unread notification count
+    fun getUnreadNotificationCount() {
+        viewModelScope.launchIO {
+            //call unread notification count api
+            val response = lmFeedClient.getUnreadNotificationCount()
+
+            if (response.success) {
+                val data = response.data ?: return@launchIO
+                val count = data.count
+
+                _unreadNotificationCount.postValue(count)
+            } else {
+                //for error
+                errorMessageChannel.send(ErrorMessageEvent.GetUnreadNotificationCount(response.errorMessage))
+            }
         }
     }
 

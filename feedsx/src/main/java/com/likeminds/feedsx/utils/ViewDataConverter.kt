@@ -9,6 +9,8 @@ import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.media.model.VIDEO
+import com.likeminds.feedsx.notificationfeed.model.ActivityEntityViewData
+import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.posttypes.model.*
@@ -22,6 +24,8 @@ import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.helper.model.TagMember
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
+import com.likeminds.likemindsfeed.notificationfeed.model.Activity
+import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.User
 
@@ -467,6 +471,99 @@ object ViewDataConverter {
                 .value(tag.name)
                 .build()
         }.toMutableList()
+    }
+
+    /**
+     * convert list of [Activity] and usersMap [Map] of String to User
+     * to list of [ActivityViewData]
+     *
+     * @param activities: list of [Activity]
+     * @param usersMap: [Map] of String to User
+     * */
+    fun convertActivities(
+        activities: List<Activity>,
+        usersMap: Map<String, User>
+    ): List<ActivityViewData> {
+        return activities.map {
+            convertActivity(it, usersMap)
+        }
+    }
+
+    /**
+     * converts [Activity] and usersMap [Map] of String to User
+     * to [ActivityViewData]
+     *
+     * @param activity: an activity [ActivityViewData]
+     * @param usersMap: [Map] of String to User
+     * */
+    private fun convertActivity(
+        activity: Activity,
+        usersMap: Map<String, User>
+    ): ActivityViewData {
+        return ActivityViewData.Builder()
+            .id(activity.id)
+            .isRead(activity.isRead)
+            .actionOn(activity.actionOn)
+            .actionBy(activity.actionBy)
+            .entityType(activity.entityType)
+            .entityId(activity.entityId)
+            .entityOwnerId(activity.entityOwnerId)
+            .action(activity.action)
+            .cta(activity.cta)
+            .activityText(activity.activityText)
+            .activityEntityData(
+                convertActivityEntityData(
+                    activity.activityEntityData,
+                    usersMap
+                )
+            )
+            .createdAt(activity.createdAt)
+            .updatedAt(activity.updatedAt)
+            .build()
+    }
+
+    private fun convertActivityEntityData(
+        activityEntityData: ActivityEntityData,
+        usersMap: Map<String, User>
+    ): ActivityEntityViewData {
+        val entityCreator = activityEntityData.userId
+        val user = usersMap[entityCreator]
+        val replies = activityEntityData.replies?.toMutableList()
+
+        val userViewData = if (user == null) {
+            createDeletedUser()
+        } else {
+            convertUser(user)
+        }
+
+        return ActivityEntityViewData.Builder()
+            .id(activityEntityData.id)
+            .text(activityEntityData.text)
+            .deleteReason(activityEntityData.deleteReason)
+            .deletedBy(activityEntityData.deletedBy)
+            .heading(activityEntityData.heading)
+            .attachments(
+                convertAttachments(
+                    activityEntityData.attachments,
+                    activityEntityData.id
+                )
+            )
+            .communityId(activityEntityData.communityId)
+            .isEdited(activityEntityData.isEdited)
+            .isPinned(activityEntityData.isPinned)
+            .userId(activityEntityData.userId)
+            .user(userViewData)
+            .replies(
+                convertComments(
+                    replies,
+                    usersMap,
+                    activityEntityData.postId ?: activityEntityData.id
+                )
+            )
+            .level(activityEntityData.level)
+            .createdAt(activityEntityData.createdAt)
+            .updatedAt(activityEntityData.updatedAt)
+            .build()
     }
 
     /**--------------------------------

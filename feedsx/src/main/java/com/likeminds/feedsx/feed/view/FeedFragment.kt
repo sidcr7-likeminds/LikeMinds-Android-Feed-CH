@@ -159,6 +159,11 @@ class FeedFragment :
             ViewUtils.showErrorMessageToast(requireContext(), it)
         }
 
+        // observe unread notification count
+        viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { count ->
+            observeUnreadNotificationCount(count)
+        }
+
         // observe universal feed
         viewModel.universalFeedResponse.observe(viewLifecycleOwner) { pair ->
             observeFeedUniversal(pair)
@@ -201,7 +206,21 @@ class FeedFragment :
     private fun observeUserResponse(user: UserViewData?) {
         initToolbar()
         setUserImage(user)
+        viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
+    }
+
+    // observe unread notification count
+    private fun observeUnreadNotificationCount(count: Int) {
+        binding.apply {
+            ivNotification.show()
+            if (count == 0) {
+                tvNotificationCount.isVisible = false
+            } else {
+                tvNotificationCount.isVisible = true
+                tvNotificationCount.text = count.toString()
+            }
+        }
     }
 
     //observe feed response
@@ -369,6 +388,10 @@ class FeedFragment :
             is FeedViewModel.ErrorMessageEvent.AddPost -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 removePostingView()
+            }
+            is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
+                binding.tvNotificationCount.hide()
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
         }
     }
@@ -625,6 +648,7 @@ class FeedFragment :
     private fun refreshFeed() {
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
+        viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
     }
 

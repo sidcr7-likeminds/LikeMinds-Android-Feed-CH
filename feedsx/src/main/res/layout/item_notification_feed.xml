@@ -3,6 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+
+        <variable
+            name="activityViewData"
+            type="com.likeminds.feedsx.notificationfeed.model.ActivityViewData" />
+
+        <variable
+            name="position"
+            type="int" />
+    </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,6 +46,7 @@
                 android:layout_gravity="center"
                 android:scaleType="center"
                 tools:ignore="ContentDescription"
+                android:visibility="gone"
                 tools:src="@drawable/ic_img_attachment" />
 
         </com.google.android.material.card.MaterialCardView>
@@ -49,7 +61,7 @@
             android:textSize="14sp"
             app:fontType="regular"
             app:layout_constrainedWidth="true"
-            app:layout_constraintEnd_toStartOf="@id/iv_notification_menu"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/member_image"
             app:layout_constraintTop_toTopOf="@id/member_image"
             tools:fontFamily="@font/roboto_regular"

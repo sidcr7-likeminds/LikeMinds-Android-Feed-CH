@@ -3,7 +3,6 @@ package com.likeminds.feedsx.notificationfeed.util
 import androidx.recyclerview.widget.DiffUtil
 import com.likeminds.feedsx.notificationfeed.model.ActivityEntityViewData
 import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
-import com.likeminds.feedsx.posttypes.util.PostDiffUtilHelper.userViewData
 import com.likeminds.feedsx.utils.model.BaseViewType
 
 class NotificationFeedDiffUtilCallback(
@@ -58,7 +57,6 @@ class NotificationFeedDiffUtilCallback(
                 && oldItem.cta == newItem.cta
                 && oldItem.activityText == newItem.activityText
                 && activityEntityViewData(oldItem.activityEntityData, newItem.activityEntityData)
-                && userViewData(oldItem.user, newItem.user)
                 && oldItem.createdAt == newItem.createdAt
                 && oldItem.updatedAt == newItem.updatedAt
     }
