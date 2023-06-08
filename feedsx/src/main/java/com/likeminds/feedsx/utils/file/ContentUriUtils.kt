@@ -38,8 +38,9 @@ internal object ContentUriUtils {
                     throw e
                 }
             }
+        } finally {
+            return path
         }
-        return path
     }
 
     /**

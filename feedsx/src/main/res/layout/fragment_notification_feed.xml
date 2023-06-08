@@ -28,5 +28,34 @@
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_no_notification"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/no_notifications_yet"
+            android:textAlignment="center"
+            android:textColor="@color/grey"
+            android:textSize="24sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:fontFamily="@font/roboto_regular"
+            tools:ignore="UnusedAttribute"
+            tools:text="@string/no_notifications_yet"
+            tools:visibility="visible" />
+
+        <include
+            android:id="@+id/progress_bar"
+            layout="@layout/progress_bar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

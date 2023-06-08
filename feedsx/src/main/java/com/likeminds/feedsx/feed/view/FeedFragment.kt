@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -159,6 +160,11 @@ class FeedFragment :
             ViewUtils.showErrorMessageToast(requireContext(), it)
         }
 
+        // observe unread notification count
+        viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { count ->
+            observeUnreadNotificationCount(count)
+        }
+
         // observe universal feed
         viewModel.universalFeedResponse.observe(viewLifecycleOwner) { pair ->
             observeFeedUniversal(pair)
@@ -201,7 +207,42 @@ class FeedFragment :
     private fun observeUserResponse(user: UserViewData?) {
         initToolbar()
         setUserImage(user)
+        viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
+    }
+
+    // observe unread notification count
+    private fun observeUnreadNotificationCount(count: Int) {
+        binding.apply {
+            ivNotification.show()
+            when (count) {
+                0 -> {
+                    tvNotificationCount.isVisible = false
+                }
+                in 1..99 -> {
+                    configureNotificationBadge(count.toString())
+                }
+                else -> {
+                    configureNotificationBadge(getString(R.string.nine_nine_plus))
+                }
+            }
+        }
+    }
+
+    /**
+     * Configure the notification badge based on the text length and visibility
+     * @param text Text to show on the counter, eg - 99+, 8, etc
+     */
+    private fun configureNotificationBadge(text: String) {
+        binding.tvNotificationCount.apply {
+            if (text.length > 2) {
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 7f)
+            } else {
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+            }
+            this.text = text
+            visibility = View.VISIBLE
+        }
     }
 
     //observe feed response
@@ -369,6 +410,10 @@ class FeedFragment :
             is FeedViewModel.ErrorMessageEvent.AddPost -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 removePostingView()
+            }
+            is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
+                binding.tvNotificationCount.hide()
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
         }
     }
@@ -625,6 +670,7 @@ class FeedFragment :
     private fun refreshFeed() {
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
+        viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
     }
 
@@ -670,24 +716,23 @@ class FeedFragment :
     private fun initToolbar() {
         (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
 
-        //if user is guest user hide, profile icon from toolbar
-        binding.memberImage.isVisible = !isGuestUser
+        binding.apply {
+            //if user is guest user hide, profile icon from toolbar
+            memberImage.isVisible = !isGuestUser
 
-        //click listener -> open profile screen
-        binding.memberImage.setOnClickListener {
-            // open profile on click
+            //click listener -> open profile screen
+            memberImage.setOnClickListener {
+                // open profile on click
+            }
+
+            ivNotification.setOnClickListener {
+                NotificationFeedActivity.start(requireContext())
+            }
+
+            ivSearch.setOnClickListener {
+                // perform search in feed
+            }
         }
-
-        binding.ivNotification.setOnClickListener {
-            NotificationFeedActivity.start(requireContext())
-        }
-
-        binding.ivSearch.setOnClickListener {
-            // perform search in feed
-        }
-
-        // testing data
-        binding.tvNotificationCount.text = "${10}"
     }
 
     // shows invalid access error and logs out invalid user
@@ -1021,6 +1066,9 @@ class FeedFragment :
 
     // removes the old player and refreshes auto play
     private fun refreshAutoPlayer() {
+        if (!::postVideoAutoPlayHelper.isInitialized) {
+            initiateAutoPlayer()
+        }
         postVideoAutoPlayHelper.removePlayer()
         postVideoAutoPlayHelper.playMostVisibleItem()
     }

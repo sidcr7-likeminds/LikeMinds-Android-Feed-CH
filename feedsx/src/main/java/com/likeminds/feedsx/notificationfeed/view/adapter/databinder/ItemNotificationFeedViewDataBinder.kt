@@ -1,47 +1,54 @@
 package com.likeminds.feedsx.notificationfeed.view.adapter.databinder
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemNotificationFeedBinding
-import com.likeminds.feedsx.notificationfeed.model.NotificationFeedViewData
+import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
+import com.likeminds.feedsx.posttypes.model.DOCUMENT
+import com.likeminds.feedsx.posttypes.model.IMAGE
+import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.Route
 import com.likeminds.feedsx.utils.TimeUtil.getRelativeTime
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.ViewUtils.hide
+import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
+import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 
 class ItemNotificationFeedViewDataBinder constructor(
     val listener: NotificationFeedAdapterListener
-) : ViewDataBinder<ItemNotificationFeedBinding, NotificationFeedViewData>() {
+) : ViewDataBinder<ItemNotificationFeedBinding, ActivityViewData>() {
 
     override val viewType: Int
         get() = ITEM_NOTIFICATION_FEED
 
     override fun createBinder(parent: ViewGroup): ItemNotificationFeedBinding {
-        return ItemNotificationFeedBinding.inflate(
-            LayoutInflater.from(parent.context),
+        val inflater = LayoutInflater.from(parent.context)
+        val binding = ItemNotificationFeedBinding.inflate(
+            inflater,
             parent,
             false
         )
+        binding.root.setOnClickListener {
+            val activityViewData = binding.activityViewData ?: return@setOnClickListener
+            listener.onNotificationFeedItemClicked(binding.position, activityViewData)
+        }
+        return binding
     }
 
     override fun bindData(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData,
+        data: ActivityViewData,
         position: Int
     ) {
-
-        // set items to overflow menu
-
-        // handles route on notification click
-        handleRoute(
-            binding,
-            data
-        )
+        // set value for binding variables
+        binding.position = position
+        binding.activityViewData = data
 
         // sets data to the notification item
         initNotificationView(
@@ -53,14 +60,14 @@ class ItemNotificationFeedViewDataBinder constructor(
     // initializes notification item
     private fun initNotificationView(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData
+        data: ActivityViewData
     ) {
         initNotificationTextContent(
             binding,
             data
         )
 
-        val user = data.user
+        val user = data.activityByUser
         binding.apply {
             if (data.isRead) {
                 root.setBackgroundColor(
@@ -78,10 +85,6 @@ class ItemNotificationFeedViewDataBinder constructor(
                 )
             }
 
-            ivNotificationMenu.setOnClickListener {
-                // show overflow menu
-            }
-
             MemberImageUtil.setImage(
                 user.imageUrl,
                 user.name,
@@ -91,7 +94,7 @@ class ItemNotificationFeedViewDataBinder constructor(
             )
 
             // find the type of post and set drawable accordingly
-            ivPostType.setImageResource(R.drawable.ic_doc_attachment)
+            updatePostTypeBadge(this, data)
 
             tvNotificationDate.text = getRelativeTime(data.createdAt)
         }
@@ -100,27 +103,45 @@ class ItemNotificationFeedViewDataBinder constructor(
     // handles text content of notification
     private fun initNotificationTextContent(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData
+        data: ActivityViewData
     ) {
         binding.apply {
-            val textForLinkify = data.activityMessage.getValidTextForLinkify()
-
-            tvNotificationContent.text = textForLinkify
+            val textForLinkify = data.activityText.getValidTextForLinkify()
+            MemberTaggingDecoder.decode(
+                tvNotificationContent,
+                textForLinkify,
+                enableClick = false,
+                highlightColor = Color.BLACK,
+                hasAtRateSymbol = false,
+                isBold = true
+            )
         }
     }
 
-    private fun handleRoute(
+    private fun updatePostTypeBadge(
         binding: ItemNotificationFeedBinding,
-        data: NotificationFeedViewData
+        data: ActivityViewData
     ) {
-        binding.root.apply {
-            setOnClickListener {
-                val routeIntent = Route.getRouteIntent(
-                    context,
-                    data.cta,
-                )
-                if (routeIntent != null)
-                    context.startActivity(routeIntent)
+        binding.apply {
+            val attachments = data.activityEntityData.attachments
+            if (!attachments.isNullOrEmpty()) {
+                when (attachments.first().attachmentType) {
+                    IMAGE -> {
+                        cvPostType.show()
+                        ivPostType.setImageResource(R.drawable.ic_media_attachment)
+                    }
+                    VIDEO -> {
+                        cvPostType.show()
+                        ivPostType.setImageResource(R.drawable.ic_media_attachment)
+                    }
+                    DOCUMENT -> {
+                        cvPostType.show()
+                        ivPostType.setImageResource(R.drawable.ic_doc_attachment)
+                    }
+                    else -> {
+                        cvPostType.hide()
+                    }
+                }
             }
         }
     }

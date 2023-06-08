@@ -68,6 +68,7 @@ class CreatePostFragment :
     CreatePostListener {
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
+
     @Inject
     lateinit var helperViewModel: HelperViewModel
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
@@ -111,6 +112,7 @@ class CreatePostFragment :
             ?: throw emptyExtrasException(TAG)
         checkForSource()
     }
+
     //to check for source of the follow trigger
     private fun checkForSource() {
         //if source is notification, then call initiate first in the background
@@ -128,10 +130,12 @@ class CreatePostFragment :
         initPostContentTextListener()
         initPostDoneListener()
     }
+
     // fetches user data from local db
     private fun fetchUserFromDB() {
         helperViewModel.fetchUserFromDB()
     }
+
     // observes data
     override fun observeData() {
         super.observeData()
@@ -161,6 +165,7 @@ class CreatePostFragment :
             }
         }
     }
+
     /**
      * Observes for member tagging list, This is a live observer which will update itself on addition of new members
      * [taggingData] contains first -> page called in api
@@ -171,6 +176,7 @@ class CreatePostFragment :
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
+
     // observes error events
     private fun observeErrors() {
         viewModel.errorEventFlow.onEach { response ->
@@ -198,6 +204,7 @@ class CreatePostFragment :
             }
         }.observeInLifecycle(viewLifecycleOwner)
     }
+
     /**
      * initializes the [memberTaggingView] with the edit text
      * also sets listener to the [memberTaggingView]
@@ -227,6 +234,7 @@ class CreatePostFragment :
             }
         })
     }
+
     // adds text watcher on post content edit text
     @SuppressLint("ClickableViewAccessibility")
     @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
@@ -277,6 +285,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // initializes post done button click listener
     private fun initPostDoneListener() {
         val createPostActivity = requireActivity() as CreatePostActivity
@@ -303,6 +312,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // initializes click listeners on add attachment layouts
     private fun initAddAttachmentsView() {
         binding.apply {
@@ -330,6 +340,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // sets data to the author frame
     private fun initAuthorFrame(user: UserViewData) {
         binding.authorFrame.apply {
@@ -344,6 +355,7 @@ class CreatePostFragment :
             )
         }
     }
+
     /**
      * Adds TextWatcher to edit text with Flow operators
      * **/
@@ -368,6 +380,7 @@ class CreatePostFragment :
             awaitClose { removeTextChangedListener(etPostTextChangeListener) }
         }.onStart { emit(text) }
     }
+
     // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
     private fun initiateMediaPicker(list: List<String>) {
         val extras = MediaPickerExtras.Builder()
@@ -377,6 +390,7 @@ class CreatePostFragment :
         val intent = MediaPickerActivity.getIntent(requireContext(), extras)
         galleryLauncher.launch(intent)
     }
+
     // process the result obtained from media picker
     private fun checkMediaPickedResult(result: MediaPickerResult?) {
         if (result != null) {
@@ -404,6 +418,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // converts the picked media to SingleUriData and adds to the selected media
     private fun onMediaPicked(result: MediaPickerResult) {
         val data =
@@ -480,6 +495,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // shows attached video in single video post type
     private fun showAttachedVideo() {
         handleAddAttachmentLayouts(false)
@@ -512,6 +528,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // shows attached image in single image post type
     private fun showAttachedImage() {
         handleAddAttachmentLayouts(false)
@@ -544,6 +561,7 @@ class CreatePostFragment :
             )
         }
     }
+
     // shows view pager with multiple media
     private fun showMultiMediaAttachments() {
         handleAddAttachmentLayouts(false)
@@ -599,6 +617,7 @@ class CreatePostFragment :
             })
         }
     }
+
     // shows document recycler view with attached files
     private fun showAttachedDocuments() {
         handleAddAttachmentLayouts(false)
@@ -654,6 +673,7 @@ class CreatePostFragment :
         super.onPause()
         videoPreviewAutoPlayHelper.removePlayer()
     }
+
     // shows link preview for link post type
     private fun showLinkPreview(text: String?) {
         binding.linkPreview.apply {
@@ -676,6 +696,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // renders data in the link view
     private fun initLinkView(data: LinkOGTagsViewData) {
         val link = data.url ?: ""
@@ -714,6 +735,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // clears link preview
     private fun clearPreviewLink() {
         ogTags = null
@@ -721,10 +743,12 @@ class CreatePostFragment :
             root.hide()
         }
     }
+
     // handles visibility of add attachment layouts
     private fun handleAddAttachmentLayouts(show: Boolean) {
         binding.groupAddAttachments.isVisible = show
     }
+
     // handles Post Done button click-ability
     private fun handlePostButton(
         clickable: Boolean,
@@ -747,6 +771,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // shows toast and removes extra items if attachments limit is exceeded
     private fun attachmentsLimitExceeded() {
         if (selectedMediaUris.size > 10) {
@@ -761,6 +786,7 @@ class CreatePostFragment :
             selectedMediaUris.subList(POST_ATTACHMENTS_LIMIT, size).clear()
         }
     }
+
     // triggered when a document/media from view pager is removed
     override fun onMediaRemoved(position: Int, mediaType: String) {
         selectedMediaUris.removeAt(position)
@@ -773,6 +799,7 @@ class CreatePostFragment :
         }
         showPostMedia()
     }
+
     // launcher to handle gallery (IMAGE/VIDEO) intent
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -794,6 +821,7 @@ class CreatePostFragment :
                 onPdfPicked(result.data)
             }
         }
+
     // launcher to handle document (PDF) intent
     private val documentLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
