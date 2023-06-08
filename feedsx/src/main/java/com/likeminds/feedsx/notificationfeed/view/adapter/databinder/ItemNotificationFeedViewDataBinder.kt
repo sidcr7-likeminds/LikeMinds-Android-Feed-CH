@@ -12,7 +12,7 @@ import com.likeminds.feedsx.posttypes.model.DOCUMENT
 import com.likeminds.feedsx.posttypes.model.IMAGE
 import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.TimeUtil.getRelativeTime
+import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -96,7 +96,7 @@ class ItemNotificationFeedViewDataBinder constructor(
             // find the type of post and set drawable accordingly
             updatePostTypeBadge(this, data)
 
-            tvNotificationDate.text = getRelativeTime(data.createdAt)
+            tvNotificationDate.text = TimeUtil.getRelativeTime(root.context, data.updatedAt)
         }
     }
 
@@ -123,8 +123,8 @@ class ItemNotificationFeedViewDataBinder constructor(
         data: ActivityViewData
     ) {
         binding.apply {
-            val attachments = data.activityEntityData.attachments
-            if (!attachments.isNullOrEmpty()) {
+            val attachments = data.activityEntityData?.attachments ?: return
+            if (attachments.isNotEmpty()) {
                 when (attachments.first().attachmentType) {
                     IMAGE -> {
                         cvPostType.show()

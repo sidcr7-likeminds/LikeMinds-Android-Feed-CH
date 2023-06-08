@@ -19,7 +19,7 @@ class ActivityViewData private constructor(
     val action: Int,
     val cta: String,
     val activityText: String,
-    val activityEntityData: ActivityEntityViewData,
+    val activityEntityData: ActivityEntityViewData?,
     val activityByUser: UserViewData,
     val createdAt: Long,
     val updatedAt: Long
@@ -41,8 +41,7 @@ class ActivityViewData private constructor(
         private var action: Int = -1
         private var cta: String = ""
         private var activityText: String = ""
-        private var activityEntityData: ActivityEntityViewData =
-            ActivityEntityViewData.Builder().build()
+        private var activityEntityData: ActivityEntityViewData? = null
         private var activityByUser: UserViewData = UserViewData.Builder().build()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
@@ -61,7 +60,7 @@ class ActivityViewData private constructor(
         fun activityText(activityText: String) =
             apply { this.activityText = activityText }
 
-        fun activityEntityData(activityEntityData: ActivityEntityViewData) =
+        fun activityEntityData(activityEntityData: ActivityEntityViewData?) =
             apply { this.activityEntityData = activityEntityData }
 
         fun activityByUser(activityByUser: UserViewData) =
