@@ -5,6 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
@@ -214,12 +215,33 @@ class FeedFragment :
     private fun observeUnreadNotificationCount(count: Int) {
         binding.apply {
             ivNotification.show()
-            if (count == 0) {
-                tvNotificationCount.isVisible = false
-            } else {
-                tvNotificationCount.isVisible = true
-                tvNotificationCount.text = count.toString()
+            when (count) {
+                0 -> {
+                    tvNotificationCount.isVisible = false
+                }
+                in 1..99 -> {
+                    configureNotificationBadge(count.toString())
+                }
+                else -> {
+                    configureNotificationBadge(getString(R.string.nine_nine_plus))
+                }
             }
+        }
+    }
+
+    /**
+     * Configure the notification badge based on the text length and visibility
+     * @param text Text to show on the counter, eg - 99+, 8, etc
+     */
+    private fun configureNotificationBadge(text: String) {
+        binding.tvNotificationCount.apply {
+            if (text.length > 2) {
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 7f)
+            } else {
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+            }
+            this.text = text
+            visibility = View.VISIBLE
         }
     }
 
@@ -1044,10 +1066,11 @@ class FeedFragment :
 
     // removes the old player and refreshes auto play
     private fun refreshAutoPlayer() {
-//        if (::postVideoAutoPlayHelper.isInitialized) {
+        if (!::postVideoAutoPlayHelper.isInitialized) {
+            initiateAutoPlayer()
+        }
         postVideoAutoPlayHelper.removePlayer()
         postVideoAutoPlayHelper.playMostVisibleItem()
-//        }
     }
 
     // shows all attachment documents in list view and updates [isExpanded]

@@ -3,6 +3,7 @@ package com.likeminds.feedsx.post.create.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
@@ -149,8 +150,10 @@ class CreatePostViewModel @Inject constructor(
     ): List<SingleUriData> {
         return files.map {
             // generates localFilePath from the ContentUri provided by client
+            Log.d("PUI", "includeAttachmentMetaData: -1")
             val localFilePath =
                 FileUtil.getRealPath(context, it.uri)
+            Log.d("PUI", "includeAttachmentMetaData: 0")
 
             // generates awsFolderPath to upload the file
             val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
@@ -161,6 +164,7 @@ class CreatePostViewModel @Inject constructor(
                 .awsFolderPath(awsFolderPath)
             when (it.fileType) {
                 IMAGE -> {
+                    Log.d("PUI", "includeAttachmentMetaData: 1")
                     val dimensions = FileUtil.getImageDimensions(context, it.uri)
                     builder.width(dimensions.first)
                         .thumbnailUri(it.uri)
@@ -168,6 +172,7 @@ class CreatePostViewModel @Inject constructor(
                         .build()
                 }
                 VIDEO -> {
+                    Log.d("PUI", "includeAttachmentMetaData: 2")
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
                         builder.thumbnailUri(thumbnailUri).build()
@@ -176,6 +181,7 @@ class CreatePostViewModel @Inject constructor(
                     }
                 }
                 else -> {
+                    Log.d("PUI", "includeAttachmentMetaData: 3")
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
                     val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
                     builder
