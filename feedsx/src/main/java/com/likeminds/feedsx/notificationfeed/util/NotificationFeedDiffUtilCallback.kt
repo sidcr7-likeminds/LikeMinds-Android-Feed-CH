@@ -74,9 +74,15 @@ class NotificationFeedDiffUtilCallback(
     }
 
     private fun activityEntityViewData(
-        oldItem: ActivityEntityViewData,
-        newItem: ActivityEntityViewData
+        oldItem: ActivityEntityViewData?,
+        newItem: ActivityEntityViewData?
     ): Boolean {
+        if (oldItem == null || newItem == null) {
+            if (oldItem == newItem) {
+                return true
+            }
+            return false
+        }
         return oldItem.id == newItem.id
                 && oldItem.text == newItem.text
                 && oldItem.deleteReason == newItem.deleteReason

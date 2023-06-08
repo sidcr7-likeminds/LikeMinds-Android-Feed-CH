@@ -530,9 +530,12 @@ object ViewDataConverter {
     }
 
     private fun convertActivityEntityData(
-        activityEntityData: ActivityEntityData,
+        activityEntityData: ActivityEntityData?,
         usersMap: Map<String, User>
-    ): ActivityEntityViewData {
+    ): ActivityEntityViewData? {
+        if (activityEntityData == null) {
+            return null
+        }
         val entityCreator = activityEntityData.userId
         val user = usersMap[entityCreator]
         val replies = activityEntityData.replies?.toMutableList()
