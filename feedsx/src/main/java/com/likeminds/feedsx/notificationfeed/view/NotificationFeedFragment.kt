@@ -122,7 +122,7 @@ class NotificationFeedFragment :
         //page in api send
         val page = pair.first
 
-        //list of post
+        //list of activities
         val activities = pair.second
 
         //if pull to refresh is called
@@ -155,13 +155,13 @@ class NotificationFeedFragment :
         }
     }
 
-    //set posts through diff utils and scroll to top of the feed
+    //set activities through diff utils and scroll to top of the feed
     private fun setFeedAndScrollToTop(feed: List<ActivityViewData>) {
         mNotificationFeedAdapter.replace(feed)
         binding.rvNotifications.scrollToPosition(0)
     }
 
-    // checks if there is any post or not
+    // checks if there is any activity or not
     private fun checkForNoActivity(feed: List<BaseViewType>) {
         if (feed.isNotEmpty()) {
             binding.apply {
