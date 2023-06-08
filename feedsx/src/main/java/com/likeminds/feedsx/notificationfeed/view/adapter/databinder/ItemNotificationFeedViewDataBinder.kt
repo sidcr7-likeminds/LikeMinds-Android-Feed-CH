@@ -142,6 +142,8 @@ class ItemNotificationFeedViewDataBinder constructor(
                         cvPostType.hide()
                     }
                 }
+            } else {
+                cvPostType.hide()
             }
         }
     }
