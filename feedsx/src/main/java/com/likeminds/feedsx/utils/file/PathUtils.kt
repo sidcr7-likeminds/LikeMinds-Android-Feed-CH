@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.util.Log
 import com.likeminds.feedsx.utils.file.Constants.PathUri.COLUMN_DATA
 import com.likeminds.feedsx.utils.file.Constants.PathUri.COLUMN_DISPLAY_NAME
 import com.likeminds.feedsx.utils.file.Constants.PathUri.FOLDER_DOWNLOAD
@@ -24,7 +23,6 @@ object PathUtils {
      *
      */
     internal fun getPath(context: Context, uri: Uri): String {
-        Log.d("PUI", "getPath: $uri")
         val contentResolver = context.contentResolver
         //Document Provider
         return when {
@@ -145,7 +143,6 @@ object PathUtils {
      *
      */
     private fun mediaDocument(contentResolver: ContentResolver, uri: Uri): String {
-        Log.d("PUI", "mediaDocument: $uri")
         val docId = DocumentsContract.getDocumentId(uri)
         val split: Array<String?> = docId.split(":").toTypedArray()
         val contentUri: Uri =
@@ -155,7 +152,6 @@ object PathUtils {
                 "audio" -> MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
                 else -> MediaStore.Files.getContentUri(docId)
             }
-        Log.d("PUI", "mediaDocument: $docId")
         val selection = "_id=?"
         val selectionArgs = arrayOf(split[1])
         return getPathFromColumn(

@@ -14,7 +14,6 @@ import android.provider.OpenableColumns
 import android.util.Log
 import android.util.Size
 import androidx.core.content.FileProvider
-import androidx.exifinterface.media.ExifInterface
 import com.likeminds.feedsx.utils.file.PathUtils.getPath
 import java.io.*
 
@@ -34,13 +33,10 @@ object FileUtil {
      * @param uri single Uri
      */
     fun getRealPath(context: Context, uri: Uri): String {
-        Log.d("PUI", "getRealPath: 0")
         val contentResolver = context.contentResolver
         val pathTempFile = getFullPathTemp(context, uri)
         val file = File(pathTempFile)
-        Log.d("PUI", "getRealPath: 1")
         val returnedPath = getPath(context, uri)
-        Log.d("PUI", "getRealPath: 2")
         return when {
             //Cloud or Third Party App or Unknown Provider or unknown mime type
             uri.isCloudFile || returnedPath.isBlank() || uri.isUnknownProvider(
@@ -167,86 +163,6 @@ object FileUtil {
         }
     }
 
-    fun getSharedPdfUri(context: Context, oldUri: Uri?): Uri? {
-        if (oldUri == null) {
-            return null
-        }
-        var newUri: Uri? = null
-        try {
-            val parcelFileDescriptor = context.contentResolver.openFileDescriptor(oldUri, "r")!!
-            val fileDescriptor = parcelFileDescriptor.fileDescriptor
-
-            val pdfsFolder = File(context.cacheDir, "pdfs")
-            pdfsFolder.mkdirs()
-            val file = File(pdfsFolder, "${System.currentTimeMillis()}.pdf")
-
-            val inputStream: InputStream = FileInputStream(fileDescriptor)
-            val outputStream = FileOutputStream(file)
-
-            // Transfer bytes from in to out
-            val buf = ByteArray(1024)
-            var len: Int
-            while (inputStream.read(buf).also { len = it } > 0) {
-                outputStream.write(buf, 0, len)
-            }
-
-            outputStream.flush()
-            outputStream.close()
-            inputStream.close()
-            newUri = try {
-                FileProvider.getUriForFile(
-                    context,
-                    getFileProviderPackage(context),
-                    file
-                )
-            } catch (e: Exception) {
-                Log.e("LikeMinds", "provider not found, ${e.localizedMessage}")
-                null
-            }
-        } catch (e: IOException) {
-            Log.e(
-                "FileUtils",
-                "IOException while trying to copy pdf from uri: " + e.localizedMessage
-            )
-        }
-        return newUri
-    }
-
-    fun getSharedVideoUri(context: Context, oldUri: Uri?): Uri? {
-        var newUri: Uri? = null
-        oldUri?.let {
-            try {
-                val parcelFileDescriptor = context.contentResolver.openFileDescriptor(oldUri, "r")!!
-                val fileDescriptor = parcelFileDescriptor.fileDescriptor
-
-                val videosFolder = File(context.cacheDir, "videos")
-                videosFolder.mkdirs()
-                val file = File(videosFolder, "${System.currentTimeMillis()}.mp4")
-
-                val inputStream: InputStream = FileInputStream(fileDescriptor)
-                val outputStream = FileOutputStream(file)
-
-                // Transfer bytes from in to out
-                val buf = ByteArray(1024)
-                var len: Int
-                while (inputStream.read(buf).also { len = it } > 0) {
-                    outputStream.write(buf, 0, len)
-                }
-
-                outputStream.flush()
-                outputStream.close()
-                inputStream.close()
-                newUri = Uri.fromFile(file)
-            } catch (e: IOException) {
-                Log.e(
-                    "FileUtils",
-                    "IOException while trying to copy video from uri: " + e.localizedMessage
-                )
-            }
-        }
-        return newUri
-    }
-
     private fun getFullPathTemp(context: Context, uri: Uri): String {
         val folder: File? = context.getExternalFilesDir("Temp")
         return "${folder.toString()}/${getFileName(context, uri)}"
@@ -320,28 +236,6 @@ object FileUtil {
         fileName: String?
     ): String? {
         return fileName?.substringAfterLast(".", "")
-    }
-
-    fun getSharedImageUri(context: Context, uri: Uri?): Uri? {
-        if (uri == null) {
-            return null
-        }
-        return try {
-            val oldExifOrientation = ExifInterface(getRealPath(context, uri))
-                .getAttribute(ExifInterface.TAG_ORIENTATION)
-            val bitmap = getBitmapFromUri(uri, context) ?: return null
-            val newUri = getUriFromBitmapWithRandomName(context, bitmap) ?: return null
-            if (oldExifOrientation != null) {
-                val newExif = ExifInterface(getRealPath(context, newUri))
-                newExif.setAttribute(ExifInterface.TAG_ORIENTATION, oldExifOrientation)
-                newExif.saveAttributes()
-            }
-            newUri
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Log.e(TAG, "getSharedImageUri", e)
-            null
-        }
     }
 
     private fun getBitmapFromUri(uri: Uri?, context: Context): Bitmap? {

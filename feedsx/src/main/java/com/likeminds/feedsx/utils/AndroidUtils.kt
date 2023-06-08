@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.likeminds.feedsx.media.customviews.WrappedDrawable
-import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.model.LocalAppData
+import com.likeminds.feedsx.media.model.MediaType
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
-import com.likeminds.feedsx.utils.file.FileUtil
 
 object AndroidUtils {
 
@@ -79,31 +79,6 @@ object AndroidUtils {
             intent.setClassName(browseClassName.first, browseClassName.second)
         }
         return intent
-    }
-
-    fun moveAttachmentToCache(
-        context: Context,
-        vararg data: SingleUriData
-    ): List<SingleUriData> {
-        return data.mapNotNull { singleUriData ->
-            val uri = when (singleUriData.fileType) {
-                IMAGE -> {
-                    FileUtil.getSharedImageUri(context, singleUriData.uri)
-                }
-                VIDEO -> {
-                    FileUtil.getSharedVideoUri(context, singleUriData.uri)
-                }
-                PDF -> {
-                    FileUtil.getSharedPdfUri(context, singleUriData.uri)
-                }
-                else -> null
-            }
-            if (uri != null) {
-                singleUriData.toBuilder().uri(uri).build()
-            } else {
-                null
-            }
-        }
     }
 
     /**
