@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.notificationfeed.view.adapter
 
+import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.databinder.ItemNotificationFeedViewDataBinder
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -23,6 +24,6 @@ class NotificationFeedAdapter constructor(
     }
 
     interface NotificationFeedAdapterListener {
-        fun onPostMenuItemClicked(postId: String, title: String)
+        fun onNotificationFeedItemClicked(position: Int, activityViewData: ActivityViewData)
     }
 }

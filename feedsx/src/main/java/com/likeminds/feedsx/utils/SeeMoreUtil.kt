@@ -5,7 +5,7 @@ import android.widget.TextView
 internal object SeeMoreUtil {
 
     /**
-     * This function is for getting short post content for the see more feature
+     * This function is for getting short text content for the see more feature
      */
     fun getShortContent(
         textView: TextView,

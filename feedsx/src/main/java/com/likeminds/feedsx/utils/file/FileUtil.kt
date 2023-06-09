@@ -39,7 +39,10 @@ object FileUtil {
         val returnedPath = getPath(context, uri)
         return when {
             //Cloud or Third Party App or Unknown Provider or unknown mime type
-            uri.isCloudFile ||  returnedPath.isBlank() || uri.isUnknownProvider(returnedPath, contentResolver)->  {
+            uri.isCloudFile || returnedPath.isBlank() || uri.isUnknownProvider(
+                returnedPath,
+                contentResolver
+            ) -> {
                 downloadFile(contentResolver, file, uri)
                 pathTempFile
             }
@@ -233,6 +236,24 @@ object FileUtil {
         fileName: String?
     ): String? {
         return fileName?.substringAfterLast(".", "")
+    }
+
+    private fun getBitmapFromUri(uri: Uri?, context: Context): Bitmap? {
+        var bitmap: Bitmap? = null
+        uri?.let {
+            try {
+                val parcelFileDescriptor = context.contentResolver.openFileDescriptor(uri, "r")!!
+                val fileDescriptor = parcelFileDescriptor.fileDescriptor
+                bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+                parcelFileDescriptor.close()
+            } catch (e: IOException) {
+                Log.e(
+                    "FileUtils",
+                    "IOException while trying to get bitmap from uri: " + e.localizedMessage
+                )
+            }
+        }
+        return bitmap
     }
 }
 
