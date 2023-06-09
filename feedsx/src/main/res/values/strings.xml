@@ -133,6 +133,7 @@
     <string name="edit_post">Edit Post</string>
     <string name="no_activities_to_showno_activities_to_show">No activities to show</string>
     <string name="nine_nine_plus">99+</string>
-    <string name="no_notifications_yet">You don\'t have any notifications yet!</string>
+    <string name="no_notifications_yet">Oops! You don\'t have any notifications yet!</string>
     <string name="just_now">Just now</string>
+    <string name="ellipsize">…</string>
 </resources>
