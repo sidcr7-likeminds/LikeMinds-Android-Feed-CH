@@ -131,4 +131,9 @@
     <string name="you_do_not_have_permission_to_comment">You do not have permission to comment</string>
     <string name="share_post">Share Post</string>
     <string name="edit_post">Edit Post</string>
+    <string name="no_activities_to_showno_activities_to_show">No activities to show</string>
+    <string name="nine_nine_plus">99+</string>
+    <string name="no_notifications_yet">Oops! You don\'t have any notifications yet!</string>
+    <string name="just_now">Just now</string>
+    <string name="ellipsize">…</string>
 </resources>

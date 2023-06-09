@@ -1,12 +1,12 @@
 package com.likeminds.feedsx.notificationfeed.model
 
-import androidx.annotation.StringDef
+import androidx.annotation.IntDef
 
-const val POST = "POST"
-const val COMMENT = "COMMENT"
-const val USER = "USER"
+const val POST = 0
+const val COMMENT = 1
+const val USER = 2
 
-@StringDef(
+@IntDef(
     POST,
     COMMENT,
     USER

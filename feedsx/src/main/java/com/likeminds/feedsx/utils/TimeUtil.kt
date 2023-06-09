@@ -1,6 +1,8 @@
 package com.likeminds.feedsx.utils
 
+import android.content.Context
 import android.text.format.DateUtils
+import com.likeminds.feedsx.R
 
 object TimeUtil {
 
@@ -39,11 +41,16 @@ object TimeUtil {
      * @param timestamp epoch time in milliseconds
      * @return time in " time ago" format
      * */
-    fun getRelativeTime(timestamp: Long): String {
-        return DateUtils.getRelativeTimeSpanString(
+    fun getRelativeTime(context: Context, timestamp: Long): String {
+        val relativeTime = DateUtils.getRelativeTimeSpanString(
             timestamp,
             System.currentTimeMillis(),
             DateUtils.MINUTE_IN_MILLIS
         ).toString()
+        return if (relativeTime == "0 minutes ago") {
+            context.getString(R.string.just_now)
+        } else {
+            relativeTime
+        }
     }
 }

@@ -4,6 +4,7 @@ import android.net.Uri
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.widget.EditText
 import android.widget.TextView
 
@@ -21,6 +22,8 @@ object MemberTaggingDecoder {
         enableClick: Boolean,
         highlightColor: Int,
         underLineText: Boolean = false,
+        isBold: Boolean = false,
+        hasAtRateSymbol: Boolean = true,
         listener: MemberTaggingDecoderListener? = null,
     ) {
         if (text.isNullOrEmpty()) {
@@ -33,7 +36,12 @@ object MemberTaggingDecoder {
             val end = matchResult.range.last
             val value = matchResult.value
             val tag = value.substring(2, value.length - 2).split("\\|".toRegex())
-            val memberName = SpannableString("@${tag[0]}")
+            val spannableString = if (hasAtRateSymbol) {
+                "@${tag[0]}"
+            } else {
+                tag[0]
+            }
+            val memberName = SpannableString(spannableString)
             if (enableClick) {
                 memberName.setSpan(
                     MemberTaggingClickableSpan(
@@ -52,8 +60,13 @@ object MemberTaggingDecoder {
                     }, 0, memberName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
             } else {
+                val style = if (isBold) {
+                    StyleSpan(android.graphics.Typeface.BOLD)
+                } else {
+                    ForegroundColorSpan(highlightColor)
+                }
                 memberName.setSpan(
-                    ForegroundColorSpan(highlightColor),
+                    style,
                     0,
                     memberName.length,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
