@@ -165,12 +165,12 @@ class NotificationFeedFragment :
     private fun checkForNoActivity(feed: List<BaseViewType>) {
         if (feed.isNotEmpty()) {
             binding.apply {
-                tvNoNotification.hide()
+                layoutNoNotification.root.hide()
                 rvNotifications.show()
             }
         } else {
             binding.apply {
-                tvNoNotification.show()
+                layoutNoNotification.root.show()
                 rvNotifications.hide()
             }
         }
