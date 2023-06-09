@@ -127,7 +127,7 @@ class ItemNotificationFeedViewDataBinder constructor(
             if (tvNotificationContent.lineCount >= MAX_LINES) {
                 val lineEndIndex: Int = tvNotificationContent.layout.getLineEnd(MAX_LINES - 1)
                 shortText =
-                    tvNotificationContent.text.subSequence(0, lineEndIndex).toString()
+                    tvNotificationContent.text.subSequence(0, lineEndIndex).toString().trim()
             }
             val finalText = shortText?.plus(ellipsize) ?: tvNotificationContent.text
             tvNotificationContent.text = finalText
