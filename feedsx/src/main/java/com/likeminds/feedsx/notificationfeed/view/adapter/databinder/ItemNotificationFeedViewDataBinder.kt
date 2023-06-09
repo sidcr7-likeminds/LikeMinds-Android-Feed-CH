@@ -3,6 +3,7 @@ package com.likeminds.feedsx.notificationfeed.view.adapter.databinder
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ItemNotificationFeedBinding
@@ -23,6 +24,10 @@ import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 class ItemNotificationFeedViewDataBinder constructor(
     val listener: NotificationFeedAdapterListener
 ) : ViewDataBinder<ItemNotificationFeedBinding, ActivityViewData>() {
+
+    companion object {
+        private const val MAX_LINES = 3
+    }
 
     override val viewType: Int
         get() = ITEM_NOTIFICATION_FEED
@@ -63,7 +68,7 @@ class ItemNotificationFeedViewDataBinder constructor(
         data: ActivityViewData
     ) {
         initNotificationTextContent(
-            binding,
+            binding.tvNotificationContent,
             data
         )
 
@@ -102,19 +107,30 @@ class ItemNotificationFeedViewDataBinder constructor(
 
     // handles text content of notification
     private fun initNotificationTextContent(
-        binding: ItemNotificationFeedBinding,
+        tvNotificationContent: TextView,
         data: ActivityViewData
     ) {
-        binding.apply {
-            val textForLinkify = data.activityText.getValidTextForLinkify()
+        val textForLinkify = data.activityText.getValidTextForLinkify()
+        val context = tvNotificationContent.context
+        tvNotificationContent.post {
             MemberTaggingDecoder.decode(
                 tvNotificationContent,
-                textForLinkify,
+                textForLinkify.trim(),
                 enableClick = false,
                 highlightColor = Color.BLACK,
                 hasAtRateSymbol = false,
                 isBold = true
             )
+            // get the short text as per max lines
+            var shortText: String? = null
+            val ellipsize = context.getString(R.string.ellipsize)
+            if (tvNotificationContent.lineCount >= MAX_LINES) {
+                val lineEndIndex: Int = tvNotificationContent.layout.getLineEnd(MAX_LINES - 1)
+                shortText =
+                    tvNotificationContent.text.subSequence(0, lineEndIndex).toString()
+            }
+            val finalText = shortText?.plus(ellipsize) ?: tvNotificationContent.text
+            tvNotificationContent.text = finalText
         }
     }
 

@@ -135,4 +135,5 @@
     <string name="nine_nine_plus">99+</string>
     <string name="no_notifications_yet">Oops! You don\'t have any notifications yet!</string>
     <string name="just_now">Just now</string>
+    <string name="ellipsize">…</string>
 </resources>

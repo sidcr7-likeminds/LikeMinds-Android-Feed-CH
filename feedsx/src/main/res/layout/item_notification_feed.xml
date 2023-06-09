@@ -53,10 +53,11 @@
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_notification_content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="18dp"
+            android:ellipsize="end"
             android:textColor="@color/dark_grey"
             android:textSize="14sp"
             app:fontType="regular"
@@ -65,7 +66,7 @@
             app:layout_constraintStart_toEndOf="@id/member_image"
             app:layout_constraintTop_toTopOf="@id/member_image"
             tools:fontFamily="@font/roboto_regular"
-            tools:text="Nishkarsh Kaushik commented on your post: “Here is a list of social media tools to help you...”" />
+            tools:text="Nishkarsh Kaushik commented on your post: “Here is a list of social media tools to help yousdfs sdfsd f sdf sfsdfds sdf sdfsdf sfsdfsfd sdfsdfsd  sdff”" />
 
         <com.likeminds.feedsx.branding.customview.LikeMindsTextView
             android:id="@+id/tv_notification_date"
