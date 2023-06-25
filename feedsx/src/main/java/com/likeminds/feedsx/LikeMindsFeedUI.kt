@@ -2,7 +2,10 @@ package com.likeminds.feedsx
 
 import android.app.Application
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
+import com.likeminds.feedsx.feed.model.FeedExtras
+import com.likeminds.feedsx.feed.view.FeedFragment
 
 object LikeMindsFeedUI {
 
@@ -28,6 +31,41 @@ object LikeMindsFeedUI {
             lmUICallback,
             brandingRequest
         )
+    }
+
+    fun initFeed(
+        activity: AppCompatActivity,
+        containerViewId: Int,
+        apiKey: String,
+        userName: String,
+        userId: String,
+        isGuest: Boolean
+    ) {
+        Log.d(SDKApplication.LOG_TAG, "initiate feed called")
+        Log.d(
+            SDKApplication.LOG_TAG, """
+            container id: $containerViewId
+            user_name: $userName
+            user id: $userId
+            isGuest: $isGuest
+        """.trimIndent()
+        )
+
+        val extras = FeedExtras.Builder()
+            .apiKey(apiKey)
+            .userId(userId)
+            .userName(userName)
+            .isGuest(isGuest)
+            .build()
+
+        // todo: ask about callback
+        val fragment = FeedFragment.getInstance(extras)
+
+        val transaction = activity.supportFragmentManager.beginTransaction()
+        transaction.replace(containerViewId, fragment, containerViewId.toString())
+        transaction.setReorderingAllowed(true)
+        Log.d(SDKApplication.LOG_TAG, "showing feed")
+        transaction.commitNowAllowingStateLoss()
     }
 
     fun setBranding(brandingRequest: SetBrandingRequest) {

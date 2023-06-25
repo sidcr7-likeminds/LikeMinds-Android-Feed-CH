@@ -73,7 +73,7 @@ class AuthActivity : AppCompatActivity() {
             .apiKey(authPreferences.getApiKey())
             .userId(authPreferences.getUserId())
             .userName(authPreferences.getUserName())
-            .isLoggedIn(true)
+            .isGuest(false)
             .build()
         val intent = MainActivity.getIntent(this, feedExtras)
         startActivity(intent)

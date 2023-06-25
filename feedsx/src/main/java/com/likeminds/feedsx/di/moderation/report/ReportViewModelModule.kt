@@ -11,10 +11,10 @@ import dagger.multibindings.IntoMap
 abstract class ReportViewModelModule {
 
     @Binds
-    abstract fun bindCreatePostViewModelFactory(factory: ReportViewModelFactory): ViewModelProvider.Factory
+    abstract fun bindReportViewModelFactory(factory: ReportViewModelFactory): ViewModelProvider.Factory
 
     @Binds
     @IntoMap
     @ReportViewModelKey(ReportViewModel::class)
-    abstract fun bindCreatePostViewModel(reportViewModel: ReportViewModel): ViewModel
+    abstract fun bindReportViewModel(reportViewModel: ReportViewModel): ViewModel
 }
