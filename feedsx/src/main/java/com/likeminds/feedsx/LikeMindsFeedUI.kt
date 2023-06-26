@@ -33,6 +33,17 @@ object LikeMindsFeedUI {
         )
     }
 
+    /**
+     * Call this function to initiate feed in the client's app
+     * this function will show home screen of the sdk
+     *
+     * @param activity: instance of the activity
+     * @param containerViewId: Id of the container (FrameLayout or FragmentContainerView) to show the home feed
+     * @param apiKey : API key of the community
+     * @param userName : Name of the user
+     * @param userId : user id of the user
+     * @param isGuest | nullable: is user a guest user of not
+     **/
     fun initFeed(
         activity: AppCompatActivity,
         containerViewId: Int,
@@ -58,7 +69,6 @@ object LikeMindsFeedUI {
             .isGuest(isGuest)
             .build()
 
-        // todo: ask about callback
         val fragment = FeedFragment.getInstance(extras)
 
         val transaction = activity.supportFragmentManager.beginTransaction()
