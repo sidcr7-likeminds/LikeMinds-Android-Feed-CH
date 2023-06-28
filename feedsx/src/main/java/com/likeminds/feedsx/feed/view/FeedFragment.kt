@@ -77,7 +77,6 @@ class FeedFragment :
 
     companion object {
         const val TAG = "FeedFragment"
-        const val sampleDomain = "https://www.sampleapp.com"
         private const val FEED_EXTRAS = "FEED_EXTRAS"
 
         /**
@@ -945,7 +944,7 @@ class FeedFragment :
         ShareUtils.sharePost(
             requireContext(),
             postId,
-            sampleDomain
+            ShareUtils.domain
         )
         val post = getIndexAndPostFromAdapter(postId)?.second ?: return
         postActionsViewModel.sendPostShared(post)

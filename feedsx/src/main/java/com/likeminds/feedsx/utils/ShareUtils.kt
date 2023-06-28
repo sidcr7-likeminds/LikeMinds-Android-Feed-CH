@@ -5,7 +5,14 @@ import android.content.Intent
 import com.likeminds.feedsx.R
 
 object ShareUtils {
-    //share post with url using default sharing in Android OS
+    const val domain = "https://www.sampleapp.com"
+
+    /**
+     * Share post with url using default sharing in Android OS
+     * @param context - context
+     * @param postId - id of the shared post
+     * @param domain - domain required to create share link
+     */
     fun sharePost(
         context: Context,
         postId: String,

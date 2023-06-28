@@ -18,7 +18,6 @@ import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
 import com.likeminds.feedsx.feed.util.PostEvent
-import com.likeminds.feedsx.feed.view.FeedFragment
 import com.likeminds.feedsx.likes.model.COMMENT
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -1519,7 +1518,7 @@ class PostDetailFragment :
         ShareUtils.sharePost(
             requireContext(),
             postId,
-            FeedFragment.sampleDomain
+            ShareUtils.domain
         )
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
         postActionsViewModel.sendPostShared(post)
