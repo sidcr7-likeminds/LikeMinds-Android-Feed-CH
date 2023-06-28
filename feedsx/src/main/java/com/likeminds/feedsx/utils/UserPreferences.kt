@@ -14,20 +14,54 @@ class UserPreferences @Inject constructor(
 
     companion object {
         const val USER_PREFS = "user_prefs"
+        const val API_KEY = "api_key"
+        const val USER_NAME = "user_name"
         const val USER_UNIQUE_ID = "user_unique_id"
+        const val IS_GUEST = "is_guest"
+    }
+
+    fun getApiKey(): String {
+        return getPreference(API_KEY, "") ?: ""
+    }
+
+    fun saveApiKey(apiKey: String) {
+        putPreference(API_KEY, apiKey)
+    }
+
+    fun getUserName(): String {
+        return getPreference(USER_NAME, "") ?: ""
+    }
+
+    fun saveUserName(userName: String) {
+        putPreference(USER_NAME, userName)
     }
 
     fun getUserUniqueId(): String {
         return getPreference(USER_UNIQUE_ID, "") ?: ""
     }
 
-    fun saveUserUniqueId(memberId: String) {
-        putPreference(USER_UNIQUE_ID, memberId)
+    fun saveUserUniqueId(userUniqueId: String) {
+        putPreference(USER_UNIQUE_ID, userUniqueId)
+    }
+
+    fun getIsGuest(): Boolean {
+        return getPreference(IS_GUEST, false)
+    }
+
+    fun saveIsGuest(isGuest: Boolean) {
+        putPreference(IS_GUEST, isGuest)
     }
 
     @SuppressLint("HardwareIds")
     fun getDeviceId(): String {
         return Settings.Secure.getString(application.contentResolver, Settings.Secure.ANDROID_ID)
             ?: ""
+    }
+
+    fun clearPrefs() {
+        saveApiKey("")
+        saveUserName("")
+        saveUserUniqueId("")
+        saveIsGuest(false)
     }
 }

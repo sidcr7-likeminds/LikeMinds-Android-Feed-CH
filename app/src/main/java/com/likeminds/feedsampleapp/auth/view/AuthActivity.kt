@@ -1,19 +1,18 @@
 package com.likeminds.feedsampleapp.auth.view
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.github.dhaval2404.colorpicker.MaterialColorPickerDialog
 import com.github.dhaval2404.colorpicker.model.ColorShape
 import com.github.dhaval2404.colorpicker.model.ColorSwatch
-import com.likeminds.feedsampleapp.MainActivity
 import com.likeminds.feedsampleapp.R
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
 import com.likeminds.feedsampleapp.databinding.ActivityAuthBinding
 import com.likeminds.feedsx.LikeMindsFeedUI
 import com.likeminds.feedsx.branding.model.LMFonts
 import com.likeminds.feedsx.branding.model.SetBrandingRequest
-import com.likeminds.feedsx.feed.model.FeedExtras
 import com.likeminds.feedsx.utils.Route
 import javax.inject.Singleton
 
@@ -48,7 +47,7 @@ class AuthActivity : AppCompatActivity() {
             if (intent.data != null) {
                 parseDeepLink()
             } else {
-                navigateToMain()
+                navigateToAfterLogin()
             }
         } else {
             // user is not logged in, ask login details.
@@ -67,15 +66,9 @@ class AuthActivity : AppCompatActivity() {
         finish()
     }
 
-    // navigates user to [MainActivity]
-    private fun navigateToMain() {
-        val feedExtras = FeedExtras.Builder()
-            .apiKey(authPreferences.getApiKey())
-            .userId(authPreferences.getUserId())
-            .userName(authPreferences.getUserName())
-            .isLoggedIn(true)
-            .build()
-        val intent = MainActivity.getIntent(this, feedExtras)
+    // navigates user to [AfterLoginActivity]
+    private fun navigateToAfterLogin() {
+        val intent = Intent(this, AfterLoginActivity::class.java)
         startActivity(intent)
         finish()
     }
@@ -161,7 +154,7 @@ class AuthActivity : AppCompatActivity() {
 
                 LikeMindsFeedUI.setBranding(brandingRequest)
 
-                navigateToMain()
+                navigateToAfterLogin()
             }
         }
     }
