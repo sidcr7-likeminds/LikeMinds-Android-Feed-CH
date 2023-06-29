@@ -15,7 +15,7 @@ import com.likeminds.feedsx.db.models.UserEntity
         PostEntity::class,
         AttachmentEntity::class,
         MemberRightsEntity::class
-    ], version = 3, exportSchema = true
+    ], version = 3, exportSchema = false
 )
 abstract class FeedSXDatabase : RoomDatabase() {
     //User related queries

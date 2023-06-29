@@ -1,10 +1,7 @@
 package com.likeminds.feedsx.db.models
 
 import androidx.room.ColumnInfo
-import androidx.room.Entity
-import com.likeminds.feedsx.db.utils.DbConstants
 
-@Entity(tableName = DbConstants.SDK_CLIENT_INFO_TABLE)
 class SDKClientInfoEntity constructor(
     @ColumnInfo(name = "community")
     var community: Int,
