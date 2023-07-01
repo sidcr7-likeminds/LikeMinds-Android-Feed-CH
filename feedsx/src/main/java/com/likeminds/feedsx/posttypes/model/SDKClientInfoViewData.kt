@@ -1,18 +1,15 @@
-package com.likeminds.feedsx.db.models
+package com.likeminds.feedsx.posttypes.model
 
-import androidx.room.ColumnInfo
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
-class SDKClientInfoEntity constructor(
-    @ColumnInfo(name = "community", defaultValue = "0")
-    var community: Int,
-    @ColumnInfo(name = "user", defaultValue = "0")
-    var user: Int,
-    @ColumnInfo(name = "sdk_client_user_unique_id", defaultValue = "")
-    var userUniqueId: String,
-    @ColumnInfo(name = "sdk_client_uuid", defaultValue = "")
-    var uuid: String
-) {
-
+@Parcelize
+class SDKClientInfoViewData private constructor(
+    val community: Int,
+    val user: Int,
+    val userUniqueId: String,
+    val uuid: String
+) : Parcelable {
     class Builder {
         private var community: Int = 0
         private var user: Int = 0
@@ -24,13 +21,13 @@ class SDKClientInfoEntity constructor(
         fun userUniqueId(userUniqueId: String) = apply { this.userUniqueId = userUniqueId }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
 
-        fun build() = SDKClientInfoEntity(community, user, userUniqueId, uuid)
+        fun build() = SDKClientInfoViewData(community, user, userUniqueId, uuid)
     }
 
     fun toBuilder(): Builder {
         return Builder().user(user)
             .community(community)
-            .userUniqueId(userUniqueId)
             .uuid(uuid)
+            .userUniqueId(userUniqueId)
     }
 }

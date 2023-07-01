@@ -27,7 +27,7 @@ class UserEntity constructor(
     var state: Int,
     @ColumnInfo(name = "is_owner")
     var isOwner: Boolean,
-    @ColumnInfo(name = "uuid")
+    @ColumnInfo(name = "uuid", defaultValue = "")
     var uuid: String,
     @Embedded
     var sdkClientInfoEntity: SDKClientInfoEntity

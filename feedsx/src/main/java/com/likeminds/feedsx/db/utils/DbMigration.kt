@@ -19,16 +19,19 @@ object DbMigration {
     val MIGRATION_2_3 = object : Migration(2, 3) {
         override fun migrate(database: SupportSQLiteDatabase) {
             database.execSQL(
-                "ALTER TABLE `$USER_TABLE` ADD COLUMN community INTEGER NOT NULL"
+                "ALTER TABLE `$USER_TABLE` ADD COLUMN uuid TEXT DEFAULT '' NOT NULL"
             )
             database.execSQL(
-                "ALTER TABLE `$USER_TABLE` ADD COLUMN user INTEGER NOT NULL"
+                "ALTER TABLE `$USER_TABLE` ADD sdk_client_user_unique_id TEXT DEFAULT '' NOT NULL"
             )
             database.execSQL(
-                "ALTER TABLE `$USER_TABLE` ADD COLUMN sdk_client_user_unique_id TEXT NOT NULL"
+                "ALTER TABLE `$USER_TABLE` ADD sdk_client_uuid TEXT DEFAULT '' NOT NULL"
             )
             database.execSQL(
-                "ALTER TABLE `$USER_TABLE` ADD COLUMN sdk_client_uuid TEXT NOT NULL"
+                "ALTER TABLE `$USER_TABLE` ADD community INTEGER DEFAULT 0 NOT NULL"
+            )
+            database.execSQL(
+                "ALTER TABLE `$USER_TABLE` ADD user INTEGER DEFAULT 0 NOT NULL"
             )
         }
     }
