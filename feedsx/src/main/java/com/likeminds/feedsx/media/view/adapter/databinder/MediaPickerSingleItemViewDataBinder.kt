@@ -71,7 +71,7 @@ class MediaPickerSingleItemViewDataBinder constructor(
             ?.into(binding.ivThumbnail)
 
         val showVideoIcon = MediaType.isVideo(data.mediaType)
-        binding.imageViewFileTypeIcon.isVisible = showVideoIcon
+        binding.ivFileTypeIcon.isVisible = showVideoIcon
         binding.ivShadow.isVisible = showVideoIcon
     }
 }

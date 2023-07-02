@@ -3,12 +3,21 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.SDKApplication
 
 object ShareUtils {
-    //share post with url using default sharing in Android OS
-    fun sharePost(context: Context, postId: String) {
-        val domain = (SDKApplication.getInstance()).getDomain()
+    const val domain = "https://www.sampleapp.com"
+
+    /**
+     * Share post with url using default sharing in Android OS
+     * @param context - context
+     * @param postId - id of the shared post
+     * @param domain - domain required to create share link
+     */
+    fun sharePost(
+        context: Context,
+        postId: String,
+        domain: String
+    ) {
         val shareLink = "$domain/post?post_id=$postId"
         val shareTitle = context.getString(R.string.share_post)
         shareLink(context, shareLink, shareTitle)

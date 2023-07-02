@@ -71,6 +71,9 @@ class PostDetailFragment :
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
 
+    @Inject
+    lateinit var userPreferences: UserPreferences
+
     private lateinit var postDetailExtras: PostDetailExtras
 
     private lateinit var mPostDetailAdapter: PostDetailAdapter
@@ -162,7 +165,13 @@ class PostDetailFragment :
         if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
             postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
         ) {
-            initiateViewModel.initiateUser()
+            initiateViewModel.initiateUser(
+                requireContext(),
+                userPreferences.getApiKey(),
+                userPreferences.getUserName(),
+                userPreferences.getUserUniqueId(),
+                userPreferences.getIsGuest()
+            )
         } else {
             viewModel.getPost(postDetailExtras.postId, 1)
         }
@@ -1506,7 +1515,11 @@ class PostDetailFragment :
 
     // callback when user clicks to share the post
     override fun sharePost(postId: String) {
-        ShareUtils.sharePost(requireContext(), postId)
+        ShareUtils.sharePost(
+            requireContext(),
+            postId,
+            ShareUtils.domain
+        )
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
         postActionsViewModel.sendPostShared(post)
     }

@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -83,7 +84,22 @@ class FeedFragment :
     PostObserver {
 
     companion object {
-        const val FEED_EXTRAS = "FEED_EXTRAS"
+        const val TAG = "FeedFragment"
+        private const val FEED_EXTRAS = "FEED_EXTRAS"
+
+        /**
+         * creates a instance of fragment
+         **/
+        @JvmStatic
+        fun getInstance(
+            extras: FeedExtras,
+        ): FeedFragment {
+            val fragment = FeedFragment()
+            val bundle = Bundle()
+            bundle.putParcelable(FEED_EXTRAS, extras)
+            fragment.arguments = bundle
+            return fragment
+        }
     }
 
     private lateinit var feedExtras: FeedExtras
@@ -541,14 +557,20 @@ class FeedFragment :
     // initiates SDK
     private fun initiateSDK() {
         ProgressHelper.showProgress(binding.progressBar)
-        initiateViewModel.initiateUser()
+        initiateViewModel.initiateUser(
+            requireContext(),
+            feedExtras.apiKey,
+            feedExtras.userName,
+            feedExtras.userId,
+            feedExtras.isGuest
+        )
     }
 
     /**
      * UI Block
      **/
 
-    // initializes various UI components
+// initializes various UI components
     private fun initUI() {
         binding.toolbarColor = LMBranding.getToolbarColor()
 
@@ -791,7 +813,7 @@ class FeedFragment :
      * Post Actions block
      **/
 
-    // updates [alreadySeenFullContent] for the post
+// updates [alreadySeenFullContent] for the post
     override fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         // get item from adapter
         val item = mPostAdapter[position]
@@ -941,7 +963,11 @@ class FeedFragment :
 
     // callback when user clicks to share the post
     override fun sharePost(postId: String) {
-        ShareUtils.sharePost(requireContext(), postId)
+        ShareUtils.sharePost(
+            requireContext(),
+            postId,
+            ShareUtils.domain
+        )
         val post = getIndexAndPostFromAdapter(postId)?.second ?: return
         postActionsViewModel.sendPostShared(post)
     }
@@ -1135,7 +1161,7 @@ class FeedFragment :
      * Adapter Util Block
      **/
 
-    //get index and post from the adapter using postId
+//get index and post from the adapter using postId
     private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData>? {
         val index = mPostAdapter.items().indexOfFirst {
             (it is PostViewData) && (it.id == postId)
