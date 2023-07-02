@@ -2,13 +2,7 @@ package com.likeminds.feedsx.utils
 
 import android.net.Uri
 import android.util.Base64
-import com.likeminds.feedsx.db.models.AttachmentEntity
-import com.likeminds.feedsx.db.models.AttachmentMetaEntity
-import com.likeminds.feedsx.db.models.MemberRightsEntity
-import com.likeminds.feedsx.db.models.PostEntity
-import com.likeminds.feedsx.db.models.PostWithAttachments
-import com.likeminds.feedsx.db.models.SDKClientInfoEntity
-import com.likeminds.feedsx.db.models.UserEntity
+import com.likeminds.feedsx.db.models.*
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
@@ -19,15 +13,7 @@ import com.likeminds.feedsx.notificationfeed.model.ActivityEntityViewData
 import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
-import com.likeminds.feedsx.posttypes.model.AttachmentMetaViewData
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.CommentViewData
-import com.likeminds.feedsx.posttypes.model.DOCUMENT
-import com.likeminds.feedsx.posttypes.model.LINK
-import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.SDKClientInfoViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
@@ -40,12 +26,7 @@ import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionD
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
 import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
-import com.likeminds.likemindsfeed.post.model.Attachment
-import com.likeminds.likemindsfeed.post.model.AttachmentMeta
-import com.likeminds.likemindsfeed.post.model.Like
-import com.likeminds.likemindsfeed.post.model.LinkOGTags
-import com.likeminds.likemindsfeed.post.model.MenuItem
-import com.likeminds.likemindsfeed.post.model.Post
+import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
 import com.likeminds.likemindsfeed.sdk.model.User
 

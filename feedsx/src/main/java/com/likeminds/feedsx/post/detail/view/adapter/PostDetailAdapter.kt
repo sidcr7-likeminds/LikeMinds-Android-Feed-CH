@@ -5,21 +5,16 @@ import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCo
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentsCountViewDataBinder
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostDocumentsViewDataBinder
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostLinkViewDataBinder
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostMultipleMediaViewDataBinder
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostSingleImageViewDataBinder
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostSingleVideoViewDataBinder
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostTextOnlyViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
 import com.likeminds.feedsx.utils.ValueUtils.getItemInList
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 
 class PostDetailAdapter constructor(
-    val postAdapterListener: PostAdapterListener,
-    val postDetailAdapterListener: PostDetailAdapterListener,
-    val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
+    private val postAdapterListener: PostAdapterListener,
+    private val postDetailAdapterListener: PostDetailAdapterListener,
+    private val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
 ) : BaseRecyclerAdapter<BaseViewType>() {
 
     init {

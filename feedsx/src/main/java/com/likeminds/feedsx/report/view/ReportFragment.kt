@@ -11,12 +11,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.databinding.FragmentReportBinding
-import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
-import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
-import com.likeminds.feedsx.report.model.REPORT_TYPE_REPLY
-import com.likeminds.feedsx.report.model.ReportExtras
-import com.likeminds.feedsx.report.model.ReportTagViewData
-import com.likeminds.feedsx.report.model.ReportType
+import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
 import com.likeminds.feedsx.report.viewmodel.ReportViewModel
@@ -125,6 +120,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
                     reasonOrTag
                 )
             }
+
             REPORT_TYPE_COMMENT -> {
                 // sends comment reported event
                 viewModel.sendCommentReportedEvent(
@@ -134,6 +130,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
                     reasonOrTag
                 )
             }
+
             REPORT_TYPE_REPLY -> {
                 // sends reply reported event
                 viewModel.sendReplyReportedEvent(
@@ -163,9 +160,11 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
             REPORT_TYPE_POST -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "post")
             }
+
             REPORT_TYPE_COMMENT -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "comment")
             }
+
             REPORT_TYPE_REPLY -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "reply")
             }
