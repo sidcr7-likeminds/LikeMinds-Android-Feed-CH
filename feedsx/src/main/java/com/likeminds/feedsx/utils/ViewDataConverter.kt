@@ -21,12 +21,12 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 import com.likeminds.likemindsfeed.comment.model.Comment
-import com.likeminds.likemindsfeed.helper.model.TagMember
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
 import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
 import com.likeminds.likemindsfeed.post.model.*
+import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
 import com.likeminds.likemindsfeed.sdk.model.User
 
 object ViewDataConverter {
@@ -43,10 +43,12 @@ object ViewDataConverter {
                 attachmentType = com.likeminds.feedsx.posttypes.model.IMAGE
                 ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
             }
+
             VIDEO -> {
                 attachmentType = com.likeminds.feedsx.posttypes.model.VIDEO
                 ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
             }
+
             else -> {
                 attachmentType = DOCUMENT
                 ITEM_CREATE_POST_DOCUMENTS_ITEM
@@ -164,6 +166,17 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isGuest(user.isGuest)
             .isDeleted(user.isDeleted)
+            .uuid(user.uuid)
+            .sdkClientInfoViewData(convertSDKClientInfo(user.sdkClientInfo))
+            .build()
+    }
+
+    private fun convertSDKClientInfo(sdkClientInfo: SDKClientInfo): SDKClientInfoViewData {
+        return SDKClientInfoViewData.Builder()
+            .user(sdkClientInfo.user)
+            .uuid(sdkClientInfo.uuid)
+            .userUniqueId(sdkClientInfo.userUniqueId)
+            .community(sdkClientInfo.community)
             .build()
     }
 
@@ -393,7 +406,7 @@ object ViewDataConverter {
             .build()
     }
 
-    fun convertUserTag(tagMember: TagMember): UserTagViewData {
+    fun convertUserTag(tagMember: User): UserTagViewData {
         val nameDrawable = MemberImageUtil.getNameDrawable(
             MemberImageUtil.SIXTY_PX,
             tagMember.id.toString(),
@@ -406,6 +419,7 @@ object ViewDataConverter {
             .name(tagMember.name)
             .userUniqueId(tagMember.userUniqueId)
             .placeHolder(nameDrawable.first)
+            .uuid(tagMember.sdkClientInfo.uuid)
             .build()
     }
 
@@ -579,6 +593,12 @@ object ViewDataConverter {
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
+
+    /**
+     * converts [User] to [UserEntity]
+     * @param user: object of [User]
+     * @return object of [UserEntity]
+     */
     fun createUserEntity(user: User): UserEntity {
         return UserEntity.Builder()
             .id(user.id)
@@ -589,6 +609,22 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isDeleted(user.isDeleted)
             .userUniqueId(user.userUniqueId)
+            .uuid(user.uuid)
+            .sdkClientInfoEntity(createSDKClientInfoEntity(user.sdkClientInfo))
+            .build()
+    }
+
+    /**
+     * converts [SDKClientInfo] to [SDKClientInfoEntity]
+     * @param sdkClientInfo: object of [SDKClientInfo]
+     * @return object of [SDKClientInfoEntity]
+     */
+    private fun createSDKClientInfoEntity(sdkClientInfo: SDKClientInfo): SDKClientInfoEntity {
+        return SDKClientInfoEntity.Builder()
+            .user(sdkClientInfo.user)
+            .community(sdkClientInfo.community)
+            .userUniqueId(sdkClientInfo.userUniqueId)
+            .uuid(sdkClientInfo.uuid)
             .build()
     }
 
@@ -716,9 +752,11 @@ object ViewDataConverter {
             IMAGE -> {
                 com.likeminds.feedsx.posttypes.model.IMAGE
             }
+
             VIDEO -> {
                 com.likeminds.feedsx.posttypes.model.VIDEO
             }
+
             else -> {
                 DOCUMENT
             }

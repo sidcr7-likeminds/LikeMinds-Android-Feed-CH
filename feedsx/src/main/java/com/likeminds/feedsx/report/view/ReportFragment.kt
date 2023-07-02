@@ -115,25 +115,27 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
                 // sends post reported event
                 viewModel.sendPostReportedEvent(
                     extras.entityId,
-                    extras.entityCreatorId,
+                    extras.uuid,
                     ViewUtils.getPostTypeFromViewType(extras.postViewType),
                     reasonOrTag
                 )
             }
+
             REPORT_TYPE_COMMENT -> {
                 // sends comment reported event
                 viewModel.sendCommentReportedEvent(
                     extras.postId,
-                    extras.entityCreatorId,
+                    extras.uuid,
                     extras.entityId,
                     reasonOrTag
                 )
             }
+
             REPORT_TYPE_REPLY -> {
                 // sends reply reported event
                 viewModel.sendReplyReportedEvent(
                     extras.postId,
-                    extras.entityCreatorId,
+                    extras.uuid,
                     extras.parentCommentId,
                     extras.entityId,
                     reasonOrTag
@@ -158,9 +160,11 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
             REPORT_TYPE_POST -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "post")
             }
+
             REPORT_TYPE_COMMENT -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "comment")
             }
+
             REPORT_TYPE_REPLY -> {
                 binding.tvReportSubHeader.text = getString(R.string.report_sub_header, "reply")
             }
@@ -210,7 +214,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
             //call post api
             viewModel.postReport(
                 extras.entityId,
-                extras.entityCreatorId,
+                extras.uuid,
                 extras.entityType,
                 tagSelected?.id,
                 reason

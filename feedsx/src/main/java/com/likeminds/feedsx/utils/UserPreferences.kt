@@ -17,6 +17,7 @@ class UserPreferences @Inject constructor(
         const val API_KEY = "api_key"
         const val USER_NAME = "user_name"
         const val USER_UNIQUE_ID = "user_unique_id"
+        const val USER_UUID = "user_uuid"
         const val IS_GUEST = "is_guest"
     }
 
@@ -50,6 +51,14 @@ class UserPreferences @Inject constructor(
 
     fun saveIsGuest(isGuest: Boolean) {
         putPreference(IS_GUEST, isGuest)
+    }
+
+    fun getUUID(): String {
+        return getPreference(USER_UUID, "") ?: ""
+    }
+
+    fun saveUUID(uuid: String) {
+        putPreference(USER_UUID, uuid)
     }
 
     @SuppressLint("HardwareIds")

@@ -64,9 +64,8 @@ import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
-
 
 class FeedFragment :
     BaseFragment<FragmentFeedBinding, FeedViewModel>(),
@@ -235,9 +234,11 @@ class FeedFragment :
                 0 -> {
                     tvNotificationCount.isVisible = false
                 }
+
                 in 1..99 -> {
                     configureNotificationBadge(count.toString())
                 }
+
                 else -> {
                     configureNotificationBadge(getString(R.string.nine_nine_plus))
                 }
@@ -376,6 +377,7 @@ class FeedFragment :
                 }
                 viewModel.addPost(postingData)
             }
+
             WorkInfo.State.FAILED -> {
                 // uploading failed, initiate retry mechanism
                 val indexList = workInfo.outputData.getIntArray(
@@ -386,6 +388,7 @@ class FeedFragment :
                     indexList.size
                 )
             }
+
             else -> {
                 // uploading in progress, map the progress to progress bar
                 val progress = MediaUploadWorker.getProgress(workInfo) ?: return
@@ -423,10 +426,12 @@ class FeedFragment :
                 ProgressHelper.hideProgress(binding.progressBar)
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is FeedViewModel.ErrorMessageEvent.AddPost -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 removePostingView()
             }
+
             is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
                 binding.tvNotificationCount.hide()
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
@@ -458,6 +463,7 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is PostActionsViewModel.ErrorMessageEvent.SavePost -> {
                 val postId = response.postId
 
@@ -479,10 +485,12 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is PostActionsViewModel.ErrorMessageEvent.DeletePost -> {
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is PostActionsViewModel.ErrorMessageEvent.PinPost -> {
                 val postId = response.postId
 
@@ -634,6 +642,7 @@ class FeedFragment :
                     // post of type text/link has been created and posted
                     refreshFeed()
                 }
+
                 CreatePostActivity.RESULT_UPLOAD_POST -> {
                     // post with attachments created, now upload and post it from db
                     viewModel.fetchPendingPostFromDB()
@@ -858,7 +867,7 @@ class FeedFragment :
     // callback when post menu items are clicked
     override fun onPostMenuItemClicked(
         postId: String,
-        creatorId: String,
+        postCreatorUUID: String,
         menuId: Int
     ) {
         when (menuId) {
@@ -869,15 +878,19 @@ class FeedFragment :
                 val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
                 startActivity(intent)
             }
+
             DELETE_POST_MENU_ITEM_ID -> {
-                deletePost(postId, creatorId)
+                deletePost(postId, postCreatorUUID)
             }
+
             REPORT_POST_MENU_ITEM_ID -> {
-                reportPost(postId, creatorId)
+                reportPost(postId, postCreatorUUID)
             }
+
             PIN_POST_MENU_ITEM_ID -> {
                 pinPost(postId)
             }
+
             UNPIN_POST_MENU_ITEM_ID -> {
                 unpinPost(postId)
             }
@@ -951,13 +964,13 @@ class FeedFragment :
     }
 
     // processes delete post request
-    private fun deletePost(postId: String, creatorId: String) {
+    private fun deletePost(postId: String, postCreatorUUID: String) {
         val deleteExtras = DeleteExtras.Builder()
             .postId(postId)
             .entityType(DELETE_TYPE_POST)
             .build()
 
-        if (creatorId == postActionsViewModel.getUserUniqueId()) {
+        if (postCreatorUUID == postActionsViewModel.getUUID()) {
             // if the post was created by current user
             SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
@@ -973,12 +986,12 @@ class FeedFragment :
     }
 
     // Processes report action on post
-    private fun reportPost(postId: String, creatorId: String) {
+    private fun reportPost(postId: String, uuid: String) {
         val post = getIndexAndPostFromAdapter(postId)?.second ?: return
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
-            .entityCreatorId(creatorId)
+            .uuid(uuid)
             .entityType(REPORT_TYPE_POST)
             .postViewType(post.viewType)
             .build()

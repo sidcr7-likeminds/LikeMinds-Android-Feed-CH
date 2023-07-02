@@ -5,7 +5,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.likeminds.feedsx.SDKApplication
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -33,7 +32,7 @@ internal class FlowObserver<T>(
                 }
 
                 else -> {
-                    Log.d(SDKApplication.LOG_TAG, "flow lifecycle event: $event")
+                    Log.d("Flow", "flow lifecycle event: $event")
                 }
             }
         })

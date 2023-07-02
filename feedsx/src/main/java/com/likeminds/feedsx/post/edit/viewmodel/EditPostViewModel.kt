@@ -123,10 +123,11 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
         post: PostViewData
     ) {
         val postType = ViewUtils.getPostTypeFromViewType(post.viewType)
+        val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         LMAnalytics.track(
             LMAnalytics.Events.POST_EDITED,
             mapOf(
-                "created_by_id" to post.userId,
+                "created_by_id" to postCreatorUUID,
                 LMAnalytics.Keys.POST_ID to post.id,
                 "post_type" to postType,
             )
