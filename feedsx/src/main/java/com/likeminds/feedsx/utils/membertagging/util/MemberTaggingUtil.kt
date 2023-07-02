@@ -11,7 +11,7 @@ import androidx.annotation.FloatRange
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
-import com.likeminds.likemindsfeed.helper.model.TagMember
+import com.likeminds.likemindsfeed.sdk.model.User
 
 object MemberTaggingUtil {
 
@@ -21,7 +21,7 @@ object MemberTaggingUtil {
      * @return tagging list to the view
      * */
     fun getTaggingData(
-        memberTags: List<TagMember>
+        memberTags: List<User>
     ): ArrayList<UserTagViewData> {
         //list send to view
         val listOfTaggedMembers = ArrayList<UserTagViewData>()

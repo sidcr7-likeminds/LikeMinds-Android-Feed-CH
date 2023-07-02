@@ -21,7 +21,6 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 import com.likeminds.likemindsfeed.comment.model.Comment
-import com.likeminds.likemindsfeed.helper.model.TagMember
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
@@ -407,7 +406,7 @@ object ViewDataConverter {
             .build()
     }
 
-    fun convertUserTag(tagMember: TagMember): UserTagViewData {
+    fun convertUserTag(tagMember: User): UserTagViewData {
         val nameDrawable = MemberImageUtil.getNameDrawable(
             MemberImageUtil.SIXTY_PX,
             tagMember.id.toString(),
@@ -420,6 +419,7 @@ object ViewDataConverter {
             .name(tagMember.name)
             .userUniqueId(tagMember.userUniqueId)
             .placeHolder(nameDrawable.first)
+            .uuid(tagMember.sdkClientInfo.uuid)
             .build()
     }
 
