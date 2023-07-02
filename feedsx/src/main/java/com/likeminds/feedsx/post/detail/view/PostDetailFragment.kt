@@ -868,7 +868,7 @@ class PostDetailFragment :
     // Processes report action on entity
     private fun reportEntity(
         entityId: String,
-        creatorId: String,
+        uuid: String,
         @ReportType
         entityType: Int,
         postId: String,
@@ -878,7 +878,7 @@ class PostDetailFragment :
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(entityId)
-            .entityCreatorId(creatorId)
+            .uuid(uuid)
             .entityType(entityType)
             .postId(postId)
             .postViewType(postViewType)
@@ -1235,7 +1235,7 @@ class PostDetailFragment :
     // callback when post menu items are clicked
     override fun onPostMenuItemClicked(
         postId: String,
-        creatorId: String,
+        postCreatorUUID: String,
         menuId: Int
     ) {
         when (menuId) {
@@ -1249,7 +1249,7 @@ class PostDetailFragment :
             DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(
                     postId,
-                    creatorId
+                    postCreatorUUID
                 )
             }
             REPORT_POST_MENU_ITEM_ID -> {
@@ -1257,7 +1257,7 @@ class PostDetailFragment :
                 val postViewType = postData.viewType
                 reportEntity(
                     postId,
-                    creatorId,
+                    postCreatorUUID,
                     REPORT_TYPE_POST,
                     postId,
                     postViewType = postViewType

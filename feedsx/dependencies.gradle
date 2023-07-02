@@ -64,5 +64,5 @@ dependencies {
     implementation deps.facebook.shimmer
 
     // feed-sdk
-    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:143f9160c7"
+    implementation "com.github.NateshR.LikeMinds-Android-Feed-SDK:likemindsfeed:5eb50f55e4"
 }

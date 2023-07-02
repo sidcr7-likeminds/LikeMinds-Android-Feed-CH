@@ -11,7 +11,12 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.databinding.FragmentReportBinding
-import com.likeminds.feedsx.report.model.*
+import com.likeminds.feedsx.report.model.REPORT_TYPE_COMMENT
+import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
+import com.likeminds.feedsx.report.model.REPORT_TYPE_REPLY
+import com.likeminds.feedsx.report.model.ReportExtras
+import com.likeminds.feedsx.report.model.ReportTagViewData
+import com.likeminds.feedsx.report.model.ReportType
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
 import com.likeminds.feedsx.report.viewmodel.ReportViewModel
@@ -115,7 +120,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
                 // sends post reported event
                 viewModel.sendPostReportedEvent(
                     extras.entityId,
-                    extras.entityCreatorId,
+                    extras.uuid,
                     ViewUtils.getPostTypeFromViewType(extras.postViewType),
                     reasonOrTag
                 )
@@ -124,7 +129,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
                 // sends comment reported event
                 viewModel.sendCommentReportedEvent(
                     extras.postId,
-                    extras.entityCreatorId,
+                    extras.uuid,
                     extras.entityId,
                     reasonOrTag
                 )
@@ -133,7 +138,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
                 // sends reply reported event
                 viewModel.sendReplyReportedEvent(
                     extras.postId,
-                    extras.entityCreatorId,
+                    extras.uuid,
                     extras.parentCommentId,
                     extras.entityId,
                     reasonOrTag
@@ -210,7 +215,7 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
             //call post api
             viewModel.postReport(
                 extras.entityId,
-                extras.entityCreatorId,
+                extras.uuid,
                 extras.entityType,
                 tagSelected?.id,
                 reason

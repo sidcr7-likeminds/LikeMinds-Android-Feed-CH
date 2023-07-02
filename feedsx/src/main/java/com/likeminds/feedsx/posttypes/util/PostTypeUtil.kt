@@ -1,7 +1,11 @@
 package com.likeminds.feedsx.posttypes.util
 
 import android.net.Uri
-import android.text.*
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.TextPaint
+import android.text.TextUtils
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
@@ -19,17 +23,31 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.*
+import com.likeminds.feedsx.databinding.ItemDocumentBinding
+import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
+import com.likeminds.feedsx.databinding.ItemPostLinkBinding
+import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
+import com.likeminds.feedsx.databinding.LayoutAuthorFrameBinding
+import com.likeminds.feedsx.databinding.LayoutPostActionsBinding
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.AttachmentViewData
+import com.likeminds.feedsx.posttypes.model.IMAGE
+import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
-import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.AndroidUtils
+import com.likeminds.feedsx.utils.MemberImageUtil
+import com.likeminds.feedsx.utils.Route
+import com.likeminds.feedsx.utils.SeeMoreUtil
+import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -37,7 +55,7 @@ import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
-import java.util.*
+import java.util.Locale
 
 object PostTypeUtil {
     const val SHOW_MORE_COUNT = 2
@@ -65,11 +83,13 @@ object PostTypeUtil {
                 tvEdited.hide()
             }
 
+            val postCreatorUUID = data.user.sdkClientInfoViewData.uuid
+
             ivPostMenu.setOnClickListener { view ->
                 showMenu(
                     view,
                     data.id,
-                    data.userId,
+                    postCreatorUUID,
                     data.menuItems,
                     listener
                 )
@@ -99,7 +119,7 @@ object PostTypeUtil {
     private fun showMenu(
         view: View,
         postId: String,
-        creatorId: String,
+        postCreatorUUID: String,
         menuItems: List<OverflowMenuItemViewData>,
         listener: PostAdapterListener
     ) {
@@ -116,7 +136,7 @@ object PostTypeUtil {
         popup.setOnMenuItemClickListener { menuItem ->
             listener.onPostMenuItemClicked(
                 postId,
-                creatorId,
+                postCreatorUUID,
                 menuItem.itemId
             )
             true
@@ -217,7 +237,6 @@ object PostTypeUtil {
         }
     }
 
-
     // initializes various actions on the post
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
@@ -304,9 +323,11 @@ object PostTypeUtil {
                     IMAGE -> {
                         it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
                     }
+
                     VIDEO -> {
                         it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
                     }
+
                     else -> {
                         it
                     }

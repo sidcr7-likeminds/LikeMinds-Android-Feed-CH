@@ -45,6 +45,11 @@ class PostActionsViewModel @Inject constructor(
         return userPreferences.getUserUniqueId()
     }
 
+    // returns uuid from user prefs
+    fun getUUID(): String {
+        return userPreferences.getUUID()
+    }
+
     //for like/unlike a post
     fun likePost(postId: String) {
         viewModelScope.launchIO {

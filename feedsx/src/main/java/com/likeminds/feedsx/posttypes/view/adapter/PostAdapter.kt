@@ -1,7 +1,12 @@
 package com.likeminds.feedsx.posttypes.view.adapter
 
 import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostDocumentsViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostLinkViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostMultipleMediaViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostSingleImageViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostSingleVideoViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostTextOnlyViewDataBinder
 import com.likeminds.feedsx.utils.ValueUtils.getItemInList
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -62,7 +67,7 @@ interface PostAdapterListener {
     }
     fun onPostMenuItemClicked(
         postId: String,
-        creatorId: String,
+        postCreatorUUID: String,
         menuId: Int
     ) {
         //triggered when a user clicks overflow menu of a post
