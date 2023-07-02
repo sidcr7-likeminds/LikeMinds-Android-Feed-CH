@@ -264,14 +264,16 @@ class PostDetailFragment :
                         val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
                         val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
                             ?: return@setOnClickListener
+                        val parentCommentCreatorUUID = parentComment.user.sdkClientInfoViewData.uuid
                         viewModel.replyComment(
-                            parentComment.userId,
+                            parentCommentCreatorUUID,
                             postDetailExtras.postId,
                             parentCommentId,
                             updatedText
                         )
                         hideReplyingToView()
                     }
+
                     editCommentId != null -> {
                         // when an existing comment is edited
                         val commentId = editCommentId ?: return@setOnClickListener
@@ -282,6 +284,7 @@ class PostDetailFragment :
                         )
                         editCommentId = null
                     }
+
                     else -> {
                         // input text is a comment
                         viewModel.addComment(postId, updatedText)
@@ -607,11 +610,13 @@ class PostDetailFragment :
                 is PostDetailViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
                 is PostDetailViewModel.ErrorMessageEvent.GetPost -> {
                     mSwipeRefreshLayout.isRefreshing = false
                     ProgressHelper.hideProgress(binding.progressBar)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
                 is PostDetailViewModel.ErrorMessageEvent.LikeComment -> {
                     val commentId = response.commentId
 
@@ -634,15 +639,19 @@ class PostDetailFragment :
                     //show error message
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
                 is PostDetailViewModel.ErrorMessageEvent.AddComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
                 is PostDetailViewModel.ErrorMessageEvent.DeleteComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
                 is PostDetailViewModel.ErrorMessageEvent.GetComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
                 is PostDetailViewModel.ErrorMessageEvent.EditComment -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
@@ -671,6 +680,7 @@ class PostDetailFragment :
                     val errorMessage = response.errorMessage
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
+
                 is PostActionsViewModel.ErrorMessageEvent.SavePost -> {
                     //get post
                     val post = mPostDetailAdapter[postDataPosition] as PostViewData
@@ -690,10 +700,12 @@ class PostDetailFragment :
                     val errorMessage = response.errorMessage
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
+
                 is PostActionsViewModel.ErrorMessageEvent.DeletePost -> {
                     val errorMessage = response.errorMessage
                     ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 }
+
                 is PostActionsViewModel.ErrorMessageEvent.PinPost -> {
                     //get post
                     val post = mPostDetailAdapter[postDataPosition] as PostViewData
@@ -714,7 +726,6 @@ class PostDetailFragment :
         }.observeInLifecycle(viewLifecycleOwner)
     }
 
-
     /**
      * Initializes the [postVideoAutoPlayHelper] with the recyclerView
      * And starts observing
@@ -731,11 +742,9 @@ class PostDetailFragment :
         postVideoAutoPlayHelper.playIfPostVisible()
     }
 
-
     /*
     * UI Block
     */
-
 
     // updates the comments count on toolbar
     private fun updateCommentsCount(commentsCount: Int) {
@@ -849,11 +858,9 @@ class PostDetailFragment :
         }
     }
 
-
     /*
     * Navigation Block
     */
-
 
     // callback when likes count of post is clicked - opens likes screen
     override fun showLikesScreen(postId: String) {
@@ -913,11 +920,9 @@ class PostDetailFragment :
             }
         }
 
-
     /**
      * Adapter Util Block
      */
-
 
     // sets page-1 data of post and scrolls to top
     private fun setPostDataAndScrollToTop(post: PostViewData) {
@@ -1255,12 +1260,14 @@ class PostDetailFragment :
                 val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
                 editPostLauncher.launch(intent)
             }
+
             DELETE_POST_MENU_ITEM_ID -> {
                 deletePost(
                     postId,
                     postCreatorUUID
                 )
             }
+
             REPORT_POST_MENU_ITEM_ID -> {
                 val postData = mPostDetailAdapter[postDataPosition] as PostViewData
                 val postViewType = postData.viewType
@@ -1272,9 +1279,11 @@ class PostDetailFragment :
                     postViewType = postViewType
                 )
             }
+
             PIN_POST_MENU_ITEM_ID -> {
                 pinPost()
             }
+
             UNPIN_POST_MENU_ITEM_ID -> {
                 unpinPost()
             }
@@ -1389,6 +1398,7 @@ class PostDetailFragment :
             EDIT_COMMENT_MENU_ITEM_ID -> {
                 editComment(commentId)
             }
+
             DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
@@ -1396,6 +1406,7 @@ class PostDetailFragment :
                     commentCreatorUUID
                 )
             }
+
             REPORT_COMMENT_MENU_ITEM_ID -> {
                 reportEntity(
                     commentId,
@@ -1432,6 +1443,7 @@ class PostDetailFragment :
             EDIT_COMMENT_MENU_ITEM_ID -> {
                 editComment(replyId, parentCommentId)
             }
+
             DELETE_COMMENT_MENU_ITEM_ID -> {
                 deleteComment(
                     postId,
@@ -1440,6 +1452,7 @@ class PostDetailFragment :
                     parentCommentId
                 )
             }
+
             REPORT_COMMENT_MENU_ITEM_ID -> {
                 reportEntity(
                     replyId,
@@ -1459,6 +1472,7 @@ class PostDetailFragment :
                 val post = mPostDetailAdapter[postDataPosition] as PostViewData
                 postActionsViewModel.deletePost(post)
             }
+
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
                 viewModel.deleteComment(
@@ -1477,6 +1491,7 @@ class PostDetailFragment :
                 val post = mPostDetailAdapter[postDataPosition] as PostViewData
                 postActionsViewModel.deletePost(post, reason)
             }
+
             DELETE_TYPE_COMMENT -> {
                 val commentId = deleteExtras.commentId ?: return
                 viewModel.deleteComment(
