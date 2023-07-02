@@ -42,7 +42,7 @@ class PostDetailReplyAdapter constructor(
             postId: String,
             parentCommentId: String,
             replyId: String,
-            creatorId: String,
+            replyCreatorUUID: String,
             menuId: Int
         )
     }

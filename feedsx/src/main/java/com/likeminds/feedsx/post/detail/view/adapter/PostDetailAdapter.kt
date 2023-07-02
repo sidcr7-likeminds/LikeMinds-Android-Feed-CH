@@ -5,7 +5,12 @@ import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCo
 import com.likeminds.feedsx.post.detail.view.adapter.databinder.ItemPostDetailCommentsCountViewDataBinder
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.*
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostDocumentsViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostLinkViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostMultipleMediaViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostSingleImageViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostSingleVideoViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.ItemPostTextOnlyViewDataBinder
 import com.likeminds.feedsx.utils.ValueUtils.getItemInList
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -79,7 +84,7 @@ class PostDetailAdapter constructor(
         fun onCommentMenuItemClicked(
             postId: String,
             commentId: String,
-            creatorId: String,
+            commentCreatorUUID: String,
             menuId: Int
         )
 

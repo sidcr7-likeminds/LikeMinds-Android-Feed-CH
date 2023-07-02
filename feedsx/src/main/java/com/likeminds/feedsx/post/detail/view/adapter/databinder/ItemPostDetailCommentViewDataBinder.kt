@@ -145,12 +145,13 @@ class ItemPostDetailCommentViewDataBinder constructor(
                     )
                 }
 
+                val commentCreatorUUID = data.user.sdkClientInfoViewData.uuid
                 ivCommentMenu.setOnClickListener { view ->
                     showMenu(
                         view,
                         data.postId,
                         data.id,
-                        data.userId,
+                        commentCreatorUUID,
                         data.menuItems
                     )
                 }
@@ -188,7 +189,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
         view: View,
         postId: String,
         commentId: String,
-        creatorId: String,
+        commentCreatorUUID: String,
         menuItems: List<OverflowMenuItemViewData>
     ) {
         val popup = PopupMenu(view.context, view)
@@ -205,7 +206,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
             postDetailAdapterListener.onCommentMenuItemClicked(
                 postId,
                 commentId,
-                creatorId,
+                commentCreatorUUID,
                 menuItem.itemId
             )
             true

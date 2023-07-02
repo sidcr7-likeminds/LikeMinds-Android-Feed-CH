@@ -70,12 +70,14 @@ class InitiateViewModel @Inject constructor(
                 } else {
                     val user = data.user
                     val id = user?.userUniqueId ?: ""
+                    val uuid = user?.sdkClientInfo?.uuid ?: ""
 
                     //add user in local db
                     addUser(user)
 
                     //save user.id in local prefs
                     userPreferences.saveUserUniqueId(id)
+                    userPreferences.saveUUID(uuid)
 
                     //post the user response in LiveData
                     _userResponse.postValue(ViewDataConverter.convertUser(user))

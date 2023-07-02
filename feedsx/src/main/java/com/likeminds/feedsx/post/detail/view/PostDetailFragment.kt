@@ -802,7 +802,7 @@ class PostDetailFragment :
     private fun deleteComment(
         postId: String,
         commentId: String,
-        creatorId: String,
+        uuid: String,
         parentCommentId: String? = null,
     ) {
         val deleteExtras = DeleteExtras.Builder()
@@ -812,11 +812,11 @@ class PostDetailFragment :
             .parentCommentId(parentCommentId)
             .build()
 
-        showDeleteDialog(creatorId, deleteExtras)
+        showDeleteDialog(uuid, deleteExtras)
     }
 
-    private fun showDeleteDialog(creatorId: String, deleteExtras: DeleteExtras) {
-        if (creatorId == postActionsViewModel.getUserUniqueId()) {
+    private fun showDeleteDialog(uuid: String, deleteExtras: DeleteExtras) {
+        if (uuid == postActionsViewModel.getUUID()) {
             // when user deletes their own entity
             SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
@@ -1373,7 +1373,7 @@ class PostDetailFragment :
     override fun onCommentMenuItemClicked(
         postId: String,
         commentId: String,
-        creatorId: String,
+        commentCreatorUUID: String,
         menuId: Int
     ) {
         when (menuId) {
@@ -1384,13 +1384,13 @@ class PostDetailFragment :
                 deleteComment(
                     postId,
                     commentId,
-                    creatorId
+                    commentCreatorUUID
                 )
             }
             REPORT_COMMENT_MENU_ITEM_ID -> {
                 reportEntity(
                     commentId,
-                    creatorId,
+                    commentCreatorUUID,
                     REPORT_TYPE_COMMENT,
                     postId
                 )
@@ -1416,7 +1416,7 @@ class PostDetailFragment :
         postId: String,
         parentCommentId: String,
         replyId: String,
-        creatorId: String,
+        replyCreatorUUID: String,
         menuId: Int
     ) {
         when (menuId) {
@@ -1427,14 +1427,14 @@ class PostDetailFragment :
                 deleteComment(
                     postId,
                     replyId,
-                    creatorId,
+                    replyCreatorUUID,
                     parentCommentId
                 )
             }
             REPORT_COMMENT_MENU_ITEM_ID -> {
                 reportEntity(
                     replyId,
-                    creatorId,
+                    replyCreatorUUID,
                     REPORT_TYPE_REPLY,
                     postId,
                     parentCommentId = parentCommentId
