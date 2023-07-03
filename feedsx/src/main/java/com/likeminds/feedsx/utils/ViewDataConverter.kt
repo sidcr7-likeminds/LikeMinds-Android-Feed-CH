@@ -221,7 +221,7 @@ object ViewDataConverter {
         post: Post,
         usersMap: Map<String, User>
     ): PostViewData {
-        val postCreator = post.userId
+        val postCreator = post.uuid
         val user = usersMap[postCreator]
         val postId = post.id
         val replies = post.replies?.toMutableList()
@@ -255,6 +255,7 @@ object ViewDataConverter {
             .createdAt(post.createdAt)
             .updatedAt(post.updatedAt)
             .user(userViewData)
+            .uuid(postCreator)
             .build()
     }
 
@@ -289,8 +290,8 @@ object ViewDataConverter {
         postId: String,
         parentCommentId: String? = null
     ): CommentViewData {
-        val userId = comment.userId
-        val user = usersMap[userId]
+        val commentCreator = comment.uuid
+        val user = usersMap[commentCreator]
         val replies = comment.replies?.toMutableList()
         val parentId = parentCommentId ?: comment.parentComment?.id
 
@@ -305,7 +306,7 @@ object ViewDataConverter {
             .postId(postId)
             .isLiked(comment.isLiked)
             .isEdited(comment.isEdited)
-            .userId(userId)
+            .userId(commentCreator)
             .text(comment.text)
             .level(comment.level)
             .likesCount(comment.likesCount)
@@ -332,6 +333,7 @@ object ViewDataConverter {
                     )
                 }
             )
+            .uuid(commentCreator)
             .build()
     }
 
@@ -550,7 +552,7 @@ object ViewDataConverter {
         if (activityEntityData == null) {
             return null
         }
-        val entityCreator = activityEntityData.userId
+        val entityCreator = activityEntityData.uuid
         val user = usersMap[entityCreator]
         val replies = activityEntityData.replies?.toMutableList()
 
@@ -587,6 +589,7 @@ object ViewDataConverter {
             .level(activityEntityData.level)
             .createdAt(activityEntityData.createdAt)
             .updatedAt(activityEntityData.updatedAt)
+            .uuid(activityEntityData.uuid)
             .build()
     }
 
@@ -691,7 +694,7 @@ object ViewDataConverter {
             .text(post.text)
             .temporaryId(post.temporaryId)
             .thumbnail(post.thumbnail)
-            .uuid(post.uuid)
+            .workerUUID(post.uuid)
             .isPosted(post.isPosted)
             .attachments(convertAttachmentsEntity(attachments))
             .build()

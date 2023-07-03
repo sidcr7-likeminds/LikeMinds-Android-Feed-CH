@@ -29,9 +29,10 @@ class PostViewData private constructor(
     val fromPostSaved: Boolean,
     val fromVideoAction: Boolean,
     val thumbnail: String?,
-    val uuid: String,
+    val workerUUID: String,
     val isPosted: Boolean,
-    val temporaryId: Long?
+    val temporaryId: Long?,
+    val uuid: String
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -39,18 +40,23 @@ class PostViewData private constructor(
             (attachments.size == 1 && attachments.first().attachmentType == IMAGE) -> {
                 ITEM_POST_SINGLE_IMAGE
             }
+
             (attachments.size == 1 && attachments.first().attachmentType == VIDEO) -> {
                 ITEM_POST_SINGLE_VIDEO
             }
+
             (attachments.isNotEmpty() && attachments.first().attachmentType == DOCUMENT) -> {
                 ITEM_POST_DOCUMENTS
             }
+
             (attachments.size > 1 && (attachments.first().attachmentType == IMAGE || attachments.first().attachmentType == VIDEO)) -> {
                 ITEM_POST_MULTIPLE_MEDIA
             }
+
             (attachments.size == 1 && attachments.first().attachmentType == LINK) -> {
                 ITEM_POST_LINK
             }
+
             else -> {
                 ITEM_POST_TEXT_ONLY
             }
@@ -78,10 +84,11 @@ class PostViewData private constructor(
         private var fromPostLiked: Boolean = false
         private var fromPostSaved: Boolean = false
         private var thumbnail: String? = null
-        private var uuid: String = ""
+        private var workerUUID: String = ""
         private var isPosted: Boolean = false
         private var temporaryId: Long? = null
         private var fromVideoAction: Boolean = false
+        private var uuid: String = ""
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String?) = apply { this.text = text }
@@ -116,9 +123,10 @@ class PostViewData private constructor(
             apply { this.fromVideoAction = fromVideoAction }
 
         fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
-        fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun workerUUID(workerUUID: String) = apply { this.workerUUID = workerUUID }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
         fun temporaryId(temporaryId: Long?) = apply { this.temporaryId = temporaryId }
+        fun uuid(uuid: String) = apply { this.uuid = uuid }
 
         fun build() = PostViewData(
             id,
@@ -143,9 +151,10 @@ class PostViewData private constructor(
             fromPostSaved,
             fromVideoAction,
             thumbnail,
-            uuid,
+            workerUUID,
             isPosted,
-            temporaryId
+            temporaryId,
+            uuid
         )
     }
 
@@ -172,8 +181,9 @@ class PostViewData private constructor(
             .fromPostSaved(fromPostSaved)
             .fromVideoAction(fromVideoAction)
             .thumbnail(thumbnail)
-            .uuid(uuid)
+            .workerUUID(workerUUID)
             .isPosted(isPosted)
             .temporaryId(temporaryId)
+            .uuid(uuid)
     }
 }

@@ -349,10 +349,10 @@ class FeedFragment :
 
     // finds the upload worker by UUID and observes the worker
     private fun observeMediaUpload(postingData: PostViewData) {
-        if (postingData.uuid.isEmpty()) {
+        if (postingData.workerUUID.isEmpty()) {
             return
         }
-        val uuid = UUID.fromString(postingData.uuid)
+        val uuid = UUID.fromString(postingData.workerUUID)
         if (!workersMap.contains(uuid)) {
             workersMap.add(uuid)
             WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
