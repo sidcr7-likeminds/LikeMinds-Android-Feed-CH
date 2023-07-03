@@ -289,8 +289,8 @@ object ViewDataConverter {
         postId: String,
         parentCommentId: String? = null
     ): CommentViewData {
-        val userId = comment.uuid
-        val user = usersMap[userId]
+        val commentCreator = comment.uuid
+        val user = usersMap[commentCreator]
         val replies = comment.replies?.toMutableList()
         val parentId = parentCommentId ?: comment.parentComment?.id
 
@@ -305,7 +305,7 @@ object ViewDataConverter {
             .postId(postId)
             .isLiked(comment.isLiked)
             .isEdited(comment.isEdited)
-            .userId(userId)
+            .userId(commentCreator)
             .text(comment.text)
             .level(comment.level)
             .likesCount(comment.likesCount)
