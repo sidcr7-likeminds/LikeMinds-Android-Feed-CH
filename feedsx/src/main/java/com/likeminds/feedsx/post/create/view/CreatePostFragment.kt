@@ -235,7 +235,7 @@ class CreatePostFragment :
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
                 helperViewModel.sendUserTagEvent(
-                    user.userUniqueId,
+                    user.uuid,
                     memberTagging.getTaggedMemberCount()
                 )
             }

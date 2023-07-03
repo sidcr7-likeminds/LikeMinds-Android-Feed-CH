@@ -138,7 +138,7 @@ class PostActionsViewModel @Inject constructor(
         val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         val map = mapOf(
             "user_state" to userStateString,
-            LMAnalytics.Keys.USER_ID to postCreatorUUID,
+            LMAnalytics.Keys.UUID to postCreatorUUID,
             LMAnalytics.Keys.POST_ID to post.id,
             "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
         )
@@ -178,7 +178,7 @@ class PostActionsViewModel @Inject constructor(
     private fun sendPinUnpinPostEvent(post: PostViewData) {
         val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         val map = mapOf(
-            "created_by_id" to postCreatorUUID,
+            "created_by_uuid" to postCreatorUUID,
             LMAnalytics.Keys.POST_ID to post.id,
             "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
         )
@@ -207,7 +207,7 @@ class PostActionsViewModel @Inject constructor(
         LMAnalytics.track(
             LMAnalytics.Events.POST_SHARED,
             mapOf(
-                "created_by_id" to postCreatorUUID,
+                "created_by_uuid" to postCreatorUUID,
                 LMAnalytics.Keys.POST_ID to post.id,
                 "post_type" to postType,
             )
