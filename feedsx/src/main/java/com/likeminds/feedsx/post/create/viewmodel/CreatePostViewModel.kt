@@ -295,7 +295,7 @@ class CreatePostViewModel @Inject constructor(
                 taggedUsers.joinToString {
                     it.first
                 }
-            map["tagged_users_id"] = taggedUserIds
+            map["tagged_users_uuid"] = taggedUserIds
         } else {
             map["user_tagged"] = "no"
         }

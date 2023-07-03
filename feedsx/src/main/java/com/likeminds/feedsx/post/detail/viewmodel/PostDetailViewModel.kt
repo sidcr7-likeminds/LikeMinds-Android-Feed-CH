@@ -275,7 +275,7 @@ class PostDetailViewModel @Inject constructor(
         LMAnalytics.track(
             LMAnalytics.Events.REPLY_POSTED,
             mapOf(
-                LMAnalytics.Keys.USER_ID to parentCommentCreatorUUID,
+                LMAnalytics.Keys.UUID to parentCommentCreatorUUID,
                 LMAnalytics.Keys.POST_ID to postId,
                 LMAnalytics.Keys.COMMENT_ID to parentCommentId,
                 LMAnalytics.Keys.COMMENT_REPLY_ID to commentId

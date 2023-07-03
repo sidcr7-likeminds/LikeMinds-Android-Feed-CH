@@ -96,7 +96,7 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         LMAnalytics.track(
             LMAnalytics.Events.POST_REPORTED,
             mapOf(
-                "created_by_id" to uuid,
+                "created_by_uuid" to uuid,
                 LMAnalytics.Keys.POST_ID to postId,
                 "report_reason" to reason,
                 "post_type" to postType,
@@ -117,7 +117,7 @@ class ReportViewModel @Inject constructor() : ViewModel() {
             LMAnalytics.Events.COMMENT_REPORTED,
             mapOf(
                 LMAnalytics.Keys.POST_ID to postId,
-                LMAnalytics.Keys.USER_ID to uuid,
+                LMAnalytics.Keys.UUID to uuid,
                 LMAnalytics.Keys.COMMENT_ID to commentId,
                 "reason" to reason,
             )
@@ -141,7 +141,7 @@ class ReportViewModel @Inject constructor() : ViewModel() {
                 LMAnalytics.Keys.POST_ID to postId,
                 LMAnalytics.Keys.COMMENT_ID to updatedParentId,
                 LMAnalytics.Keys.COMMENT_REPLY_ID to replyId,
-                LMAnalytics.Keys.USER_ID to uuid,
+                LMAnalytics.Keys.UUID to uuid,
                 "reason" to reason,
             )
         )

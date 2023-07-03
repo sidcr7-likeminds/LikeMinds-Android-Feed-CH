@@ -127,7 +127,7 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
         LMAnalytics.track(
             LMAnalytics.Events.POST_EDITED,
             mapOf(
-                "created_by_id" to postCreatorUUID,
+                "created_by_uuid" to postCreatorUUID,
                 LMAnalytics.Keys.POST_ID to post.id,
                 "post_type" to postType,
             )

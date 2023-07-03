@@ -42,6 +42,7 @@ object LMAnalytics {
     object Keys {
         const val POST_ID = "post_id"
         const val USER_ID = "user_id"
+        const val UUID = "uuid"
         const val COMMENT_ID = "comment_id"
         const val COMMENT_REPLY_ID = "comment_reply_id"
         const val POST_TYPE_TEXT = "text"
