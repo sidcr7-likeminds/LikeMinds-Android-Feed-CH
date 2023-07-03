@@ -255,6 +255,7 @@ object ViewDataConverter {
             .createdAt(post.createdAt)
             .updatedAt(post.updatedAt)
             .user(userViewData)
+            .uuid(postCreator)
             .build()
     }
 
@@ -332,6 +333,7 @@ object ViewDataConverter {
                     )
                 }
             )
+            .uuid(commentCreator)
             .build()
     }
 
@@ -587,6 +589,7 @@ object ViewDataConverter {
             .level(activityEntityData.level)
             .createdAt(activityEntityData.createdAt)
             .updatedAt(activityEntityData.updatedAt)
+            .uuid(activityEntityData.uuid)
             .build()
     }
 
@@ -691,7 +694,7 @@ object ViewDataConverter {
             .text(post.text)
             .temporaryId(post.temporaryId)
             .thumbnail(post.thumbnail)
-            .uuid(post.uuid)
+            .workerUUID(post.uuid)
             .isPosted(post.isPosted)
             .attachments(convertAttachmentsEntity(attachments))
             .build()

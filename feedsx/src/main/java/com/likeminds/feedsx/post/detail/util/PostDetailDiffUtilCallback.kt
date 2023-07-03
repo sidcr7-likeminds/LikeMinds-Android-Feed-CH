@@ -28,12 +28,15 @@ class PostDetailDiffUtilCallback(
             oldItem is CommentsCountViewData && newItem is CommentsCountViewData -> {
                 oldItem.commentsCount == newItem.commentsCount
             }
+
             oldItem is PostViewData && newItem is PostViewData -> {
                 oldItem.id == newItem.id
             }
+
             oldItem is CommentViewData && newItem is CommentViewData -> {
                 oldItem.id == newItem.id
             }
+
             else -> false
         }
     }
@@ -51,6 +54,7 @@ class PostDetailDiffUtilCallback(
                     newItem
                 )
             }
+
             oldItem is PostViewData && newItem is PostViewData -> {
                 postViewData(
                     oldItem,
@@ -58,6 +62,7 @@ class PostDetailDiffUtilCallback(
                 )
                 return true
             }
+
             oldItem is CommentViewData && newItem is CommentViewData -> {
                 commentViewData(
                     oldItem,
@@ -67,6 +72,7 @@ class PostDetailDiffUtilCallback(
                     newItem.replies
                 )
             }
+
             else -> false
         }
     }
@@ -99,6 +105,7 @@ class PostDetailDiffUtilCallback(
                 && oldItem.parentId == newItem.parentId
                 && userViewData(oldItem.user, newItem.user)
                 && overflowMenuItemViewDataList(oldItem.menuItems, newItem.menuItems)
+                && oldItem.uuid == newItem.uuid
     }
 
     private fun commentsCountViewData(
