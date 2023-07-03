@@ -221,7 +221,7 @@ object ViewDataConverter {
         post: Post,
         usersMap: Map<String, User>
     ): PostViewData {
-        val postCreator = post.userId
+        val postCreator = post.uuid
         val user = usersMap[postCreator]
         val postId = post.id
         val replies = post.replies?.toMutableList()
@@ -289,7 +289,7 @@ object ViewDataConverter {
         postId: String,
         parentCommentId: String? = null
     ): CommentViewData {
-        val userId = comment.userId
+        val userId = comment.uuid
         val user = usersMap[userId]
         val replies = comment.replies?.toMutableList()
         val parentId = parentCommentId ?: comment.parentComment?.id
@@ -550,7 +550,7 @@ object ViewDataConverter {
         if (activityEntityData == null) {
             return null
         }
-        val entityCreator = activityEntityData.userId
+        val entityCreator = activityEntityData.uuid
         val user = usersMap[entityCreator]
         val replies = activityEntityData.replies?.toMutableList()
 
