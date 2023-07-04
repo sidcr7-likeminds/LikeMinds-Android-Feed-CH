@@ -59,6 +59,7 @@ class NotificationFeedDiffUtilCallback(
                 && activityEntityViewData(oldItem.activityEntityData, newItem.activityEntityData)
                 && oldItem.createdAt == newItem.createdAt
                 && oldItem.updatedAt == newItem.updatedAt
+                && oldItem.uuid == newItem.uuid
     }
 
     private fun actionByList(
@@ -94,5 +95,6 @@ class NotificationFeedDiffUtilCallback(
                 && oldItem.level == newItem.level
                 && oldItem.createdAt == newItem.createdAt
                 && oldItem.updatedAt == newItem.updatedAt
+                && oldItem.deletedByUUID == newItem.deletedByUUID
     }
 }

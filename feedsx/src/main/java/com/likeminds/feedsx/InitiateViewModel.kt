@@ -63,7 +63,7 @@ class InitiateViewModel @Inject constructor(
             val request = InitiateUserRequest.Builder()
                 .apiKey(apiKey)
                 .deviceId(userPreferences.getDeviceId())
-                .userId(userId)
+                .uuid(userId)
                 .userName(userName)
                 .isGuest(isGuest)
                 .build()
