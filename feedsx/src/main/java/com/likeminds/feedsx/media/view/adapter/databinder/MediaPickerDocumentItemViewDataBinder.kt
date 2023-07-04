@@ -36,23 +36,25 @@ class MediaPickerDocumentItemViewDataBinder constructor(
     override fun bindData(
         binding: ItemMediaPickerDocumentBinding, data: MediaViewData, position: Int
     ) {
-        binding.position = position
-        binding.mediaViewData = data
-        binding.isSelected = listener.isMediaSelected(data.uri.toString())
+        binding.apply {
+            this.position = position
+            mediaViewData = data
+            isSelected = listener.isMediaSelected(data.uri.toString())
 
-        if (data.filteredKeywords.isNullOrEmpty()) {
-            binding.tvDocumentName.text = data.mediaName
-        } else {
-            binding.tvDocumentName.setText(
-                getFilteredText(
-                    data.mediaName ?: "",
-                    data.filteredKeywords.orEmpty(),
-                    ContextCompat.getColor(binding.root.context, R.color.turquoise),
-                ), TextView.BufferType.SPANNABLE
-            )
+            if (data.filteredKeywords.isNullOrEmpty()) {
+                tvDocumentName.text = data.mediaName
+            } else {
+                tvDocumentName.setText(
+                    getFilteredText(
+                        data.mediaName ?: "",
+                        data.filteredKeywords,
+                        ContextCompat.getColor(binding.root.context, R.color.turquoise),
+                    ), TextView.BufferType.SPANNABLE
+                )
+            }
+
+            tvDocumentSize.text = MediaUtils.getFileSizeText(data.size)
+            tvDocumentDate.text = DateUtil.createDateFormat("dd/MM/yy", data.date)
         }
-
-        binding.tvDocumentSize.text = MediaUtils.getFileSizeText(data.size)
-        binding.tvDocumentDate.text = DateUtil.createDateFormat("dd/MM/yy", data.date)
     }
 }

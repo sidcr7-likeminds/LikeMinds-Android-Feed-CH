@@ -127,14 +127,14 @@ class HelperViewModel @Inject constructor(
 
     /**
      * Triggers event when the user tags someone
-     * @param userId user-unique-id
+     * @param uuid user-unique-id
      * @param userCount count of tagged users
      */
-    fun sendUserTagEvent(userId: String, userCount: Int) {
+    fun sendUserTagEvent(uuid: String, userCount: Int) {
         LMAnalytics.track(
             LMAnalytics.Events.USER_TAGGED_IN_POST,
             mapOf(
-                "tagged_user_id" to userId,
+                "tagged_user_uuid" to uuid,
                 "tagged_user_count" to userCount.toString()
             )
         )

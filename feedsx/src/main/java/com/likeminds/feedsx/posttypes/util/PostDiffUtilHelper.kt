@@ -24,6 +24,7 @@ object PostDiffUtilHelper {
                 && userViewData(oldItem.user, newItem.user)
                 && overflowMenuItemViewDataList(oldItem.menuItems, newItem.menuItems)
                 && attachmentViewDataList(oldItem.attachments, newItem.attachments)
+                && oldItem.uuid == newItem.uuid
     }
 
     fun userViewData(
@@ -37,6 +38,21 @@ object PostDiffUtilHelper {
                 && oldItem.customTitle == newItem.customTitle
                 && oldItem.isGuest == newItem.isGuest
                 && oldItem.isDeleted == newItem.isDeleted
+                && sdkClientInfoViewData(
+            oldItem.sdkClientInfoViewData,
+            newItem.sdkClientInfoViewData
+        )
+                && oldItem.uuid == newItem.uuid
+    }
+
+    private fun sdkClientInfoViewData(
+        oldItem: SDKClientInfoViewData,
+        newItem: SDKClientInfoViewData
+    ): Boolean {
+        return oldItem.user == newItem.user
+                && oldItem.uuid == newItem.uuid
+                && oldItem.userUniqueId == newItem.userUniqueId
+                && oldItem.community == newItem.community
     }
 
     fun overflowMenuItemViewDataList(

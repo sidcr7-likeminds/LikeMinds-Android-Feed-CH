@@ -12,9 +12,9 @@ import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
 
 class PostDetailAdapter constructor(
-    val postAdapterListener: PostAdapterListener,
-    val postDetailAdapterListener: PostDetailAdapterListener,
-    val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
+    private val postAdapterListener: PostAdapterListener,
+    private val postDetailAdapterListener: PostDetailAdapterListener,
+    private val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
 ) : BaseRecyclerAdapter<BaseViewType>() {
 
     init {
@@ -79,7 +79,7 @@ class PostDetailAdapter constructor(
         fun onCommentMenuItemClicked(
             postId: String,
             commentId: String,
-            creatorId: String,
+            commentCreatorUUID: String,
             menuId: Int
         )
 

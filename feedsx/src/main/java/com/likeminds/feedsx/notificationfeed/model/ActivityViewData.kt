@@ -22,7 +22,8 @@ class ActivityViewData private constructor(
     val activityEntityData: ActivityEntityViewData?,
     val activityByUser: UserViewData,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val uuid: String
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -45,6 +46,7 @@ class ActivityViewData private constructor(
         private var activityByUser: UserViewData = UserViewData.Builder().build()
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
+        private var uuid: String = ""
 
         fun id(id: String) = apply { this.id = id }
         fun isRead(isRead: Boolean) = apply { this.isRead = isRead }
@@ -68,6 +70,7 @@ class ActivityViewData private constructor(
 
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
+        fun uuid(uuid: String) = apply { this.uuid = uuid }
 
         fun build() = ActivityViewData(
             id,
@@ -83,7 +86,8 @@ class ActivityViewData private constructor(
             activityEntityData,
             activityByUser,
             createdAt,
-            updatedAt
+            updatedAt,
+            uuid
         )
     }
 
@@ -102,5 +106,6 @@ class ActivityViewData private constructor(
             .activityByUser(activityByUser)
             .createdAt(createdAt)
             .updatedAt(updatedAt)
+            .uuid(uuid)
     }
 }

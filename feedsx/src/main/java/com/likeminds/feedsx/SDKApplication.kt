@@ -62,8 +62,6 @@ class SDKApplication : LMCallback {
         }
     }
 
-    private lateinit var domain: String
-
     fun initSDKApplication(
         application: Application,
         lmUICallback: LMUICallback,
@@ -74,7 +72,6 @@ class SDKApplication : LMCallback {
             .build()
         SDKApplication.lmUICallback = lmUICallback
         setupBranding(brandingRequest)
-        setupDomain()
         initAppComponent(application)
         initAWSMobileClient(application)
     }
@@ -82,16 +79,6 @@ class SDKApplication : LMCallback {
     // sets branding to the app
     fun setupBranding(setBrandingRequest: SetBrandingRequest) {
         LMBranding.setBranding(setBrandingRequest)
-    }
-
-    // function to set client domain
-    private fun setupDomain() {
-        domain = "https://www.sampleapp.com"
-    }
-
-    // function to get client domain
-    fun getDomain(): String {
-        return domain
     }
 
     private fun initAWSMobileClient(applicationContext: Context) {

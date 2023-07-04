@@ -37,7 +37,7 @@ import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
-import java.util.*
+import java.util.Locale
 
 object PostTypeUtil {
     const val SHOW_MORE_COUNT = 2
@@ -65,11 +65,13 @@ object PostTypeUtil {
                 tvEdited.hide()
             }
 
+            val postCreatorUUID = data.user.sdkClientInfoViewData.uuid
+
             ivPostMenu.setOnClickListener { view ->
                 showMenu(
                     view,
                     data.id,
-                    data.userId,
+                    postCreatorUUID,
                     data.menuItems,
                     listener
                 )
@@ -99,7 +101,7 @@ object PostTypeUtil {
     private fun showMenu(
         view: View,
         postId: String,
-        creatorId: String,
+        postCreatorUUID: String,
         menuItems: List<OverflowMenuItemViewData>,
         listener: PostAdapterListener
     ) {
@@ -116,7 +118,7 @@ object PostTypeUtil {
         popup.setOnMenuItemClickListener { menuItem ->
             listener.onPostMenuItemClicked(
                 postId,
-                creatorId,
+                postCreatorUUID,
                 menuItem.itemId
             )
             true
@@ -217,7 +219,6 @@ object PostTypeUtil {
         }
     }
 
-
     // initializes various actions on the post
     fun initActionsLayout(
         binding: LayoutPostActionsBinding,
@@ -304,9 +305,11 @@ object PostTypeUtil {
                     IMAGE -> {
                         it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
                     }
+
                     VIDEO -> {
                         it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
                     }
+
                     else -> {
                         it
                     }
