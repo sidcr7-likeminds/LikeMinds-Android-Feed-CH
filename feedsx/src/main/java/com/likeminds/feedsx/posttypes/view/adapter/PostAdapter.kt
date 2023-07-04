@@ -62,7 +62,7 @@ interface PostAdapterListener {
     }
     fun onPostMenuItemClicked(
         postId: String,
-        creatorId: String,
+        postCreatorUUID: String,
         menuId: Int
     ) {
         //triggered when a user clicks overflow menu of a post

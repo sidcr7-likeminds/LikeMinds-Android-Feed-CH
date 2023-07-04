@@ -45,6 +45,11 @@ class PostActionsViewModel @Inject constructor(
         return userPreferences.getUserUniqueId()
     }
 
+    // returns uuid from user prefs
+    fun getUUID(): String {
+        return userPreferences.getUUID()
+    }
+
     //for like/unlike a post
     fun likePost(postId: String) {
         viewModelScope.launchIO {
@@ -120,14 +125,20 @@ class PostActionsViewModel @Inject constructor(
         post: PostViewData,
         reason: String? = null
     ) {
+        /**
+         * if [reason] is [null], that it is a self delete
+         */
         val userStateString = if (reason == null) {
-            "member"
+            "Member"
         } else {
-            "CM"
+            "Community Manager"
         }
+
+        //uuid of the post creator
+        val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         val map = mapOf(
             "user_state" to userStateString,
-            LMAnalytics.Keys.USER_ID to post.userId,
+            LMAnalytics.Keys.UUID to postCreatorUUID,
             LMAnalytics.Keys.POST_ID to post.id,
             "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
         )
@@ -165,8 +176,9 @@ class PostActionsViewModel @Inject constructor(
      * Triggers when a post is pinned/unpinned
      **/
     private fun sendPinUnpinPostEvent(post: PostViewData) {
+        val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         val map = mapOf(
-            "created_by_id" to post.userId,
+            "created_by_uuid" to postCreatorUUID,
             LMAnalytics.Keys.POST_ID to post.id,
             "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
         )
@@ -190,10 +202,12 @@ class PostActionsViewModel @Inject constructor(
         post: PostViewData
     ) {
         val postType = ViewUtils.getPostTypeFromViewType(post.viewType)
+
+        val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         LMAnalytics.track(
             LMAnalytics.Events.POST_SHARED,
             mapOf(
-                "created_by_id" to post.userId,
+                "created_by_uuid" to postCreatorUUID,
                 LMAnalytics.Keys.POST_ID to post.id,
                 "post_type" to postType,
             )

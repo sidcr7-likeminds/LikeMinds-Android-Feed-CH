@@ -1,5 +1,6 @@
 package com.likeminds.feedsx
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,7 +10,6 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.utils.SDKAuthPreferences
 import com.likeminds.feedsx.utils.UserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -21,7 +21,6 @@ import com.likeminds.likemindsfeed.sdk.model.User
 import javax.inject.Inject
 
 class InitiateViewModel @Inject constructor(
-    private val authPreferences: SDKAuthPreferences,
     private val userPreferences: UserPreferences,
     private val userWithRightsRepository: UserWithRightsRepository
 ) : ViewModel() {
@@ -48,14 +47,25 @@ class InitiateViewModel @Inject constructor(
      * store user:{} in db
      * and posts the response in LiveData
      * */
-    fun initiateUser() {
+    fun initiateUser(
+        context: Context,
+        apiKey: String,
+        userName: String,
+        userId: String?,
+        isGuest: Boolean
+    ) {
         viewModelScope.launchIO {
+            if (apiKey.isEmpty()) {
+                _initiateErrorMessage.postValue(context.getString(R.string.empty_api_key))
+                return@launchIO
+            }
+
             val request = InitiateUserRequest.Builder()
-                .apiKey(authPreferences.getApiKey())
+                .apiKey(apiKey)
                 .deviceId(userPreferences.getDeviceId())
-                .userId(authPreferences.getUserId())
-                .userName(authPreferences.getUserName())
-                .isGuest(false)
+                .uuid(userId)
+                .userName(userName)
+                .isGuest(isGuest)
                 .build()
 
             //call api
@@ -65,17 +75,25 @@ class InitiateViewModel @Inject constructor(
                 val data = initiateResponse.data ?: return@launchIO
                 if (data.logoutResponse != null) {
                     //user is invalid
-                    authPreferences.clearPrefs()
+                    userPreferences.clearPrefs()
                     _logoutResponse.postValue(true)
                 } else {
                     val user = data.user
                     val id = user?.userUniqueId ?: ""
+                    val uuid = user?.sdkClientInfo?.uuid ?: ""
 
                     //add user in local db
                     addUser(user)
 
                     //save user.id in local prefs
+                    saveUserDetailsToPrefs(
+                        apiKey,
+                        userName,
+                        id,
+                        isGuest
+                    )
                     userPreferences.saveUserUniqueId(id)
+                    userPreferences.saveUUID(uuid)
 
                     //post the user response in LiveData
                     _userResponse.postValue(ViewDataConverter.convertUser(user))
@@ -173,6 +191,20 @@ class InitiateViewModel @Inject constructor(
 
             //call api
             lmFeedClient.registerDevice(request)
+        }
+    }
+
+    private fun saveUserDetailsToPrefs(
+        apiKey: String,
+        userName: String,
+        userUniqueId: String,
+        isGuest: Boolean
+    ) {
+        userPreferences.apply {
+            saveApiKey(apiKey)
+            saveUserName(userName)
+            saveUserUniqueId(userUniqueId)
+            saveIsGuest(isGuest)
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.db.models
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import com.likeminds.feedsx.db.utils.DbConstants
 
@@ -25,7 +26,11 @@ class UserEntity constructor(
     @ColumnInfo(name = "state")
     var state: Int,
     @ColumnInfo(name = "is_owner")
-    var isOwner: Boolean
+    var isOwner: Boolean,
+    @ColumnInfo(name = "uuid", defaultValue = "")
+    var uuid: String,
+    @Embedded
+    var sdkClientInfoEntity: SDKClientInfoEntity
 ) {
     class Builder {
         private var id: Int = 0
@@ -38,6 +43,8 @@ class UserEntity constructor(
         private var userUniqueId: String = ""
         private var state: Int = -1
         private var isOwner: Boolean = false
+        private var uuid: String = ""
+        private var sdkClientInfoEntity: SDKClientInfoEntity = SDKClientInfoEntity.Builder().build()
 
         fun id(id: Int) = apply { this.id = id }
         fun imageUrl(imageUrl: String) = apply { this.imageUrl = imageUrl }
@@ -49,6 +56,10 @@ class UserEntity constructor(
         fun userUniqueId(userUniqueId: String) = apply { this.userUniqueId = userUniqueId }
         fun state(state: Int) = apply { this.state = state }
         fun isOwner(isOwner: Boolean) = apply { this.isOwner = isOwner }
+        fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun sdkClientInfoEntity(sdkClientInfoEntity: SDKClientInfoEntity) = apply {
+            this.sdkClientInfoEntity = sdkClientInfoEntity
+        }
 
         fun build() =
             UserEntity(
@@ -61,7 +72,9 @@ class UserEntity constructor(
                 isDeleted,
                 userUniqueId,
                 state,
-                isOwner
+                isOwner,
+                uuid,
+                sdkClientInfoEntity
             )
     }
 
@@ -76,5 +89,7 @@ class UserEntity constructor(
             .userUniqueId(userUniqueId)
             .state(state)
             .isOwner(isOwner)
+            .uuid(uuid)
+            .sdkClientInfoEntity(sdkClientInfoEntity)
     }
 }

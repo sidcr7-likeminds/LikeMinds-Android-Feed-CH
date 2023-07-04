@@ -66,11 +66,16 @@ import javax.inject.Inject
 class CreatePostFragment :
     BaseFragment<FragmentCreatePostBinding, CreatePostViewModel>(),
     CreatePostListener {
+
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
 
     @Inject
     lateinit var helperViewModel: HelperViewModel
+
+    @Inject
+    lateinit var userPreferences: UserPreferences
+
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
@@ -117,7 +122,13 @@ class CreatePostFragment :
     private fun checkForSource() {
         //if source is notification, then call initiate first in the background
         if (source == LMAnalytics.Source.NOTIFICATION) {
-            initiateViewModel.initiateUser()
+            initiateViewModel.initiateUser(
+                requireContext(),
+                userPreferences.getApiKey(),
+                userPreferences.getUserName(),
+                userPreferences.getUserUniqueId(),
+                userPreferences.getIsGuest()
+            )
         }
     }
 
@@ -224,7 +235,7 @@ class CreatePostFragment :
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
                 helperViewModel.sendUserTagEvent(
-                    user.userUniqueId,
+                    user.uuid,
                     memberTagging.getTaggedMemberCount()
                 )
             }
@@ -459,6 +470,7 @@ class CreatePostFragment :
             }
         }
     }
+
     // handles the logic to show the type of post
     private fun showPostMedia() {
         attachmentsLimitExceeded()

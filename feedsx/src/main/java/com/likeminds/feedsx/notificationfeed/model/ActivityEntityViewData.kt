@@ -22,7 +22,9 @@ class ActivityEntityViewData private constructor(
     val replies: MutableList<CommentViewData>?,
     val level: Int?,
     val createdAt: Long,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val uuid: String,
+    val deletedByUUID: String?
 ) : Parcelable {
     class Builder {
         private var id: String = ""
@@ -40,6 +42,8 @@ class ActivityEntityViewData private constructor(
         private var level: Int? = null
         private var createdAt: Long = 0
         private var updatedAt: Long = 0
+        private var uuid: String = ""
+        private var deletedByUUID: String? = null
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String) = apply { this.text = text }
@@ -58,6 +62,8 @@ class ActivityEntityViewData private constructor(
         fun level(level: Int?) = apply { this.level = level }
         fun createdAt(createdAt: Long) = apply { this.createdAt = createdAt }
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
+        fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun deletedByUUID(deletedByUUID: String?) = apply { this.deletedByUUID = deletedByUUID }
 
         fun build() = ActivityEntityViewData(
             id,
@@ -74,7 +80,9 @@ class ActivityEntityViewData private constructor(
             replies,
             level,
             createdAt,
-            updatedAt
+            updatedAt,
+            uuid,
+            deletedByUUID
         )
     }
 
@@ -94,5 +102,7 @@ class ActivityEntityViewData private constructor(
             .level(level)
             .createdAt(createdAt)
             .updatedAt(updatedAt)
+            .uuid(uuid)
+            .deletedByUUID(deletedByUUID)
     }
 }

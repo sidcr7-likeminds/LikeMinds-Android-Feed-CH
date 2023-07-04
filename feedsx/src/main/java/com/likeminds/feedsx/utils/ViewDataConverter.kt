@@ -21,12 +21,12 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
 import com.likeminds.likemindsfeed.comment.model.Comment
-import com.likeminds.likemindsfeed.helper.model.TagMember
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
 import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
 import com.likeminds.likemindsfeed.post.model.*
+import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
 import com.likeminds.likemindsfeed.sdk.model.User
 
 object ViewDataConverter {
@@ -43,10 +43,12 @@ object ViewDataConverter {
                 attachmentType = com.likeminds.feedsx.posttypes.model.IMAGE
                 ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
             }
+
             VIDEO -> {
                 attachmentType = com.likeminds.feedsx.posttypes.model.VIDEO
                 ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
             }
+
             else -> {
                 attachmentType = DOCUMENT
                 ITEM_CREATE_POST_DOCUMENTS_ITEM
@@ -164,6 +166,17 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isGuest(user.isGuest)
             .isDeleted(user.isDeleted)
+            .uuid(user.uuid)
+            .sdkClientInfoViewData(convertSDKClientInfo(user.sdkClientInfo))
+            .build()
+    }
+
+    private fun convertSDKClientInfo(sdkClientInfo: SDKClientInfo): SDKClientInfoViewData {
+        return SDKClientInfoViewData.Builder()
+            .user(sdkClientInfo.user)
+            .uuid(sdkClientInfo.uuid)
+            .userUniqueId(sdkClientInfo.userUniqueId)
+            .community(sdkClientInfo.community)
             .build()
     }
 
@@ -208,7 +221,7 @@ object ViewDataConverter {
         post: Post,
         usersMap: Map<String, User>
     ): PostViewData {
-        val postCreator = post.userId
+        val postCreator = post.uuid
         val user = usersMap[postCreator]
         val postId = post.id
         val replies = post.replies?.toMutableList()
@@ -242,6 +255,7 @@ object ViewDataConverter {
             .createdAt(post.createdAt)
             .updatedAt(post.updatedAt)
             .user(userViewData)
+            .uuid(postCreator)
             .build()
     }
 
@@ -276,8 +290,8 @@ object ViewDataConverter {
         postId: String,
         parentCommentId: String? = null
     ): CommentViewData {
-        val userId = comment.userId
-        val user = usersMap[userId]
+        val commentCreator = comment.uuid
+        val user = usersMap[commentCreator]
         val replies = comment.replies?.toMutableList()
         val parentId = parentCommentId ?: comment.parentComment?.id
 
@@ -292,7 +306,7 @@ object ViewDataConverter {
             .postId(postId)
             .isLiked(comment.isLiked)
             .isEdited(comment.isEdited)
-            .userId(userId)
+            .userId(commentCreator)
             .text(comment.text)
             .level(comment.level)
             .likesCount(comment.likesCount)
@@ -319,6 +333,7 @@ object ViewDataConverter {
                     )
                 }
             )
+            .uuid(commentCreator)
             .build()
     }
 
@@ -393,7 +408,7 @@ object ViewDataConverter {
             .build()
     }
 
-    fun convertUserTag(tagMember: TagMember): UserTagViewData {
+    fun convertUserTag(tagMember: User): UserTagViewData {
         val nameDrawable = MemberImageUtil.getNameDrawable(
             MemberImageUtil.SIXTY_PX,
             tagMember.id.toString(),
@@ -406,6 +421,7 @@ object ViewDataConverter {
             .name(tagMember.name)
             .userUniqueId(tagMember.userUniqueId)
             .placeHolder(nameDrawable.first)
+            .uuid(tagMember.sdkClientInfo.uuid)
             .build()
     }
 
@@ -420,7 +436,7 @@ object ViewDataConverter {
     ): List<LikeViewData> {
         return likes.map { like ->
             //get user id
-            val likedById = like.userId
+            val likedById = like.uuid
 
             //get user
             val likedBy = users[likedById]
@@ -526,6 +542,7 @@ object ViewDataConverter {
             .activityByUser(activityByUser)
             .createdAt(activity.createdAt)
             .updatedAt(activity.updatedAt)
+            .uuid(activity.uuid)
             .build()
     }
 
@@ -536,7 +553,7 @@ object ViewDataConverter {
         if (activityEntityData == null) {
             return null
         }
-        val entityCreator = activityEntityData.userId
+        val entityCreator = activityEntityData.uuid
         val user = usersMap[entityCreator]
         val replies = activityEntityData.replies?.toMutableList()
 
@@ -573,12 +590,20 @@ object ViewDataConverter {
             .level(activityEntityData.level)
             .createdAt(activityEntityData.createdAt)
             .updatedAt(activityEntityData.updatedAt)
+            .uuid(activityEntityData.uuid)
+            .deletedByUUID(activityEntityData.deletedByUUID)
             .build()
     }
 
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
+
+    /**
+     * converts [User] to [UserEntity]
+     * @param user: object of [User]
+     * @return object of [UserEntity]
+     */
     fun createUserEntity(user: User): UserEntity {
         return UserEntity.Builder()
             .id(user.id)
@@ -589,6 +614,22 @@ object ViewDataConverter {
             .customTitle(user.customTitle)
             .isDeleted(user.isDeleted)
             .userUniqueId(user.userUniqueId)
+            .uuid(user.uuid)
+            .sdkClientInfoEntity(createSDKClientInfoEntity(user.sdkClientInfo))
+            .build()
+    }
+
+    /**
+     * converts [SDKClientInfo] to [SDKClientInfoEntity]
+     * @param sdkClientInfo: object of [SDKClientInfo]
+     * @return object of [SDKClientInfoEntity]
+     */
+    private fun createSDKClientInfoEntity(sdkClientInfo: SDKClientInfo): SDKClientInfoEntity {
+        return SDKClientInfoEntity.Builder()
+            .user(sdkClientInfo.user)
+            .community(sdkClientInfo.community)
+            .userUniqueId(sdkClientInfo.userUniqueId)
+            .uuid(sdkClientInfo.uuid)
             .build()
     }
 
@@ -655,7 +696,7 @@ object ViewDataConverter {
             .text(post.text)
             .temporaryId(post.temporaryId)
             .thumbnail(post.thumbnail)
-            .uuid(post.uuid)
+            .workerUUID(post.uuid)
             .isPosted(post.isPosted)
             .attachments(convertAttachmentsEntity(attachments))
             .build()
@@ -716,9 +757,11 @@ object ViewDataConverter {
             IMAGE -> {
                 com.likeminds.feedsx.posttypes.model.IMAGE
             }
+
             VIDEO -> {
                 com.likeminds.feedsx.posttypes.model.VIDEO
             }
+
             else -> {
                 DOCUMENT
             }

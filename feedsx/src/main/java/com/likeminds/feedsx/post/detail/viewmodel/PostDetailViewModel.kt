@@ -220,7 +220,7 @@ class PostDetailViewModel @Inject constructor(
 
     // for replying on a comment on the post
     fun replyComment(
-        userId: String,
+        parentCommentCreatorUUID: String,
         postId: String,
         parentCommentId: String,
         text: String
@@ -240,7 +240,7 @@ class PostDetailViewModel @Inject constructor(
                 val comment = data.comment
                 val users = data.users
                 sendReplyPostedEvent(
-                    userId,
+                    parentCommentCreatorUUID,
                     postId,
                     parentCommentId,
                     comment.id
@@ -267,7 +267,7 @@ class PostDetailViewModel @Inject constructor(
      * Triggers when the reply is posted on a comment
      **/
     private fun sendReplyPostedEvent(
-        userId: String,
+        parentCommentCreatorUUID: String,
         postId: String,
         parentCommentId: String,
         commentId: String,
@@ -275,7 +275,7 @@ class PostDetailViewModel @Inject constructor(
         LMAnalytics.track(
             LMAnalytics.Events.REPLY_POSTED,
             mapOf(
-                LMAnalytics.Keys.USER_ID to userId,
+                LMAnalytics.Keys.UUID to parentCommentCreatorUUID,
                 LMAnalytics.Keys.POST_ID to postId,
                 LMAnalytics.Keys.COMMENT_ID to parentCommentId,
                 LMAnalytics.Keys.COMMENT_REPLY_ID to commentId

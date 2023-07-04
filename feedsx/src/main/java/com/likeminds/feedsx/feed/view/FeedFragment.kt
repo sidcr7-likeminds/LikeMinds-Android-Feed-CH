@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
+import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
@@ -63,9 +64,8 @@ import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
-import java.util.*
+import java.util.UUID
 import javax.inject.Inject
-
 
 class FeedFragment :
     BaseFragment<FragmentFeedBinding, FeedViewModel>(),
@@ -75,7 +75,22 @@ class FeedFragment :
     PostObserver {
 
     companion object {
-        const val FEED_EXTRAS = "FEED_EXTRAS"
+        const val TAG = "FeedFragment"
+        private const val FEED_EXTRAS = "FEED_EXTRAS"
+
+        /**
+         * creates a instance of fragment
+         **/
+        @JvmStatic
+        fun getInstance(
+            extras: FeedExtras,
+        ): FeedFragment {
+            val fragment = FeedFragment()
+            val bundle = Bundle()
+            bundle.putParcelable(FEED_EXTRAS, extras)
+            fragment.arguments = bundle
+            return fragment
+        }
     }
 
     private lateinit var feedExtras: FeedExtras
@@ -219,9 +234,11 @@ class FeedFragment :
                 0 -> {
                     tvNotificationCount.isVisible = false
                 }
+
                 in 1..99 -> {
                     configureNotificationBadge(count.toString())
                 }
+
                 else -> {
                     configureNotificationBadge(getString(R.string.nine_nine_plus))
                 }
@@ -332,10 +349,10 @@ class FeedFragment :
 
     // finds the upload worker by UUID and observes the worker
     private fun observeMediaUpload(postingData: PostViewData) {
-        if (postingData.uuid.isEmpty()) {
+        if (postingData.workerUUID.isEmpty()) {
             return
         }
-        val uuid = UUID.fromString(postingData.uuid)
+        val uuid = UUID.fromString(postingData.workerUUID)
         if (!workersMap.contains(uuid)) {
             workersMap.add(uuid)
             WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
@@ -360,6 +377,7 @@ class FeedFragment :
                 }
                 viewModel.addPost(postingData)
             }
+
             WorkInfo.State.FAILED -> {
                 // uploading failed, initiate retry mechanism
                 val indexList = workInfo.outputData.getIntArray(
@@ -370,6 +388,7 @@ class FeedFragment :
                     indexList.size
                 )
             }
+
             else -> {
                 // uploading in progress, map the progress to progress bar
                 val progress = MediaUploadWorker.getProgress(workInfo) ?: return
@@ -407,10 +426,12 @@ class FeedFragment :
                 ProgressHelper.hideProgress(binding.progressBar)
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is FeedViewModel.ErrorMessageEvent.AddPost -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 removePostingView()
             }
+
             is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
                 binding.tvNotificationCount.hide()
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
@@ -442,6 +463,7 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is PostActionsViewModel.ErrorMessageEvent.SavePost -> {
                 val postId = response.postId
 
@@ -463,10 +485,12 @@ class FeedFragment :
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is PostActionsViewModel.ErrorMessageEvent.DeletePost -> {
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
+
             is PostActionsViewModel.ErrorMessageEvent.PinPost -> {
                 val postId = response.postId
 
@@ -524,14 +548,20 @@ class FeedFragment :
     // initiates SDK
     private fun initiateSDK() {
         ProgressHelper.showProgress(binding.progressBar)
-        initiateViewModel.initiateUser()
+        initiateViewModel.initiateUser(
+            requireContext(),
+            feedExtras.apiKey,
+            feedExtras.userName,
+            feedExtras.userId,
+            feedExtras.isGuest
+        )
     }
 
     /**
      * UI Block
      **/
 
-    // initializes various UI components
+// initializes various UI components
     private fun initUI() {
         binding.toolbarColor = LMBranding.getToolbarColor()
 
@@ -612,6 +642,7 @@ class FeedFragment :
                     // post of type text/link has been created and posted
                     refreshFeed()
                 }
+
                 CreatePostActivity.RESULT_UPLOAD_POST -> {
                     // post with attachments created, now upload and post it from db
                     viewModel.fetchPendingPostFromDB()
@@ -773,7 +804,7 @@ class FeedFragment :
      * Post Actions block
      **/
 
-    // updates [alreadySeenFullContent] for the post
+// updates [alreadySeenFullContent] for the post
     override fun updatePostSeenFullContent(position: Int, alreadySeenFullContent: Boolean) {
         // get item from adapter
         val item = mPostAdapter[position]
@@ -836,7 +867,7 @@ class FeedFragment :
     // callback when post menu items are clicked
     override fun onPostMenuItemClicked(
         postId: String,
-        creatorId: String,
+        postCreatorUUID: String,
         menuId: Int
     ) {
         when (menuId) {
@@ -847,15 +878,19 @@ class FeedFragment :
                 val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
                 startActivity(intent)
             }
+
             DELETE_POST_MENU_ITEM_ID -> {
-                deletePost(postId, creatorId)
+                deletePost(postId, postCreatorUUID)
             }
+
             REPORT_POST_MENU_ITEM_ID -> {
-                reportPost(postId, creatorId)
+                reportPost(postId, postCreatorUUID)
             }
+
             PIN_POST_MENU_ITEM_ID -> {
                 pinPost(postId)
             }
+
             UNPIN_POST_MENU_ITEM_ID -> {
                 unpinPost(postId)
             }
@@ -919,19 +954,23 @@ class FeedFragment :
 
     // callback when user clicks to share the post
     override fun sharePost(postId: String) {
-        ShareUtils.sharePost(requireContext(), postId)
+        ShareUtils.sharePost(
+            requireContext(),
+            postId,
+            ShareUtils.domain
+        )
         val post = getIndexAndPostFromAdapter(postId)?.second ?: return
         postActionsViewModel.sendPostShared(post)
     }
 
     // processes delete post request
-    private fun deletePost(postId: String, creatorId: String) {
+    private fun deletePost(postId: String, postCreatorUUID: String) {
         val deleteExtras = DeleteExtras.Builder()
             .postId(postId)
             .entityType(DELETE_TYPE_POST)
             .build()
 
-        if (creatorId == postActionsViewModel.getUserUniqueId()) {
+        if (postCreatorUUID == postActionsViewModel.getUUID()) {
             // if the post was created by current user
             SelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
@@ -947,12 +986,12 @@ class FeedFragment :
     }
 
     // Processes report action on post
-    private fun reportPost(postId: String, creatorId: String) {
+    private fun reportPost(postId: String, uuid: String) {
         val post = getIndexAndPostFromAdapter(postId)?.second ?: return
         //create extras for [ReportActivity]
         val reportExtras = ReportExtras.Builder()
             .entityId(postId)
-            .entityCreatorId(creatorId)
+            .uuid(uuid)
             .entityType(REPORT_TYPE_POST)
             .postViewType(post.viewType)
             .build()
@@ -1113,7 +1152,7 @@ class FeedFragment :
      * Adapter Util Block
      **/
 
-    //get index and post from the adapter using postId
+//get index and post from the adapter using postId
     private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData>? {
         val index = mPostAdapter.items().indexOfFirst {
             (it is PostViewData) && (it.id == postId)
