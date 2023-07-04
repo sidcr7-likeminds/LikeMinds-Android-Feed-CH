@@ -30,21 +30,21 @@ You can setup your own branding in the SDK by passing values of three colors (`h
 <br> Create a `SetBrandingRequest` object using `SetBrandingRequest.Builder` class by passing all the required parameters.
 <br> Below is the model for `SetBrandingRequest`.
 
-| **VARIABLE** 	    | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	|
-|:-----------------	|:------------	|:-------------------------------------  |:---------------: |
-| **headerColor**     	| String      	| Header color of Application. 	     |                  | 
-| **buttonsColor**     | String      	| Color of buttons in Application. 	     |                  | 
-| **textLinkColor**     | String      	| Color of text links in Application. 	     |                  | 
-| **fonts**     | LMFonts      	| Fonts used in Application. 	     |                  | 
+| **VARIABLE** 	        | **TYPE** 	     | **DESCRIPTION**                      	 | **NULLABLE** 	 |
+|:----------------------|:---------------|:---------------------------------------|:--------------:|
+| **headerColor**     	 | String      	  | Header color of Application. 	         |                | 
+| **buttonsColor**      | String      	  | Color of buttons in Application. 	     |                | 
+| **textLinkColor**     | String      	  | Color of text links in Application. 	  |                | 
+| **fonts**             | LMFonts      	 | Fonts used in Application. 	           |                | 
 
 Create `fonts` using `LMFonts.Builder` class by passing all the required parameters.
 <br> Below is the model for `LMFonts`.
 
-| **VARIABLE** 	    | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	|
-|:-----------------	|:------------	|:-------------------------------------  |:---------------: |
-| **bold**     	| String      	| Path of font with bold typeface. 	     |                  | 
-| **medium**     | String      	| Path of font with medium typeface. 	     |                  | 
-| **regular**     | String      	| Path of font with medium regular. 	     |                  | 
+| **VARIABLE** 	 | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	 |
+|:---------------|:--------------|:---------------------------------------|:--------------:|
+| **bold**     	 | String      	 | Path of font with bold typeface. 	     |                | 
+| **medium**     | String      	 | Path of font with medium typeface. 	   |                | 
+| **regular**    | String      	 | Path of font with medium regular. 	    |                | 
 
 #### LMUICallback (Optional)
 
@@ -67,8 +67,8 @@ Finally to see the magic of Feed inside your application, add `FeedFragment` nav
 
 #### `FeedExtras`
 
-| **VARIABLE** 	    | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	|
-|:-----------------	|:------------	|:-------------------------------------  |:---------------: |
-| **apiKey**     	| String      	| Api key of your community. 	     |                  | 
-| **userName**     | String      	| Name of the logged in user. 	     |                  | 
-| **userId**     | String      	| Unique id of logged in user. 	     |                  | 
+| **VARIABLE** 	   | **TYPE** 	    | **DESCRIPTION**                      	 | **NULLABLE** 	 |
+|:-----------------|:--------------|:---------------------------------------|:--------------:|
+| **apiKey**     	 | String      	 | Api key of your community. 	           |                | 
+| **userName**     | String      	 | Name of the logged in user. 	          |                | 
+| **userId**       | String      	 | Id of logged in user. 	                |      Yes       | 
