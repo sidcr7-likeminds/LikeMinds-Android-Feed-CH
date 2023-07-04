@@ -436,7 +436,7 @@ object ViewDataConverter {
     ): List<LikeViewData> {
         return likes.map { like ->
             //get user id
-            val likedById = like.userId
+            val likedById = like.uuid
 
             //get user
             val likedBy = users[likedById]
@@ -542,6 +542,7 @@ object ViewDataConverter {
             .activityByUser(activityByUser)
             .createdAt(activity.createdAt)
             .updatedAt(activity.updatedAt)
+            .uuid(activity.uuid)
             .build()
     }
 
@@ -590,6 +591,7 @@ object ViewDataConverter {
             .createdAt(activityEntityData.createdAt)
             .updatedAt(activityEntityData.updatedAt)
             .uuid(activityEntityData.uuid)
+            .deletedByUUID(activityEntityData.deletedByUUID)
             .build()
     }
 
