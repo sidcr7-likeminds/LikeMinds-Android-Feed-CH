@@ -17,8 +17,10 @@
 -keep class com.likeminds.feedsx.utils.memberrights.model.** { *; }
 -keep class com.likeminds.feedsx.utils.membertagging.model.** { *; }
 -keep class com.likeminds.feedsx.utils.model.** { *; }
--keep class androidx.databinding.DataBindingComponent {*;}
+-keep class androidx.databinding.DataBindingComponent { *; }
 
+# for parcelable classes
+-keepnames class * implements android.os.Parcelable
 
 # Class names are needed in reflection
 -keepnames class com.amazonaws.**
