@@ -335,6 +335,9 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    /**
+     * Triggers when the user taps on the bell icon and lands on the notification page
+     **/
     fun sendNotificationPageOpenedEvent() {
         LMAnalytics.track(LMAnalytics.Events.NOTIFICATION_PAGE_OPENED)
     }
