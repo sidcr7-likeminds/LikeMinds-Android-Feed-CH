@@ -9,7 +9,6 @@ const val PDF = "pdf"
 @StringDef(
     IMAGE, VIDEO, PDF
 )
-
 @Retention(AnnotationRetention.SOURCE)
 annotation class MediaType {
     companion object {

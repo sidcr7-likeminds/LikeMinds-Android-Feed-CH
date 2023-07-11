@@ -34,6 +34,8 @@ object LMAnalytics {
 
         const val NOTIFICATION_RECEIVED = "Notification Received"
         const val NOTIFICATION_CLICKED = "Notification Clicked"
+
+        const val NOTIFICATION_PAGE_OPENED = "Notification page opened"
     }
 
     /*
