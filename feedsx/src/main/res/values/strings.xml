@@ -52,6 +52,7 @@
     <string name="all_posts">All Posts</string>
     <string name="following">Following</string>
     <string name="scalix">Scalix</string>
+    <string name="likeMinds">LikeMinds</string>
     <string name="new_post">New Post</string>
     <plurals name="placeholder_pages">
         <item quantity="one">1 Page</item>

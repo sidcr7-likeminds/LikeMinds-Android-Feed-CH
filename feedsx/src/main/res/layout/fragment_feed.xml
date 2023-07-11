@@ -47,7 +47,7 @@
                     android:ellipsize="end"
                     android:maxEms="15"
                     android:maxLines="1"
-                    android:text="@string/scalix"
+                    android:text="@string/likeMinds"
                     android:textColor="@{toolbarColor}"
                     android:textSize="22sp"
                     app:fontType="medium"
