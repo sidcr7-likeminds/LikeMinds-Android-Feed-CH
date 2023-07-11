@@ -279,6 +279,7 @@ class FeedViewModel @Inject constructor(
                     Pair("link_attached", "no")
                 )
             }
+
             ITEM_POST_SINGLE_VIDEO -> {
                 listOf(
                     Pair("video_attached", "1"),
@@ -287,6 +288,7 @@ class FeedViewModel @Inject constructor(
                     Pair("link_attached", "no")
                 )
             }
+
             ITEM_POST_DOCUMENTS -> {
                 listOf(
                     Pair("video_attached", "no"),
@@ -295,6 +297,7 @@ class FeedViewModel @Inject constructor(
                     Pair("link_attached", "no")
                 )
             }
+
             ITEM_POST_MULTIPLE_MEDIA -> {
                 val imageCount = post.attachments.count {
                     it.attachmentType == IMAGE
@@ -325,9 +328,17 @@ class FeedViewModel @Inject constructor(
                     Pair("link_attached", "no")
                 )
             }
+
             else -> {
                 return emptyList()
             }
         }
+    }
+
+    /**
+     * Triggers when the user taps on the bell icon and lands on the notification page
+     **/
+    fun sendNotificationPageOpenedEvent() {
+        LMAnalytics.track(LMAnalytics.Events.NOTIFICATION_PAGE_OPENED)
     }
 }

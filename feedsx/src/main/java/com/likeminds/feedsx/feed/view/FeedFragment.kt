@@ -757,6 +757,7 @@ class FeedFragment :
             }
 
             ivNotification.setOnClickListener {
+                viewModel.sendNotificationPageOpenedEvent()
                 NotificationFeedActivity.start(requireContext())
             }
 
