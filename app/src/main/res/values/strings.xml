@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Android Feed Sample App</string>
+    <string name="app_name">LikeMinds Feed</string>
     <string name="no_internet">No internet!</string>
     <string name="check_your_connection_and_try_again">Check your connection and try again.</string>
     <string name="not_now">Not now</string>
