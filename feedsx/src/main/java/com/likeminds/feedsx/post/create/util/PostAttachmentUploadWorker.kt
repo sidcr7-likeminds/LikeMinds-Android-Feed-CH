@@ -9,10 +9,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.db.models.PostWithAttachments
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
-import com.likeminds.feedsx.utils.mediauploader.model.AWSFileResponse
-import com.likeminds.feedsx.utils.mediauploader.model.GenericFileRequest
-import com.likeminds.feedsx.utils.mediauploader.model.IMAGE
-import com.likeminds.feedsx.utils.mediauploader.model.WORKER_SUCCESS
+import com.likeminds.feedsx.utils.mediauploader.model.*
 import com.likeminds.feedsx.utils.mediauploader.utils.FileHelper
 import com.likeminds.feedsx.utils.mediauploader.utils.UploadHelper
 import kotlinx.coroutines.runBlocking
@@ -49,7 +46,7 @@ class PostAttachmentUploadWorker(
                 )
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(TAG)
