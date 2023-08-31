@@ -4,10 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -130,7 +127,8 @@ class MediaPickerDocumentFragment :
 
     private fun initializeListeners() {
         binding.ivBack.setOnClickListener {
-            requireActivity().onBackPressed()
+            // todo: test
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
 
         binding.fabSend.setOnClickListener {

@@ -10,9 +10,7 @@ import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.utils.permissions.Permission
-import com.likeminds.feedsx.utils.permissions.PermissionCallback
-import com.likeminds.feedsx.utils.permissions.SessionPermission
+import com.likeminds.feedsx.utils.permissions.*
 import com.likeminds.feedsx.utils.snackbar.CustomSnackBar
 import javax.inject.Inject
 
@@ -67,7 +65,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
     @RequiresApi(api = Build.VERSION_CODES.M)
     fun requestPermission(permission: Permission, permissionCallback: PermissionCallback) {
         permissionCallbackSparseArray.put(permission.requestCode, permissionCallback)
-        sessionPermission.setPermissionRequest(permission)
+        sessionPermission.setPermissionRequest(permission.permissionName)
         requestPermissions(arrayOf(permission.permissionName), permission.requestCode)
     }
 
@@ -78,7 +76,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
     }
 
     private fun wasRequestedBefore(permission: Permission): Boolean {
-        return sessionPermission.wasPermissionRequestedBefore(permission)
+        return sessionPermission.wasPermissionRequestedBefore(permission.permissionName)
     }
 
     override fun onRequestPermissionsResult(

@@ -9,6 +9,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ActivityPostDetailBinding
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
@@ -54,7 +55,12 @@ class PostDetailActivity : BaseAppCompatActivity() {
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            postDetailExtras = bundle.getParcelable(POST_DETAIL_EXTRAS)
+            // todo: test
+            postDetailExtras = ExtrasUtil.getParcelable(
+                bundle,
+                POST_DETAIL_EXTRAS,
+                PostDetailExtras::class.java
+            )
             val args = Bundle().apply {
                 putParcelable(POST_DETAIL_EXTRAS, postDetailExtras)
             }
@@ -83,14 +89,14 @@ class PostDetailActivity : BaseAppCompatActivity() {
     private fun redirectActivity() {
         ViewUtils.showShortToast(this, getString(R.string.request_not_processed))
         supportFragmentManager.popBackStack()
-        super.onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 
     private fun initActionBar() {
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 

@@ -10,11 +10,11 @@ class SessionPermission @Inject constructor(application: Application) :
         const val PERMISSION_PREFS = "permission_prefs"
     }
 
-    fun setPermissionRequest(permission: Permission) {
-        putPreference(permission.permissionName, true)
+    fun setPermissionRequest(permissionName: String) {
+        putPreference(permissionName, true)
     }
 
-    fun wasPermissionRequestedBefore(permission: Permission): Boolean {
-        return getPreference(permission.permissionName, false)
+    fun wasPermissionRequestedBefore(permissionName: String): Boolean {
+        return getPreference(permissionName, false)
     }
 }

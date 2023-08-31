@@ -11,7 +11,7 @@ apply from: '../jacoco.gradle'
 
 android {
     namespace 'com.likeminds.feedsampleapp'
-    compileSdk versions.compile_sdk
+    compileSdkVersion versions.compile_sdk
 
     defaultConfig {
         applicationId "com.likeminds.feedsampleapp"

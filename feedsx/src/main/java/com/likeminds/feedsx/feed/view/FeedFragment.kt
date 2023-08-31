@@ -13,17 +13,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.likeminds.feedsx.InitiateViewModel
-import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.R
-import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.*
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
@@ -53,9 +47,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
-import com.likeminds.feedsx.report.view.ReportActivity
-import com.likeminds.feedsx.report.view.ReportFragment
-import com.likeminds.feedsx.report.view.ReportSuccessDialog
+import com.likeminds.feedsx.report.view.*
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -64,7 +56,7 @@ import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 class FeedFragment :
@@ -137,7 +129,12 @@ class FeedFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        feedExtras = arguments?.getParcelable(FEED_EXTRAS)!!
+        // todo: test
+        feedExtras = ExtrasUtil.getParcelable(
+            arguments,
+            FEED_EXTRAS,
+            FeedExtras::class.java
+        ) ?: throw emptyExtrasException(TAG)
     }
 
     override fun setUpViews() {

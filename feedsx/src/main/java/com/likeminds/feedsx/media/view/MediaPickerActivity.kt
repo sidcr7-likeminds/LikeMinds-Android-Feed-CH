@@ -8,15 +8,11 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.media.model.MEDIA_RESULT_BROWSE
-import com.likeminds.feedsx.media.model.MediaPickerExtras
-import com.likeminds.feedsx.media.model.MediaPickerResult
-import com.likeminds.feedsx.media.model.MediaType
+import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import com.likeminds.feedsx.utils.permissions.Permission
-import com.likeminds.feedsx.utils.permissions.PermissionDeniedCallback
-import com.likeminds.feedsx.utils.permissions.PermissionManager
+import com.likeminds.feedsx.utils.permissions.*
 
 class MediaPickerActivity : BaseAppCompatActivity() {
 
@@ -53,7 +49,12 @@ class MediaPickerActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media_picker)
-        val extras = intent.extras?.getParcelable<MediaPickerExtras>(ARG_MEDIA_PICKER_EXTRAS)
+        // todo: test
+        val extras = ExtrasUtil.getParcelable(
+            intent.extras,
+            ARG_MEDIA_PICKER_EXTRAS,
+            MediaPickerExtras::class.java
+        )
         if (extras == null) {
             throw IllegalArgumentException("Arguments are missing")
         } else {
@@ -73,11 +74,11 @@ class MediaPickerActivity : BaseAppCompatActivity() {
             showDeniedPopup = true,
             permissionDeniedCallback = object : PermissionDeniedCallback {
                 override fun onDeny() {
-                    onBackPressed()
+                    onBackPressedDispatcher.onBackPressed()
                 }
 
                 override fun onCancel() {
-                    onBackPressed()
+                    onBackPressedDispatcher.onBackPressed()
                 }
             }
         )
@@ -134,18 +135,19 @@ class MediaPickerActivity : BaseAppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        // todo: test
         when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
             is MediaPickerFolderFragment -> {
-                super.onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
             is MediaPickerItemFragment -> {
                 fragment.onBackPressedFromFragment()
             }
             is MediaPickerDocumentFragment -> {
-                if (fragment.onBackPressedFromFragment()) super.onBackPressed()
+                if (fragment.onBackPressedFromFragment()) onBackPressedDispatcher.onBackPressed()
             }
             else -> {
-                super.onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             }
         }
     }

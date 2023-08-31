@@ -8,8 +8,7 @@ import com.likeminds.feedsx.databinding.FragmentLikesBinding
 import com.likeminds.feedsx.likes.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.viewmodel.LikesViewModel
-import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
@@ -42,7 +41,11 @@ class LikesFragment : BaseFragment<FragmentLikesBinding, LikesViewModel>() {
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        likesScreenExtras = arguments?.getParcelable(LikesActivity.LIKES_SCREEN_EXTRAS)!!
+        likesScreenExtras = ExtrasUtil.getParcelable(
+            arguments,
+            LikesActivity.LIKES_SCREEN_EXTRAS,
+            LikesScreenExtras::class.java
+        ) ?: throw emptyExtrasException(TAG)
     }
 
     override fun setUpViews() {

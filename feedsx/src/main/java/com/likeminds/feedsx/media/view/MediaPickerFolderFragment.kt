@@ -4,9 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.navigation.fragment.findNavController
@@ -96,7 +94,8 @@ class MediaPickerFolderFragment :
 
     private fun initializeListeners() {
         binding.ivBack.setOnClickListener {
-            requireActivity().onBackPressed()
+            // todo: test
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 

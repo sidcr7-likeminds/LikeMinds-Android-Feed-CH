@@ -6,9 +6,7 @@ import android.content.Context
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.os.Build
-import android.provider.MediaStore
-import android.provider.MediaStore.Images
-import android.provider.MediaStore.Video
+import android.provider.MediaStore.*
 import android.util.Log
 import android.webkit.MimeTypeMap
 import androidx.annotation.WorkerThread
@@ -315,7 +313,7 @@ class MediaRepository @Inject constructor() {
                             null
                         }
                         val mediaName =
-                            cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
+                            cursor.getString(cursor.getColumnIndexOrThrow(Files.FileColumns.DISPLAY_NAME))
                         val mediaType = if (isImage) IMAGE else VIDEO
                         media.add(
                             MediaViewData.Builder().uri(uri)
@@ -348,34 +346,34 @@ class MediaRepository @Inject constructor() {
         context: Context,
         mimeTypes: Array<String?>,
     ): List<MediaViewData> {
-        val contentUri = MediaStore.Files.getContentUri("external")
+        val contentUri = Files.getContentUri(VOLUME_EXTERNAL)
         val media: MutableList<MediaViewData> = LinkedList()
-        val sortBy = MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC"
+        val sortBy = Files.FileColumns.DATE_MODIFIED + " DESC"
         val projection = arrayOf(
-            MediaStore.Files.FileColumns._ID,
-            MediaStore.Files.FileColumns.MIME_TYPE,
-            MediaStore.Files.FileColumns.DATE_MODIFIED,
-            MediaStore.Files.FileColumns.SIZE,
-            MediaStore.Files.FileColumns.DISPLAY_NAME,
-            MediaStore.Files.FileColumns.TITLE
+            Files.FileColumns._ID,
+            Files.FileColumns.MIME_TYPE,
+            Files.FileColumns.DATE_MODIFIED,
+            Files.FileColumns.SIZE,
+            Files.FileColumns.DISPLAY_NAME,
+            Files.FileColumns.TITLE
         )
-        val selection = MediaStore.Files.FileColumns.MIME_TYPE + "=? AND " + isNotPending
+        val selection = Files.FileColumns.MIME_TYPE + "=? AND " + isNotPending
         context.contentResolver.query(contentUri, projection, selection, mimeTypes, sortBy)
             .use { cursor ->
                 while (cursor != null && cursor.moveToNext()) {
                     val rowId = cursor.getLong(cursor.getColumnIndexOrThrow(projection[0]))
                     val uri = ContentUris.withAppendedId(contentUri, rowId)
                     val mimetype =
-                        cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE))
+                        cursor.getString(cursor.getColumnIndexOrThrow(Files.FileColumns.MIME_TYPE))
                     val date =
-                        cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DATE_MODIFIED))
+                        cursor.getLong(cursor.getColumnIndexOrThrow(Files.FileColumns.DATE_MODIFIED))
                     val size =
-                        cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE))
+                        cursor.getLong(cursor.getColumnIndexOrThrow(Files.FileColumns.SIZE))
                     var mediaName =
-                        cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
+                        cursor.getString(cursor.getColumnIndexOrThrow(Files.FileColumns.DISPLAY_NAME))
                     if (mediaName == null)
                         mediaName =
-                            cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.TITLE))
+                            cursor.getString(cursor.getColumnIndexOrThrow(Files.FileColumns.TITLE))
                     if (!size.isLargeFile) {
                         media.add(
                             MediaViewData.Builder()
@@ -412,17 +410,17 @@ class MediaRepository @Inject constructor() {
         context.contentResolver.query(contentUri, null, null, null, null).use { cursor ->
             if (cursor != null && cursor.moveToNext()) {
                 val mimetype =
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MIME_TYPE))
+                    cursor.getString(cursor.getColumnIndexOrThrow(Files.FileColumns.MIME_TYPE))
                 val size =
-                    cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.SIZE))
+                    cursor.getLong(cursor.getColumnIndexOrThrow(Files.FileColumns.SIZE))
                 val mediaName =
-                    cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME))
+                    cursor.getString(cursor.getColumnIndexOrThrow(Files.FileColumns.DISPLAY_NAME))
                 val mediaType = mimetype.getMediaType() ?: contentUri.getMediaType(context)
                 ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(mediaName).getMediaType()
                 val duration =
                     if (MediaType.isVideo(mediaType)) {
-                        if (!cursor.isNull(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DURATION))) {
-                            cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DURATION)) / 1000
+                        if (!cursor.isNull(cursor.getColumnIndexOrThrow(Files.FileColumns.DURATION))) {
+                            cursor.getInt(cursor.getColumnIndexOrThrow(Files.FileColumns.DURATION)) / 1000
                         } else {
                             null
                         }
@@ -466,7 +464,7 @@ class MediaRepository @Inject constructor() {
         get() = if (Build.VERSION.SDK_INT <= 28) {
             Images.Media._ID + " NOT NULL"
         } else {
-            MediaStore.MediaColumns.IS_PENDING + " != 1"
+            MediaColumns.IS_PENDING + " != 1"
         }
 
     private class FolderResult(

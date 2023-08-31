@@ -10,7 +10,7 @@ apply from: '../jacoco.gradle'
 
 android {
     namespace 'com.likeminds.feedsx'
-    compileSdk versions.compile_sdk
+    compileSdkVersion versions.compile_sdk
 
     defaultConfig {
         minSdk versions.min_sdk

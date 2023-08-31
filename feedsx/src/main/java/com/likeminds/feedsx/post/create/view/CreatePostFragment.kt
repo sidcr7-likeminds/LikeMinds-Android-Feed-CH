@@ -17,14 +17,9 @@ import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import androidx.viewpager2.widget.ViewPager2
-import com.likeminds.feedsx.InitiateViewModel
-import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.R
-import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
 import com.likeminds.feedsx.databinding.ItemCreatePostSingleVideoBinding
@@ -816,8 +811,12 @@ class CreatePostFragment :
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data =
-                    result.data?.extras?.getParcelable<MediaPickerResult>(ARG_MEDIA_PICKER_RESULT)
+                // todo: test
+                val data = ExtrasUtil.getParcelable(
+                    result.data?.extras,
+                    ARG_MEDIA_PICKER_RESULT,
+                    MediaPickerResult::class.java
+                )
                 checkMediaPickedResult(data)
             }
         }
@@ -838,10 +837,12 @@ class CreatePostFragment :
     private val documentLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data =
-                    result.data?.extras?.getParcelable<MediaPickerResult>(
-                        ARG_MEDIA_PICKER_RESULT
-                    )
+                // todo: test
+                val data = ExtrasUtil.getParcelable(
+                    result.data?.extras,
+                    ARG_MEDIA_PICKER_RESULT,
+                    MediaPickerResult::class.java
+                )
                 checkMediaPickedResult(data)
             }
         }

@@ -4,29 +4,20 @@ import android.app.Activity
 import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.likeminds.feedsx.InitiateViewModel
-import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.R
-import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
 import com.likeminds.feedsx.feed.util.PostEvent
-import com.likeminds.feedsx.likes.model.COMMENT
-import com.likeminds.feedsx.likes.model.LikesScreenExtras
-import com.likeminds.feedsx.likes.model.POST
+import com.likeminds.feedsx.likes.model.*
 import com.likeminds.feedsx.likes.view.LikesActivity
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.*
-import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
-import com.likeminds.feedsx.post.detail.model.NoCommentsViewData
-import com.likeminds.feedsx.post.detail.model.PostDetailExtras
+import com.likeminds.feedsx.post.detail.model.*
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
@@ -35,22 +26,16 @@ import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
-import com.likeminds.feedsx.posttypes.model.CommentViewData
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.*
-import com.likeminds.feedsx.report.view.ReportActivity
-import com.likeminds.feedsx.report.view.ReportFragment
-import com.likeminds.feedsx.report.view.ReportSuccessDialog
+import com.likeminds.feedsx.report.view.*
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
+import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
@@ -126,9 +111,12 @@ class PostDetailFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        postDetailExtras =
-            arguments?.getParcelable(POST_DETAIL_EXTRAS)
-                ?: throw emptyExtrasException(TAG)
+        // todo: test
+        postDetailExtras = ExtrasUtil.getParcelable(
+            arguments,
+            POST_DETAIL_EXTRAS,
+            PostDetailExtras::class.java
+        ) ?: throw emptyExtrasException(TAG)
     }
 
     override fun onResume() {

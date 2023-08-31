@@ -7,6 +7,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.DialogFragmentSelfDeleteBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 
@@ -50,7 +51,12 @@ class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBind
     override fun receiveExtras() {
         super.receiveExtras()
         arguments?.let {
-            deleteExtras = it.getParcelable(ARG_DELETE_EXTRAS) ?: throw emptyExtrasException(TAG)
+            // todo: test
+            deleteExtras = ExtrasUtil.getParcelable(
+                it,
+                ARG_DELETE_EXTRAS,
+                DeleteExtras::class.java
+            ) ?: throw emptyExtrasException(TAG)
         }
     }
 

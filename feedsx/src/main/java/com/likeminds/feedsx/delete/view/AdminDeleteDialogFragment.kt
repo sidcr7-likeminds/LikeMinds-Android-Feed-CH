@@ -9,9 +9,8 @@ import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.DialogFragmentAdminDeleteBinding
-import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
-import com.likeminds.feedsx.delete.model.DeleteExtras
-import com.likeminds.feedsx.delete.model.ReasonChooseViewData
+import com.likeminds.feedsx.delete.model.*
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 
@@ -52,10 +51,15 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
         }
     }
 
+    // todo: test
     override fun receiveExtras() {
         super.receiveExtras()
         arguments?.let {
-            deleteExtras = it.getParcelable(ARG_DELETE_EXTRAS) ?: throw emptyExtrasException(TAG)
+            deleteExtras = ExtrasUtil.getParcelable(
+                it,
+                ARG_DELETE_EXTRAS,
+                DeleteExtras::class.java
+            ) ?: throw emptyExtrasException(TAG)
         }
     }
 
@@ -115,6 +119,7 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
     private fun isTagOthersAndReasonIsEmpty(tag: String, reason: String): Boolean {
         return tag == "Others" && reason.isEmpty()
     }
+
     // handles confirm button (enabled/disabled)
     private fun handleConfirmButton(isEnabled: Boolean) {
         binding.tvConfirm.isEnabled = isEnabled
@@ -128,6 +133,7 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
             )
         }
     }
+
     // callback when a reason is selected from bottom sheet
     override fun onReasonSelected(viewData: ReasonChooseViewData) {
         binding.reasonData = viewData

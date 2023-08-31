@@ -1,7 +1,9 @@
 package com.likeminds.feedsx.utils.permissions
 
 import android.Manifest
+import android.os.Build
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import com.likeminds.feedsx.R
 
 class Permission private constructor(
@@ -14,24 +16,21 @@ class Permission private constructor(
 ) {
     companion object {
 
-        private const val LOCATION = Manifest.permission.ACCESS_FINE_LOCATION
         private const val WRITE_STORAGE = Manifest.permission.WRITE_EXTERNAL_STORAGE
-        private const val RECORD_AUDIO = Manifest.permission.RECORD_AUDIO
-        private const val CAMERA = Manifest.permission.CAMERA
-        private const val REQUEST_LOCATION = 10101
-        private const val REQUEST_STORAGE = 10102
-        private const val REQUEST_RECORD_AUDIO = 10103
-        private const val REQUEST_CAMERA = 10104
 
-        fun getCameraPermissionData(): Permission {
-            return Permission(
-                CAMERA,
-                REQUEST_CAMERA,
-                "The app allows users to click pictures from camera and share it with other users.",
-                "To share pictures, allow LikeMinds access to camera. Tap on Settings > Permission, and turn Camera on.",
-                R.drawable.ic_camera_white
-            )
-        }
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        private const val READ_MEDIA_VIDEO = Manifest.permission.READ_MEDIA_VIDEO
+
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        private const val READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES
+
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        private const val READ_MEDIA_AUDIO = Manifest.permission.READ_MEDIA_AUDIO
+
+        private const val REQUEST_STORAGE = 10101
+        private const val REQUEST_NOTIFICATIONS = 10102
+        private const val REQUEST_GALLERY = 10103
+        private const val REQUEST_AUDIO = 10104
 
         fun getStoragePermissionData(): Permission {
             return Permission(
