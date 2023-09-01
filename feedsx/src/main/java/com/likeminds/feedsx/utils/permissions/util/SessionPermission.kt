@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.utils.permissions
+package com.likeminds.feedsx.utils.permissions.util
 
 import android.app.Application
 import com.likeminds.feedsx.utils.sharedpreferences.BasePreferences

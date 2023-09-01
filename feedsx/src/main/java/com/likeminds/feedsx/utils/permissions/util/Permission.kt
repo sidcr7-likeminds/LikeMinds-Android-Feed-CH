@@ -1,10 +1,12 @@
-package com.likeminds.feedsx.utils.permissions
+package com.likeminds.feedsx.utils.permissions.util
 
 import android.Manifest
+import android.content.Context
 import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import com.likeminds.feedsx.R
+import com.likeminds.feedsx.utils.permissions.model.PermissionExtras
 
 class Permission private constructor(
     val permissionName: String,
@@ -24,13 +26,9 @@ class Permission private constructor(
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         private const val READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES
 
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-        private const val READ_MEDIA_AUDIO = Manifest.permission.READ_MEDIA_AUDIO
-
         private const val REQUEST_STORAGE = 10101
         private const val REQUEST_NOTIFICATIONS = 10102
         private const val REQUEST_GALLERY = 10103
-        private const val REQUEST_AUDIO = 10104
 
         fun getStoragePermissionData(): Permission {
             return Permission(
@@ -40,6 +38,23 @@ class Permission private constructor(
                 "To send media, allow LikeMinds access to your device’s photos, media and files. Tap on Settings > Permission, and turn Storage on.",
                 R.drawable.ic_folder
             )
+        }
+
+        // returns the [PermissionExtras] for gallery permissions request
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        fun getGalleryPermissionExtras(context: Context): PermissionExtras {
+            return PermissionExtras.Builder()
+                .permissions(
+                    arrayOf(
+                        READ_MEDIA_VIDEO,
+                        READ_MEDIA_IMAGES
+                    )
+                )
+                .requestCode(REQUEST_GALLERY)
+                .preDialogMessage(context.getString(R.string.pre_gallery_media_permission_dialog_message))
+                .deniedDialogMessage(context.getString(R.string.denied_gallery_media_permission_dialog_message))
+                .dialogImage(R.drawable.ic_folder)
+                .build()
         }
     }
 }

@@ -11,6 +11,8 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.utils.permissions.*
+import com.likeminds.feedsx.utils.permissions.model.PermissionExtras
+import com.likeminds.feedsx.utils.permissions.util.*
 import com.likeminds.feedsx.utils.snackbar.CustomSnackBar
 import javax.inject.Inject
 
@@ -62,6 +64,19 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         }
     }
 
+    fun hasPermissions(permissions: Array<String>): Boolean {
+        return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            true
+        } else {
+            var hasPermission = true
+            permissions.forEach { permission ->
+                hasPermission =
+                    hasPermission && checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+            }
+            return hasPermission
+        }
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     fun requestPermission(permission: Permission, permissionCallback: PermissionCallback) {
         permissionCallbackSparseArray.put(permission.requestCode, permissionCallback)
@@ -69,14 +84,38 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         requestPermissions(arrayOf(permission.permissionName), permission.requestCode)
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    fun requestMultiplePermissions(
+        permissionExtras: PermissionExtras,
+        permissionCallback: PermissionCallback
+    ) {
+        permissionExtras.apply {
+            permissions.forEach { permissionName ->
+                permissionCallbackSparseArray.put(requestCode, permissionCallback)
+                sessionPermission.setPermissionRequest(permissionName)
+            }
+            requestPermissions(permissions, requestCode)
+        }
+    }
+
     @TargetApi(Build.VERSION_CODES.M)
     fun canRequestPermission(permission: Permission): Boolean {
-        return !wasRequestedBefore(permission) ||
+        return !wasRequestedBefore(permission.permissionName) ||
                 shouldShowRequestPermissionRationale(permission.permissionName)
     }
 
-    private fun wasRequestedBefore(permission: Permission): Boolean {
-        return sessionPermission.wasPermissionRequestedBefore(permission.permissionName)
+    @TargetApi(Build.VERSION_CODES.M)
+    fun canRequestPermissions(permissions: Array<String>): Boolean {
+        var canRequest = true
+        permissions.forEach { permission ->
+            canRequest = canRequest && (!wasRequestedBefore(permission) ||
+                    shouldShowRequestPermissionRationale(permission))
+        }
+        return canRequest
+    }
+
+    private fun wasRequestedBefore(permissionName: String): Boolean {
+        return sessionPermission.wasPermissionRequestedBefore(permissionName)
     }
 
     override fun onRequestPermissionsResult(

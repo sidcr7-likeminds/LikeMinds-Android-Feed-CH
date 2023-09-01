@@ -12,7 +12,7 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import com.likeminds.feedsx.utils.permissions.*
+import com.likeminds.feedsx.utils.permissions.util.*
 
 class MediaPickerActivity : BaseAppCompatActivity() {
 
@@ -64,24 +64,52 @@ class MediaPickerActivity : BaseAppCompatActivity() {
         checkStoragePermission()
     }
 
+    // checks if the application has the required media permission
     private fun checkStoragePermission() {
-        PermissionManager.performTaskWithPermission(
-            this,
-            settingsPermissionLauncher,
-            { startMediaPickerFragment() },
-            Permission.getStoragePermissionData(),
-            showInitialPopup = true,
-            showDeniedPopup = true,
-            permissionDeniedCallback = object : PermissionDeniedCallback {
-                override fun onDeny() {
-                    onBackPressedDispatcher.onBackPressed()
-                }
-
-                override fun onCancel() {
-                    onBackPressedDispatcher.onBackPressed()
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val mediaTypes = mediaPickerExtras.mediaTypes
+            if (mediaTypes.contains(PDF)) {
+                startMediaPickerFragment()
+                return
             }
-        )
+            val permissionExtras = Permission.getGalleryPermissionExtras(this)
+
+            PermissionManager.performTaskWithPermissionExtras(
+                this,
+                settingsPermissionLauncher,
+                { startMediaPickerFragment() },
+                permissionExtras,
+                showInitialPopup = true,
+                showDeniedPopup = true,
+                permissionDeniedCallback = object : PermissionDeniedCallback {
+                    override fun onDeny() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+
+                    override fun onCancel() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            )
+        } else {
+            PermissionManager.performTaskWithPermission(
+                this,
+                settingsPermissionLauncher,
+                { startMediaPickerFragment() },
+                Permission.getStoragePermissionData(),
+                showInitialPopup = true,
+                showDeniedPopup = true,
+                permissionDeniedCallback = object : PermissionDeniedCallback {
+                    override fun onDeny() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+
+                    override fun onCancel() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            )
+        }
     }
 
     private fun startMediaPickerFragment() {
