@@ -1,16 +1,21 @@
 package com.likeminds.feedsx.feed.view
 
+import android.Manifest
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
@@ -69,6 +74,9 @@ class FeedFragment :
     companion object {
         const val TAG = "FeedFragment"
         private const val FEED_EXTRAS = "FEED_EXTRAS"
+
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        private const val POST_NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS
 
         /**
          * creates a instance of fragment
@@ -139,9 +147,24 @@ class FeedFragment :
 
     override fun setUpViews() {
         super.setUpViews()
+        checkNotificationPermission()
         initUI()
         initiateSDK()
         initToolbar()
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {}
+
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!NotificationManagerCompat.from(requireContext()).areNotificationsEnabled()) {
+                if (activity?.checkSelfPermission(POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
+                }
+            }
+        }
     }
 
     override fun observeData() {
