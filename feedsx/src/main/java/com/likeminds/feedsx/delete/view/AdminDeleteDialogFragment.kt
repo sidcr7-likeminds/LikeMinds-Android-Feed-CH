@@ -51,7 +51,6 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
         }
     }
 
-    // todo: test
     override fun receiveExtras() {
         super.receiveExtras()
         arguments?.let {

@@ -137,7 +137,6 @@ class FeedFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        // todo: test
         feedExtras = ExtrasUtil.getParcelable(
             arguments,
             FEED_EXTRAS,
@@ -591,11 +590,13 @@ class FeedFragment :
         initSwipeRefreshLayout()
     }
 
+    @Suppress("Deprecation")
     private fun setStatusBarColor() {
         requireActivity().window.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             statusBarColor = LMBranding.getHeaderColor()
+            @RequiresApi(Build.VERSION_CODES.M)
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }

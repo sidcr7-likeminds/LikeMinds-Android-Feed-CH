@@ -51,7 +51,6 @@ class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBind
     override fun receiveExtras() {
         super.receiveExtras()
         arguments?.let {
-            // todo: test
             deleteExtras = ExtrasUtil.getParcelable(
                 it,
                 ARG_DELETE_EXTRAS,

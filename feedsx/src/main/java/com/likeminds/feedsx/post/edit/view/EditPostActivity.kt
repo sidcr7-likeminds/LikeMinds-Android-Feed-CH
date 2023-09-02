@@ -53,7 +53,6 @@ class EditPostActivity : BaseAppCompatActivity() {
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            // todo: test
             editPostExtras = ExtrasUtil.getParcelable(
                 bundle,
                 EDIT_POST_EXTRAS,

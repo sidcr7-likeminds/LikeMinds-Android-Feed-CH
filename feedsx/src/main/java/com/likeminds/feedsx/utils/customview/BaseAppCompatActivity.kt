@@ -49,10 +49,12 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    @Suppress("Deprecation")
     private fun setStatusBarColor(statusBarColor: Int) {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = statusBarColor
+        @RequiresApi(Build.VERSION_CODES.M)
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
     }
 

@@ -106,7 +106,6 @@ class EditPostFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        // todo: test
         editPostExtras = ExtrasUtil.getParcelable(
             arguments,
             EDIT_POST_EXTRAS,

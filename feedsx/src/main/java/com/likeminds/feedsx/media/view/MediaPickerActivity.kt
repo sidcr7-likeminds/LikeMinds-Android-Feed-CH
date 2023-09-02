@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
@@ -49,7 +50,7 @@ class MediaPickerActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media_picker)
-        // todo: test
+        setupOnBackPressedCallback()
         val extras = ExtrasUtil.getParcelable(
             intent.extras,
             ARG_MEDIA_PICKER_EXTRAS,
@@ -62,6 +63,31 @@ class MediaPickerActivity : BaseAppCompatActivity() {
         }
 
         checkStoragePermission()
+    }
+
+    // setups up on back pressed callback
+    private fun setupOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(this) {
+            when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
+                is MediaPickerFolderFragment -> {
+                    finish()
+                }
+
+                is MediaPickerItemFragment -> {
+                    fragment.onBackPressedFromFragment()
+                }
+
+                is MediaPickerDocumentFragment -> {
+                    if (fragment.onBackPressedFromFragment()) {
+                        finish()
+                    }
+                }
+
+                else -> {
+                    finish()
+                }
+            }
+        }
     }
 
     // checks if the application has the required media permission
@@ -125,9 +151,11 @@ class MediaPickerActivity : BaseAppCompatActivity() {
             MediaType.isImageOrVideo(mediaPickerExtras.mediaTypes) -> {
                 navGraph.setStartDestination(R.id.media_picker_folder_fragment)
             }
+
             MediaType.isPDF(mediaPickerExtras.mediaTypes) -> {
                 navGraph.setStartDestination(R.id.media_picker_document_fragment)
             }
+
             else -> {
                 finish()
             }
@@ -159,24 +187,6 @@ class MediaPickerActivity : BaseAppCompatActivity() {
             }
             setResult(Activity.RESULT_OK, intent)
             finish()
-        }
-    }
-
-    override fun onBackPressed() {
-        // todo: test
-        when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
-            is MediaPickerFolderFragment -> {
-                onBackPressedDispatcher.onBackPressed()
-            }
-            is MediaPickerItemFragment -> {
-                fragment.onBackPressedFromFragment()
-            }
-            is MediaPickerDocumentFragment -> {
-                if (fragment.onBackPressedFromFragment()) onBackPressedDispatcher.onBackPressed()
-            }
-            else -> {
-                onBackPressedDispatcher.onBackPressed()
-            }
         }
     }
 }

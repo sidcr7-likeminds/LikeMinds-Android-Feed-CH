@@ -55,7 +55,6 @@ class PostDetailActivity : BaseAppCompatActivity() {
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            // todo: test
             postDetailExtras = ExtrasUtil.getParcelable(
                 bundle,
                 POST_DETAIL_EXTRAS,

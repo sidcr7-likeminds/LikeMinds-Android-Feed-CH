@@ -811,7 +811,6 @@ class CreatePostFragment :
     private val galleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // todo: test
                 val data = ExtrasUtil.getParcelable(
                     result.data?.extras,
                     ARG_MEDIA_PICKER_RESULT,
@@ -837,7 +836,6 @@ class CreatePostFragment :
     private val documentLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                // todo: test
                 val data = ExtrasUtil.getParcelable(
                     result.data?.extras,
                     ARG_MEDIA_PICKER_RESULT,

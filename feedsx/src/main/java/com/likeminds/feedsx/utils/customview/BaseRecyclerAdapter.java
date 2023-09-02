@@ -2,7 +2,6 @@ package com.likeminds.feedsx.utils.customview;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.ViewGroup;
@@ -72,8 +71,7 @@ public abstract class BaseRecyclerAdapter<T extends BaseViewType> extends Recycl
                 Log.e(TAG, "Please add the supported view binder to view binders list in adapter");
                 return;
             }
-            Bundle bundle = (Bundle) payloads.get(0);
-            viewDataBinder.bindData(holder.getBinding(), bundle, position);
+            viewDataBinder.bindData();
         }
     }
 

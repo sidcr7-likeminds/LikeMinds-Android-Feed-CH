@@ -57,7 +57,6 @@ class CreatePostActivity : BaseAppCompatActivity() {
         //Toolbar
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            // todo: test
             onBackPressedDispatcher.onBackPressed()
         }
 

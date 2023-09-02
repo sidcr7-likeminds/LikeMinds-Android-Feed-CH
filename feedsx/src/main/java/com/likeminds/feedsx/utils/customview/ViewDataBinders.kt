@@ -1,6 +1,5 @@
 package com.likeminds.feedsx.utils.customview
 
-import android.os.Bundle
 import android.view.ViewGroup
 import androidx.databinding.ViewDataBinding
 import com.likeminds.feedsx.utils.model.BaseViewType
@@ -15,7 +14,7 @@ abstract class ViewDataBinder<V : ViewDataBinding, T : BaseViewType> {
 
     abstract fun bindData(binding: V, data: T, position: Int)
 
-    fun bindData(binding: V, data: Bundle, position: Int) {
+    fun bindData() {
         //This function can be called in case to handle inflation of data dependent on `data`
     }
 }

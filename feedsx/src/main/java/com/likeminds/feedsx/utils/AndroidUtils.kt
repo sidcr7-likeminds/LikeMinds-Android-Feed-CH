@@ -1,8 +1,11 @@
 package com.likeminds.feedsx.utils
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import com.likeminds.feedsx.media.customviews.WrappedDrawable
 import com.likeminds.feedsx.media.model.LocalAppData
 import com.likeminds.feedsx.media.model.MediaType
@@ -37,19 +40,36 @@ object AndroidUtils {
     /**
      * Returns the list of apps with basic information which can be queried for a particular intent
      * */
+    @SuppressLint("QueryPermissionsNeeded")
     private fun getLocalAppData(context: Context, intent: Intent): List<LocalAppData> {
         val packageManager = context.packageManager
-        return packageManager.queryIntentActivities(intent, 0)
-            .mapIndexedNotNull { index, resolveInfo ->
-                val drawable = WrappedDrawable(resolveInfo.loadIcon(packageManager))
-                drawable.setBounds(0, 0, dpToPx(50), dpToPx(50))
-                LocalAppData(
-                    index,
-                    resolveInfo.loadLabel(packageManager).toString(),
-                    drawable,
-                    resolveInfo
-                )
-            }
+        val localAppData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0L))
+                .mapIndexedNotNull { index, resolveInfo ->
+                    val drawable = WrappedDrawable(resolveInfo.loadIcon(packageManager))
+                    drawable.setBounds(0, 0, dpToPx(50), dpToPx(50))
+                    LocalAppData(
+                        index,
+                        resolveInfo.loadLabel(packageManager).toString(),
+                        drawable,
+                        resolveInfo
+                    )
+                }
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.queryIntentActivities(intent, 0)
+                .mapIndexedNotNull { index, resolveInfo ->
+                    val drawable = WrappedDrawable(resolveInfo.loadIcon(packageManager))
+                    drawable.setBounds(0, 0, dpToPx(50), dpToPx(50))
+                    LocalAppData(
+                        index,
+                        resolveInfo.loadLabel(packageManager).toString(),
+                        drawable,
+                        resolveInfo
+                    )
+                }
+        }
+        return localAppData
     }
 
     /**
@@ -67,12 +87,15 @@ object AndroidUtils {
             MediaType.isBothImageAndVideo(mediaTypes) -> {
                 getExternalMediaPickerIntent(allowMultipleSelect)
             }
+
             MediaType.isImage(mediaTypes) -> {
                 getExternalImagePickerIntent(allowMultipleSelect)
             }
+
             MediaType.isVideo(mediaTypes) -> {
                 getExternalVideoPickerIntent(allowMultipleSelect)
             }
+
             else -> null
         }
         if (intent != null && browseClassName != null) {

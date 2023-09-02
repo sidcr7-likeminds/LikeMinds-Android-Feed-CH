@@ -111,7 +111,6 @@ class PostDetailFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        // todo: test
         postDetailExtras = ExtrasUtil.getParcelable(
             arguments,
             POST_DETAIL_EXTRAS,

@@ -7,6 +7,9 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.view.menu.MenuBuilder
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
@@ -31,9 +34,7 @@ class MediaPickerFolderFragment :
     private val appsList by lazy { ArrayList<LocalAppData>() }
 
     companion object {
-        const val BUNDLE_MEDIA_PICKER_FOLDER = "bundle of media picker folder"
-        const val REQUEST_KEY = "request key of media item"
-        const val RESULT_KEY = "result of media item"
+        private const val BUNDLE_MEDIA_PICKER_FOLDER = "bundle of media picker folder"
         const val TAG = "MediaPickerFolder"
 
         @JvmStatic
@@ -70,7 +71,7 @@ class MediaPickerFolderFragment :
         super.setUpViews()
 
         binding.toolbarColor = LMBranding.getToolbarColor()
-        setHasOptionsMenu(true)
+        setupMenu()
         initializeUI()
         initializeListeners()
         viewModel.fetchAllFolders(requireContext(), mediaPickerExtras.mediaTypes)
@@ -94,54 +95,63 @@ class MediaPickerFolderFragment :
 
     private fun initializeListeners() {
         binding.ivBack.setOnClickListener {
-            // todo: test
             requireActivity().onBackPressedDispatcher.onBackPressed()
         }
     }
 
-    @SuppressLint("RestrictedApi")
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
+    private fun setupMenu() {
+        // The usage of an interface lets you inject your own implementation
+        val menuHost: MenuHost = requireActivity()
 
-        appsList.forEachIndexed { index, localAppData ->
-            menu.add(0, localAppData.appId, index, localAppData.appName)
-            menu.getItem(index).icon = localAppData.appIcon
-        }
-        if (menu is MenuBuilder) {
-            menu.setOptionalIconsVisible(true)
-        }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val localAppData = appsList.find {
-            it.appId == item.itemId
-        }
-
-        return if (localAppData != null) {
-            val extra = MediaPickerResult.Builder()
-                .mediaPickerResultType(MEDIA_RESULT_BROWSE)
-                .mediaTypes(mediaPickerExtras.mediaTypes)
-                .allowMultipleSelect(mediaPickerExtras.allowMultipleSelect)
-                .browseClassName(
-                    Pair(
-                        localAppData.resolveInfo.activityInfo.applicationInfo.packageName,
-                        localAppData.resolveInfo.activityInfo.name
-                    )
-                )
-                .build()
-            val intent = Intent().apply {
-                putExtras(Bundle().apply {
-                    putParcelable(
-                        ARG_MEDIA_PICKER_RESULT, extra
-                    )
-                })
+        // Add menu items without using the Fragment Menu APIs
+        // Note how we can tie the MenuProvider to the viewLifecycleOwner
+        // and an optional Lifecycle.State (here, RESUMED) to indicate when
+        // the menu should be visible
+        menuHost.addMenuProvider(object : MenuProvider {
+            @SuppressLint("RestrictedApi")
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                appsList.forEachIndexed { index, localAppData ->
+                    menu.add(0, localAppData.appId, index, localAppData.appName)
+                    menu.getItem(index).icon = localAppData.appIcon
+                }
+                if (menu is MenuBuilder) {
+                    menu.setOptionalIconsVisible(true)
+                }
             }
-            requireActivity().setResult(Activity.RESULT_OK, intent)
-            requireActivity().finish()
-            true
-        } else {
-            false
-        }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                val localAppData = appsList.find {
+                    it.appId == menuItem.itemId
+                }
+
+                return if (localAppData != null) {
+                    val extra = MediaPickerResult.Builder()
+                        .mediaPickerResultType(MEDIA_RESULT_BROWSE)
+                        .mediaTypes(mediaPickerExtras.mediaTypes)
+                        .allowMultipleSelect(mediaPickerExtras.allowMultipleSelect)
+                        .browseClassName(
+                            Pair(
+                                localAppData.resolveInfo.activityInfo.applicationInfo.packageName,
+                                localAppData.resolveInfo.activityInfo.name
+                            )
+                        )
+                        .build()
+                    val intent = Intent().apply {
+                        putExtras(Bundle().apply {
+                            putParcelable(
+                                ARG_MEDIA_PICKER_RESULT, extra
+                            )
+                        })
+                    }
+                    requireActivity().setResult(Activity.RESULT_OK, intent)
+                    requireActivity().finish()
+                    true
+                } else {
+                    false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun getExternalAppList() {
@@ -149,9 +159,11 @@ class MediaPickerFolderFragment :
             MediaType.isBothImageAndVideo(mediaPickerExtras.mediaTypes) -> {
                 appsList.addAll(AndroidUtils.getExternalMediaPickerApps(requireContext()))
             }
+
             MediaType.isImage(mediaPickerExtras.mediaTypes) -> {
                 appsList.addAll(AndroidUtils.getExternalImagePickerApps(requireContext()))
             }
+
             MediaType.isVideo(mediaPickerExtras.mediaTypes) -> {
                 appsList.addAll(AndroidUtils.getExternalVideoPickerApps(requireContext()))
             }

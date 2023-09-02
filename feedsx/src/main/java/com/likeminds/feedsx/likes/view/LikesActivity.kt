@@ -55,7 +55,6 @@ class LikesActivity : BaseAppCompatActivity() {
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            // todo: test
             likesScreenExtras = ExtrasUtil.getParcelable(
                 bundle,
                 LIKES_SCREEN_EXTRAS,
@@ -92,7 +91,6 @@ class LikesActivity : BaseAppCompatActivity() {
             ViewUtils.showSomethingWentWrongToast(this)
         }
         supportFragmentManager.popBackStack()
-        // todo: test
         onBackPressedDispatcher.onBackPressed()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
