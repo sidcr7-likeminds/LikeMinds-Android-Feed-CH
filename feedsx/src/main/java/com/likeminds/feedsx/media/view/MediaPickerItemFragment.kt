@@ -87,6 +87,7 @@ class MediaPickerItemFragment :
         }
     }
 
+    // sets up the menu item
     private fun setupMenu() {
         // The usage of an interface lets you inject your own implementation
         val menuHost: MenuHost = requireActivity()
