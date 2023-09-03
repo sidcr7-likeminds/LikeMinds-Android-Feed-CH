@@ -58,7 +58,7 @@ class NotificationFeedActivity : BaseAppCompatActivity() {
     private fun initActionBar() {
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 

@@ -23,6 +23,8 @@ internal class WrappedDrawable(private val drawable: Drawable) : Drawable() {
         drawable.colorFilter = colorFilter
     }
 
+    @Suppress("DEPRECATION")
+    @Deprecated("Deprecated in Java")
     override fun getOpacity(): Int {
         val drawable: Drawable = drawable
         return drawable.opacity

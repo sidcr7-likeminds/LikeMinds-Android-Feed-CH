@@ -4,9 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.core.view.isVisible
-import com.google.android.flexbox.FlexDirection
-import com.google.android.flexbox.FlexboxLayoutManager
-import com.google.android.flexbox.JustifyContent
+import com.google.android.flexbox.*
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
@@ -15,9 +13,8 @@ import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
 import com.likeminds.feedsx.report.viewmodel.ReportViewModel
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.feedsx.utils.emptyExtrasException
 
 class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
     ReportAdapterListener {
@@ -47,9 +44,11 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
 
     override fun receiveExtras() {
         super.receiveExtras()
-        extras = requireActivity().intent?.getBundleExtra("bundle")
-            ?.getParcelable(ReportActivity.ARG_REPORTS)
-            ?: throw emptyExtrasException(TAG)
+        extras = ExtrasUtil.getParcelable(
+            requireActivity().intent?.getBundleExtra("bundle"),
+            ReportActivity.ARG_REPORTS,
+            ReportExtras::class.java
+        ) ?: throw emptyExtrasException(TAG)
     }
 
     override fun reportTagSelected(reportTagViewData: ReportTagViewData) {

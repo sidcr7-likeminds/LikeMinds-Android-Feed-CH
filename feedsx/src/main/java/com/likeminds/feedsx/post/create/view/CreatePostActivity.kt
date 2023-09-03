@@ -57,7 +57,7 @@ class CreatePostActivity : BaseAppCompatActivity() {
         //Toolbar
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->

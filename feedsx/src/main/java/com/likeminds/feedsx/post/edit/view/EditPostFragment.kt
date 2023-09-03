@@ -16,9 +16,7 @@ import androidx.core.view.get
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
@@ -36,11 +34,9 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
-import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.ProgressHelper
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -49,12 +45,9 @@ import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.util.LinkUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
-import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
+import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
 import com.likeminds.feedsx.utils.model.*
-import com.likeminds.feedsx.utils.observeInLifecycle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -87,6 +80,10 @@ class EditPostFragment :
         VideoPreviewAutoPlayHelper.getInstance()
     }
 
+    companion object {
+        const val TAG = "EditPostFragment"
+    }
+
     override val useSharedViewModel: Boolean
         get() = true
 
@@ -109,7 +106,11 @@ class EditPostFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        editPostExtras = arguments?.getParcelable(EDIT_POST_EXTRAS)!!
+        editPostExtras = ExtrasUtil.getParcelable(
+            arguments,
+            EDIT_POST_EXTRAS,
+            EditPostExtras::class.java
+        ) ?: throw emptyExtrasException(TAG)
     }
 
     override fun onResume() {
@@ -481,7 +482,7 @@ class EditPostFragment :
                     initLinkView()
                 }
                 else -> {
-                    Log.e(SDKApplication.LOG_TAG,"invalid view type")
+                    Log.e(SDKApplication.LOG_TAG, "invalid view type")
 
                 }
             }

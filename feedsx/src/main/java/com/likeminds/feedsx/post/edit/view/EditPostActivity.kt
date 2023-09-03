@@ -8,6 +8,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.ActivityEditPostBinding
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
@@ -52,7 +53,12 @@ class EditPostActivity : BaseAppCompatActivity() {
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            editPostExtras = bundle.getParcelable(EDIT_POST_EXTRAS)
+            editPostExtras = ExtrasUtil.getParcelable(
+                bundle,
+                EDIT_POST_EXTRAS,
+                EditPostExtras::class.java
+            )
+
             val args = Bundle().apply {
                 putParcelable(EDIT_POST_EXTRAS, editPostExtras)
             }
@@ -72,7 +78,7 @@ class EditPostActivity : BaseAppCompatActivity() {
             ViewUtils.showSomethingWentWrongToast(this)
         }
         supportFragmentManager.popBackStack()
-        super.onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 

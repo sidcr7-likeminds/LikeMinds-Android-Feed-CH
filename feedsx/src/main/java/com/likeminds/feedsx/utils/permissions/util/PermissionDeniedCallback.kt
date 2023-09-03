@@ -1,4 +1,4 @@
-package com.likeminds.feedsx.utils.permissions
+package com.likeminds.feedsx.utils.permissions.util
 
 interface PermissionDeniedCallback {
     fun onDeny()

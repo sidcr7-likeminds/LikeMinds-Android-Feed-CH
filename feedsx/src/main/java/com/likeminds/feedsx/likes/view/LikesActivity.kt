@@ -9,6 +9,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.ActivityLikesBinding
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
@@ -54,7 +55,12 @@ class LikesActivity : BaseAppCompatActivity() {
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            likesScreenExtras = bundle.getParcelable(LIKES_SCREEN_EXTRAS)
+            likesScreenExtras = ExtrasUtil.getParcelable(
+                bundle,
+                LIKES_SCREEN_EXTRAS,
+                LikesScreenExtras::class.java
+            )
+
             val args = Bundle().apply {
                 putParcelable(LIKES_SCREEN_EXTRAS, likesScreenExtras)
             }
@@ -85,14 +91,14 @@ class LikesActivity : BaseAppCompatActivity() {
             ViewUtils.showSomethingWentWrongToast(this)
         }
         supportFragmentManager.popBackStack()
-        super.onBackPressed()
+        onBackPressedDispatcher.onBackPressed()
         overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
     }
 
     private fun initActionBar() {
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            onBackPressed()
+            onBackPressedDispatcher.onBackPressed()
         }
     }
 

@@ -1,29 +1,28 @@
 package com.likeminds.feedsx.feed.view
 
+import android.Manifest
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SimpleItemAnimator
+import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import com.likeminds.feedsx.InitiateViewModel
-import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.R
-import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.*
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentFeedBinding
@@ -53,9 +52,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
-import com.likeminds.feedsx.report.view.ReportActivity
-import com.likeminds.feedsx.report.view.ReportFragment
-import com.likeminds.feedsx.report.view.ReportSuccessDialog
+import com.likeminds.feedsx.report.view.*
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -64,7 +61,7 @@ import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
-import java.util.UUID
+import java.util.*
 import javax.inject.Inject
 
 class FeedFragment :
@@ -77,6 +74,9 @@ class FeedFragment :
     companion object {
         const val TAG = "FeedFragment"
         private const val FEED_EXTRAS = "FEED_EXTRAS"
+
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+        private const val POST_NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS
 
         /**
          * creates a instance of fragment
@@ -137,14 +137,33 @@ class FeedFragment :
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        feedExtras = arguments?.getParcelable(FEED_EXTRAS)!!
+        feedExtras = ExtrasUtil.getParcelable(
+            arguments,
+            FEED_EXTRAS,
+            FeedExtras::class.java
+        ) ?: throw emptyExtrasException(TAG)
     }
 
     override fun setUpViews() {
         super.setUpViews()
+        checkNotificationPermission()
         initUI()
         initiateSDK()
         initToolbar()
+    }
+
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {}
+
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (!NotificationManagerCompat.from(requireContext()).areNotificationsEnabled()) {
+                if (activity?.checkSelfPermission(POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                    notificationPermissionLauncher.launch(POST_NOTIFICATIONS)
+                }
+            }
+        }
     }
 
     override fun observeData() {
@@ -571,11 +590,13 @@ class FeedFragment :
         initSwipeRefreshLayout()
     }
 
+    @Suppress("Deprecation")
     private fun setStatusBarColor() {
         requireActivity().window.apply {
             clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
             addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
             statusBarColor = LMBranding.getHeaderColor()
+            @RequiresApi(Build.VERSION_CODES.M)
             decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
     }

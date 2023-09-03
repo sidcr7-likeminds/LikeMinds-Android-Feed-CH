@@ -11,7 +11,7 @@ apply from: '../jacoco.gradle'
 
 android {
     namespace 'com.likeminds.feedsampleapp'
-    compileSdk versions.compile_sdk
+    compileSdkVersion versions.compile_sdk
 
     defaultConfig {
         applicationId "com.likeminds.feedsampleapp"
@@ -21,15 +21,6 @@ android {
         versionName "$versions.app_version_major.$versions.app_version_minor.$versions.app_version_patch"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += [
-                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
-                        "room.incremental"     : "true",
-                        "room.expandProjection": "true"]
-            }
-        }
     }
 
     buildTypes {
@@ -51,11 +42,11 @@ android {
         dataBinding = true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     sonarqube {

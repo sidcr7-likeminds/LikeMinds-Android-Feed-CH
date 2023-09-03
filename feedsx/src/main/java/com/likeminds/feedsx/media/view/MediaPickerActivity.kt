@@ -5,18 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.media.model.MEDIA_RESULT_BROWSE
-import com.likeminds.feedsx.media.model.MediaPickerExtras
-import com.likeminds.feedsx.media.model.MediaPickerResult
-import com.likeminds.feedsx.media.model.MediaType
+import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
-import com.likeminds.feedsx.utils.permissions.Permission
-import com.likeminds.feedsx.utils.permissions.PermissionDeniedCallback
-import com.likeminds.feedsx.utils.permissions.PermissionManager
+import com.likeminds.feedsx.utils.permissions.util.*
 
 class MediaPickerActivity : BaseAppCompatActivity() {
 
@@ -53,7 +50,12 @@ class MediaPickerActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_media_picker)
-        val extras = intent.extras?.getParcelable<MediaPickerExtras>(ARG_MEDIA_PICKER_EXTRAS)
+        setupOnBackPressedCallback()
+        val extras = ExtrasUtil.getParcelable(
+            intent.extras,
+            ARG_MEDIA_PICKER_EXTRAS,
+            MediaPickerExtras::class.java
+        )
         if (extras == null) {
             throw IllegalArgumentException("Arguments are missing")
         } else {
@@ -63,24 +65,52 @@ class MediaPickerActivity : BaseAppCompatActivity() {
         checkStoragePermission()
     }
 
+    // checks if the application has the required media permission
     private fun checkStoragePermission() {
-        PermissionManager.performTaskWithPermission(
-            this,
-            settingsPermissionLauncher,
-            { startMediaPickerFragment() },
-            Permission.getStoragePermissionData(),
-            showInitialPopup = true,
-            showDeniedPopup = true,
-            permissionDeniedCallback = object : PermissionDeniedCallback {
-                override fun onDeny() {
-                    onBackPressed()
-                }
-
-                override fun onCancel() {
-                    onBackPressed()
-                }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val mediaTypes = mediaPickerExtras.mediaTypes
+            if (mediaTypes.contains(PDF)) {
+                startMediaPickerFragment()
+                return
             }
-        )
+            val permissionExtras = Permission.getGalleryPermissionExtras(this)
+
+            PermissionManager.performTaskWithPermissionExtras(
+                this,
+                settingsPermissionLauncher,
+                { startMediaPickerFragment() },
+                permissionExtras,
+                showInitialPopup = true,
+                showDeniedPopup = true,
+                permissionDeniedCallback = object : PermissionDeniedCallback {
+                    override fun onDeny() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+
+                    override fun onCancel() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            )
+        } else {
+            PermissionManager.performTaskWithPermission(
+                this,
+                settingsPermissionLauncher,
+                { startMediaPickerFragment() },
+                Permission.getStoragePermissionData(),
+                showInitialPopup = true,
+                showDeniedPopup = true,
+                permissionDeniedCallback = object : PermissionDeniedCallback {
+                    override fun onDeny() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+
+                    override fun onCancel() {
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            )
+        }
     }
 
     private fun startMediaPickerFragment() {
@@ -96,9 +126,11 @@ class MediaPickerActivity : BaseAppCompatActivity() {
             MediaType.isImageOrVideo(mediaPickerExtras.mediaTypes) -> {
                 navGraph.setStartDestination(R.id.media_picker_folder_fragment)
             }
+
             MediaType.isPDF(mediaPickerExtras.mediaTypes) -> {
                 navGraph.setStartDestination(R.id.media_picker_document_fragment)
             }
+
             else -> {
                 finish()
             }
@@ -133,19 +165,27 @@ class MediaPickerActivity : BaseAppCompatActivity() {
         }
     }
 
-    override fun onBackPressed() {
-        when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
-            is MediaPickerFolderFragment -> {
-                super.onBackPressed()
-            }
-            is MediaPickerItemFragment -> {
-                fragment.onBackPressedFromFragment()
-            }
-            is MediaPickerDocumentFragment -> {
-                if (fragment.onBackPressedFromFragment()) super.onBackPressed()
-            }
-            else -> {
-                super.onBackPressed()
+    // setups up on back pressed callback
+    private fun setupOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(this) {
+            when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
+                is MediaPickerFolderFragment -> {
+                    finish()
+                }
+
+                is MediaPickerItemFragment -> {
+                    fragment.onBackPressedFromFragment()
+                }
+
+                is MediaPickerDocumentFragment -> {
+                    if (fragment.onBackPressedFromFragment()) {
+                        finish()
+                    }
+                }
+
+                else -> {
+                    finish()
+                }
             }
         }
     }

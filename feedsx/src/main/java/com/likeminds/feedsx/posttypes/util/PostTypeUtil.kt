@@ -7,9 +7,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.view.Menu.NONE
 import android.view.View
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
@@ -24,9 +22,7 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
-import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.*
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
@@ -426,7 +422,9 @@ object PostTypeUtil {
                 seeMoreSpannableStringBuilder
             )
 
-            LinkifyCompat.addLinks(tvPostContent, Linkify.ALL)
+            val linkifyLinks =
+                (Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS)
+            LinkifyCompat.addLinks(tvPostContent, linkifyLinks)
             tvPostContent.movementMethod = CustomLinkMovementMethod { url ->
                 tvPostContent.setOnClickListener {
                     return@setOnClickListener

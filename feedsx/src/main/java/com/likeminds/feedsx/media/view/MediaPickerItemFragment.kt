@@ -4,20 +4,18 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
 import com.likeminds.feedsx.databinding.FragmentMediaPickerItemBinding
-import com.likeminds.feedsx.media.model.MEDIA_RESULT_PICKED
-import com.likeminds.feedsx.media.model.MediaPickerItemExtras
-import com.likeminds.feedsx.media.model.MediaPickerResult
-import com.likeminds.feedsx.media.model.MediaViewData
+import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.viewmodel.MediaViewModel
@@ -75,7 +73,7 @@ class MediaPickerItemFragment :
         super.setUpViews()
         binding.toolbarColor = LMBranding.getToolbarColor()
         if (mediaPickerItemExtras.allowMultipleSelect) {
-            setHasOptionsMenu(true)
+            setupMenu()
         }
         initializeUI()
         initializeListeners()
@@ -89,19 +87,33 @@ class MediaPickerItemFragment :
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.media_picker_item_menu, menu)
-    }
+    // sets up the menu item
+    private fun setupMenu() {
+        // The usage of an interface lets you inject your own implementation
+        val menuHost: MenuHost = requireActivity()
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.select_multiple -> {
-                startActionMode()
-                true
+        // Add menu items without using the Fragment Menu APIs
+        // Note how we can tie the MenuProvider to the viewLifecycleOwner
+        // and an optional Lifecycle.State (here, RESUMED) to indicate when
+        // the menu should be visible
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                // Add menu items here
+                menuInflater.inflate(R.menu.media_picker_item_menu, menu)
             }
-            else -> false
-        }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                // Handle the menu selection
+                return when (menuItem.itemId) {
+                    R.id.select_multiple -> {
+                        startActionMode()
+                        true
+                    }
+
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     private fun initializeUI() {
