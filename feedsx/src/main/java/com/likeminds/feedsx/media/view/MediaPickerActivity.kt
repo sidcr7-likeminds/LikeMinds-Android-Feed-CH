@@ -65,31 +65,6 @@ class MediaPickerActivity : BaseAppCompatActivity() {
         checkStoragePermission()
     }
 
-    // setups up on back pressed callback
-    private fun setupOnBackPressedCallback() {
-        onBackPressedDispatcher.addCallback(this) {
-            when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
-                is MediaPickerFolderFragment -> {
-                    finish()
-                }
-
-                is MediaPickerItemFragment -> {
-                    fragment.onBackPressedFromFragment()
-                }
-
-                is MediaPickerDocumentFragment -> {
-                    if (fragment.onBackPressedFromFragment()) {
-                        finish()
-                    }
-                }
-
-                else -> {
-                    finish()
-                }
-            }
-        }
-    }
-
     // checks if the application has the required media permission
     private fun checkStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -187,6 +162,31 @@ class MediaPickerActivity : BaseAppCompatActivity() {
             }
             setResult(Activity.RESULT_OK, intent)
             finish()
+        }
+    }
+
+    // setups up on back pressed callback
+    private fun setupOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(this) {
+            when (val fragment = supportFragmentManager.currentFragment(R.id.nav_host)) {
+                is MediaPickerFolderFragment -> {
+                    finish()
+                }
+
+                is MediaPickerItemFragment -> {
+                    fragment.onBackPressedFromFragment()
+                }
+
+                is MediaPickerDocumentFragment -> {
+                    if (fragment.onBackPressedFromFragment()) {
+                        finish()
+                    }
+                }
+
+                else -> {
+                    finish()
+                }
+            }
         }
     }
 }

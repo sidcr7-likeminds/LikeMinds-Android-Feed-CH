@@ -49,6 +49,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         super.onPause()
     }
 
+    // todo: find alternative for this code
     @Suppress("Deprecation")
     private fun setStatusBarColor(statusBarColor: Int) {
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
