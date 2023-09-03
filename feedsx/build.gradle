@@ -5,6 +5,7 @@ plugins {
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs'
     id 'org.sonarqube'
+    id 'com.google.devtools.ksp'
 }
 apply from: '../jacoco.gradle'
 

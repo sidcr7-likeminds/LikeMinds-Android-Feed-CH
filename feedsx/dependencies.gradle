@@ -54,7 +54,7 @@ dependencies {
     //room
     implementation deps.room.main
     implementation deps.room.ktx
-    kapt deps.room.compiler
+    ksp deps.room.compiler
 
     //firebase
     implementation platform(deps.firebase.bom)
