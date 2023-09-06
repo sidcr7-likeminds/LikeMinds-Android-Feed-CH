@@ -4,7 +4,6 @@ pluginManagement {
         google()
         mavenCentral()
         mavenLocal()
-        maven { url "https://plugins.gradle.org/m2/"}
     }
 }
 dependencyResolutionManagement {
@@ -14,7 +13,6 @@ dependencyResolutionManagement {
         mavenCentral()
         mavenLocal()
         maven { url "https://www.jitpack.io" }
-        maven { url "https://plugins.gradle.org/m2/"}
     }
 }
 rootProject.name = "LikeMinds-Android-Feed-SX"
