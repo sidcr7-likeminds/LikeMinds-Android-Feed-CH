@@ -19,7 +19,7 @@ import javax.inject.Inject
 open class BaseAppCompatActivity : AppCompatActivity() {
     /**
      * Dispatch onResume() to fragments.  Note that for better inter-operation
-     * with older versions of the platform, at the point of this call the
+     * with older feed_versions of the platform, at the point of this call the
      * fragments attached to the activity are *not* resumed.
      */
 

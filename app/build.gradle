@@ -10,14 +10,14 @@ plugins {
 
 android {
     namespace 'com.likeminds.feedsampleapp'
-    compileSdkVersion versions.compile_sdk
+    compileSdkVersion feed_versions.compile_sdk
 
     defaultConfig {
         applicationId "com.likeminds.feedsampleapp"
-        minSdk versions.min_sdk
-        targetSdk versions.target_sdk
-        versionCode versions.app_version_code
-        versionName "$versions.app_version_major.$versions.app_version_minor.$versions.app_version_patch"
+        minSdk feed_versions.min_sdk
+        targetSdk feed_versions.target_sdk
+        versionCode feed_versions.app_version_code
+        versionName "$feed_versions.app_version_major.$feed_versions.app_version_minor.$feed_versions.app_version_patch"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
