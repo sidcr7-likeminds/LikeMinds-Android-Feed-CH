@@ -17,15 +17,15 @@
 
     <application>
         <activity
-            android:name="com.likeminds.feedsx.media.view.MediaPickerActivity"
+            android:name="com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.report.view.ReportActivity"
+            android:name="com.likeminds.feedsx.report.view.LMFeedReportActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.post.create.view.CreatePostActivity"
+            android:name="com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
@@ -34,11 +34,11 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.likes.view.LikesActivity"
+            android:name="com.likeminds.feedsx.likes.view.LMFeedLikesActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity"
+            android:name="com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

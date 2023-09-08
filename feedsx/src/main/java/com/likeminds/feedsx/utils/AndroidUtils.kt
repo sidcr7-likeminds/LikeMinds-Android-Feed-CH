@@ -6,7 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
-import com.likeminds.feedsx.media.customviews.WrappedDrawable
+import com.likeminds.feedsx.media.customviews.LMFeedWrappedDrawable
 import com.likeminds.feedsx.media.model.LocalAppData
 import com.likeminds.feedsx.media.model.MediaType
 import com.likeminds.feedsx.utils.ViewUtils.dpToPx
@@ -46,7 +46,7 @@ object AndroidUtils {
         val localAppData = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             packageManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(0L))
                 .mapIndexedNotNull { index, resolveInfo ->
-                    val drawable = WrappedDrawable(resolveInfo.loadIcon(packageManager))
+                    val drawable = LMFeedWrappedDrawable(resolveInfo.loadIcon(packageManager))
                     drawable.setBounds(0, 0, dpToPx(50), dpToPx(50))
                     LocalAppData(
                         index,
@@ -59,7 +59,7 @@ object AndroidUtils {
             @Suppress("DEPRECATION")
             packageManager.queryIntentActivities(intent, 0)
                 .mapIndexedNotNull { index, resolveInfo ->
-                    val drawable = WrappedDrawable(resolveInfo.loadIcon(packageManager))
+                    val drawable = LMFeedWrappedDrawable(resolveInfo.loadIcon(packageManager))
                     drawable.setBounds(0, 0, dpToPx(50), dpToPx(50))
                     LocalAppData(
                         index,

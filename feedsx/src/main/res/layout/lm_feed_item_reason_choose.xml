@@ -33,7 +33,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/textViewTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -48,7 +48,7 @@
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
                     tools:ignore="ContentDescription,UseAppTint" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     app:textType="title" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_selected_count"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"

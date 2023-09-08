@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedActivityPostDetailBinding
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
@@ -49,7 +49,7 @@ class PostDetailActivity : BaseAppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = LmFeedActivityPostDetailBinding.inflate(layoutInflater)
-        binding.toolbarColor = LMBranding.getToolbarColor()
+        binding.toolbarColor = LMFeedBranding.getToolbarColor()
         setContentView(binding.root)
 
         val bundle = intent.getBundleExtra("bundle")
@@ -68,7 +68,7 @@ class PostDetailActivity : BaseAppCompatActivity() {
             navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             navController = navHostFragment.navController
-            navController.setGraph(R.navigation.nav_graph_post_detail, args)
+            navController.setGraph(R.navigation.lm_feed_nav_graph_post_detail, args)
 
             //Toolbar
             initActionBar()

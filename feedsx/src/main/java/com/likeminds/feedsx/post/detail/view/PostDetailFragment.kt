@@ -7,14 +7,14 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.likeminds.feedsx.*
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.*
-import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
-import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
+import com.likeminds.feedsx.delete.view.LMFeedAdminDeleteDialogFragment
+import com.likeminds.feedsx.delete.view.LMFeedSelfDeleteDialogFragment
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.likes.model.*
-import com.likeminds.feedsx.likes.view.LikesActivity
+import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.*
@@ -36,7 +36,7 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.util.*
-import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -46,8 +46,8 @@ class PostDetailFragment :
     PostAdapterListener,
     PostDetailAdapterListener,
     PostDetailReplyAdapterListener,
-    SelfDeleteDialogFragment.DeleteAlertDialogListener,
-    AdminDeleteDialogFragment.DeleteDialogListener {
+    LMFeedSelfDeleteDialogFragment.DeleteAlertDialogListener,
+    LMFeedAdminDeleteDialogFragment.DeleteDialogListener {
 
     // shared viewModel between [FeedFragment] and [PostDetailFragment] for postActions
     @Inject
@@ -57,7 +57,7 @@ class PostDetailFragment :
     lateinit var initiateViewModel: InitiateViewModel
 
     @Inject
-    lateinit var userPreferences: UserPreferences
+    lateinit var userPreferences: LMFeedUserPreferences
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -70,7 +70,7 @@ class PostDetailFragment :
 
     private var editCommentId: String? = null
 
-    private lateinit var memberTagging: MemberTaggingView
+    private lateinit var memberTagging: LMFeedMemberTaggingView
 
     private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
 
@@ -132,7 +132,7 @@ class PostDetailFragment :
     override fun setUpViews() {
         super.setUpViews()
 
-        binding.buttonColor = LMBranding.getButtonsColor()
+        binding.buttonColor = LMFeedBranding.getButtonsColor()
         fetchPostData()
         checkCommentsRight()
         initRecyclerView()
@@ -149,8 +149,8 @@ class PostDetailFragment :
             ProgressHelper.showProgress(binding.progressBar)
         }
         //if source is notification/deep link, then call initiate first and then other apis
-        if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
-            postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+        if (postDetailExtras.source == LMFeedAnalytics.Source.NOTIFICATION ||
+            postDetailExtras.source == LMFeedAnalytics.Source.DEEP_LINK
         ) {
             initiateViewModel.initiateUser(
                 requireContext(),
@@ -198,7 +198,7 @@ class PostDetailFragment :
                 .editText(binding.etComment)
                 .maxHeightInPercentage(0.4f)
                 .color(
-                    LMBranding.getTextLinkColor()
+                    LMFeedBranding.getTextLinkColor()
                 )
                 .build()
         )
@@ -213,7 +213,7 @@ class PostDetailFragment :
     private fun initSwipeRefreshLayout() {
         mSwipeRefreshLayout = binding.swipeRefreshLayout
         mSwipeRefreshLayout.setColorSchemeColors(
-            LMBranding.getButtonsColor(),
+            LMFeedBranding.getButtonsColor(),
         )
 
         mSwipeRefreshLayout.setOnRefreshListener {
@@ -303,8 +303,8 @@ class PostDetailFragment :
     private fun observeCommentsRightData() {
         viewModel.hasCommentRights.observe(viewLifecycleOwner) {
             //if source is notification/deep link, don't update comments right from here
-            if (postDetailExtras.source != LMAnalytics.Source.NOTIFICATION &&
-                postDetailExtras.source != LMAnalytics.Source.DEEP_LINK
+            if (postDetailExtras.source != LMFeedAnalytics.Source.NOTIFICATION &&
+                postDetailExtras.source != LMFeedAnalytics.Source.DEEP_LINK
             ) {
                 handleCommentRights(it)
             }
@@ -331,8 +331,8 @@ class PostDetailFragment :
 
         initiateViewModel.hasCommentRights.observe(viewLifecycleOwner) {
             //if source is notification/deep link, update comments right from Initiate call
-            if (postDetailExtras.source == LMAnalytics.Source.NOTIFICATION ||
-                postDetailExtras.source == LMAnalytics.Source.DEEP_LINK
+            if (postDetailExtras.source == LMFeedAnalytics.Source.NOTIFICATION ||
+                postDetailExtras.source == LMFeedAnalytics.Source.DEEP_LINK
             ) {
                 handleCommentRights(it)
             }
@@ -796,7 +796,7 @@ class PostDetailFragment :
             MemberTaggingDecoder.decode(
                 etComment,
                 commentText,
-                LMBranding.getTextLinkColor()
+                LMFeedBranding.getTextLinkColor()
             )
             etComment.setSelection(etComment.length())
             etComment.focusAndShowKeyboard()
@@ -823,13 +823,13 @@ class PostDetailFragment :
     private fun showDeleteDialog(uuid: String, deleteExtras: DeleteExtras) {
         if (uuid == postActionsViewModel.getUUID()) {
             // when user deletes their own entity
-            SelfDeleteDialogFragment.showDialog(
+            LMFeedSelfDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
         } else {
             // when CM deletes other user's entity
-            AdminDeleteDialogFragment.showDialog(
+            LMFeedAdminDeleteDialogFragment.showDialog(
                 childFragmentManager,
                 deleteExtras
             )
@@ -855,7 +855,7 @@ class PostDetailFragment :
             .postId(postId)
             .entityType(POST)
             .build()
-        LikesActivity.start(requireContext(), likesScreenExtras)
+        LMFeedLikesActivity.start(requireContext(), likesScreenExtras)
     }
 
     // callback when likes count of a comment is clicked - opens likes screen
@@ -865,7 +865,7 @@ class PostDetailFragment :
             .commentId(commentId)
             .entityType(COMMENT)
             .build()
-        LikesActivity.start(requireContext(), likesScreenExtras)
+        LMFeedLikesActivity.start(requireContext(), likesScreenExtras)
     }
 
     // Processes report action on entity
@@ -889,7 +889,7 @@ class PostDetailFragment :
             .build()
 
         //get Intent for [ReportActivity]
-        val intent = ReportActivity.getIntent(requireContext(), reportExtras)
+        val intent = LMFeedReportActivity.getIntent(requireContext(), reportExtras)
 
         //start [ReportActivity] and check for result
         reportPostLauncher.launch(intent)
@@ -899,10 +899,10 @@ class PostDetailFragment :
     private val reportPostLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data = result.data?.getStringExtra(ReportFragment.REPORT_RESULT)
-                ReportSuccessDialog(data ?: "").show(
+                val data = result.data?.getStringExtra(LMFeedReportFragment.REPORT_RESULT)
+                LMFeedReportSuccessDialog(data ?: "").show(
                     childFragmentManager,
-                    ReportSuccessDialog.TAG
+                    LMFeedReportSuccessDialog.TAG
                 )
             }
         }

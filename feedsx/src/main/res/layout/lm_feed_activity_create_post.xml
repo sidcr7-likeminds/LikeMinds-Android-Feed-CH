@@ -13,9 +13,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.likeminds.feedsx.post.create.view.CreatePostActivity">
+        tools:context="com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity">
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
+        <com.likeminds.feedsx.branding.customview.LMFeedToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -47,7 +47,7 @@
                     app:srcCompat="@drawable/ic_arrow_back_white_24dp"
                     tools:ignore="ContentDescription,UnusedAttribute,UseAppTint" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -65,7 +65,7 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     app:textType="title" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_post_done"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="UnusedAttribute" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsProgressBar
+                <com.likeminds.feedsx.branding.customview.LMFeedProgressBar
                     android:id="@+id/pb_posting"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -92,7 +92,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
+        </com.likeminds.feedsx.branding.customview.LMFeedToolbar>
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/nav_host_fragment"

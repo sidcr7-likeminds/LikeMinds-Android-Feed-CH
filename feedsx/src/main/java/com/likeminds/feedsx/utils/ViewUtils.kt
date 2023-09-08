@@ -17,9 +17,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.NavHostFragment
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
-import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.customview.snackbar.LikeMindsSnackbar
+import com.likeminds.feedsx.branding.customview.snackbar.LMFeedSnackbar
 import com.likeminds.feedsx.utils.model.*
 
 //view related utils class
@@ -52,7 +52,7 @@ object ViewUtils {
             )
         }
 
-        saveBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+        saveBounceAnim.interpolator = LMFeedBounceInterpolator(0.2, 20.0)
         view.startAnimation(saveBounceAnim)
     }
 
@@ -112,7 +112,7 @@ object ViewUtils {
     // shows short length snackbar
     fun showShortSnack(view: View, text: String?, anchorView: View? = null) {
         if (text.isNullOrEmpty()) return
-        val snackBar = LikeMindsSnackbar.make(view, text)
+        val snackBar = LMFeedSnackbar.make(view, text)
         anchorView?.let {
             snackBar.setAnchorView(anchorView)
         }
@@ -123,25 +123,25 @@ object ViewUtils {
     fun getPostTypeFromViewType(postViewType: Int?): String {
         return when (postViewType) {
             ITEM_POST_TEXT_ONLY -> {
-                LMAnalytics.Keys.POST_TYPE_TEXT
+                LMFeedAnalytics.Keys.POST_TYPE_TEXT
             }
             ITEM_POST_SINGLE_IMAGE -> {
-                LMAnalytics.Keys.POST_TYPE_IMAGE
+                LMFeedAnalytics.Keys.POST_TYPE_IMAGE
             }
             ITEM_POST_SINGLE_VIDEO -> {
-                LMAnalytics.Keys.POST_TYPE_VIDEO
+                LMFeedAnalytics.Keys.POST_TYPE_VIDEO
             }
             ITEM_POST_DOCUMENTS -> {
-                LMAnalytics.Keys.POST_TYPE_DOCUMENT
+                LMFeedAnalytics.Keys.POST_TYPE_DOCUMENT
             }
             ITEM_POST_MULTIPLE_MEDIA -> {
-                LMAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
+                LMFeedAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
             }
             ITEM_POST_LINK -> {
-                LMAnalytics.Keys.POST_TYPE_LINK
+                LMFeedAnalytics.Keys.POST_TYPE_LINK
             }
             else -> {
-                LMAnalytics.Keys.POST_TYPE_TEXT
+                LMFeedAnalytics.Keys.POST_TYPE_TEXT
             }
         }
     }

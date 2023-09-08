@@ -14,7 +14,7 @@
             android:background="@color/cultured"
             app:layout_constraintTop_toTopOf="parent"/>
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/tv_comments_count"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

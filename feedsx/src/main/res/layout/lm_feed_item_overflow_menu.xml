@@ -20,7 +20,7 @@
         android:clickable="true"
         android:focusable="true">
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/text_view_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -23,7 +23,7 @@
             app:srcCompat="@drawable/ic_like_filled"
             tools:ignore="ContentDescription" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/likes_count"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,7 +41,7 @@
             tools:ignore="UnusedAttribute"
             tools:text="39 Likes" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/comments_count"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
@@ -46,7 +46,7 @@ object PostTypeUtil {
     ) {
         binding.apply {
             // sets button color variable in xml
-            buttonColor = LMBranding.getButtonsColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
             if (data.isPinned) {
                 ivPin.show()
             } else {
@@ -295,7 +295,7 @@ object PostTypeUtil {
     ) {
         binding.apply {
             // sets button color variable in xml
-            buttonColor = LMBranding.getButtonsColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
             val attachments = data.attachments.map {
                 when (it.attachmentType) {
                     IMAGE -> {
@@ -387,7 +387,7 @@ object PostTypeUtil {
                 tvPostContent,
                 textForLinkify,
                 enableClick = true,
-                LMBranding.getTextLinkColor()
+                LMFeedBranding.getTextLinkColor()
             ) {
                 onMemberTagClicked()
             }

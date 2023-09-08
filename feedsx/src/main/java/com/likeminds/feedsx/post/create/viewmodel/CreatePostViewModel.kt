@@ -6,14 +6,14 @@ import android.net.Uri
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
-import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 class CreatePostViewModel @Inject constructor(
-    private val userPreferences: UserPreferences,
+    private val userPreferences: LMFeedUserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val mediaRepository: MediaRepository
 ) : ViewModel() {
@@ -204,8 +204,8 @@ class CreatePostViewModel @Inject constructor(
      * @param type - type of attachment
      */
     fun sendClickedOnAttachmentEvent(type: String) {
-        LMAnalytics.track(
-            LMAnalytics.Events.CLICKED_ON_ATTACHMENT,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.CLICKED_ON_ATTACHMENT,
             mapOf(
                 "type" to type
             )
@@ -245,8 +245,8 @@ class CreatePostViewModel @Inject constructor(
      * @param imageCount - number of attached images
      **/
     private fun sendImageAttachedEvent(imageCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.IMAGE_ATTACHED_TO_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.IMAGE_ATTACHED_TO_POST,
             mapOf(
                 "image_count" to imageCount.toString()
             )
@@ -258,8 +258,8 @@ class CreatePostViewModel @Inject constructor(
      * @param videoCount - number of attached videos
      **/
     private fun sendVideoAttachedEvent(videoCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.VIDEO_ATTACHED_TO_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.VIDEO_ATTACHED_TO_POST,
             mapOf(
                 "video_count" to videoCount.toString()
             )
@@ -271,8 +271,8 @@ class CreatePostViewModel @Inject constructor(
      * @param documentCount - number of attached documents
      **/
     private fun sendDocumentAttachedEvent(documentCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.DOCUMENT_ATTACHED_TO_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.DOCUMENT_ATTACHED_TO_POST,
             mapOf(
                 "document_count" to documentCount.toString()
             )
@@ -308,8 +308,8 @@ class CreatePostViewModel @Inject constructor(
         map["image_attached"] = "no"
         map["video_attached"] = "no"
         map["document_attached"] = "no"
-        LMAnalytics.track(
-            LMAnalytics.Events.POST_CREATION_COMPLETED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.POST_CREATION_COMPLETED,
             map
         )
     }

@@ -49,7 +49,7 @@
                     app:srcCompat="@drawable/ic_cross"
                     tools:ignore="ContentDescription" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_link_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -66,7 +66,7 @@
                     app:layout_constraintTop_toBottomOf="@id/iv_link"
                     tools:text="Twitter will soon let you schedule your tweets" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_link_description"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -82,7 +82,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/tv_link_title"
                     tools:text="The new feature has already been implemented in the United States and Other Eu…" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_link_url"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsProgressBar
+        <com.likeminds.feedsx.branding.customview.LMFeedProgressBar
             android:id="@+id/pb_link_preview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

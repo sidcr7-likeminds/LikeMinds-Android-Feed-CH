@@ -2,7 +2,7 @@ package com.likeminds.feedsx.media.util
 
 import android.net.Uri
 import android.widget.ProgressBar
-import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
+import com.likeminds.feedsx.media.customviews.LMFeedVideoPlayerView
 import javax.inject.Singleton
 
 @Singleton
@@ -18,7 +18,7 @@ class VideoPreviewAutoPlayHelper {
         }
     }
 
-    private var lastPlayerView: LikeMindsVideoPlayerView? = null
+    private var lastPlayerView: LMFeedVideoPlayerView? = null
 
     /**
      * @param [videoPost] - Player view in which the provided video is played
@@ -26,7 +26,7 @@ class VideoPreviewAutoPlayHelper {
      * @param [url] - If the video is remote, then provided [url] is used to play locally
      */
     fun playVideo(
-        videoPost: LikeMindsVideoPlayerView,
+        videoPost: LMFeedVideoPlayerView,
         progressBar: ProgressBar,
         uri: Uri? = null,
         url: String? = null

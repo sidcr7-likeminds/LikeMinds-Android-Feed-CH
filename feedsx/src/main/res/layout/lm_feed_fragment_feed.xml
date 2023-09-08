@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:background="@color/cultured">
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
+        <com.likeminds.feedsx.branding.customview.LMFeedToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -38,7 +38,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/toolbar_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -84,7 +84,7 @@
                     tools:ignore="ContentDescription,UseAppTint"
                     tools:visibility="visible" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_notification_count"
                     android:layout_width="16dp"
                     android:layout_height="16dp"
@@ -115,7 +115,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
+        </com.likeminds.feedsx.branding.customview.LMFeedToolbar>
 
         <include
             android:id="@+id/layout_posting"
@@ -180,7 +180,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsExtendedFAB
+        <com.likeminds.feedsx.branding.customview.LMFeedExtendedFAB
             android:id="@+id/new_post_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

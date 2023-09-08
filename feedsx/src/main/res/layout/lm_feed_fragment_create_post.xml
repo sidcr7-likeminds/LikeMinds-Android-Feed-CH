@@ -14,7 +14,7 @@
             app:layout_constraintBottom_toTopOf="@id/layout_add_image"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0"
-            tools:context="com.likeminds.feedsx.post.create.view.CreatePostFragment">
+            tools:context="com.likeminds.feedsx.post.create.view.LMFeedCreatePostFragment">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -30,7 +30,7 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsEditText
+                <com.likeminds.feedsx.branding.customview.LMFeedEditText
                     android:id="@+id/et_post_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
                     app:layout_constraintTop_toBottomOf="@id/author_frame" />
 
 
-                <com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+                <com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
                     android:id="@+id/member_tagging_view"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -155,7 +155,7 @@
                 android:src="@drawable/ic_attach_files"
                 tools:ignore="ContentDescription" />
 
-            <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            <com.likeminds.feedsx.branding.customview.LMFeedTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -193,7 +193,7 @@
                 android:src="@drawable/ic_add_video"
                 tools:ignore="ContentDescription" />
 
-            <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            <com.likeminds.feedsx.branding.customview.LMFeedTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"
@@ -230,7 +230,7 @@
                 android:src="@drawable/ic_add_image"
                 tools:ignore="ContentDescription" />
 
-            <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            <com.likeminds.feedsx.branding.customview.LMFeedTextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="18dp"

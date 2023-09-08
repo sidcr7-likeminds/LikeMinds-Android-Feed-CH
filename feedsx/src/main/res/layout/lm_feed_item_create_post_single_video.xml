@@ -7,7 +7,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
+        <com.likeminds.feedsx.media.customviews.LMFeedVideoPlayerView
             android:id="@+id/video_post"
             android:layout_width="0dp"
             android:layout_height="0dp"

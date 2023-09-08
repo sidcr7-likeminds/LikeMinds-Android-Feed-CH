@@ -2,12 +2,12 @@ package com.likeminds.feedsampleapp
 
 import android.app.Application
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
-import com.likeminds.feedsx.LMUICallback
-import com.likeminds.feedsx.LikeMindsFeedUI
-import com.likeminds.feedsx.branding.model.LMFonts
-import com.likeminds.feedsx.branding.model.SetBrandingRequest
+import com.likeminds.feedsx.LMFeedUI
+import com.likeminds.feedsx.LMFeedUICallback
+import com.likeminds.feedsx.branding.model.LMFeedFonts
+import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 
-class FeedSXApplication : Application(), LMUICallback {
+class FeedSXApplication : Application(), LMFeedUICallback {
 
     private lateinit var authPreferences: AuthPreferences
 
@@ -29,12 +29,12 @@ class FeedSXApplication : Application(), LMUICallback {
 
         authPreferences = AuthPreferences(this)
 
-        val brandingRequest = SetBrandingRequest.Builder()
+        val brandingRequest = SetFeedBrandingRequest.Builder()
             .headerColor(authPreferences.getHeaderColor())
             .buttonsColor(authPreferences.getButtonColor())
             .textLinkColor(authPreferences.getTextLinkColor())
             .fonts(
-                LMFonts.Builder()
+                LMFeedFonts.Builder()
                     .bold("fonts/montserrat-bold.ttf")
                     .medium("fonts/montserrat-medium.ttf")
                     .regular("fonts/montserrat-regular.ttf")
@@ -42,7 +42,7 @@ class FeedSXApplication : Application(), LMUICallback {
             )
             .build()
 
-        LikeMindsFeedUI.initLikeMindsFeedUI(
+        LMFeedUI.initLikeMindsFeedUI(
             this,
             this,
             brandingRequest

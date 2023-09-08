@@ -15,7 +15,7 @@
         android:layout_height="match_parent"
         android:background="@color/white">
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsToolbar
+        <com.likeminds.feedsx.branding.customview.LMFeedToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
@@ -48,7 +48,7 @@
                     app:tint="@color/black"
                     tools:ignore="ContentDescription,UseAppTint" />
 
-                <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_toolbar_title"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -67,9 +67,9 @@
                     app:textType="title"
                     tools:text="All Media" />
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </com.likeminds.feedsx.branding.customview.LikeMindsToolbar>
+        </com.likeminds.feedsx.branding.customview.LMFeedToolbar>
 
-        <com.likeminds.feedsx.utils.recyclerview.AnimatedRecyclerView
+        <com.likeminds.feedsx.utils.recyclerview.LMFeedAnimatedRecyclerView
             android:id="@+id/rv_folder"
             android:layout_width="0dp"
             android:layout_height="0dp"

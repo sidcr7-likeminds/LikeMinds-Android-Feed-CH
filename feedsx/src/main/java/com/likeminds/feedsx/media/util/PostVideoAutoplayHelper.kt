@@ -7,7 +7,7 @@ import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.*
-import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
+import com.likeminds.feedsx.media.customviews.LMFeedVideoPlayerView
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
@@ -39,7 +39,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
         }
     }
 
-    private var lastPlayerView: LikeMindsVideoPlayerView? = null
+    private var lastPlayerView: LMFeedVideoPlayerView? = null
 
     private var currentPlayingVideoItemPos = -1 // -1 indicates nothing playing
 
@@ -275,7 +275,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
 
     // starts player in new player view and stops last player
     private fun startNewPlayer(
-        videoPost: LikeMindsVideoPlayerView,
+        videoPost: LMFeedVideoPlayerView,
         progressBar: ProgressBar,
         url: String?
     ) {

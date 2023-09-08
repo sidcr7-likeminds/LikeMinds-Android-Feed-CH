@@ -3,8 +3,8 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.post.create.view.CreatePostActivity
+import com.likeminds.feedsx.LMFeedAnalytics
+import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 
@@ -89,7 +89,7 @@ object Route {
             context,
             firstPath,
             0,
-            source = LMAnalytics.Source.DEEP_LINK
+            source = LMFeedAnalytics.Source.DEEP_LINK
         )
     }
 
@@ -137,6 +137,6 @@ object Route {
         context: Context,
         source: String?
     ): Intent {
-        return CreatePostActivity.getIntent(context, source)
+        return LMFeedCreatePostActivity.getIntent(context, source)
     }
 }

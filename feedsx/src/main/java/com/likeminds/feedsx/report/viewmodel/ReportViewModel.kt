@@ -1,18 +1,13 @@
 package com.likeminds.feedsx.report.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.LMAnalytics
+import androidx.lifecycle.*
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
-import com.likeminds.likemindsfeed.moderation.model.GetReportTagsRequest
-import com.likeminds.likemindsfeed.moderation.model.GetReportTagsResponse
-import com.likeminds.likemindsfeed.moderation.model.PostReportRequest
+import com.likeminds.likemindsfeed.moderation.model.*
 import javax.inject.Inject
 
 class ReportViewModel @Inject constructor() : ViewModel() {
@@ -93,11 +88,11 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         postType: String,
         reason: String
     ) {
-        LMAnalytics.track(
-            LMAnalytics.Events.POST_REPORTED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.POST_REPORTED,
             mapOf(
                 "created_by_uuid" to uuid,
-                LMAnalytics.Keys.POST_ID to postId,
+                LMFeedAnalytics.Keys.POST_ID to postId,
                 "report_reason" to reason,
                 "post_type" to postType,
             )
@@ -113,12 +108,12 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         commentId: String,
         reason: String
     ) {
-        LMAnalytics.track(
-            LMAnalytics.Events.COMMENT_REPORTED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.COMMENT_REPORTED,
             mapOf(
-                LMAnalytics.Keys.POST_ID to postId,
-                LMAnalytics.Keys.UUID to uuid,
-                LMAnalytics.Keys.COMMENT_ID to commentId,
+                LMFeedAnalytics.Keys.POST_ID to postId,
+                LMFeedAnalytics.Keys.UUID to uuid,
+                LMFeedAnalytics.Keys.COMMENT_ID to commentId,
                 "reason" to reason,
             )
         )
@@ -135,13 +130,13 @@ class ReportViewModel @Inject constructor() : ViewModel() {
         reason: String
     ) {
         val updatedParentId = parentCommentId ?: ""
-        LMAnalytics.track(
-            LMAnalytics.Events.REPLY_REPORTED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.REPLY_REPORTED,
             mapOf(
-                LMAnalytics.Keys.POST_ID to postId,
-                LMAnalytics.Keys.COMMENT_ID to updatedParentId,
-                LMAnalytics.Keys.COMMENT_REPLY_ID to replyId,
-                LMAnalytics.Keys.UUID to uuid,
+                LMFeedAnalytics.Keys.POST_ID to postId,
+                LMFeedAnalytics.Keys.COMMENT_ID to updatedParentId,
+                LMFeedAnalytics.Keys.COMMENT_REPLY_ID to replyId,
+                LMFeedAnalytics.Keys.UUID to uuid,
                 "reason" to reason,
             )
         )

@@ -21,7 +21,7 @@
             tools:listitem="@layout/lm_feed_item_create_post_document"
             tools:visibility="visible" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsButton
+        <com.likeminds.feedsx.branding.customview.LMFeedButton
             android:id="@+id/btn_add_more_doc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

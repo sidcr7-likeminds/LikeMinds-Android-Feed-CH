@@ -9,7 +9,7 @@
         android:layout_marginTop="30dp"
         android:paddingHorizontal="16dp">
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/tv_view_more_replies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             tools:fontFamily="@font/roboto_medium"
             tools:ignore="UnusedAttribute" />
 
-        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/tv_replies"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

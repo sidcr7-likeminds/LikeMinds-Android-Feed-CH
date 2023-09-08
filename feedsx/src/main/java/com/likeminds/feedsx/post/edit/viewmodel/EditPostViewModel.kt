@@ -2,10 +2,8 @@ package com.likeminds.feedsx.post.edit.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.LMFeedAnalytics
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -124,11 +122,11 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
     ) {
         val postType = ViewUtils.getPostTypeFromViewType(post.viewType)
         val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
-        LMAnalytics.track(
-            LMAnalytics.Events.POST_EDITED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.POST_EDITED,
             mapOf(
                 "created_by_uuid" to postCreatorUUID,
-                LMAnalytics.Keys.POST_ID to post.id,
+                LMFeedAnalytics.Keys.POST_ID to post.id,
                 "post_type" to postType,
             )
         )

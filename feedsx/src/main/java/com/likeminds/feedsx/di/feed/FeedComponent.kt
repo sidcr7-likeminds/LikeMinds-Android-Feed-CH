@@ -1,6 +1,6 @@
 package com.likeminds.feedsx.di.feed
 
-import com.likeminds.feedsx.feed.view.FeedFragment
+import com.likeminds.feedsx.feed.view.LMFeedFragment
 import dagger.Subcomponent
 
 @Subcomponent(modules = [FeedViewModelModule::class])
@@ -11,5 +11,5 @@ interface FeedComponent {
         fun create(): FeedComponent
     }
 
-    fun inject(feedFragment: FeedFragment)
+    fun inject(lmFeedFragment: LMFeedFragment)
 }

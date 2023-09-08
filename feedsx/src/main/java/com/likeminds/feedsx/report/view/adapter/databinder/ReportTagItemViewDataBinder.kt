@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedItemReportTagsBinding
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
@@ -38,7 +38,7 @@ class ReportTagItemViewDataBinder constructor(
 
         binding.apply {
             if (reportTagViewData?.isSelected == true) {
-                drawable.setStroke(width, LMBranding.getButtonsColor())
+                drawable.setStroke(width, LMFeedBranding.getButtonsColor())
             } else {
                 drawable.setStroke(
                     width,
@@ -55,7 +55,7 @@ class ReportTagItemViewDataBinder constructor(
     ) {
         binding.apply {
             reportTagViewData = data
-            buttonColor = LMBranding.getButtonsColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
             setTagBackground(this)
         }
     }

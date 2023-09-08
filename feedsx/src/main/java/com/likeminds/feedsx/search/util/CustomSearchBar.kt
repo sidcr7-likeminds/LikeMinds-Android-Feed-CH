@@ -16,7 +16,7 @@ import android.widget.TextView.OnEditorActionListener
 import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleCoroutineScope
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedLayoutSearchBarBinding
 import com.likeminds.feedsx.utils.AnimationUtils.circleHideView
 import com.likeminds.feedsx.utils.AnimationUtils.circleRevealView
@@ -196,7 +196,7 @@ class CustomSearchBar @JvmOverloads constructor(
         binding.etSearch.setText("")
         binding.etSearch.requestFocus()
         circleRevealView(binding.searchToolbar)
-        setBackgroundColor(LMBranding.getHeaderColor())
+        setBackgroundColor(LMFeedBranding.getHeaderColor())
         elevation = 20F
         isOpen = true
         mSearchViewListener?.onSearchViewOpened()
