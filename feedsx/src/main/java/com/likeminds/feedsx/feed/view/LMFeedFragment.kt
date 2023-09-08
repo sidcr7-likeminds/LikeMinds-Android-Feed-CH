@@ -571,7 +571,7 @@ class LMFeedFragment :
             requireContext(),
             lmFeedExtras.apiKey,
             lmFeedExtras.userName,
-            lmFeedExtras.userId,
+            lmFeedExtras.uuid,
             lmFeedExtras.isGuest
         )
     }

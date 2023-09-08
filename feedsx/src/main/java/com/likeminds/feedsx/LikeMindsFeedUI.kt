@@ -7,7 +7,7 @@ import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 import com.likeminds.feedsx.feed.model.LMFeedExtras
 import com.likeminds.feedsx.feed.view.LMFeedFragment
 
-object LMFeedUI {
+object LikeMindsFeedUI {
 
     /**
      * Call this function to configure SDK in client's app
@@ -41,7 +41,7 @@ object LMFeedUI {
      * @param containerViewId: Id of the container (FrameLayout or FragmentContainerView) to show the home feed
      * @param apiKey : API key of the community
      * @param userName : Name of the user
-     * @param userId : user id of the user
+     * @param uuid : uuid of the user
      * @param isGuest | nullable: is user a guest user of not
      **/
     fun initFeed(
@@ -49,7 +49,7 @@ object LMFeedUI {
         containerViewId: Int,
         apiKey: String,
         userName: String,
-        userId: String,
+        uuid: String,
         isGuest: Boolean
     ) {
         Log.d(SDKApplication.LOG_TAG, "initiate feed called")
@@ -57,14 +57,14 @@ object LMFeedUI {
             SDKApplication.LOG_TAG, """
             container id: $containerViewId
             user_name: $userName
-            user id: $userId
+            uuid: $uuid
             isGuest: $isGuest
         """.trimIndent()
         )
 
         val extras = LMFeedExtras.Builder()
             .apiKey(apiKey)
-            .userId(userId)
+            .uuid(uuid)
             .userName(userName)
             .isGuest(isGuest)
             .build()
