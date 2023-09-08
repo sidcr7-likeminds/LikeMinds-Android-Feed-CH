@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.di.notificationfeed
 
-import com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity
-import com.likeminds.feedsx.notificationfeed.view.NotificationFeedFragment
+import com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity
+import com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedFragment
 import dagger.Subcomponent
 
 @Subcomponent(modules = [NotificationFeedViewModelModule::class])
@@ -12,6 +12,6 @@ interface NotificationFeedComponent {
         fun create(): NotificationFeedComponent
     }
 
-    fun inject(likesFragment: NotificationFeedFragment)
-    fun inject(likesActivity: NotificationFeedActivity)
+    fun inject(likesFragment: LMFeedNotificationFeedFragment)
+    fun inject(likesActivity: LMFeedNotificationFeedActivity)
 }

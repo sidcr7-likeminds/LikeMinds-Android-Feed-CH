@@ -9,31 +9,31 @@ import android.view.View
 import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.utils.permissions.*
 import com.likeminds.feedsx.utils.permissions.model.PermissionExtras
 import com.likeminds.feedsx.utils.permissions.util.*
-import com.likeminds.feedsx.utils.snackbar.CustomSnackBar
+import com.likeminds.feedsx.utils.snackbar.LMFeedCustomSnackBar
 import javax.inject.Inject
 
 open class BaseAppCompatActivity : AppCompatActivity() {
     /**
      * Dispatch onResume() to fragments.  Note that for better inter-operation
-     * with older versions of the platform, at the point of this call the
+     * with older feed_versions of the platform, at the point of this call the
      * fragments attached to the activity are *not* resumed.
      */
 
     @Inject
-    lateinit var snackBar: CustomSnackBar
+    lateinit var snackBar: LMFeedCustomSnackBar
 
-    private lateinit var sessionPermission: SessionPermission
-    private val permissionCallbackSparseArray = SparseArray<PermissionCallback>()
+    private lateinit var LMFeedSessionPermission: LMFeedSessionPermission
+    private val LMFeedPermissionCallbackSparseArray = SparseArray<LMFeedPermissionCallback>()
 
     private var wasNetworkGone = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        sessionPermission = SessionPermission(application)
+        LMFeedSessionPermission = LMFeedSessionPermission(application)
     }
 
     override fun onResume() {
@@ -42,7 +42,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        setStatusBarColor(LMBranding.getHeaderColor())
+        setStatusBarColor(LMFeedBranding.getHeaderColor())
     }
 
     override fun onPause() {
@@ -59,11 +59,11 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
     }
 
-    fun hasPermission(permission: Permission): Boolean {
+    fun hasPermission(LMFeedPermission: LMFeedPermission): Boolean {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             true
         } else {
-            checkSelfPermission(permission.permissionName) == PackageManager.PERMISSION_GRANTED
+            checkSelfPermission(LMFeedPermission.permissionName) == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -81,30 +81,36 @@ open class BaseAppCompatActivity : AppCompatActivity() {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    fun requestPermission(permission: Permission, permissionCallback: PermissionCallback) {
-        permissionCallbackSparseArray.put(permission.requestCode, permissionCallback)
-        sessionPermission.setPermissionRequest(permission.permissionName)
-        requestPermissions(arrayOf(permission.permissionName), permission.requestCode)
+    fun requestPermission(
+        LMFeedPermission: LMFeedPermission,
+        LMFeedPermissionCallback: LMFeedPermissionCallback
+    ) {
+        LMFeedPermissionCallbackSparseArray.put(
+            LMFeedPermission.requestCode,
+            LMFeedPermissionCallback
+        )
+        LMFeedSessionPermission.setPermissionRequest(LMFeedPermission.permissionName)
+        requestPermissions(arrayOf(LMFeedPermission.permissionName), LMFeedPermission.requestCode)
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     fun requestMultiplePermissions(
         permissionExtras: PermissionExtras,
-        permissionCallback: PermissionCallback
+        LMFeedPermissionCallback: LMFeedPermissionCallback
     ) {
         permissionExtras.apply {
             permissions.forEach { permissionName ->
-                permissionCallbackSparseArray.put(requestCode, permissionCallback)
-                sessionPermission.setPermissionRequest(permissionName)
+                LMFeedPermissionCallbackSparseArray.put(requestCode, LMFeedPermissionCallback)
+                LMFeedSessionPermission.setPermissionRequest(permissionName)
             }
             requestPermissions(permissions, requestCode)
         }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    fun canRequestPermission(permission: Permission): Boolean {
-        return !wasRequestedBefore(permission.permissionName) ||
-                shouldShowRequestPermissionRationale(permission.permissionName)
+    fun canRequestPermission(LMFeedPermission: LMFeedPermission): Boolean {
+        return !wasRequestedBefore(LMFeedPermission.permissionName) ||
+                shouldShowRequestPermissionRationale(LMFeedPermission.permissionName)
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -118,7 +124,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
     }
 
     private fun wasRequestedBefore(permissionName: String): Boolean {
-        return sessionPermission.wasPermissionRequestedBefore(permissionName)
+        return LMFeedSessionPermission.wasPermissionRequestedBefore(permissionName)
     }
 
     override fun onRequestPermissionsResult(
@@ -127,7 +133,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val callback = permissionCallbackSparseArray.get(requestCode, null) ?: return
+        val callback = LMFeedPermissionCallbackSparseArray.get(requestCode, null) ?: return
         if (grantResults.isNotEmpty()) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 callback.onGrant()

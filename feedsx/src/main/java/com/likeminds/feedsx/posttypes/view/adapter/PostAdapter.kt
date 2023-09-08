@@ -18,22 +18,23 @@ class PostAdapter constructor(
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(6)
 
-        val itemPostTextOnlyBinder = ItemPostTextOnlyViewDataBinder(listener)
+        val itemPostTextOnlyBinder = LMFeedItemPostTextOnlyViewDataBinder(listener)
         viewDataBinders.add(itemPostTextOnlyBinder)
 
-        val itemPostSingleImageViewDataBinder = ItemPostSingleImageViewDataBinder(listener)
+        val itemPostSingleImageViewDataBinder = LMFeedItemPostSingleImageViewDataBinder(listener)
         viewDataBinders.add(itemPostSingleImageViewDataBinder)
 
-        val itemPostSingleVideoViewDataBinder = ItemPostSingleVideoViewDataBinder(listener)
+        val itemPostSingleVideoViewDataBinder = LMFeedItemPostSingleVideoViewDataBinder(listener)
         viewDataBinders.add(itemPostSingleVideoViewDataBinder)
 
-        val itemPostLinkViewDataBinder = ItemPostLinkViewDataBinder(listener)
+        val itemPostLinkViewDataBinder = LMFeedItemPostLinkViewDataBinder(listener)
         viewDataBinders.add(itemPostLinkViewDataBinder)
 
-        val itemPostDocumentsViewDataBinder = ItemPostDocumentsViewDataBinder(listener)
-        viewDataBinders.add(itemPostDocumentsViewDataBinder)
+        val lmFeedItemPostDocumentsViewDataBinder = LMFeedItemPostDocumentsViewDataBinder(listener)
+        viewDataBinders.add(lmFeedItemPostDocumentsViewDataBinder)
 
-        val itemPostMultipleMediaViewDataBinder = ItemPostMultipleMediaViewDataBinder(listener)
+        val itemPostMultipleMediaViewDataBinder =
+            LMFeedItemPostMultipleMediaViewDataBinder(listener)
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
 
         return viewDataBinders

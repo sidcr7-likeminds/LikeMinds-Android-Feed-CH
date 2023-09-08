@@ -20,9 +20,9 @@ import androidx.recyclerview.widget.*
 import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
-import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentEditPostBinding
-import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
+import com.likeminds.feedsx.databinding.LmFeedFragmentEditPostBinding
+import com.likeminds.feedsx.databinding.LmFeedItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
@@ -46,7 +46,7 @@ import com.likeminds.feedsx.utils.link.util.LinkUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.*
-import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -56,7 +56,7 @@ import java.util.*
 import javax.inject.Inject
 
 class EditPostFragment :
-    BaseFragment<FragmentEditPostBinding, EditPostViewModel>(),
+    BaseFragment<LmFeedFragmentEditPostBinding, EditPostViewModel>(),
     PostAdapterListener {
 
     @Inject
@@ -69,7 +69,7 @@ class EditPostFragment :
 
     private lateinit var etPostTextChangeListener: TextWatcher
 
-    private lateinit var memberTagging: MemberTaggingView
+    private lateinit var memberTagging: LMFeedMemberTaggingView
 
     // [postPublisher] to publish changes in the post
     private val postEvent = PostEvent.getPublisher()
@@ -96,8 +96,8 @@ class EditPostFragment :
         SDKApplication.getInstance().editPostComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentEditPostBinding {
-        return FragmentEditPostBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentEditPostBinding {
+        return LmFeedFragmentEditPostBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {
@@ -146,8 +146,8 @@ class EditPostFragment :
 
     // sets the binding variables
     private fun setBindingVariables() {
-        binding.toolbarColor = LMBranding.getToolbarColor()
-        binding.buttonColor = LMBranding.getButtonsColor()
+        binding.toolbarColor = LMFeedBranding.getToolbarColor()
+        binding.buttonColor = LMFeedBranding.getButtonsColor()
     }
 
 
@@ -167,7 +167,7 @@ class EditPostFragment :
                 .editText(binding.etPostContent)
                 .maxHeightInPercentage(0.4f)
                 .color(
-                    LMBranding.getTextLinkColor()
+                    LMFeedBranding.getTextLinkColor()
                 )
                 .build()
         )
@@ -189,7 +189,7 @@ class EditPostFragment :
     // initializes the toolbar
     private fun initToolbar() {
         binding.apply {
-            toolbarColor = LMBranding.getToolbarColor()
+            toolbarColor = LMFeedBranding.getToolbarColor()
 
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
@@ -289,7 +289,7 @@ class EditPostFragment :
                 pbSaving.hide()
                 if (clickable) {
                     tvSave.isClickable = true
-                    tvSave.setTextColor(LMBranding.getButtonsColor())
+                    tvSave.setTextColor(LMFeedBranding.getButtonsColor())
                 } else {
                     tvSave.isClickable = false
                     tvSave.setTextColor(Color.parseColor("#666666"))
@@ -453,7 +453,7 @@ class EditPostFragment :
             MemberTaggingDecoder.decode(
                 etPostContent,
                 post.text,
-                LMBranding.getTextLinkColor()
+                LMFeedBranding.getTextLinkColor()
             )
 
             // sets the cursor to the end and opens keyboard
@@ -569,7 +569,7 @@ class EditPostFragment :
         handleSaveButton(clickable = true)
         binding.apply {
             multipleMediaAttachment.root.show()
-            multipleMediaAttachment.buttonColor = LMBranding.getButtonsColor()
+            multipleMediaAttachment.buttonColor = LMFeedBranding.getButtonsColor()
             val multiMediaAdapter = MultipleMediaPostAdapter(this@EditPostFragment)
             val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
             viewPager.adapter = multiMediaAdapter
@@ -596,7 +596,7 @@ class EditPostFragment :
                     // processes the current video whenever view pager's page is changed
                     val itemMultipleMediaVideoBinding =
                         ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
-                            ?.binding as? ItemMultipleMediaVideoBinding
+                            ?.binding as? LmFeedItemMultipleMediaVideoBinding
 
                     if (itemMultipleMediaVideoBinding == null) {
                         // in case the item is not a video

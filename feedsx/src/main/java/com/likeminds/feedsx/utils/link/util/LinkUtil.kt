@@ -2,13 +2,13 @@ package com.likeminds.feedsx.utils.link.util
 
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import com.likeminds.feedsx.databinding.LayoutCreatePostLinkBinding
+import com.likeminds.feedsx.databinding.LmFeedLayoutCreatePostLinkBinding
 import com.likeminds.feedsx.utils.ViewUtils
 
 object LinkUtil {
     // if image url is invalid/empty then handle link preview constraints
     fun handleLinkPreviewConstraints(
-        binding: LayoutCreatePostLinkBinding,
+        binding: LmFeedLayoutCreatePostLinkBinding,
         isImageValid: Boolean
     ) {
         binding.apply {
@@ -34,7 +34,7 @@ object LinkUtil {
 
     // sets constraints of link preview when image is invalid
     private fun setInvalidLinkImageConstraints(
-        binding: LayoutCreatePostLinkBinding,
+        binding: LmFeedLayoutCreatePostLinkBinding,
         constraintSet: ConstraintSet
     ) {
         binding.apply {
@@ -66,7 +66,7 @@ object LinkUtil {
 
     // sets constraints of link preview when image is valid
     private fun setValidLinkImageConstraints(
-        binding: LayoutCreatePostLinkBinding,
+        binding: LmFeedLayoutCreatePostLinkBinding,
         constraintSet: ConstraintSet
     ) {
         binding.apply {

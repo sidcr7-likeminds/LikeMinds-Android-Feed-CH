@@ -1,9 +1,6 @@
 package com.likeminds.feedsx.di.media
 
-import com.likeminds.feedsx.media.view.MediaPickerActivity
-import com.likeminds.feedsx.media.view.MediaPickerDocumentFragment
-import com.likeminds.feedsx.media.view.MediaPickerFolderFragment
-import com.likeminds.feedsx.media.view.MediaPickerItemFragment
+import com.likeminds.feedsx.media.view.*
 import dagger.Subcomponent
 
 @Subcomponent(modules = [MediaViewModelModule::class])
@@ -14,8 +11,8 @@ interface MediaComponent {
         fun create(): MediaComponent
     }
 
-    fun inject(mediaPickerDocumentFragment: MediaPickerDocumentFragment)
-    fun inject(mediaPickerFolderFragment: MediaPickerFolderFragment)
-    fun inject(mediaPickerItemFragment: MediaPickerItemFragment)
-    fun inject(mediaPickerActivity: MediaPickerActivity)
+    fun inject(lmFeedMediaPickerDocumentFragment: LMFeedMediaPickerDocumentFragment)
+    fun inject(lmFeedMediaPickerFolderFragment: LMFeedMediaPickerFolderFragment)
+    fun inject(lmFeedMediaPickerItemFragment: LMFeedMediaPickerItemFragment)
+    fun inject(lmFeedMediaPickerActivity: LMFeedMediaPickerActivity)
 }

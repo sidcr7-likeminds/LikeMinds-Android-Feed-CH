@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.likeminds.feedsx.databinding.ItemMemberBinding
+import com.likeminds.feedsx.databinding.LmFeedItemMemberBinding
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 
 internal class MemberAdapter(
@@ -15,7 +15,8 @@ internal class MemberAdapter(
     private val members = ArrayList<UserTagViewData>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MemberViewHolder {
-        val binding = ItemMemberBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        val binding =
+            LmFeedItemMemberBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MemberViewHolder(binding, darkMode, memberAdapterClickListener)
     }
 

@@ -2,38 +2,40 @@ package com.likeminds.feedsx.feed.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
-import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
+import com.likeminds.feedsx.post.create.util.LMFeedPostPreferences
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
-import com.likeminds.feedsx.post.create.util.PostPreferences
-import com.likeminds.feedsx.posttypes.model.IMAGE
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.VIDEO
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
-import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
-import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
-import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_IMAGE
-import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
+import com.likeminds.feedsx.utils.model.*
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
+import kotlin.collections.List
+import kotlin.collections.count
+import kotlin.collections.emptyList
+import kotlin.collections.forEach
+import kotlin.collections.hashMapOf
+import kotlin.collections.isNotEmpty
+import kotlin.collections.joinToString
+import kotlin.collections.listOf
+import kotlin.collections.mapOf
+import kotlin.collections.set
 
 class FeedViewModel @Inject constructor(
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
-    private val postPreferences: PostPreferences
+    private val postPreferences: LMFeedPostPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -209,8 +211,8 @@ class FeedViewModel @Inject constructor(
      * Triggers when the user opens feed fragment
      **/
     fun sendFeedOpenedEvent() {
-        LMAnalytics.track(
-            LMAnalytics.Events.FEED_OPENED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.FEED_OPENED,
             mapOf(
                 "feed_type" to "universal_feed"
             )
@@ -221,14 +223,14 @@ class FeedViewModel @Inject constructor(
      * Triggers when the user clicks on New Post button
      **/
     fun sendPostCreationStartedEvent() {
-        LMAnalytics.track(LMAnalytics.Events.POST_CREATION_STARTED)
+        LMFeedAnalytics.track(LMFeedAnalytics.Events.POST_CREATION_STARTED)
     }
 
     /**
      * Triggers when the user opens post detail screen
      **/
     fun sendCommentListOpenEvent() {
-        LMAnalytics.track(LMAnalytics.Events.COMMENT_LIST_OPEN)
+        LMFeedAnalytics.track(LMFeedAnalytics.Events.COMMENT_LIST_OPEN)
     }
 
     /**
@@ -259,8 +261,8 @@ class FeedViewModel @Inject constructor(
         attachmentInfo.forEach {
             map[it.first] = it.second
         }
-        LMAnalytics.track(
-            LMAnalytics.Events.POST_CREATION_COMPLETED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.POST_CREATION_COMPLETED,
             map
         )
     }
@@ -339,6 +341,6 @@ class FeedViewModel @Inject constructor(
      * Triggers when the user taps on the bell icon and lands on the notification page
      **/
     fun sendNotificationPageOpenedEvent() {
-        LMAnalytics.track(LMAnalytics.Events.NOTIFICATION_PAGE_OPENED)
+        LMFeedAnalytics.track(LMFeedAnalytics.Events.NOTIFICATION_PAGE_OPENED)
     }
 }

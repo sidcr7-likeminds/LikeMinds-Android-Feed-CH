@@ -1,68 +1,68 @@
 dependencies {
     //core android
-    implementation deps.android_core.core
-    implementation deps.android_core.appcompat
-    implementation deps.ktx.fragment
+    implementation feed_deps.android_core.core
+    implementation feed_deps.android_core.appcompat
+    implementation feed_deps.ktx.fragment
 
     //ui
-    implementation deps.ui.material_design
-    implementation deps.ui.constraint_layout
-    implementation deps.ui.recycler_view
-    implementation deps.ui.circleimageview
-    implementation deps.ui.dot_indicator
-    implementation deps.ui.swiperefreshlayout
-    implementation deps.ui.flexbox
+    implementation feed_deps.ui.material_design
+    implementation feed_deps.ui.constraint_layout
+    implementation feed_deps.ui.recycler_view
+    implementation feed_deps.ui.circleimageview
+    implementation feed_deps.ui.dot_indicator
+    implementation feed_deps.ui.swiperefreshlayout
+    implementation feed_deps.ui.flexbox
 
     //dagger
-    implementation deps.dagger.main
-    kapt deps.dagger.compiler
+    implementation feed_deps.dagger.main
+    kapt feed_deps.dagger.compiler
 
     //exoplayer
-    implementation deps.exo_player.main
+    implementation feed_deps.exo_player.main
 
     //lifecycle and viewmodel
-    implementation deps.lifecycle.viewmodel
-    implementation deps.lifecycle.livedata
-    kapt deps.lifecycle.annotation
+    implementation feed_deps.lifecycle.viewmodel
+    implementation feed_deps.lifecycle.livedata
+    kapt feed_deps.lifecycle.annotation
 
     //navigation
-    implementation deps.navigation.main
-    implementation deps.navigation.ui
+    implementation feed_deps.navigation.main
+    implementation feed_deps.navigation.ui
 
     //glide
-    implementation deps.glide.core
-    kapt deps.glide.compiler
+    implementation feed_deps.glide.core
+    kapt feed_deps.glide.compiler
 
     //Stream
-    implementation deps.stream.main
+    implementation feed_deps.stream.main
 
     //work manager
-    implementation deps.work_manager.main
+    implementation feed_deps.work_manager.main
 
     // gson
-    implementation deps.gson.main
+    implementation feed_deps.gson.main
 
     //aws
-    implementation deps.aws.s3
-    implementation(deps.aws.mobile_client) { transitive = true }
+    implementation feed_deps.aws.s3
+    implementation(feed_deps.aws.mobile_client) { transitive = true }
 
     //testing
-    testImplementation deps.testing.junit
-    androidTestImplementation deps.testing.android_junit
-    androidTestImplementation deps.testing.espresso
+    testImplementation feed_deps.testing.junit
+    androidTestImplementation feed_deps.testing.android_junit
+    androidTestImplementation feed_deps.testing.espresso
 
     //room
-    implementation deps.room.main
-    implementation deps.room.ktx
-    kapt deps.room.compiler
+    implementation feed_deps.room.main
+    implementation feed_deps.room.ktx
+    ksp feed_deps.room.compiler
 
     //firebase
-    implementation platform(deps.firebase.bom)
-    implementation deps.firebase.messaging
+    implementation platform(feed_deps.firebase.bom)
+    implementation feed_deps.firebase.messaging
 
     //shimmer
-    implementation deps.facebook.shimmer
+    implementation feed_deps.facebook.shimmer
 
     // feed-sdk
-    implementation 'community.likeminds:likemindsfeed:1.4.0'
+    implementation 'community.likeminds:likemindsfeed:1.5.0'
 }
