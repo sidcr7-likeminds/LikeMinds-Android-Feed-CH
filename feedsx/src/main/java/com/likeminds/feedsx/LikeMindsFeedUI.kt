@@ -7,7 +7,7 @@ import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 import com.likeminds.feedsx.feed.model.LMFeedExtras
 import com.likeminds.feedsx.feed.view.LMFeedFragment
 
-object LMFeedUI {
+object LikeMindsFeedUI {
 
     /**
      * Call this function to configure SDK in client's app
