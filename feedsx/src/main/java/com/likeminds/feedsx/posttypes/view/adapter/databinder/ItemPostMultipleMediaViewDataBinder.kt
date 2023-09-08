@@ -2,7 +2,7 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
+import com.likeminds.feedsx.databinding.LmFeedItemPostMultipleMediaBinding
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
@@ -11,13 +11,13 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
 
 class ItemPostMultipleMediaViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<ItemPostMultipleMediaBinding, PostViewData>() {
+) : ViewDataBinder<LmFeedItemPostMultipleMediaBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_MULTIPLE_MEDIA
 
-    override fun createBinder(parent: ViewGroup): ItemPostMultipleMediaBinding {
-        return ItemPostMultipleMediaBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostMultipleMediaBinding {
+        return LmFeedItemPostMultipleMediaBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -25,7 +25,7 @@ class ItemPostMultipleMediaViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemPostMultipleMediaBinding,
+        binding: LmFeedItemPostMultipleMediaBinding,
         data: PostViewData,
         position: Int
     ) {

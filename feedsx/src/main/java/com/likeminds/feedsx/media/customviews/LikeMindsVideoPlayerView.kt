@@ -3,14 +3,9 @@ package com.likeminds.feedsx.media.customviews
 import android.content.Context
 import android.net.Uri
 import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.SurfaceView
-import android.view.View
+import android.view.*
 import android.widget.ProgressBar
-import com.google.android.exoplayer2.DefaultLoadControl
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultAllocator
@@ -55,7 +50,7 @@ class LikeMindsVideoPlayerView @JvmOverloads constructor(
         if (isInEditMode) {
             videoPlayerSurfaceView = null
         } else {
-            LayoutInflater.from(context).inflate(R.layout.exo_player_view, this, true)
+            LayoutInflater.from(context).inflate(R.layout.lm_feed_exo_player_view, this, true)
             descendantFocusability = FOCUS_AFTER_DESCENDANTS
 
             // Content frame.

@@ -49,7 +49,7 @@ class MediaPickerActivity : BaseAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_media_picker)
+        setContentView(R.layout.lm_feed_activity_media_picker)
         setupOnBackPressedCallback()
         val extras = ExtrasUtil.getParcelable(
             intent.extras,

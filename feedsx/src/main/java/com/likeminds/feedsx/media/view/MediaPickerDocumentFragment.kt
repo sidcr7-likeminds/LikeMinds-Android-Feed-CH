@@ -13,7 +13,7 @@ import androidx.lifecycle.lifecycleScope
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentMediaPickerDocumentBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentMediaPickerDocumentBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
@@ -23,7 +23,7 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
 class MediaPickerDocumentFragment :
-    BaseFragment<FragmentMediaPickerDocumentBinding, MediaViewModel>(),
+    BaseFragment<LmFeedFragmentMediaPickerDocumentBinding, MediaViewModel>(),
     MediaPickerAdapterListener {
 
     private lateinit var mediaPickerAdapter: MediaPickerAdapter
@@ -58,8 +58,8 @@ class MediaPickerDocumentFragment :
         SDKApplication.getInstance().mediaComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentMediaPickerDocumentBinding {
-        return FragmentMediaPickerDocumentBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentMediaPickerDocumentBinding {
+        return LmFeedFragmentMediaPickerDocumentBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {

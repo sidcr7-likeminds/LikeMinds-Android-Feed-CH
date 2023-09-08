@@ -13,7 +13,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.DialogPermissionBinding
+import com.likeminds.feedsx.databinding.LmFeedDialogPermissionBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import com.likeminds.feedsx.utils.permissions.model.PermissionExtras
 import com.likeminds.feedsx.utils.permissions.util.*
@@ -27,8 +27,8 @@ class PermissionDialog(
     private val permissionDeniedCallback: PermissionDeniedCallback?,
     private val permissionExtras: PermissionExtras? = null
 ) : Dialog(activity), View.OnClickListener {
-    private val dialogPermissionBinding: DialogPermissionBinding =
-        DialogPermissionBinding.inflate(LayoutInflater.from(context))
+    private val dialogPermissionBinding: LmFeedDialogPermissionBinding =
+        LmFeedDialogPermissionBinding.inflate(LayoutInflater.from(context))
 
     init {
         setContentView(dialogPermissionBinding.root)

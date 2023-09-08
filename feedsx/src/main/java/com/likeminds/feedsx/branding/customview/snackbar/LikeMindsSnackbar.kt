@@ -1,8 +1,6 @@
 package com.likeminds.feedsx.branding.customview.snackbar
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.likeminds.feedsx.R
@@ -32,7 +30,7 @@ class LikeMindsSnackbar(
             )
 
             val customView = LayoutInflater.from(view.context).inflate(
-                R.layout.likeminds_snackbar,
+                R.layout.lm_feed_snackbar,
                 parent,
                 false
             ) as LikeMindsSnackbarView

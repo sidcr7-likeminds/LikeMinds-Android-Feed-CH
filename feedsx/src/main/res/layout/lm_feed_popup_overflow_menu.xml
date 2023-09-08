@@ -16,7 +16,7 @@
             android:overScrollMode="never"
             android:orientation="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            tools:listitem="@layout/item_overflow_menu" />
+            tools:listitem="@layout/lm_feed_item_overflow_menu" />
 
     </androidx.cardview.widget.CardView>
 

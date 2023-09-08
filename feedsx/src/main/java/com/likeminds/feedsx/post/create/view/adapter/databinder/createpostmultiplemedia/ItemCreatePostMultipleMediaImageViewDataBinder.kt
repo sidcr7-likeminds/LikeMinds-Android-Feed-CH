@@ -2,7 +2,7 @@ package com.likeminds.feedsx.post.create.view.adapter.databinder.createpostmulti
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.ItemCreatePostSingleImageBinding
+import com.likeminds.feedsx.databinding.LmFeedItemCreatePostSingleImageBinding
 import com.likeminds.feedsx.media.model.IMAGE
 import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.posttypes.model.AttachmentViewData
@@ -13,13 +13,13 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 
 class ItemCreatePostMultipleMediaImageViewDataBinder constructor(
     private val listener: CreatePostListener
-) : ViewDataBinder<ItemCreatePostSingleImageBinding, AttachmentViewData>() {
+) : ViewDataBinder<LmFeedItemCreatePostSingleImageBinding, AttachmentViewData>() {
 
     override val viewType: Int
         get() = ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
 
-    override fun createBinder(parent: ViewGroup): ItemCreatePostSingleImageBinding {
-        return ItemCreatePostSingleImageBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemCreatePostSingleImageBinding {
+        return LmFeedItemCreatePostSingleImageBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -27,7 +27,7 @@ class ItemCreatePostMultipleMediaImageViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemCreatePostSingleImageBinding,
+        binding: LmFeedItemCreatePostSingleImageBinding,
         data: AttachmentViewData,
         position: Int
     ) {

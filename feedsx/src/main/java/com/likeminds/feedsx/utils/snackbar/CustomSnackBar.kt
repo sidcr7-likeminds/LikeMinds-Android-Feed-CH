@@ -5,8 +5,8 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
-import com.likeminds.feedsx.databinding.LayoutNoInternetBinding
-import com.likeminds.feedsx.databinding.LayoutSnackbarMessageBinding
+import com.likeminds.feedsx.databinding.LmFeedLayoutNoInternetBinding
+import com.likeminds.feedsx.databinding.LmFeedLayoutSnackbarMessageBinding
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import javax.inject.Inject
 
@@ -20,7 +20,7 @@ class CustomSnackBar @Inject constructor() {
     ) {
         createSnackBar(view, Snackbar.LENGTH_INDEFINITE)
 
-        val binding = LayoutNoInternetBinding.inflate(LayoutInflater.from(view.context))
+        val binding = LmFeedLayoutNoInternetBinding.inflate(LayoutInflater.from(view.context))
         //set the custom view binding to snack bar
         (snackBar?.view as? Snackbar.SnackbarLayout)?.addView(binding.root)
 
@@ -49,7 +49,7 @@ class CustomSnackBar @Inject constructor() {
         duration: Int = Snackbar.LENGTH_SHORT,
     ) {
         createSnackBar(view, duration)
-        val binding = LayoutSnackbarMessageBinding.inflate(LayoutInflater.from(view.context))
+        val binding = LmFeedLayoutSnackbarMessageBinding.inflate(LayoutInflater.from(view.context))
         //set the custom view binding to snack bar
         (snackBar?.view as? Snackbar.SnackbarLayout)?.addView(binding.root)
         binding.tvMessage.text = text

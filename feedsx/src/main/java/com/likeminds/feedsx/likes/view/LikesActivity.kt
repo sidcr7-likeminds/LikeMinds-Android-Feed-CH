@@ -7,7 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.ActivityLikesBinding
+import com.likeminds.feedsx.databinding.LmFeedActivityLikesBinding
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
@@ -15,7 +15,7 @@ import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class LikesActivity : BaseAppCompatActivity() {
 
-    lateinit var binding: ActivityLikesBinding
+    lateinit var binding: LmFeedActivityLikesBinding
 
     private var likesScreenExtras: LikesScreenExtras? = null
 
@@ -48,7 +48,7 @@ class LikesActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityLikesBinding.inflate(layoutInflater)
+        binding = LmFeedActivityLikesBinding.inflate(layoutInflater)
         binding.toolbarColor = LMBranding.getToolbarColor()
         setContentView(binding.root)
 
@@ -92,7 +92,7 @@ class LikesActivity : BaseAppCompatActivity() {
         }
         supportFragmentManager.popBackStack()
         onBackPressedDispatcher.onBackPressed()
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+        overridePendingTransition(R.anim.lm_feed_slide_from_left, R.anim.lm_feed_slide_to_right)
     }
 
     private fun initActionBar() {

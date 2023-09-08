@@ -3,7 +3,7 @@ package com.likeminds.feedsx.report.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.likeminds.feedsx.databinding.ActivityReportBinding
+import com.likeminds.feedsx.databinding.LmFeedActivityReportBinding
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
@@ -32,11 +32,11 @@ class ReportActivity : BaseAppCompatActivity() {
         }
     }
 
-    private lateinit var binding: ActivityReportBinding
+    private lateinit var binding: LmFeedActivityReportBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityReportBinding.inflate(layoutInflater)
+        binding = LmFeedActivityReportBinding.inflate(layoutInflater)
         setContentView(binding.root)
     }
 }

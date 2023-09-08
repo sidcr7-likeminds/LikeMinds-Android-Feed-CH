@@ -40,7 +40,7 @@ object PostTypeUtil {
 
     // initializes author data frame on the post
     private fun initAuthorFrame(
-        binding: LayoutAuthorFrameBinding,
+        binding: LmFeedLayoutAuthorFrameBinding,
         data: PostViewData,
         listener: PostAdapterListener
     ) {
@@ -125,7 +125,7 @@ object PostTypeUtil {
 
     // initializes the recyclerview with attached documents
     fun initDocumentsRecyclerView(
-        binding: ItemPostDocumentsBinding,
+        binding: LmFeedItemPostDocumentsBinding,
         postData: PostViewData,
         postAdapterListener: PostAdapterListener,
         position: Int
@@ -170,7 +170,7 @@ object PostTypeUtil {
 
     // initializes document item of the document recyclerview
     fun initDocument(
-        binding: ItemDocumentBinding,
+        binding: LmFeedItemDocumentBinding,
         document: AttachmentViewData,
     ) {
         binding.apply {
@@ -217,7 +217,7 @@ object PostTypeUtil {
 
     // initializes various actions on the post
     fun initActionsLayout(
-        binding: LayoutPostActionsBinding,
+        binding: LmFeedLayoutPostActionsBinding,
         data: PostViewData,
         listener: PostAdapterListener,
         position: Int
@@ -289,7 +289,7 @@ object PostTypeUtil {
 
     // initializes view pager for multiple media post
     fun initViewPager(
-        binding: ItemPostMultipleMediaBinding,
+        binding: LmFeedItemPostMultipleMediaBinding,
         data: PostViewData,
         listener: PostAdapterListener
     ) {
@@ -484,7 +484,7 @@ object PostTypeUtil {
 
     // handles link view in the post
     fun initLinkView(
-        binding: ItemPostLinkBinding,
+        binding: LmFeedItemPostLinkBinding,
         data: LinkOGTagsViewData
     ) {
         binding.apply {
@@ -532,7 +532,7 @@ object PostTypeUtil {
 
     // checks if binder is called from liking/saving post or not
     fun initPostTypeBindData(
-        authorFrame: LayoutAuthorFrameBinding,
+        authorFrame: LmFeedLayoutAuthorFrameBinding,
         tvPostContent: TextView,
         data: PostViewData,
         position: Int,

@@ -23,7 +23,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:listitem="@layout/item_member" />
+            tools:listitem="@layout/lm_feed_item_member" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

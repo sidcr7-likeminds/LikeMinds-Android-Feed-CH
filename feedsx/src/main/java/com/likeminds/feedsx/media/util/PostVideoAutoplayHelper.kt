@@ -6,9 +6,7 @@ import android.widget.ProgressBar
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
-import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
-import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
+import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.PostViewData
@@ -227,7 +225,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 // if the post is of type [ITEM_POST_SINGLE_VIDEO]
                 val itemPostSingleVideoBinding =
                     (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
-                        ?.binding as? ItemPostSingleVideoBinding ?: return
+                        ?.binding as? LmFeedItemPostSingleVideoBinding ?: return
 
                 if (lastPlayerView == null || lastPlayerView != itemPostSingleVideoBinding.videoPost) {
                     val meta = data.attachments.first().attachmentMeta
@@ -243,7 +241,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 // if the post is of type [ITEM_POST_MULTIPLE_MEDIA]
                 val itemMultipleMediaBinding =
                     (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
-                        ?.binding as? ItemPostMultipleMediaBinding ?: return
+                        ?.binding as? LmFeedItemPostMultipleMediaBinding ?: return
 
                 val viewPager = itemMultipleMediaBinding.viewpagerMultipleMedia
                 val currentItem = viewPager.currentItem
@@ -251,7 +249,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 // gets the video binding from view pager
                 val itemMultipleMediaVideoBinding =
                     ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(currentItem) as? DataBoundViewHolder<*>)
-                        ?.binding as? ItemMultipleMediaVideoBinding
+                        ?.binding as? LmFeedItemMultipleMediaVideoBinding
 
                 if (itemMultipleMediaVideoBinding == null) {
                     // if itemMultipleMediaVideoBinding, that means it is an image

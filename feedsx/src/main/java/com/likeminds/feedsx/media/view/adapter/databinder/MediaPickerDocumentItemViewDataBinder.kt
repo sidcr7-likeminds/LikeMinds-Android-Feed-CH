@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemMediaPickerDocumentBinding
+import com.likeminds.feedsx.databinding.LmFeedItemMediaPickerDocumentBinding
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.util.MediaPickerDataBinderUtils.Companion.getFilteredText
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -16,13 +16,13 @@ import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_DOCUMENT
 
 class MediaPickerDocumentItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
-) : ViewDataBinder<ItemMediaPickerDocumentBinding, MediaViewData>() {
+) : ViewDataBinder<LmFeedItemMediaPickerDocumentBinding, MediaViewData>() {
 
     override val viewType: Int
         get() = ITEM_MEDIA_PICKER_DOCUMENT
 
-    override fun createBinder(parent: ViewGroup): ItemMediaPickerDocumentBinding {
-        val binding = ItemMediaPickerDocumentBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemMediaPickerDocumentBinding {
+        val binding = LmFeedItemMediaPickerDocumentBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         binding.root.setOnClickListener {
@@ -34,7 +34,7 @@ class MediaPickerDocumentItemViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemMediaPickerDocumentBinding, data: MediaViewData, position: Int
+        binding: LmFeedItemMediaPickerDocumentBinding, data: MediaViewData, position: Int
     ) {
         binding.apply {
             this.position = position

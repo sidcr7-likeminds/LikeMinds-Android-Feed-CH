@@ -4,9 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.res.Configuration
-import android.text.Editable
-import android.text.TextUtils
-import android.text.TextWatcher
+import android.text.*
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +17,7 @@ import androidx.annotation.CheckResult
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.LayoutSearchBarBinding
+import com.likeminds.feedsx.databinding.LmFeedLayoutSearchBarBinding
 import com.likeminds.feedsx.utils.AnimationUtils.circleHideView
 import com.likeminds.feedsx.utils.AnimationUtils.circleRevealView
 import com.likeminds.feedsx.utils.ViewUtils
@@ -62,7 +60,8 @@ class CustomSearchBar @JvmOverloads constructor(
     var isOpen = false
         private set
 
-    private val binding = LayoutSearchBarBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding =
+        LmFeedLayoutSearchBarBinding.inflate(LayoutInflater.from(context), this, true)
 
     private lateinit var lifecycleScope: LifecycleCoroutineScope
 

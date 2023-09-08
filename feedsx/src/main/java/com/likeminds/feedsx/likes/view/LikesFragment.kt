@@ -4,7 +4,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
-import com.likeminds.feedsx.databinding.FragmentLikesBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentLikesBinding
 import com.likeminds.feedsx.likes.adapter.LikesScreenAdapter
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.viewmodel.LikesViewModel
@@ -12,7 +12,7 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
-class LikesFragment : BaseFragment<FragmentLikesBinding, LikesViewModel>() {
+class LikesFragment : BaseFragment<LmFeedFragmentLikesBinding, LikesViewModel>() {
 
     companion object {
         private const val TAG = "Likes Screen"
@@ -31,8 +31,8 @@ class LikesFragment : BaseFragment<FragmentLikesBinding, LikesViewModel>() {
         SDKApplication.getInstance().likesComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentLikesBinding {
-        return FragmentLikesBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentLikesBinding {
+        return LmFeedFragmentLikesBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {

@@ -7,7 +7,7 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemMediaPickerFolderBinding
+import com.likeminds.feedsx.databinding.LmFeedItemMediaPickerFolderBinding
 import com.likeminds.feedsx.media.model.MediaFolderType
 import com.likeminds.feedsx.media.model.MediaFolderViewData
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
@@ -16,15 +16,15 @@ import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_FOLDER
 
 class MediaPickerFolderItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
-) : ViewDataBinder<ItemMediaPickerFolderBinding, MediaFolderViewData>() {
+) : ViewDataBinder<LmFeedItemMediaPickerFolderBinding, MediaFolderViewData>() {
 
     private var glideRequestManager: RequestManager? = null
 
     override val viewType: Int
         get() = ITEM_MEDIA_PICKER_FOLDER
 
-    override fun createBinder(parent: ViewGroup): ItemMediaPickerFolderBinding {
-        val binding = ItemMediaPickerFolderBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemMediaPickerFolderBinding {
+        val binding = LmFeedItemMediaPickerFolderBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         binding.root.setOnClickListener {
@@ -36,7 +36,7 @@ class MediaPickerFolderItemViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemMediaPickerFolderBinding, data: MediaFolderViewData, position: Int
+        binding: LmFeedItemMediaPickerFolderBinding, data: MediaFolderViewData, position: Int
     ) {
         binding.folderData = data
         binding.ivFolderIcon.setImageResource(getFolderIcon(data.folderType))

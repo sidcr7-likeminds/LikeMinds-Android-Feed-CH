@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.DialogFragmentSelfDeleteBinding
+import com.likeminds.feedsx.databinding.LmFeedDialogFragmentSelfDeleteBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
@@ -12,7 +12,7 @@ import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 
 //when user deletes their own post
-class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBinding>() {
+class SelfDeleteDialogFragment : BaseDialogFragment<LmFeedDialogFragmentSelfDeleteBinding>() {
 
     companion object {
         private const val TAG = "DeleteAlertDialogFragment"
@@ -35,8 +35,8 @@ class SelfDeleteDialogFragment : BaseDialogFragment<DialogFragmentSelfDeleteBind
 
     private lateinit var deleteExtras: DeleteExtras
 
-    override fun getViewBinding(): DialogFragmentSelfDeleteBinding {
-        return DialogFragmentSelfDeleteBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedDialogFragmentSelfDeleteBinding {
+        return LmFeedDialogFragmentSelfDeleteBinding.inflate(layoutInflater)
     }
 
     override fun onAttach(context: Context) {

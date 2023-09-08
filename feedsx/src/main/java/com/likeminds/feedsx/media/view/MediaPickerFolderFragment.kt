@@ -14,7 +14,7 @@ import androidx.navigation.fragment.findNavController
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentMediaPickerFolderBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentMediaPickerFolderBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.MediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
@@ -25,7 +25,7 @@ import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.recyclerview.GridSpacingItemDecoration
 
 class MediaPickerFolderFragment :
-    BaseFragment<FragmentMediaPickerFolderBinding, MediaViewModel>(),
+    BaseFragment<LmFeedFragmentMediaPickerFolderBinding, MediaViewModel>(),
     MediaPickerAdapterListener {
 
     private lateinit var mediaPickerAdapter: MediaPickerAdapter
@@ -56,8 +56,8 @@ class MediaPickerFolderFragment :
         SDKApplication.getInstance().mediaComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentMediaPickerFolderBinding {
-        return FragmentMediaPickerFolderBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentMediaPickerFolderBinding {
+        return LmFeedFragmentMediaPickerFolderBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {

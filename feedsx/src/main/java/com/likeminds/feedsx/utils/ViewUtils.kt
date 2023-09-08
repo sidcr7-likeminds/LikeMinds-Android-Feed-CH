@@ -48,7 +48,7 @@ object ViewUtils {
         val saveBounceAnim: Animation by lazy {
             AnimationUtils.loadAnimation(
                 context,
-                R.anim.bounce
+                R.anim.lm_feed_bounce
             )
         }
 

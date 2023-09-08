@@ -2,7 +2,7 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
+import com.likeminds.feedsx.databinding.LmFeedItemPostSingleVideoBinding
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
@@ -11,13 +11,13 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 
 class ItemPostSingleVideoViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<ItemPostSingleVideoBinding, PostViewData>() {
+) : ViewDataBinder<LmFeedItemPostSingleVideoBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_SINGLE_VIDEO
 
-    override fun createBinder(parent: ViewGroup): ItemPostSingleVideoBinding {
-        return ItemPostSingleVideoBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostSingleVideoBinding {
+        return LmFeedItemPostSingleVideoBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -25,7 +25,7 @@ class ItemPostSingleVideoViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemPostSingleVideoBinding,
+        binding: LmFeedItemPostSingleVideoBinding,
         data: PostViewData,
         position: Int
     ) {

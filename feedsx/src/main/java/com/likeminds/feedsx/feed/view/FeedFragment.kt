@@ -25,7 +25,7 @@ import androidx.work.WorkManager
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentFeedBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentFeedBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
@@ -65,7 +65,7 @@ import java.util.*
 import javax.inject.Inject
 
 class FeedFragment :
-    BaseFragment<FragmentFeedBinding, FeedViewModel>(),
+    BaseFragment<LmFeedFragmentFeedBinding, FeedViewModel>(),
     PostAdapterListener,
     AdminDeleteDialogFragment.DeleteDialogListener,
     SelfDeleteDialogFragment.DeleteAlertDialogListener,
@@ -127,8 +127,8 @@ class FeedFragment :
         SDKApplication.getInstance().feedComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentFeedBinding {
-        return FragmentFeedBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentFeedBinding {
+        return LmFeedFragmentFeedBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {

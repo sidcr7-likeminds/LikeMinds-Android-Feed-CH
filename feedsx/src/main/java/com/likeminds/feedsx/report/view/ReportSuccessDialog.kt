@@ -1,15 +1,15 @@
 package com.likeminds.feedsx.report.view
 
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.DialogReportSuccessBinding
+import com.likeminds.feedsx.databinding.LmFeedDialogReportSuccessBinding
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 
 class ReportSuccessDialog constructor(
     private val type: String
-) : BaseDialogFragment<DialogReportSuccessBinding>() {
+) : BaseDialogFragment<LmFeedDialogReportSuccessBinding>() {
 
-    override fun getViewBinding(): DialogReportSuccessBinding {
-        return DialogReportSuccessBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedDialogReportSuccessBinding {
+        return LmFeedDialogReportSuccessBinding.inflate(layoutInflater)
     }
 
     override val cancellable: Boolean

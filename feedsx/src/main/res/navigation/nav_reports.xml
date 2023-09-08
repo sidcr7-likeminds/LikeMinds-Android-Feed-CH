@@ -9,6 +9,6 @@
         android:id="@+id/fragment_report"
         android:name="com.likeminds.feedsx.report.view.ReportFragment"
         android:label="ReportFragment"
-        tools:layout="@layout/fragment_report" />
+        tools:layout="@layout/lm_feed_fragment_report" />
 
 </navigation>

@@ -2,7 +2,7 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.ItemPostDocumentsBinding
+import com.likeminds.feedsx.databinding.LmFeedItemPostDocumentsBinding
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
@@ -11,13 +11,13 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
 
 class ItemPostDocumentsViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<ItemPostDocumentsBinding, PostViewData>() {
+) : ViewDataBinder<LmFeedItemPostDocumentsBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_DOCUMENTS
 
-    override fun createBinder(parent: ViewGroup): ItemPostDocumentsBinding {
-        return ItemPostDocumentsBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostDocumentsBinding {
+        return LmFeedItemPostDocumentsBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -25,7 +25,7 @@ class ItemPostDocumentsViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemPostDocumentsBinding,
+        binding: LmFeedItemPostDocumentsBinding,
         data: PostViewData,
         position: Int
     ) {

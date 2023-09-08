@@ -8,7 +8,7 @@ import com.google.android.flexbox.*
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
-import com.likeminds.feedsx.databinding.FragmentReportBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentReportBinding
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
@@ -16,7 +16,7 @@ import com.likeminds.feedsx.report.viewmodel.ReportViewModel
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
-class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
+class ReportFragment : BaseFragment<LmFeedFragmentReportBinding, ReportViewModel>(),
     ReportAdapterListener {
 
     override fun getViewModelClass(): Class<ReportViewModel> {
@@ -28,8 +28,8 @@ class ReportFragment : BaseFragment<FragmentReportBinding, ReportViewModel>(),
         SDKApplication.getInstance().reportComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentReportBinding {
-        return FragmentReportBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentReportBinding {
+        return LmFeedFragmentReportBinding.inflate(layoutInflater)
     }
 
     companion object {

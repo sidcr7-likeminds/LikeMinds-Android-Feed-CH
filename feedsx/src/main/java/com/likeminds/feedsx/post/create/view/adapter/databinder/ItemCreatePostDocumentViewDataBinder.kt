@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemCreatePostDocumentBinding
+import com.likeminds.feedsx.databinding.LmFeedItemCreatePostDocumentBinding
 import com.likeminds.feedsx.media.model.PDF
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.create.util.CreatePostListener
@@ -17,12 +17,12 @@ import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
 
 class ItemCreatePostDocumentViewDataBinder constructor(
     private val listener: CreatePostListener
-) : ViewDataBinder<ItemCreatePostDocumentBinding, AttachmentViewData>() {
+) : ViewDataBinder<LmFeedItemCreatePostDocumentBinding, AttachmentViewData>() {
     override val viewType: Int
         get() = ITEM_CREATE_POST_DOCUMENTS_ITEM
 
-    override fun createBinder(parent: ViewGroup): ItemCreatePostDocumentBinding {
-        return ItemCreatePostDocumentBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemCreatePostDocumentBinding {
+        return LmFeedItemCreatePostDocumentBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -30,7 +30,7 @@ class ItemCreatePostDocumentViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemCreatePostDocumentBinding,
+        binding: LmFeedItemCreatePostDocumentBinding,
         data: AttachmentViewData,
         position: Int
     ) {
@@ -41,7 +41,7 @@ class ItemCreatePostDocumentViewDataBinder constructor(
 
     // initializes document item of the document recyclerview
     private fun initDocument(
-        binding: ItemCreatePostDocumentBinding,
+        binding: LmFeedItemCreatePostDocumentBinding,
         document: AttachmentViewData,
         position: Int
     ) {

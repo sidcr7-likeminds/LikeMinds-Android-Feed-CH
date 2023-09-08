@@ -7,12 +7,12 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.ActivityNotificationFeedBinding
+import com.likeminds.feedsx.databinding.LmFeedActivityNotificationFeedBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class NotificationFeedActivity : BaseAppCompatActivity() {
 
-    private lateinit var binding: ActivityNotificationFeedBinding
+    private lateinit var binding: LmFeedActivityNotificationFeedBinding
 
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
@@ -33,7 +33,7 @@ class NotificationFeedActivity : BaseAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityNotificationFeedBinding.inflate(layoutInflater)
+        binding = LmFeedActivityNotificationFeedBinding.inflate(layoutInflater)
         binding.toolbarColor = LMBranding.getToolbarColor()
         setContentView(binding.root)
 

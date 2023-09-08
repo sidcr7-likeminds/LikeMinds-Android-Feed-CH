@@ -4,7 +4,7 @@ import android.graphics.Color
 import android.view.View
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.SDKApplication
-import com.likeminds.feedsx.databinding.DialogReasonChooseBinding
+import com.likeminds.feedsx.databinding.LmFeedDialogReasonChooseBinding
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter
 import com.likeminds.feedsx.delete.view.adapter.ReasonChooseAdapter.ReasonChooseAdapterListener
@@ -14,7 +14,7 @@ import com.likeminds.feedsx.utils.customview.BaseBottomSheetFragment
 
 // bottom sheet dialog to show the reasons list
 class ReasonChooseDialog :
-    BaseBottomSheetFragment<DialogReasonChooseBinding, ReasonChooseViewModel>(),
+    BaseBottomSheetFragment<LmFeedDialogReasonChooseBinding, ReasonChooseViewModel>(),
     ReasonChooseAdapterListener {
 
     companion object {
@@ -38,8 +38,8 @@ class ReasonChooseDialog :
         SDKApplication.getInstance().reasonChooseComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): DialogReasonChooseBinding {
-        return DialogReasonChooseBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedDialogReasonChooseBinding {
+        return LmFeedDialogReasonChooseBinding.inflate(layoutInflater)
     }
 
     override fun setUpViews() {

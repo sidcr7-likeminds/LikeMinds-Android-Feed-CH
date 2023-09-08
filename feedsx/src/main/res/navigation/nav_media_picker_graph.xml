@@ -9,7 +9,7 @@
         android:id="@+id/media_picker_folder_fragment"
         android:name="com.likeminds.feedsx.media.view.MediaPickerFolderFragment"
         android:label="MediaPickerFolderFragment"
-        tools:layout="@layout/fragment_media_picker_folder">
+        tools:layout="@layout/lm_feed_fragment_media_picker_folder">
         <action
             android:id="@+id/action_folder_to_items"
             app:destination="@id/media_picker_item_fragment" />
@@ -21,7 +21,7 @@
         android:id="@+id/media_picker_item_fragment"
         android:name="com.likeminds.feedsx.media.view.MediaPickerItemFragment"
         android:label="MediaPickerItemFragment"
-        tools:layout="@layout/fragment_media_picker_item">
+        tools:layout="@layout/lm_feed_fragment_media_picker_item">
         <argument
             android:name="mediaPickerItemExtras"
             app:argType="com.likeminds.feedsx.media.model.MediaPickerItemExtras" />
@@ -30,7 +30,7 @@
         android:id="@+id/media_picker_document_fragment"
         android:name="com.likeminds.feedsx.media.view.MediaPickerDocumentFragment"
         android:label="MediaPickerDocumentFragment"
-        tools:layout="@layout/fragment_media_picker_document">
+        tools:layout="@layout/lm_feed_fragment_media_picker_document">
         <argument
             android:name="mediaPickerExtras"
             app:argType="com.likeminds.feedsx.media.model.MediaPickerExtras" />

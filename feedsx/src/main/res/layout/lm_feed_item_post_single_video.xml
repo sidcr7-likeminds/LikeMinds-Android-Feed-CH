@@ -17,7 +17,7 @@
 
         <include
             android:id="@+id/author_frame"
-            layout="@layout/layout_author_frame"
+            layout="@layout/lm_feed_layout_author_frame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
@@ -70,7 +70,7 @@
 
         <include
             android:id="@+id/post_actions_layout"
-            layout="@layout/layout_post_actions"
+            layout="@layout/lm_feed_layout_post_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"

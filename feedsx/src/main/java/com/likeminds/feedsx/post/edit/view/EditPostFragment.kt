@@ -21,8 +21,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentEditPostBinding
-import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentEditPostBinding
+import com.likeminds.feedsx.databinding.LmFeedItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
@@ -56,7 +56,7 @@ import java.util.*
 import javax.inject.Inject
 
 class EditPostFragment :
-    BaseFragment<FragmentEditPostBinding, EditPostViewModel>(),
+    BaseFragment<LmFeedFragmentEditPostBinding, EditPostViewModel>(),
     PostAdapterListener {
 
     @Inject
@@ -96,8 +96,8 @@ class EditPostFragment :
         SDKApplication.getInstance().editPostComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentEditPostBinding {
-        return FragmentEditPostBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentEditPostBinding {
+        return LmFeedFragmentEditPostBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {
@@ -596,7 +596,7 @@ class EditPostFragment :
                     // processes the current video whenever view pager's page is changed
                     val itemMultipleMediaVideoBinding =
                         ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
-                            ?.binding as? ItemMultipleMediaVideoBinding
+                            ?.binding as? LmFeedItemMultipleMediaVideoBinding
 
                     if (itemMultipleMediaVideoBinding == null) {
                         // in case the item is not a video

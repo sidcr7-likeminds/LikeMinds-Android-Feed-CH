@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentNotificationFeedBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
@@ -18,7 +18,7 @@ import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
 
 class NotificationFeedFragment :
-    BaseFragment<FragmentNotificationFeedBinding, NotificationFeedViewModel>(),
+    BaseFragment<LmFeedFragmentNotificationFeedBinding, NotificationFeedViewModel>(),
     NotificationFeedAdapterListener {
 
     private lateinit var mNotificationFeedAdapter: NotificationFeedAdapter
@@ -29,8 +29,8 @@ class NotificationFeedFragment :
         return NotificationFeedViewModel::class.java
     }
 
-    override fun getViewBinding(): FragmentNotificationFeedBinding {
-        return FragmentNotificationFeedBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentNotificationFeedBinding {
+        return LmFeedFragmentNotificationFeedBinding.inflate(layoutInflater)
     }
 
     override fun attachDagger() {

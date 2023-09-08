@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentMediaPickerItemBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentMediaPickerItemBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
@@ -25,7 +25,7 @@ import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_HEADER
 
 class MediaPickerItemFragment :
-    BaseFragment<FragmentMediaPickerItemBinding, MediaViewModel>(),
+    BaseFragment<LmFeedFragmentMediaPickerItemBinding, MediaViewModel>(),
     MediaPickerAdapterListener,
     ActionModeListener<Nothing> {
 
@@ -59,8 +59,8 @@ class MediaPickerItemFragment :
         SDKApplication.getInstance().mediaComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentMediaPickerItemBinding {
-        return FragmentMediaPickerItemBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentMediaPickerItemBinding {
+        return LmFeedFragmentMediaPickerItemBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {

@@ -3,24 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="buttonColor"
-            type="int" />
-    </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:paddingHorizontal="16dp">
 
         <include
             android:id="@+id/author_frame"
-            layout="@layout/layout_author_frame"
+            layout="@layout/lm_feed_layout_author_frame"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -29,7 +22,6 @@
             android:id="@+id/tv_post_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="8dp"
             android:lineSpacingExtra="1sp"
             android:textColor="@color/grey"
@@ -41,42 +33,46 @@
             tools:fontFamily="@font/roboto_regular"
             tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
 
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/viewpager_multiple_media"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_documents"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            app:layout_constraintDimensionRatio="1:1"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:descendantFocusability="blocksDescendants"
+            android:orientation="vertical"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_post_content" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_post_content"
+            tools:itemCount="3"
+            tools:listitem="@layout/lm_feed_item_document"
+            tools:visibility="visible" />
 
-        <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
-            android:id="@+id/dots_indicator"
+        <com.likeminds.feedsx.branding.customview.LikeMindsTextView
+            android:id="@+id/tv_show_more"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:dotsColor="@color/cloudy_blue"
-            app:dotsCornerRadius="6dp"
-            app:dotsSize="6dp"
-            app:dotsSpacing="4dp"
-            app:dotsWidthFactor="1"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/viewpager_multiple_media"
-            app:selectedDotColor="@{buttonColor}" />
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/roboto_regular"
+            android:textColor="@color/majorelle_blue"
+            android:textSize="16sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:fontType="regular"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/rv_documents"
+            tools:text="+1 more"
+            tools:visibility="visible" />
 
         <include
             android:id="@+id/post_actions_layout"
-            layout="@layout/layout_post_actions"
+            layout="@layout/lm_feed_layout_post_actions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/dots_indicator" />
+            app:layout_constraintTop_toBottomOf="@id/tv_show_more" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

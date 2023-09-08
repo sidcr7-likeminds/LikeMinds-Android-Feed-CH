@@ -89,7 +89,7 @@
             app:layout_constraintTop_toBottomOf="@+id/toolbar"
             app:spanCount="2"
             tools:itemCount="10"
-            tools:listitem="@layout/item_media_picker_folder" />
+            tools:listitem="@layout/lm_feed_item_media_picker_folder" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

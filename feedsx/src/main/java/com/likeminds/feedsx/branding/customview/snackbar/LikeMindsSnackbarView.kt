@@ -20,7 +20,7 @@ class LikeMindsSnackbarView @JvmOverloads constructor(
     var textView: TextView
 
     init {
-        View.inflate(context, R.layout.likeminds_snackbar_view, this)
+        View.inflate(context, R.layout.lm_feed_snackbar_view, this)
         clipToPadding = false
         this.textView = findViewById(R.id.message)
     }

@@ -8,12 +8,12 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.ActivityCreatePostBinding
+import com.likeminds.feedsx.databinding.LmFeedActivityCreatePostBinding
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class CreatePostActivity : BaseAppCompatActivity() {
 
-    lateinit var binding: ActivityCreatePostBinding
+    lateinit var binding: LmFeedActivityCreatePostBinding
 
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
@@ -40,7 +40,7 @@ class CreatePostActivity : BaseAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityCreatePostBinding.inflate(layoutInflater)
+        binding = LmFeedActivityCreatePostBinding.inflate(layoutInflater)
         binding.toolbarColor = LMBranding.getToolbarColor()
         setContentView(binding.root)
 

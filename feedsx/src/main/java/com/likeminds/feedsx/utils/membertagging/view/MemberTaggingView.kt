@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.LayoutMemberTaggingBinding
+import com.likeminds.feedsx.databinding.LmFeedLayoutMemberTaggingBinding
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
@@ -26,7 +26,7 @@ class MemberTaggingView(
     attrs: AttributeSet? = null
 ) : ConstraintLayout(context, attrs), TextWatcherListener, MemberAdapterClickListener {
 
-    private var binding = LayoutMemberTaggingBinding.inflate(
+    private var binding = LmFeedLayoutMemberTaggingBinding.inflate(
         LayoutInflater.from(context),
         this,
         true

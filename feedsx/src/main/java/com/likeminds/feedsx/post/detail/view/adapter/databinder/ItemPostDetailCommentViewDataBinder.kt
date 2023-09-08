@@ -1,14 +1,11 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemPostDetailCommentBinding
+import com.likeminds.feedsx.databinding.LmFeedItemPostDetailCommentBinding
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.ViewMoreReplyViewData
 import com.likeminds.feedsx.post.detail.util.PostDetailUtil
@@ -28,14 +25,14 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
 class ItemPostDetailCommentViewDataBinder constructor(
     private val postDetailAdapterListener: PostDetailAdapterListener,
     private val postDetailReplyAdapterListener: PostDetailReplyAdapter.PostDetailReplyAdapterListener
-) : ViewDataBinder<ItemPostDetailCommentBinding, CommentViewData>() {
+) : ViewDataBinder<LmFeedItemPostDetailCommentBinding, CommentViewData>() {
 
     private lateinit var mRepliesAdapter: PostDetailReplyAdapter
     override val viewType: Int
         get() = ITEM_POST_DETAIL_COMMENT
 
-    override fun createBinder(parent: ViewGroup): ItemPostDetailCommentBinding {
-        return ItemPostDetailCommentBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostDetailCommentBinding {
+        return LmFeedItemPostDetailCommentBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -43,7 +40,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemPostDetailCommentBinding,
+        binding: LmFeedItemPostDetailCommentBinding,
         data: CommentViewData,
         position: Int
     ) {
@@ -56,7 +53,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
     // sets the data to comments item and handles the replies click and rv
     private fun initCommentsView(
-        binding: ItemPostDetailCommentBinding,
+        binding: LmFeedItemPostDetailCommentBinding,
         data: CommentViewData,
         position: Int
     ) {

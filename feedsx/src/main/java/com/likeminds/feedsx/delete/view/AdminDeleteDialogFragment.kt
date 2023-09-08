@@ -8,14 +8,14 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.DialogFragmentAdminDeleteBinding
+import com.likeminds.feedsx.databinding.LmFeedDialogFragmentAdminDeleteBinding
 import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 
 //when cm deletes others user post
-class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBinding>(),
+class AdminDeleteDialogFragment : BaseDialogFragment<LmFeedDialogFragmentAdminDeleteBinding>(),
     ReasonChooseDialog.ReasonChooseDialogListener {
 
     companion object {
@@ -38,8 +38,8 @@ class AdminDeleteDialogFragment : BaseDialogFragment<DialogFragmentAdminDeleteBi
 
     private lateinit var deleteExtras: DeleteExtras
 
-    override fun getViewBinding(): DialogFragmentAdminDeleteBinding {
-        return DialogFragmentAdminDeleteBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedDialogFragmentAdminDeleteBinding {
+        return LmFeedDialogFragmentAdminDeleteBinding.inflate(layoutInflater)
     }
 
     override fun onAttach(context: Context) {

@@ -10,7 +10,7 @@ import com.bumptech.glide.RequestManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemMediaPickerSingleBinding
+import com.likeminds.feedsx.databinding.LmFeedItemMediaPickerSingleBinding
 import com.likeminds.feedsx.media.model.MediaType
 import com.likeminds.feedsx.media.model.MediaViewData
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
@@ -19,7 +19,7 @@ import com.likeminds.feedsx.utils.model.ITEM_MEDIA_PICKER_SINGLE
 
 class MediaPickerSingleItemViewDataBinder constructor(
     private val listener: MediaPickerAdapterListener
-) : ViewDataBinder<ItemMediaPickerSingleBinding, MediaViewData>() {
+) : ViewDataBinder<LmFeedItemMediaPickerSingleBinding, MediaViewData>() {
 
     private var glideRequestManager: RequestManager? = null
     private var placeHolderDrawable: ColorDrawable? = null
@@ -27,8 +27,8 @@ class MediaPickerSingleItemViewDataBinder constructor(
     override val viewType: Int
         get() = ITEM_MEDIA_PICKER_SINGLE
 
-    override fun createBinder(parent: ViewGroup): ItemMediaPickerSingleBinding {
-        val binding = ItemMediaPickerSingleBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemMediaPickerSingleBinding {
+        val binding = LmFeedItemMediaPickerSingleBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )
         binding.root.setOnClickListener {
@@ -57,7 +57,7 @@ class MediaPickerSingleItemViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemMediaPickerSingleBinding, data: MediaViewData, position: Int
+        binding: LmFeedItemMediaPickerSingleBinding, data: MediaViewData, position: Int
     ) {
         binding.position = position
         binding.mediaViewData = data

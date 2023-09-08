@@ -21,7 +21,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:itemCount="4"
-            tools:listitem="@layout/item_likes_screen"
+            tools:listitem="@layout/lm_feed_item_likes_screen"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

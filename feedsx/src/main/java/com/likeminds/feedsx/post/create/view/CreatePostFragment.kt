@@ -21,8 +21,8 @@ import androidx.recyclerview.widget.*
 import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentCreatePostBinding
-import com.likeminds.feedsx.databinding.ItemCreatePostSingleVideoBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentCreatePostBinding
+import com.likeminds.feedsx.databinding.LmFeedItemCreatePostSingleVideoBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
@@ -59,7 +59,7 @@ import java.util.*
 import javax.inject.Inject
 
 class CreatePostFragment :
-    BaseFragment<FragmentCreatePostBinding, CreatePostViewModel>(),
+    BaseFragment<LmFeedFragmentCreatePostBinding, CreatePostViewModel>(),
     CreatePostListener {
 
     @Inject
@@ -93,8 +93,8 @@ class CreatePostFragment :
         SDKApplication.getInstance().createPostComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentCreatePostBinding {
-        return FragmentCreatePostBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentCreatePostBinding {
+        return LmFeedFragmentCreatePostBinding.inflate(layoutInflater)
     }
 
     companion object {
@@ -607,7 +607,7 @@ class CreatePostFragment :
                     // processes the current video whenever view pager's page is changed
                     val createPostSingleVideoBinding =
                         ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
-                            ?.binding as? ItemCreatePostSingleVideoBinding
+                            ?.binding as? LmFeedItemCreatePostSingleVideoBinding
 
                     if (createPostSingleVideoBinding == null) {
                         // in case the item is not a video

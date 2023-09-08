@@ -6,12 +6,10 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemNotificationFeedBinding
+import com.likeminds.feedsx.databinding.LmFeedItemNotificationFeedBinding
 import com.likeminds.feedsx.notificationfeed.model.ActivityViewData
 import com.likeminds.feedsx.notificationfeed.view.adapter.NotificationFeedAdapter.NotificationFeedAdapterListener
-import com.likeminds.feedsx.posttypes.model.DOCUMENT
-import com.likeminds.feedsx.posttypes.model.IMAGE
-import com.likeminds.feedsx.posttypes.model.VIDEO
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.MemberImageUtil
 import com.likeminds.feedsx.utils.TimeUtil
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
@@ -23,7 +21,7 @@ import com.likeminds.feedsx.utils.model.ITEM_NOTIFICATION_FEED
 
 class ItemNotificationFeedViewDataBinder constructor(
     val listener: NotificationFeedAdapterListener
-) : ViewDataBinder<ItemNotificationFeedBinding, ActivityViewData>() {
+) : ViewDataBinder<LmFeedItemNotificationFeedBinding, ActivityViewData>() {
 
     companion object {
         private const val MAX_LINES = 3
@@ -32,9 +30,9 @@ class ItemNotificationFeedViewDataBinder constructor(
     override val viewType: Int
         get() = ITEM_NOTIFICATION_FEED
 
-    override fun createBinder(parent: ViewGroup): ItemNotificationFeedBinding {
+    override fun createBinder(parent: ViewGroup): LmFeedItemNotificationFeedBinding {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemNotificationFeedBinding.inflate(
+        val binding = LmFeedItemNotificationFeedBinding.inflate(
             inflater,
             parent,
             false
@@ -47,7 +45,7 @@ class ItemNotificationFeedViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemNotificationFeedBinding,
+        binding: LmFeedItemNotificationFeedBinding,
         data: ActivityViewData,
         position: Int
     ) {
@@ -64,7 +62,7 @@ class ItemNotificationFeedViewDataBinder constructor(
 
     // initializes notification item
     private fun initNotificationView(
-        binding: ItemNotificationFeedBinding,
+        binding: LmFeedItemNotificationFeedBinding,
         data: ActivityViewData
     ) {
         initNotificationTextContent(
@@ -135,7 +133,7 @@ class ItemNotificationFeedViewDataBinder constructor(
     }
 
     private fun updatePostTypeBadge(
-        binding: ItemNotificationFeedBinding,
+        binding: LmFeedItemNotificationFeedBinding,
         data: ActivityViewData
     ) {
         binding.apply {

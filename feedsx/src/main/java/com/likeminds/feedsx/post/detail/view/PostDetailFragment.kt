@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.FragmentPostDetailBinding
+import com.likeminds.feedsx.databinding.LmFeedFragmentPostDetailBinding
 import com.likeminds.feedsx.delete.model.*
 import com.likeminds.feedsx.delete.view.AdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.SelfDeleteDialogFragment
@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 class PostDetailFragment :
-    BaseFragment<FragmentPostDetailBinding, PostDetailViewModel>(),
+    BaseFragment<LmFeedFragmentPostDetailBinding, PostDetailViewModel>(),
     PostAdapterListener,
     PostDetailAdapterListener,
     PostDetailReplyAdapterListener,
@@ -101,8 +101,8 @@ class PostDetailFragment :
         SDKApplication.getInstance().postDetailComponent()?.inject(this)
     }
 
-    override fun getViewBinding(): FragmentPostDetailBinding {
-        return FragmentPostDetailBinding.inflate(layoutInflater)
+    override fun getViewBinding(): LmFeedFragmentPostDetailBinding {
+        return LmFeedFragmentPostDetailBinding.inflate(layoutInflater)
     }
 
     override fun receiveExtras() {

@@ -22,7 +22,7 @@
 
             <include
                 android:id="@+id/layout_access_removed"
-                layout="@layout/layout_access_removed_from_community"
+                layout="@layout/lm_feed_layout_access_removed_from_community"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:visibility="visible"
@@ -59,7 +59,7 @@
                         android:overScrollMode="never"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:itemCount="1"
-                        tools:listitem="@layout/item_post_single_image" />
+                        tools:listitem="@layout/lm_feed_item_post_single_image" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -167,7 +167,7 @@
 
             <include
                 android:id="@+id/progress_bar"
-                layout="@layout/progress_bar"
+                layout="@layout/lm_feed_progress_bar"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
