@@ -5,19 +5,15 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
@@ -38,7 +34,6 @@ import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
-import com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
@@ -47,7 +42,6 @@ import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
@@ -57,7 +51,6 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
@@ -149,7 +142,6 @@ class LMFeedFragment :
         checkNotificationPermission()
         initUI()
         initiateSDK()
-        initToolbar()
     }
 
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -171,8 +163,8 @@ class LMFeedFragment :
         observePosting()
 
         // observes userResponse LiveData
-        initiateViewModel.userResponse.observe(viewLifecycleOwner) { response ->
-            observeUserResponse(response)
+        initiateViewModel.userResponse.observe(viewLifecycleOwner) {
+            observeUserResponse()
         }
 
         // observes hasCreatePostRights LiveData
@@ -238,9 +230,7 @@ class LMFeedFragment :
     }
 
     // observes user response from InitiateUser
-    private fun observeUserResponse(user: UserViewData?) {
-        initToolbar()
-        setUserImage(user)
+    private fun observeUserResponse() {
         viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
     }
@@ -248,36 +238,7 @@ class LMFeedFragment :
     // observe unread notification count
     private fun observeUnreadNotificationCount(count: Int) {
         binding.apply {
-            ivNotification.show()
-            when (count) {
-                0 -> {
-                    tvNotificationCount.isVisible = false
-                }
-
-                in 1..99 -> {
-                    configureNotificationBadge(count.toString())
-                }
-
-                else -> {
-                    configureNotificationBadge(getString(R.string.nine_nine_plus))
-                }
-            }
-        }
-    }
-
-    /**
-     * Configure the notification badge based on the text length and visibility
-     * @param text Text to show on the counter, eg - 99+, 8, etc
-     */
-    private fun configureNotificationBadge(text: String) {
-        binding.tvNotificationCount.apply {
-            if (text.length > 2) {
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 7f)
-            } else {
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
-            }
-            this.text = text
-            visibility = View.VISIBLE
+            // todo:
         }
     }
 
@@ -317,25 +278,7 @@ class LMFeedFragment :
                 is FeedViewModel.PostDataEvent.PostDbData -> {
                     alreadyPosting = true
                     val post = response.post
-                    binding.layoutPosting.apply {
-                        root.show()
-                        if (post.thumbnail.isNullOrEmpty()) {
-                            ivPostThumbnail.hide()
-                        } else {
-                            val shimmer = ViewUtils.getShimmer()
-                            ivPostThumbnail.show()
-                            ImageBindingUtil.loadImage(
-                                ivPostThumbnail,
-                                Uri.parse(post.thumbnail),
-                                shimmer
-                            )
-                        }
-                        postingProgress.progress = 0
-                        postingProgress.show()
-                        ivPosted.hide()
-                        tvRetry.hide()
-                        observeMediaUpload(post)
-                    }
+                    observeMediaUpload(post)
                 }
                 // when the post data comes from api response
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
@@ -389,11 +332,6 @@ class LMFeedFragment :
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
                 // uploading completed, call the add post api
-                binding.layoutPosting.apply {
-                    postingProgress.hide()
-                    tvRetry.hide()
-                    ivPosted.show()
-                }
                 viewModel.addPost(postingData)
             }
 
@@ -402,37 +340,9 @@ class LMFeedFragment :
                 val indexList = workInfo.outputData.getIntArray(
                     MediaUploadWorker.ARG_MEDIA_INDEX_LIST
                 ) ?: return
-                initRetryAction(
-                    postingData.temporaryId,
-                    indexList.size
-                )
             }
 
-            else -> {
-                // uploading in progress, map the progress to progress bar
-                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
-                binding.layoutPosting.apply {
-                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
-                    val progressValue = percentage.toInt()
-                    postingProgress.progress = progressValue
-                }
-            }
-        }
-    }
-
-    // initializes retry mechanism for attachments uploading
-    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
-        binding.layoutPosting.apply {
-            ivPosted.hide()
-            postingProgress.hide()
-            tvRetry.show()
-            tvRetry.setOnClickListener {
-                viewModel.createRetryPostMediaWorker(
-                    requireContext(),
-                    temporaryId,
-                    attachmentCount
-                )
-            }
+            else -> {}
         }
     }
 
@@ -452,7 +362,6 @@ class LMFeedFragment :
             }
 
             is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
-                binding.tvNotificationCount.hide()
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
         }
@@ -765,60 +674,20 @@ class LMFeedFragment :
         recyclerView.addOnScrollListener(mScrollListener)
     }
 
-    private fun initToolbar() {
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
-
-        binding.apply {
-            //if user is guest user hide, profile icon from toolbar
-            memberImage.isVisible = !isGuestUser
-
-            //click listener -> open profile screen
-            memberImage.setOnClickListener {
-                // open profile on click
-            }
-
-            ivNotification.setOnClickListener {
-                viewModel.sendNotificationPageOpenedEvent()
-                LMFeedNotificationFeedActivity.start(requireContext())
-            }
-
-            ivSearch.setOnClickListener {
-                // perform search in feed
-            }
-        }
-    }
-
     // shows invalid access error and logs out invalid user
     private fun showInvalidAccess() {
         binding.apply {
             ProgressHelper.hideProgress(progressBar)
             recyclerView.hide()
             layoutAccessRemoved.root.show()
-            memberImage.hide()
-            ivSearch.hide()
-            ivNotification.hide()
         }
     }
 
-    // sets user profile image
-    private fun setUserImage(user: UserViewData?) {
-        if (user != null) {
-            MemberImageUtil.setImage(
-                user.imageUrl,
-                user.name,
-                user.userUniqueId,
-                binding.memberImage,
-                showRoundImage = true,
-                objectKey = user.updatedAt
-            )
-        }
-    }
-
+    // todo: hide shimmer
     // removes the posting view and shows create post button
     private fun removePostingView() {
         binding.apply {
             alreadyPosting = false
-            layoutPosting.root.hide()
         }
     }
 

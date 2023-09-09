@@ -54,6 +54,7 @@
     <string name="scalix">Scalix</string>
     <string name="likeMinds">LikeMinds</string>
     <string name="new_post">New Post</string>
+    <string name="new_resource">New Resource</string>
     <plurals name="placeholder_pages">
         <item quantity="one">1 Page</item>
         <item quantity="other">%d Pages</item>

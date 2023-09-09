@@ -37,6 +37,40 @@ object LikeMindsFeedUI {
      * Call this function to initiate feed in the client's app
      * this function will show home screen of the sdk
      *
+     * @param apiKey : API key of the community
+     * @param userName : Name of the user
+     * @param userId : user id of the user
+     * @param isGuest | nullable: is user a guest user of not
+     **/
+    fun initFeed(
+        apiKey: String,
+        userName: String,
+        userId: String,
+        isGuest: Boolean
+    ): LMFeedFragment {
+        Log.d(SDKApplication.LOG_TAG, "initiate feed called")
+        Log.d(
+            SDKApplication.LOG_TAG, """
+            user_name: $userName
+            user id: $userId
+            isGuest: $isGuest
+        """.trimIndent()
+        )
+
+        val extras = LMFeedExtras.Builder()
+            .apiKey(apiKey)
+            .userId(userId)
+            .userName(userName)
+            .isGuest(isGuest)
+            .build()
+
+        return LMFeedFragment.getInstance(extras)
+    }
+
+    /**
+     * Call this function to initiate feed in the client's app
+     * this function will show home screen of the sdk
+     *
      * @param activity: instance of the activity
      * @param containerViewId: Id of the container (FrameLayout or FragmentContainerView) to show the home feed
      * @param apiKey : API key of the community
