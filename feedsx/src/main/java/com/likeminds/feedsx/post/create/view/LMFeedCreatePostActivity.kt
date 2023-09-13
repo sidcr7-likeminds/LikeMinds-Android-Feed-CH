@@ -9,6 +9,8 @@ import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedActivityCreatePostBinding
+import com.likeminds.feedsx.post.create.model.CreatePostExtras
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class LMFeedCreatePostActivity : BaseAppCompatActivity() {
@@ -20,20 +22,24 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
     private lateinit var navController: NavController
 
     companion object {
-
-        const val POST_ATTACHMENTS_LIMIT = 10
+        const val CREATE_POST_EXTRAS = "CREATE_POST_EXTRAS"
         const val RESULT_UPLOAD_POST = Activity.RESULT_FIRST_USER + 1
-        const val SOURCE_EXTRA = "SOURCE_EXTRA"
 
         @JvmStatic
-        fun start(context: Context) {
-            context.startActivity(Intent(context, LMFeedCreatePostActivity::class.java))
+        fun start(context: Context, extras: CreatePostExtras) {
+            val intent = Intent(context, LMFeedCreatePostActivity::class.java)
+            val bundle = Bundle()
+            bundle.putParcelable(CREATE_POST_EXTRAS, extras)
+            intent.putExtra("bundle", bundle)
+            context.startActivity(intent)
         }
 
         @JvmStatic
-        fun getIntent(context: Context, source: String?): Intent {
+        fun getIntent(context: Context, extras: CreatePostExtras): Intent {
             val intent = Intent(context, LMFeedCreatePostActivity::class.java)
-            intent.putExtra(SOURCE_EXTRA, source)
+            val bundle = Bundle()
+            bundle.putParcelable(CREATE_POST_EXTRAS, extras)
+            intent.putExtra("bundle", bundle)
             return intent
         }
     }
@@ -44,10 +50,16 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
         setContentView(binding.root)
 
-        val source = intent.getStringExtra(SOURCE_EXTRA)
+        val createPostExtras = ExtrasUtil.getParcelable(
+            intent.getBundleExtra("bundle"),
+            CREATE_POST_EXTRAS,
+            CreatePostExtras::class.java
+        )
+
         val args = Bundle().apply {
-            putString(SOURCE_EXTRA, source)
+            putParcelable(CREATE_POST_EXTRAS, createPostExtras)
         }
+
         //Navigation
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment

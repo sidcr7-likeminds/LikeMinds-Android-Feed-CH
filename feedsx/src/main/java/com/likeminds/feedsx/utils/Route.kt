@@ -43,7 +43,7 @@ object Route {
                 // navigation to feed
             }
             ROUTE_CREATE_POST -> {
-                intent = getRouteToCreatePost(context, source)
+//                intent = getRouteToCreatePost(context, source)
             }
             ROUTE_BROWSER -> {
                 intent = getRouteToBrowser(route)
@@ -132,11 +132,12 @@ object Route {
         return null
     }
 
+    // todo:
     // route://create_post
-    private fun getRouteToCreatePost(
-        context: Context,
-        source: String?
-    ): Intent {
-        return LMFeedCreatePostActivity.getIntent(context, source)
-    }
+//    private fun getRouteToCreatePost(
+//        context: Context,
+//        source: String?
+//    ): Intent {
+//        return LMFeedCreatePostActivity.getIntent(context, source)
+//    }
 }

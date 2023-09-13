@@ -39,8 +39,11 @@
     <string name="post">Post</string>
     <string name="write_something_here">Write something here…</string>
     <string name="attach_files">Attach Files</string>
+    <string name="add_article">Add Article</string>
     <string name="add_video">Add Video</string>
     <string name="add_photo">Add Photo</string>
+    <string name="add_pdf">Add PDF</string>
+    <string name="add_link">Add Link</string>
     <string name="playing_this_video">Playing this video…</string>
     <string name="add_more">Add More</string>
     <string name="documents">Documents</string>
@@ -141,4 +144,9 @@
     <string name="empty_api_key">Empty API Key</string>
     <string name="pre_gallery_media_permission_dialog_message">To easily receive and send photos, videos, allow us access to your device’s photos, and videos.</string>
     <string name="denied_gallery_media_permission_dialog_message">To send media, allow us access to your device’s photos, and videos. Tap on Settings > Permission, and turn Photos and videos on.</string>
+    <string name="enter_link_url">Enter Link/URL</string>
+    <string name="enter_link_url_you_want_post">Enter the link/URL you want to post.</string>
+    <string name="example_link">https://www.example.com</string>
+    <string name="please_enter_a_valid_link">Please enter a valid link</string>
+    <string name="link_continue">Continue</string>
 </resources>

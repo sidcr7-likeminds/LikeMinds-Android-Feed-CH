@@ -2,9 +2,11 @@ package com.likeminds.feedsx.feed.view
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -33,15 +35,20 @@ import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
+import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
+import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
 import com.likeminds.feedsx.overflowmenu.model.*
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
+import com.likeminds.feedsx.post.create.model.CreatePostExtras
+import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
-import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
@@ -51,6 +58,7 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
+import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
@@ -62,7 +70,9 @@ class LMFeedFragment :
     PostAdapterListener,
     LMFeedAdminDeleteDialogFragment.DeleteDialogListener,
     LMFeedSelfDeleteDialogFragment.DeleteAlertDialogListener,
-    PostObserver {
+    PostObserver,
+    LMFeedCreateResourceDialog.CreateResourceDialogListener,
+    LMFeedLinkResourceDialogFragment.LinkResourceDialogListener {
 
     companion object {
         const val TAG = "LMFeedFragment"
@@ -278,7 +288,25 @@ class LMFeedFragment :
                 is FeedViewModel.PostDataEvent.PostDbData -> {
                     alreadyPosting = true
                     val post = response.post
-                    observeMediaUpload(post)
+                    binding.layoutPosting.apply {
+                        root.show()
+                        if (post.thumbnail.isNullOrEmpty()) {
+                            ivPostThumbnail.hide()
+                        } else {
+                            val shimmer = ViewUtils.getShimmer()
+                            ivPostThumbnail.show()
+                            ImageBindingUtil.loadImage(
+                                ivPostThumbnail,
+                                Uri.parse(post.thumbnail),
+                                shimmer
+                            )
+                        }
+                        postingProgress.progress = 0
+                        postingProgress.show()
+                        ivPosted.hide()
+                        tvRetry.hide()
+                        observeMediaUpload(post)
+                    }
                 }
                 // when the post data comes from api response
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
@@ -332,6 +360,11 @@ class LMFeedFragment :
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
                 // uploading completed, call the add post api
+                binding.layoutPosting.apply {
+                    postingProgress.hide()
+                    tvRetry.hide()
+                    ivPosted.show()
+                }
                 viewModel.addPost(postingData)
             }
 
@@ -340,9 +373,37 @@ class LMFeedFragment :
                 val indexList = workInfo.outputData.getIntArray(
                     MediaUploadWorker.ARG_MEDIA_INDEX_LIST
                 ) ?: return
+                initRetryAction(
+                    postingData.temporaryId,
+                    indexList.size
+                )
             }
 
-            else -> {}
+            else -> {
+                // uploading in progress, map the progress to progress bar
+                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
+                binding.layoutPosting.apply {
+                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
+                    val progressValue = percentage.toInt()
+                    postingProgress.progress = progressValue
+                }
+            }
+        }
+    }
+
+    // initializes retry mechanism for attachments uploading
+    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
+        binding.layoutPosting.apply {
+            ivPosted.hide()
+            postingProgress.hide()
+            tvRetry.show()
+            tvRetry.setOnClickListener {
+                viewModel.createRetryPostMediaWorker(
+                    requireContext(),
+                    temporaryId,
+                    attachmentCount
+                )
+            }
         }
     }
 
@@ -489,7 +550,7 @@ class LMFeedFragment :
      * UI Block
      **/
 
-// initializes various UI components
+    // initializes various UI components
     private fun initUI() {
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
 
@@ -546,14 +607,7 @@ class LMFeedFragment :
                         getString(R.string.a_post_is_already_uploading)
                     )
                 } else {
-                    // sends post creation started event
-                    viewModel.sendPostCreationStartedEvent()
-
-                    val intent = LMFeedCreatePostActivity.getIntent(
-                        requireContext(),
-                        LMFeedAnalytics.Source.UNIVERSAL_FEED
-                    )
-                    createPostLauncher.launch(intent)
+                    LMFeedCreateResourceDialog.show(childFragmentManager)
                 }
             } else {
                 ViewUtils.showShortSnack(
@@ -579,6 +633,135 @@ class LMFeedFragment :
                 }
             }
         }
+
+    // launcher to handle gallery (IMAGE/VIDEO) intent
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = ExtrasUtil.getParcelable(
+                    result.data?.extras,
+                    LMFeedMediaPickerActivity.ARG_MEDIA_PICKER_RESULT,
+                    MediaPickerResult::class.java
+                )
+                checkMediaPickedResult(data)
+            }
+        }
+
+    private val mediaBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onMediaPickedFromGallery(result.data)
+            }
+        }
+
+    private val documentBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onPdfPicked(result.data)
+            }
+        }
+
+    // process the result obtained from media picker
+    private fun checkMediaPickedResult(result: MediaPickerResult?) {
+        if (result != null) {
+            when (result.mediaPickerResultType) {
+                MEDIA_RESULT_BROWSE -> {
+                    if (MediaType.isPDF(result.mediaTypes)) {
+                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
+                            allowMultipleSelect = result.allowMultipleSelect
+                        )
+                        documentBrowseLauncher.launch(intent)
+                    } else {
+                        val intent = AndroidUtils.getExternalPickerIntent(
+                            result.mediaTypes,
+                            result.allowMultipleSelect,
+                            result.browseClassName
+                        )
+                        if (intent != null)
+                            mediaBrowseLauncher.launch(intent)
+                    }
+                }
+
+                MEDIA_RESULT_PICKED -> {
+                    onMediaPicked(result)
+                }
+            }
+        }
+    }
+
+    // converts the picked media to SingleUriData and adds to the selected media
+    private fun onMediaPicked(result: MediaPickerResult) {
+        val data =
+            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        // sends media attached event with media type and count
+        viewModel.sendMediaAttachedEvent(data)
+        if (data.isNotEmpty()) {
+            val attachmentType = getAttachmentType(data.first().fileType)
+            val createPostExtras = CreatePostExtras.Builder()
+                .attachmentType(attachmentType)
+                .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                .build()
+            startCreatePostActivity(createPostExtras)
+        }
+    }
+
+    private fun onMediaPickedFromGallery(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            // sends media attached event with media type and count
+            viewModel.sendMediaAttachedEvent(mediaUris)
+            if (mediaUris.isNotEmpty()) {
+                val attachmentType = getAttachmentType(mediaUris.first().fileType)
+                val createPostExtras = CreatePostExtras.Builder()
+                    .attachmentType(attachmentType)
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .build()
+                startCreatePostActivity(createPostExtras)
+            }
+        }
+    }
+
+    private fun onPdfPicked(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            // sends media attached event with media type and count
+            viewModel.sendMediaAttachedEvent(mediaUris)
+            if (mediaUris.isNotEmpty()) {
+                val attachmentType = getAttachmentType(mediaUris.first().fileType)
+                val createPostExtras = CreatePostExtras.Builder()
+                    .attachmentType(attachmentType)
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .build()
+                startCreatePostActivity(createPostExtras)
+            }
+        }
+    }
+
+    private fun getAttachmentType(fileType: String): Int {
+        return when (fileType) {
+            com.likeminds.feedsx.media.model.IMAGE -> {
+                ARTICLE
+            }
+
+            com.likeminds.feedsx.media.model.VIDEO -> {
+                VIDEO
+            }
+
+            PDF -> {
+                DOCUMENT
+            }
+
+            else -> {
+                ARTICLE
+            }
+        }
+    }
 
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
@@ -688,6 +871,7 @@ class LMFeedFragment :
     private fun removePostingView() {
         binding.apply {
             alreadyPosting = false
+            layoutPosting.root.hide()
         }
     }
 
@@ -1039,11 +1223,69 @@ class LMFeedFragment :
         }
     }
 
+    override fun onResourceSelected(attachmentType: Int) {
+        startPostCreation(attachmentType)
+    }
+
+    override fun linkOgTags(linkOGTags: LinkOGTagsViewData) {
+        val createPostExtras = CreatePostExtras.Builder()
+            .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+            .attachmentType(LINK)
+            .linkOGTagsViewData(linkOGTags)
+            .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+            .build()
+
+        startCreatePostActivity(createPostExtras)
+    }
+
+    // starts post creation process as per the type if attachment selected
+    private fun startPostCreation(attachmentType: Int) {
+        // sends post creation started event
+        viewModel.sendPostCreationStartedEvent()
+
+        when (attachmentType) {
+            VIDEO -> {
+                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
+            }
+
+            LINK -> {
+                LMFeedLinkResourceDialogFragment.showDialog(childFragmentManager)
+            }
+
+            ARTICLE -> {
+                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.IMAGE))
+            }
+
+            DOCUMENT -> {
+                initiateMediaPicker(listOf(PDF))
+            }
+        }
+    }
+
+    // starts create post activity with the required extras
+    private fun startCreatePostActivity(createPostExtras: CreatePostExtras) {
+        val intent = LMFeedCreatePostActivity.getIntent(
+            requireContext(),
+            createPostExtras
+        )
+        createPostLauncher.launch(intent)
+    }
+
+    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
+    private fun initiateMediaPicker(list: List<String>) {
+        val extras = MediaPickerExtras.Builder()
+            .mediaTypes(list)
+            .allowMultipleSelect(true)
+            .build()
+        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
+        galleryLauncher.launch(intent)
+    }
+
     /**
      * Adapter Util Block
      **/
 
-//get index and post from the adapter using postId
+    //get index and post from the adapter using postId
     private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData>? {
         val index = mPostAdapter.items().indexOfFirst {
             (it is PostViewData) && (it.id == postId)

@@ -1,35 +1,18 @@
 package com.likeminds.feedsx.post.create.view
 
-import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Intent
 import android.graphics.Color
-import android.text.Editable
 import android.text.TextWatcher
-import android.view.MotionEvent
-import android.view.View
-import android.view.View.OnTouchListener
-import android.widget.EditText
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.CheckResult
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
-import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentCreatePostBinding
-import com.likeminds.feedsx.databinding.LmFeedItemCreatePostSingleVideoBinding
 import com.likeminds.feedsx.media.model.*
-import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
-import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
-import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
+import com.likeminds.feedsx.post.create.model.CreatePostExtras
 import com.likeminds.feedsx.post.create.util.CreatePostListener
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity.Companion.POST_ATTACHMENTS_LIMIT
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
@@ -43,7 +26,6 @@ import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.feedsx.utils.customview.DataBoundViewHolder
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.util.LinkUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
@@ -51,9 +33,6 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
@@ -71,13 +50,14 @@ class LMFeedCreatePostFragment :
     @Inject
     lateinit var userPreferences: LMFeedUserPreferences
 
+    private lateinit var createPostExtras: CreatePostExtras
+
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
     private var multiMediaAdapter: CreatePostMultipleMediaAdapter? = null
     private var documentsAdapter: CreatePostDocumentsAdapter? = null
     private lateinit var etPostTextChangeListener: TextWatcher
     private lateinit var memberTagging: LMFeedMemberTaggingView
-    private var source = ""
     private val videoPreviewAutoPlayHelper by lazy {
         VideoPreviewAutoPlayHelper.getInstance()
     }
@@ -104,19 +84,22 @@ class LMFeedCreatePostFragment :
 
     override fun receiveExtras() {
         super.receiveExtras()
-        if (arguments == null || arguments?.containsKey(LMFeedCreatePostActivity.SOURCE_EXTRA) == null) {
+        if (arguments == null || arguments?.containsKey(LMFeedCreatePostActivity.CREATE_POST_EXTRAS) == null) {
             requireActivity().supportFragmentManager.popBackStack()
             return
         }
-        source = arguments?.getString(LMFeedCreatePostActivity.SOURCE_EXTRA)
-            ?: throw emptyExtrasException(TAG)
+        createPostExtras = ExtrasUtil.getParcelable(
+            arguments,
+            LMFeedCreatePostActivity.CREATE_POST_EXTRAS,
+            CreatePostExtras::class.java
+        ) ?: throw emptyExtrasException(TAG)
         checkForSource()
     }
 
     //to check for source of the follow trigger
     private fun checkForSource() {
         //if source is notification, then call initiate first in the background
-        if (source == LMFeedAnalytics.Source.NOTIFICATION) {
+        if (createPostExtras.source == LMFeedAnalytics.Source.NOTIFICATION) {
             initiateViewModel.initiateUser(
                 requireContext(),
                 userPreferences.getApiKey(),
@@ -129,11 +112,8 @@ class LMFeedCreatePostFragment :
 
     override fun setUpViews() {
         super.setUpViews()
-
         fetchUserFromDB()
         initMemberTaggingView()
-        initAddAttachmentsView()
-        initPostContentTextListener()
         initPostDoneListener()
     }
 
@@ -241,57 +221,6 @@ class LMFeedCreatePostFragment :
         })
     }
 
-    // adds text watcher on post content edit text
-    @SuppressLint("ClickableViewAccessibility")
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-    private fun initPostContentTextListener() {
-        binding.etPostContent.apply {
-            /**
-             * As the scrollable edit text is inside a scroll view,
-             * this touch listener handles the scrolling of the edit text.
-             * When the edit text is touched and has focus then it disables scroll of scroll-view.
-             */
-            setOnTouchListener(OnTouchListener { v, event ->
-                if (hasFocus()) {
-                    v.parent.requestDisallowInterceptTouchEvent(true)
-                    when (event.action and MotionEvent.ACTION_MASK) {
-                        MotionEvent.ACTION_SCROLL -> {
-                            v.parent.requestDisallowInterceptTouchEvent(false)
-                            return@OnTouchListener true
-                        }
-                    }
-                }
-                false
-            })
-            // text watcher with debounce to add delay in api calls for ogTags
-            textChanges()
-                .debounce(500)
-                .distinctUntilChanged()
-                .onEach {
-                    val text = it?.toString()?.trim()
-                    if (selectedMediaUris.isNotEmpty()) return@onEach
-                    if (!text.isNullOrEmpty()) {
-                        showPostMedia()
-                    }
-                }
-                .launchIn(lifecycleScope)
-            // text watcher to handlePostButton click-ability
-            addTextChangedListener {
-                val text = it?.toString()?.trim()
-                if (text.isNullOrEmpty()) {
-                    clearPreviewLink()
-                    if (selectedMediaUris.isEmpty()) {
-                        handlePostButton(clickable = false)
-                    } else {
-                        handlePostButton(clickable = true)
-                    }
-                } else {
-                    handlePostButton(clickable = true)
-                }
-            }
-        }
-    }
-
     // initializes post done button click listener
     private fun initPostDoneListener() {
         val createPostActivity = requireActivity() as LMFeedCreatePostActivity
@@ -319,34 +248,6 @@ class LMFeedCreatePostFragment :
         }
     }
 
-    // initializes click listeners on add attachment layouts
-    private fun initAddAttachmentsView() {
-        binding.apply {
-            layoutAttachFiles.setOnClickListener {
-                // sends clicked on attachment event for file
-                viewModel.sendClickedOnAttachmentEvent("file")
-                val extra = MediaPickerExtras.Builder()
-                    .mediaTypes(listOf(PDF))
-                    .allowMultipleSelect(true)
-                    .build()
-                val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extra)
-                documentLauncher.launch(intent)
-            }
-
-            layoutAddImage.setOnClickListener {
-                // sends clicked on attachment event for photo
-                viewModel.sendClickedOnAttachmentEvent("photo")
-                initiateMediaPicker(listOf(IMAGE))
-            }
-
-            layoutAddVideo.setOnClickListener {
-                // sends clicked on attachment event for video
-                viewModel.sendClickedOnAttachmentEvent("video")
-                initiateMediaPicker(listOf(VIDEO))
-            }
-        }
-    }
-
     // sets data to the author frame
     private fun initAuthorFrame(user: UserViewData) {
         binding.authorFrame.apply {
@@ -362,113 +263,8 @@ class LMFeedCreatePostFragment :
         }
     }
 
-    /**
-     * Adds TextWatcher to edit text with Flow operators
-     * **/
-    @ExperimentalCoroutinesApi
-    @CheckResult
-    fun EditText.textChanges(): Flow<CharSequence?> {
-        return callbackFlow<CharSequence?> {
-            etPostTextChangeListener = object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) = Unit
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) = Unit
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    (this@callbackFlow).trySend(s.toString())
-                }
-            }
-            addTextChangedListener(etPostTextChangeListener)
-            awaitClose { removeTextChangedListener(etPostTextChangeListener) }
-        }.onStart { emit(text) }
-    }
-
-    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
-    private fun initiateMediaPicker(list: List<String>) {
-        val extras = MediaPickerExtras.Builder()
-            .mediaTypes(list)
-            .allowMultipleSelect(true)
-            .build()
-        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
-        galleryLauncher.launch(intent)
-    }
-
-    // process the result obtained from media picker
-    private fun checkMediaPickedResult(result: MediaPickerResult?) {
-        if (result != null) {
-            when (result.mediaPickerResultType) {
-                MEDIA_RESULT_BROWSE -> {
-                    if (MediaType.isPDF(result.mediaTypes)) {
-                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
-                            allowMultipleSelect = result.allowMultipleSelect
-                        )
-                        documentBrowseLauncher.launch(intent)
-                    } else {
-                        val intent = AndroidUtils.getExternalPickerIntent(
-                            result.mediaTypes,
-                            result.allowMultipleSelect,
-                            result.browseClassName
-                        )
-                        if (intent != null)
-                            mediaBrowseLauncher.launch(intent)
-                    }
-                }
-
-                MEDIA_RESULT_PICKED -> {
-                    onMediaPicked(result)
-                }
-            }
-        }
-    }
-
-    // converts the picked media to SingleUriData and adds to the selected media
-    private fun onMediaPicked(result: MediaPickerResult) {
-        val data =
-            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
-        // sends media attached event with media type and count
-        viewModel.sendMediaAttachedEvent(data)
-        selectedMediaUris.addAll(data)
-        showPostMedia()
-    }
-
-    private fun onMediaPickedFromGallery(data: Intent?) {
-        val uris = MediaUtils.getExternalIntentPickerUris(data)
-        viewModel.fetchUriDetails(requireContext(), uris) {
-            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
-                requireContext(), it
-            )
-            // sends media attached event with media type and count
-            viewModel.sendMediaAttachedEvent(mediaUris)
-            selectedMediaUris.addAll(mediaUris)
-            if (mediaUris.isNotEmpty()) {
-                showPostMedia()
-            }
-        }
-    }
-
-    private fun onPdfPicked(data: Intent?) {
-        val uris = MediaUtils.getExternalIntentPickerUris(data)
-        viewModel.fetchUriDetails(requireContext(), uris) {
-            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
-                requireContext(), it
-            )
-            // sends media attached event with media type and count
-            viewModel.sendMediaAttachedEvent(mediaUris)
-            selectedMediaUris.addAll(mediaUris)
-            if (mediaUris.isNotEmpty()) {
-                attachmentsLimitExceeded()
-                showAttachedDocuments()
-            }
-        }
-    }
-
     // handles the logic to show the type of post
     private fun showPostMedia() {
-        attachmentsLimitExceeded()
         when {
             selectedMediaUris.size >= 1 && MediaType.isPDF(selectedMediaUris.first().fileType) -> {
                 ogTags = null
@@ -485,11 +281,6 @@ class LMFeedCreatePostFragment :
                 showAttachedVideo()
             }
 
-            selectedMediaUris.size >= 1 -> {
-                ogTags = null
-                showMultiMediaAttachments()
-            }
-
             else -> {
                 val text = binding.etPostContent.text?.trim()
                 if (selectedMediaUris.size == 0 && text != null) {
@@ -498,14 +289,12 @@ class LMFeedCreatePostFragment :
                     clearPreviewLink()
                 }
                 handlePostButton(clickable = !text.isNullOrEmpty())
-                handleAddAttachmentLayouts(true)
             }
         }
     }
 
     // shows attached video in single video post type
     private fun showAttachedVideo() {
-        handleAddAttachmentLayouts(false)
         handlePostButton(clickable = true)
         binding.apply {
             singleVideoAttachment.root.show()
@@ -513,11 +302,6 @@ class LMFeedCreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
-            singleVideoAttachment.btnAddMoreMediaVideo.setOnClickListener {
-                // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent(TYPE_OF_ATTACHMENT_CLICKED)
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
             val layoutSingleVideoPost = singleVideoAttachment.layoutSingleVideoPost
             videoPreviewAutoPlayHelper.playVideo(
                 layoutSingleVideoPost.videoPost,
@@ -528,7 +312,6 @@ class LMFeedCreatePostFragment :
             layoutSingleVideoPost.ivCrossVideo.setOnClickListener {
                 selectedMediaUris.clear()
                 singleVideoAttachment.root.hide()
-                handleAddAttachmentLayouts(true)
                 val text = etPostContent.text?.trim()
                 handlePostButton(clickable = !text.isNullOrEmpty())
                 videoPreviewAutoPlayHelper.removePlayer()
@@ -538,7 +321,6 @@ class LMFeedCreatePostFragment :
 
     // shows attached image in single image post type
     private fun showAttachedImage() {
-        handleAddAttachmentLayouts(false)
         handlePostButton(clickable = true)
         binding.apply {
             singleImageAttachment.root.show()
@@ -546,15 +328,9 @@ class LMFeedCreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.hide()
             multipleMediaAttachment.root.hide()
-            singleImageAttachment.btnAddMoreMedia.setOnClickListener {
-                // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent(TYPE_OF_ATTACHMENT_CLICKED)
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
             singleImageAttachment.layoutSingleImagePost.ivCrossImage.setOnClickListener {
                 selectedMediaUris.clear()
                 singleImageAttachment.root.hide()
-                handleAddAttachmentLayouts(true)
                 val text = etPostContent.text?.trim()
                 handlePostButton(clickable = !text.isNullOrEmpty())
             }
@@ -569,65 +345,8 @@ class LMFeedCreatePostFragment :
         }
     }
 
-    // shows view pager with multiple media
-    private fun showMultiMediaAttachments() {
-        handleAddAttachmentLayouts(false)
-        handlePostButton(clickable = true)
-        binding.apply {
-            singleImageAttachment.root.hide()
-            singleVideoAttachment.root.hide()
-            linkPreview.root.hide()
-            documentsAttachment.root.hide()
-            multipleMediaAttachment.root.show()
-            multipleMediaAttachment.buttonColor = LMFeedBranding.getButtonsColor()
-            multipleMediaAttachment.btnAddMoreMultipleMedia.visibility =
-                if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
-                    View.GONE
-                } else {
-                    View.VISIBLE
-                }
-            multipleMediaAttachment.btnAddMoreMultipleMedia.setOnClickListener {
-                // sends clicked on attachment event for image and video
-                viewModel.sendClickedOnAttachmentEvent(TYPE_OF_ATTACHMENT_CLICKED)
-                initiateMediaPicker(listOf(IMAGE, VIDEO))
-            }
-            val attachments = selectedMediaUris.map {
-                convertSingleDataUri(it)
-            }
-            val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
-            multiMediaAdapter = CreatePostMultipleMediaAdapter(this@LMFeedCreatePostFragment)
-            viewPager.adapter = multiMediaAdapter
-            multipleMediaAttachment.dotsIndicator.setViewPager2(viewPager)
-            multiMediaAdapter!!.replace(attachments)
-
-            viewPager.registerOnPageChangeCallback(object :
-                ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-                    // processes the current video whenever view pager's page is changed
-                    val createPostSingleVideoBinding =
-                        ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
-                            ?.binding as? LmFeedItemCreatePostSingleVideoBinding
-
-                    if (createPostSingleVideoBinding == null) {
-                        // in case the item is not a video
-                        videoPreviewAutoPlayHelper.removePlayer()
-                    } else {
-                        // processes the current video item
-                        videoPreviewAutoPlayHelper.playVideo(
-                            createPostSingleVideoBinding.videoPost,
-                            createPostSingleVideoBinding.pbVideoLoader,
-                            selectedMediaUris[position].uri
-                        )
-                    }
-                }
-            })
-        }
-    }
-
     // shows document recycler view with attached files
     private fun showAttachedDocuments() {
-        handleAddAttachmentLayouts(false)
         handlePostButton(clickable = true)
         binding.apply {
             singleVideoAttachment.root.hide()
@@ -635,17 +354,6 @@ class LMFeedCreatePostFragment :
             linkPreview.root.hide()
             documentsAttachment.root.show()
             multipleMediaAttachment.root.hide()
-            documentsAttachment.btnAddMoreDoc.visibility =
-                if (selectedMediaUris.size >= POST_ATTACHMENTS_LIMIT) {
-                    View.GONE
-                } else {
-                    View.VISIBLE
-                }
-            documentsAttachment.btnAddMoreDoc.setOnClickListener {
-                // sends clicked on attachment event for file
-                viewModel.sendClickedOnAttachmentEvent("file")
-                initiateMediaPicker(listOf(PDF))
-            }
             val attachments = selectedMediaUris.map {
                 convertSingleDataUri(it)
             }
@@ -751,11 +459,6 @@ class LMFeedCreatePostFragment :
         }
     }
 
-    // handles visibility of add attachment layouts
-    private fun handleAddAttachmentLayouts(show: Boolean) {
-        binding.groupAddAttachments.isVisible = show
-    }
-
     // handles Post Done button click-ability
     private fun handlePostButton(
         clickable: Boolean,
@@ -779,21 +482,6 @@ class LMFeedCreatePostFragment :
         }
     }
 
-    // shows toast and removes extra items if attachments limit is exceeded
-    private fun attachmentsLimitExceeded() {
-        if (selectedMediaUris.size > 10) {
-            ViewUtils.showErrorMessageToast(
-                requireContext(), requireContext().resources.getQuantityString(
-                    R.plurals.you_can_select_upto_x_items,
-                    POST_ATTACHMENTS_LIMIT,
-                    POST_ATTACHMENTS_LIMIT
-                )
-            )
-            val size = selectedMediaUris.size
-            selectedMediaUris.subList(POST_ATTACHMENTS_LIMIT, size).clear()
-        }
-    }
-
     // triggered when a document/media from view pager is removed
     override fun onMediaRemoved(position: Int, mediaType: String) {
         selectedMediaUris.removeAt(position)
@@ -806,42 +494,4 @@ class LMFeedCreatePostFragment :
         }
         showPostMedia()
     }
-
-    // launcher to handle gallery (IMAGE/VIDEO) intent
-    private val galleryLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = ExtrasUtil.getParcelable(
-                    result.data?.extras,
-                    ARG_MEDIA_PICKER_RESULT,
-                    MediaPickerResult::class.java
-                )
-                checkMediaPickedResult(data)
-            }
-        }
-    private val mediaBrowseLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                onMediaPickedFromGallery(result.data)
-            }
-        }
-    private val documentBrowseLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                onPdfPicked(result.data)
-            }
-        }
-
-    // launcher to handle document (PDF) intent
-    private val documentLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = ExtrasUtil.getParcelable(
-                    result.data?.extras,
-                    ARG_MEDIA_PICKER_RESULT,
-                    MediaPickerResult::class.java
-                )
-                checkMediaPickedResult(data)
-            }
-        }
 }
