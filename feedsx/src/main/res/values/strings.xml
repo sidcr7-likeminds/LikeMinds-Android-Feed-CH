@@ -37,7 +37,7 @@
     <string name="create_a_post">Create a post</string>
     <string name="done">Done</string>
     <string name="post">Post</string>
-    <string name="write_something_here">Write something here…</string>
+    <string name="write_something_optional">Write something (optional)</string>
     <string name="attach_files">Attach Files</string>
     <string name="add_article">Add Article</string>
     <string name="add_video">Add Video</string>
@@ -149,4 +149,6 @@
     <string name="example_link">https://www.example.com</string>
     <string name="please_enter_a_valid_link">Please enter a valid link</string>
     <string name="link_continue">Continue</string>
+    <string name="add_title">Add title</string>
+    <string name="add_cover_photo">Add Cover Photo</string>
 </resources>

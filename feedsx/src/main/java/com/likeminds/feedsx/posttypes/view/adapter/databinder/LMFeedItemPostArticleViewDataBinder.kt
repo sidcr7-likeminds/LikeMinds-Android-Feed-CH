@@ -2,22 +2,22 @@ package com.likeminds.feedsx.posttypes.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.LmFeedItemPostSingleVideoBinding
+import com.likeminds.feedsx.databinding.LmFeedItemPostArticleBinding
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
+import com.likeminds.feedsx.utils.model.ITEM_POST_ARTICLE
 
-class LMFeedItemPostSingleVideoViewDataBinder constructor(
+class LMFeedItemPostArticleViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<LmFeedItemPostSingleVideoBinding, PostViewData>() {
+) : ViewDataBinder<LmFeedItemPostArticleBinding, PostViewData>() {
 
     override val viewType: Int
-        get() = ITEM_POST_SINGLE_VIDEO
+        get() = ITEM_POST_ARTICLE
 
-    override fun createBinder(parent: ViewGroup): LmFeedItemPostSingleVideoBinding {
-        return LmFeedItemPostSingleVideoBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostArticleBinding {
+        return LmFeedItemPostArticleBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -25,7 +25,7 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: LmFeedItemPostSingleVideoBinding,
+        binding: LmFeedItemPostArticleBinding,
         data: PostViewData,
         position: Int
     ) {
@@ -49,9 +49,12 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
                 returnBinder = {
                     return@initPostTypeBindData
                 }, executeBinder = {
-                    videoPost.setOnClickListener {
-                        listener.postDetail(data.id)
-                    }
+                    // loads post image and attaches listener
+                    PostTypeUtil.initPostArticle(
+                        binding.ivArticle,
+                        data,
+                        listener
+                    )
                 })
         }
     }

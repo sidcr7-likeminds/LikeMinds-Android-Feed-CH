@@ -1,23 +1,23 @@
-package com.likeminds.feedsx.posttypes.view.adapter.databinder
+package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.LmFeedItemPostSingleVideoBinding
+import com.likeminds.feedsx.databinding.LmFeedItemPostDetailLinkBinding
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
-import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
+import com.likeminds.feedsx.utils.model.ITEM_POST_LINK
 
-class LMFeedItemPostSingleVideoViewDataBinder constructor(
+class LMFeedItemPostDetailLinkViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<LmFeedItemPostSingleVideoBinding, PostViewData>() {
+) : ViewDataBinder<LmFeedItemPostDetailLinkBinding, PostViewData>() {
 
     override val viewType: Int
-        get() = ITEM_POST_SINGLE_VIDEO
+        get() = ITEM_POST_LINK
 
-    override fun createBinder(parent: ViewGroup): LmFeedItemPostSingleVideoBinding {
-        return LmFeedItemPostSingleVideoBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostDetailLinkBinding {
+        return LmFeedItemPostDetailLinkBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -25,13 +25,11 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: LmFeedItemPostSingleVideoBinding,
+        binding: LmFeedItemPostDetailLinkBinding,
         data: PostViewData,
         position: Int
     ) {
         binding.apply {
-            this.position = position
-
             // handles various actions for the post
             PostTypeUtil.initActionsLayout(
                 postActionsLayout,
@@ -43,16 +41,24 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
             // checks whether to bind complete data or not and execute corresponding lambda function
             PostTypeUtil.initPostTypeBindData(
                 authorFrame,
+                tvPostTitle,
+                tvPostContent,
                 data,
                 position,
                 listener,
                 returnBinder = {
                     return@initPostTypeBindData
-                }, executeBinder = {
-                    videoPost.setOnClickListener {
-                        listener.postDetail(data.id)
-                    }
-                })
+                },
+                executeBinder = {
+                    // handles the link view
+                    val linkAttachment = data.attachments.first()
+                    val ogTags = linkAttachment.attachmentMeta.ogTags
+                    PostTypeUtil.initLinkView(
+                        this,
+                        ogTags
+                    )
+                }
+            )
         }
     }
 }

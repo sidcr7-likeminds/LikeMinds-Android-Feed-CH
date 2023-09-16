@@ -117,10 +117,11 @@ class FeedViewModel @Inject constructor(
                 val data = response.data ?: return@launchIO
                 val posts = data.posts
                 val usersMap = data.users
+                val widgets = data.widgets
 
                 //convert to view data
                 val listOfPostViewData =
-                    ViewDataConverter.convertUniversalFeedPosts(posts, usersMap)
+                    ViewDataConverter.convertUniversalFeedPosts(posts, usersMap, widgets)
 
                 //send it to ui
                 _universalFeedResponse.postValue(Pair(page, listOfPostViewData))
@@ -155,7 +156,8 @@ class FeedViewModel @Inject constructor(
                 val data = response.data ?: return@launchIO
                 val postViewData = convertPost(
                     data.post,
-                    data.users
+                    data.users,
+                    data.widgets
                 )
 
                 // sends post creation completed event

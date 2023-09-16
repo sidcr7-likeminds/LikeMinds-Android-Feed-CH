@@ -699,6 +699,7 @@ class LMFeedFragment :
             val attachmentType = getAttachmentType(data.first().fileType)
             val createPostExtras = CreatePostExtras.Builder()
                 .attachmentType(attachmentType)
+                .attachmentUri(data.first())
                 .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
                 .build()
             startCreatePostActivity(createPostExtras)
@@ -717,6 +718,7 @@ class LMFeedFragment :
                 val attachmentType = getAttachmentType(mediaUris.first().fileType)
                 val createPostExtras = CreatePostExtras.Builder()
                     .attachmentType(attachmentType)
+                    .attachmentUri(mediaUris.first())
                     .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
                     .build()
                 startCreatePostActivity(createPostExtras)
@@ -736,6 +738,7 @@ class LMFeedFragment :
                 val attachmentType = getAttachmentType(mediaUris.first().fileType)
                 val createPostExtras = CreatePostExtras.Builder()
                     .attachmentType(attachmentType)
+                    .attachmentUri(mediaUris.first())
                     .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
                     .build()
                 startCreatePostActivity(createPostExtras)
@@ -1253,7 +1256,11 @@ class LMFeedFragment :
             }
 
             ARTICLE -> {
-                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.IMAGE))
+                val createPostExtras = CreatePostExtras.Builder()
+                    .attachmentType(ARTICLE)
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .build()
+                startCreatePostActivity(createPostExtras)
             }
 
             DOCUMENT -> {

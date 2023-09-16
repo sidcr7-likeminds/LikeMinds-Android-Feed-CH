@@ -15,6 +15,16 @@
         android:layout_height="wrap_content"
         android:background="@color/white">
 
+        <include
+            android:id="@+id/author_frame"
+            layout="@layout/lm_feed_layout_author_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
         <com.likeminds.feedsx.media.customviews.LMFeedVideoPlayerView
             android:id="@+id/video_post"
             android:layout_width="0dp"
@@ -25,7 +35,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/author_frame"
             app:shutter_background_color="@android:color/white"
             app:use_artwork="true"
             app:use_controller="false" />
@@ -41,15 +51,38 @@
             app:layout_constraintTop_toTopOf="@id/video_post"
             tools:ignore="ContentDescription" />
 
-        <include
-            android:id="@+id/author_frame"
-            layout="@layout/lm_feed_home_author_frame"
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_post_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="1sp"
+            android:textColor="@color/dark_grey"
+            android:textSize="16sp"
+            app:fontType="medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/video_post" />
+            app:layout_constraintTop_toBottomOf="@id/video_post"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="5 tips to position your community beyond just an online group" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_post_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="1sp"
+            android:textColor="@color/grey"
+            android:textSize="16sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_post_title"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="We curated a list of different types of tools and formats for creating content for your community. It will definitely help you with some ideas for your community. Give it a read :) \n \n Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. \n \n Nulla Lorem mollit cupidatat irure. Laborum magna nulla duis ullamco cillum dolor. Voluptate exercitation incididunt aliquip deserunt reprehenderit elit laborum. " />
+
 
         <include
             android:id="@+id/post_actions_layout"
@@ -60,7 +93,7 @@
             android:layout_marginTop="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/author_frame" />
+            app:layout_constraintTop_toBottomOf="@id/tv_post_content" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

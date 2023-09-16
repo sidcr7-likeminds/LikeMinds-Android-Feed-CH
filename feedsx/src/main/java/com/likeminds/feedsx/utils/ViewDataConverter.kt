@@ -17,9 +17,9 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.widgets.model.WidgetMetaViewData
+import com.likeminds.feedsx.widgets.model.WidgetsViewData
 import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
@@ -28,6 +28,8 @@ import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
 import com.likeminds.likemindsfeed.sdk.model.User
+import com.likeminds.likemindsfeed.widgets.model.WidgetMetaData
+import com.likeminds.likemindsfeed.widgets.model.Widgets
 
 object ViewDataConverter {
 
@@ -203,10 +205,11 @@ object ViewDataConverter {
      * */
     fun convertUniversalFeedPosts(
         posts: List<Post>,
-        usersMap: Map<String, User>
+        usersMap: Map<String, User>,
+        widgets: Map<String, Widgets>
     ): List<PostViewData> {
         return posts.map { post ->
-            convertPost(post, usersMap)
+            convertPost(post, usersMap, widgets)
         }
     }
 
@@ -219,7 +222,8 @@ object ViewDataConverter {
      * */
     fun convertPost(
         post: Post,
-        usersMap: Map<String, User>
+        usersMap: Map<String, User>,
+        widgets: Map<String, Widgets>
     ): PostViewData {
         val postCreator = post.uuid
         val user = usersMap[postCreator]
@@ -230,6 +234,12 @@ object ViewDataConverter {
             createDeletedUser()
         } else {
             convertUser(user)
+        }
+
+        val widget = if (!post.attachments.isNullOrEmpty()) {
+            widgets[post.attachments?.first()?.attachmentMeta?.entityId]
+        } else {
+            null
         }
 
         return PostViewData.Builder()
@@ -256,6 +266,8 @@ object ViewDataConverter {
             .updatedAt(post.updatedAt)
             .user(userViewData)
             .uuid(postCreator)
+            .widget(convertWidget(widget))
+            .heading(post.heading)
             .build()
     }
 
@@ -392,6 +404,7 @@ object ViewDataConverter {
             .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
+            .entityId(attachmentMeta.entityId)
             .build()
     }
 
@@ -592,6 +605,34 @@ object ViewDataConverter {
             .updatedAt(activityEntityData.updatedAt)
             .uuid(activityEntityData.uuid)
             .deletedByUUID(activityEntityData.deletedByUUID)
+            .build()
+    }
+
+    private fun convertWidget(
+        widgets: Widgets?
+    ): WidgetsViewData {
+        if (widgets == null) {
+            return WidgetsViewData.Builder().build()
+        }
+        return WidgetsViewData.Builder()
+            .id(widgets.id)
+            .createdAt(widgets.createdAt)
+            .metaData(convertWidgetMetaData(widgets.widgetMetaData))
+            .parentEntityId(widgets.parentEntityId)
+            .parentEntityType(widgets.parentEntityType)
+            .updatedAt(widgets.updatedAt)
+            .build()
+    }
+
+    private fun convertWidgetMetaData(widgetMeta: WidgetMetaData?): WidgetMetaViewData? {
+        if (widgetMeta == null) {
+            return null
+        }
+
+        return WidgetMetaViewData.Builder()
+            .body(widgetMeta.body)
+            .coverImageUrl(widgetMeta.coverImageUrl)
+            .title(widgetMeta.title)
             .build()
     }
 

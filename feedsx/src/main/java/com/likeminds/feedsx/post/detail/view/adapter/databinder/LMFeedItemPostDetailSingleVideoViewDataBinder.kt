@@ -1,23 +1,23 @@
-package com.likeminds.feedsx.posttypes.view.adapter.databinder
+package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.databinding.LmFeedItemPostSingleVideoBinding
+import com.likeminds.feedsx.databinding.LmFeedItemPostDetailSingleVideoBinding
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
 
-class LMFeedItemPostSingleVideoViewDataBinder constructor(
+class LMFeedItemPostDetailSingleVideoViewDataBinder constructor(
     val listener: PostAdapterListener
-) : ViewDataBinder<LmFeedItemPostSingleVideoBinding, PostViewData>() {
+) : ViewDataBinder<LmFeedItemPostDetailSingleVideoBinding, PostViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_SINGLE_VIDEO
 
-    override fun createBinder(parent: ViewGroup): LmFeedItemPostSingleVideoBinding {
-        return LmFeedItemPostSingleVideoBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostDetailSingleVideoBinding {
+        return LmFeedItemPostDetailSingleVideoBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -25,7 +25,7 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: LmFeedItemPostSingleVideoBinding,
+        binding: LmFeedItemPostDetailSingleVideoBinding,
         data: PostViewData,
         position: Int
     ) {
@@ -43,6 +43,8 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
             // checks whether to bind complete data or not and execute corresponding lambda function
             PostTypeUtil.initPostTypeBindData(
                 authorFrame,
+                tvPostTitle,
+                tvPostContent,
                 data,
                 position,
                 listener,

@@ -51,11 +51,13 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
+                val widgets = data.widgets
                 postDataEventChannel.send(
                     PostDataEvent.GetPost(
                         ViewDataConverter.convertPost(
                             post,
-                            users
+                            users,
+                            widgets
                         )
                     )
                 )
@@ -103,7 +105,8 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
-                val postViewData = ViewDataConverter.convertPost(post, users)
+                val widgets = data.widgets
+                val postViewData = ViewDataConverter.convertPost(post, users, widgets)
                 postDataEventChannel.send(PostDataEvent.EditPost(postViewData))
 
                 // sends post edited event
