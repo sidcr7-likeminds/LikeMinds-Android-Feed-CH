@@ -46,7 +46,7 @@ class LMFeedCreateResourceDialog :
             try {
                 createResourceDialogListener = parentFragment as CreateResourceDialogListener
             } catch (e: ClassCastException) {
-                throw ClassCastException("Calling fragment must implement ReasonChooseDialogListener interface")
+                throw ClassCastException("Calling fragment must implement CreateResourceDialogListener interface")
             }
 
             llAddArticle.setOnClickListener {

@@ -265,5 +265,5 @@ val File.size get() = if (!exists()) 0.0 else length().toDouble()
  * Size value should be in bytes
  * */
 private val Long.sizeInKb get() = this / 1000
-val Long.sizeInMb get() = sizeInKb / 1000
+private val Long.sizeInMb get() = sizeInKb / 1000
 val Long.isLargeFile get() = sizeInMb > LARGE_FILE_SIZE

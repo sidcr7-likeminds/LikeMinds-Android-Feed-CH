@@ -206,6 +206,7 @@
                     android:visibility="visible"
                     app:fontType="medium"
                     app:layout_constraintEnd_toStartOf="@id/iv_delete_media"
+                    app:layout_constraintBottom_toTopOf="@id/tv_media_size"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toEndOf="@id/iv_media_icon"
                     app:layout_constraintTop_toTopOf="@id/iv_media_icon"
@@ -227,6 +228,7 @@
                     app:fontType="medium"
                     app:layout_constraintStart_toEndOf="@id/iv_media_icon"
                     app:layout_constraintTop_toBottomOf="@id/tv_media_name"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_media_icon"
                     tools:text="45MB" />
 
                 <ImageView
@@ -267,7 +269,7 @@
                     tools:visibility="gone" />
 
                 <androidx.cardview.widget.CardView
-                    android:id="@+id/cv_video"
+                    android:id="@+id/cv_add_media"
                     android:layout_width="match_parent"
                     android:layout_height="164dp"
                     android:layout_marginHorizontal="16dp"
@@ -277,7 +279,7 @@
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
                     app:layout_constraintTop_toBottomOf="@id/input_media_separator"
-                    tools:visibility="visible">
+                    tools:visibility="gone">
 
                     <LinearLayout
                         android:id="@+id/ll_add_media"
@@ -288,12 +290,12 @@
 
                         <ImageView
                             android:id="@+id/iv_add_media"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
                             android:layout_gravity="center"
                             android:padding="8dp"
-                            android:src="@drawable/ic_add_pdf"
-                            tools:ignore="ContentDescription" />
+                            tools:ignore="ContentDescription"
+                            tools:src="@drawable/ic_add_pdf" />
 
                         <com.likeminds.feedsx.branding.customview.LMFeedTextView
                             android:id="@+id/tv_add_media"
@@ -324,7 +326,7 @@
                     android:textAllCaps="true"
                     android:textColor="@color/white"
                     android:textSize="14sp"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     app:cornerRadius="24dp"
                     app:font_type="medium"
                     app:layout_constraintBottom_toBottomOf="parent"

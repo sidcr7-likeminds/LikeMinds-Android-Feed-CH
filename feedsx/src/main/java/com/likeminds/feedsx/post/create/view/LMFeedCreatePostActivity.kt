@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
@@ -11,6 +12,7 @@ import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedActivityCreatePostBinding
 import com.likeminds.feedsx.post.create.model.CreatePostExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
+import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class LMFeedCreatePostActivity : BaseAppCompatActivity() {
@@ -50,6 +52,8 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
         setContentView(binding.root)
 
+        setupOnBackPressedCallback()
+
         val createPostExtras = ExtrasUtil.getParcelable(
             intent.getBundleExtra("bundle"),
             CREATE_POST_EXTRAS,
@@ -69,7 +73,9 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         //Toolbar
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            val fragment =
+                supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedCreatePostFragment
+            fragment.openBackPressedPopup()
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -81,8 +87,16 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         }
     }
 
+    // setups up on back pressed callback
+    private fun setupOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(this) {
+            val fragment =
+                supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedCreatePostFragment
+            fragment.openBackPressedPopup()
+        }
+    }
+
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp()
     }
-
 }

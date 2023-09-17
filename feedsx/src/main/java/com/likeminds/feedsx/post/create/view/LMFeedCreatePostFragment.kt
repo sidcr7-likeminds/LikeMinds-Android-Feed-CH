@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.*
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
@@ -23,7 +24,6 @@ import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.file.sizeInMb
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
@@ -34,7 +34,8 @@ import java.util.*
 import javax.inject.Inject
 
 class LMFeedCreatePostFragment :
-    BaseFragment<LmFeedFragmentCreatePostBinding, CreatePostViewModel>() {
+    BaseFragment<LmFeedFragmentCreatePostBinding, CreatePostViewModel>(),
+    LMFeedDiscardResourceDialog.DiscardResourceDialogListener {
 
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
@@ -54,6 +55,8 @@ class LMFeedCreatePostFragment :
     private val videoPreviewAutoPlayHelper by lazy {
         VideoPreviewAutoPlayHelper.getInstance()
     }
+    private var discardResourceDialog: LMFeedDiscardResourceDialog? = null
+
     override val useSharedViewModel: Boolean
         get() = true
 
@@ -99,6 +102,7 @@ class LMFeedCreatePostFragment :
 
     companion object {
         const val TAG = "CreatePostFragment"
+        private const val MIN_ARTICLE_CONTENT = 200
     }
 
     override fun receiveExtras() {
@@ -132,6 +136,7 @@ class LMFeedCreatePostFragment :
     override fun setUpViews() {
         super.setUpViews()
         initView()
+        initTitleListener()
         fetchUserFromDB()
         initMemberTaggingView()
         initPostDoneListener()
@@ -158,6 +163,13 @@ class LMFeedCreatePostFragment :
         }
     }
 
+    // initializes a listener to etTitle
+    private fun initTitleListener() {
+        binding.etPostTitle.doAfterTextChanged {
+            showPostMedia()
+        }
+    }
+
     // initializes click listeners
     private fun initClickListeners() {
         binding.apply {
@@ -166,15 +178,16 @@ class LMFeedCreatePostFragment :
             }
 
             ivDeleteArticle.setOnClickListener {
-                showAddArticle()
                 selectedMediaUris.clear()
+                showAddArticle()
             }
 
             ivDeleteMedia.setOnClickListener {
-                showAddMedia()
+                selectedMediaUris.clear()
+                showPostMedia()
             }
 
-            llAddMedia.setOnClickListener {
+            cvAddMedia.setOnClickListener {
                 if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
                     initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
                 }
@@ -432,54 +445,52 @@ class LMFeedCreatePostFragment :
         }
     }
 
-    // shows view to select add media
-    private fun showAddMedia() {
-        binding.apply {
-            handlePostButton(visible = false)
-            grpMedia.hide()
-            llAddMedia.show()
-            selectedMediaUris.clear()
-            if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
-                ViewUtils.getMandatoryAsterisk(
-                    getString(R.string.select_video_to_share),
-                    tvAddMedia
-                )
-
-                ImageBindingUtil.loadImage(
-                    ivAddMedia,
-                    R.drawable.ic_add_video
-                )
-            } else if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.DOCUMENT) {
-                ViewUtils.getMandatoryAsterisk(
-                    getString(R.string.select_pdf_to_share),
-                    tvAddMedia
-                )
-
-                ImageBindingUtil.loadImage(
-                    ivAddMedia,
-                    R.drawable.ic_add_pdf
-                )
-            }
-        }
-    }
-
     // shows attached media in video/document post type
     private fun showAttachedMedia() {
-        handlePostButton(visible = true)
         binding.apply {
             ivArticle.hide()
             cvArticleImage.hide()
             linkPreview.root.hide()
             val selectedMedia = selectedMediaUris.firstOrNull()
             if (selectedMedia == null) {
+                handlePostButton(visible = false)
                 grpMedia.hide()
+                cvAddMedia.show()
+                if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
+                    ViewUtils.getMandatoryAsterisk(
+                        getString(R.string.select_video_to_share),
+                        tvAddMedia
+                    )
+
+                    ImageBindingUtil.loadImage(
+                        ivAddMedia,
+                        R.drawable.ic_add_video
+                    )
+                } else if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.DOCUMENT) {
+                    ViewUtils.getMandatoryAsterisk(
+                        getString(R.string.select_pdf_to_share),
+                        tvAddMedia
+                    )
+
+                    ImageBindingUtil.loadImage(
+                        ivAddMedia,
+                        R.drawable.ic_add_pdf
+                    )
+                }
             } else {
+                val title = etPostTitle.text?.trim()
+                if (title.isNullOrEmpty()) {
+                    handlePostButton(visible = false)
+                } else {
+                    handlePostButton(visible = true)
+                }
                 grpMedia.show()
+                cvAddMedia.hide()
                 tvMediaName.text = createPostExtras.attachmentUri?.mediaName
                 tvMediaSize.text =
                     getString(
-                        R.string.d_MB,
-                        selectedMediaUris.firstOrNull()?.size?.sizeInMb
+                        R.string.f_MB,
+                        (selectedMediaUris.firstOrNull()?.size?.div(1000000.0))
                     )
             }
         }
@@ -494,7 +505,13 @@ class LMFeedCreatePostFragment :
                 cvArticleImage.show()
                 ivArticle.hide()
             } else {
-                handlePostButton(visible = true)
+                val title = etPostTitle.text?.trim()
+                val articleContent = etPostContent.text?.trim() ?: ""
+                if (title.isNullOrEmpty() || articleContent.length < MIN_ARTICLE_CONTENT) {
+                    handlePostButton(visible = false)
+                } else {
+                    handlePostButton(visible = true)
+                }
                 cvArticleImage.hide()
                 ivArticle.show()
                 ImageBindingUtil.loadImage(
@@ -531,7 +548,12 @@ class LMFeedCreatePostFragment :
             if (ogTags == null) {
                 return
             }
-            handlePostButton(visible = true)
+            val title = binding.etPostTitle.text?.trim()
+            if (title.isNullOrEmpty()) {
+                handlePostButton(visible = false)
+            } else {
+                handlePostButton(visible = true)
+            }
             // sends link attached event with the link
             helperViewModel.sendLinkAttachedEvent(ogTags?.url ?: "")
             ImageBindingUtil.loadImage(
@@ -567,10 +589,23 @@ class LMFeedCreatePostFragment :
     private fun handlePostButton(visible: Boolean) {
         binding.apply {
             if (visible) {
-                btnPost.hide()
-            } else {
                 btnPost.show()
+            } else {
+                btnPost.hide()
             }
         }
+    }
+
+    // shows discard resource popup
+    fun openBackPressedPopup() {
+        discardResourceDialog = LMFeedDiscardResourceDialog.show(childFragmentManager)
+    }
+
+    override fun onResourceDiscarded() {
+        requireActivity().finish()
+    }
+
+    override fun onResourceCreationContinued() {
+        discardResourceDialog?.dismiss()
     }
 }
