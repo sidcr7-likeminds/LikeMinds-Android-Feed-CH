@@ -130,8 +130,8 @@
     <string name="enter_user_id">Enter user id</string>
     <string name="no_posts_to_show">No posts to show</string>
     <string name="be_the_first_one_to_post_here">Be the first one to post here</string>
-    <string name="pin_this_post">Pin this Post</string>
-    <string name="unpin_this_post">Unpin this Post</string>
+    <string name="pin_this_post">Pin This Post</string>
+    <string name="unpin_this_post">Unpin This Post</string>
     <string name="you_do_not_have_permission_to_create_a_post">You do not have permission to create a post</string>
     <string name="you_do_not_have_permission_to_comment">You do not have permission to comment</string>
     <string name="share_post">Share Post</string>
@@ -151,4 +151,11 @@
     <string name="link_continue">Continue</string>
     <string name="add_title">Add title</string>
     <string name="add_cover_photo">Add Cover Photo</string>
+    <string name="write_something_here_min_200">Write something here (min. 200 char)</string>
+    <string name="d_MB">%d MB</string>
+    <string name="remove">Remove</string>
+    <string name="remove_attachment">Remove attachment?</string>
+    <string name="are_you_sure_you_want_to_remove_the_attached_video">Are you sure you want to remove the attached video?</string>
+    <string name="select_pdf_to_share">Select PDF to share</string>
+    <string name="select_video_to_share">Select Video to share</string>
 </resources>

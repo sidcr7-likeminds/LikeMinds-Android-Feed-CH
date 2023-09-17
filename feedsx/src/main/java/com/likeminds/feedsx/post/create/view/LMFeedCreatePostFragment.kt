@@ -15,18 +15,15 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
 import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
 import com.likeminds.feedsx.post.create.model.CreatePostExtras
-import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.*
-import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
-import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.link.util.LinkUtil
+import com.likeminds.feedsx.utils.file.sizeInMb
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
@@ -37,8 +34,7 @@ import java.util.*
 import javax.inject.Inject
 
 class LMFeedCreatePostFragment :
-    BaseFragment<LmFeedFragmentCreatePostBinding, CreatePostViewModel>(),
-    CreatePostListener {
+    BaseFragment<LmFeedFragmentCreatePostBinding, CreatePostViewModel>() {
 
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
@@ -144,6 +140,8 @@ class LMFeedCreatePostFragment :
     // initializes the view as per the selected post type
     private fun initView() {
         binding.apply {
+            createPostExtras.attachmentUri?.let { selectedMediaUris.add(it) }
+
             ViewUtils.getMandatoryAsterisk(
                 getString(R.string.add_title),
                 etPostTitle
@@ -155,32 +153,35 @@ class LMFeedCreatePostFragment :
                 )
             )
 
-            when (createPostExtras.attachmentType) {
-                com.likeminds.feedsx.posttypes.model.VIDEO -> {
+            showPostMedia()
+            initClickListeners()
+        }
+    }
 
-                }
-
-                DOCUMENT -> {
-
-                }
-
-                LINK -> {
-
-                }
-
-                ARTICLE -> {
-                    cvArticleImage.show()
-                    ViewUtils.getMandatoryAsterisk(
-                        getString(R.string.add_cover_photo),
-                        tvAddCoverPhoto
-                    )
-                }
-
-                else -> {}
-            }
-
+    // initializes click listeners
+    private fun initClickListeners() {
+        binding.apply {
             cvArticleImage.setOnClickListener {
                 initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.IMAGE))
+            }
+
+            ivDeleteArticle.setOnClickListener {
+                showAddArticle()
+                selectedMediaUris.clear()
+            }
+
+            ivDeleteMedia.setOnClickListener {
+                showAddMedia()
+            }
+
+            llAddMedia.setOnClickListener {
+                if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
+                    initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
+                }
+
+                if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.DOCUMENT) {
+                    initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.PDF))
+                }
             }
         }
     }
@@ -229,7 +230,8 @@ class LMFeedCreatePostFragment :
         // sends media attached event with media type and count
         viewModel.sendMediaAttachedEvent(data)
         if (data.isNotEmpty()) {
-            // todo:
+            selectedMediaUris.addAll(data)
+            showPostMedia()
         }
     }
 
@@ -242,7 +244,8 @@ class LMFeedCreatePostFragment :
             // sends media attached event with media type and count
             viewModel.sendMediaAttachedEvent(mediaUris)
             if (mediaUris.isNotEmpty()) {
-                // todo:
+                selectedMediaUris.addAll(mediaUris)
+                showPostMedia()
             }
         }
     }
@@ -256,7 +259,7 @@ class LMFeedCreatePostFragment :
             // sends media attached event with media type and count
             viewModel.sendMediaAttachedEvent(mediaUris)
             if (mediaUris.isNotEmpty()) {
-                // todo:
+                selectedMediaUris.addAll(mediaUris)
             }
         }
     }
@@ -279,7 +282,7 @@ class LMFeedCreatePostFragment :
         // observes decodeUrlResponse and returns link ogTags
         helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
-            initLinkView(ogTags)
+            showLinkPreview()
         }
         // observes addPostResponse, once post is created
         viewModel.postAdded.observe(viewLifecycleOwner) { postAdded ->
@@ -312,25 +315,23 @@ class LMFeedCreatePostFragment :
         viewModel.errorEventFlow.onEach { response ->
             when (response) {
                 is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
-                    handlePostButton(clickable = true, showProgress = false)
+                    handlePostButton(visible = true)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
             }
         }.observeInLifecycle(viewLifecycleOwner)
 
         helperViewModel.errorEventFlow.onEach { response ->
             when (response) {
                 is HelperViewModel.ErrorMessageEvent.DecodeUrl -> {
-                    val postText = binding.etPostContent.text.toString()
-                    val link = postText.getUrlIfExist()
-                    if (link != ogTags?.url) {
-                        clearPreviewLink()
-                    }
+                    // todo:
                 }
 
                 is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
             }
         }.observeInLifecycle(viewLifecycleOwner)
     }
@@ -369,10 +370,11 @@ class LMFeedCreatePostFragment :
     private fun initPostDoneListener() {
         binding.apply {
             btnPost.setOnClickListener {
+
                 val text = binding.etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 if (selectedMediaUris.isNotEmpty()) {
-                    handlePostButton(clickable = true, showProgress = true)
+                    handlePostButton(visible = true)
                     viewModel.addPost(
                         requireContext(),
                         updatedText,
@@ -380,7 +382,7 @@ class LMFeedCreatePostFragment :
                         ogTags
                     )
                 } else if (updatedText.isNotEmpty()) {
-                    handlePostButton(clickable = true, showProgress = true)
+                    handlePostButton(visible = true)
                     viewModel.addPost(
                         requireContext(),
                         updatedText,
@@ -408,55 +410,108 @@ class LMFeedCreatePostFragment :
 
     // handles the logic to show the type of post
     private fun showPostMedia() {
-        when {
-            selectedMediaUris.size >= 1 && MediaType.isPDF(selectedMediaUris.first().fileType) -> {
-                ogTags = null
-                showAttachedDocuments()
+        when (createPostExtras.attachmentType) {
+            com.likeminds.feedsx.posttypes.model.VIDEO -> {
+                showAttachedMedia()
             }
 
-            selectedMediaUris.size == 1 && MediaType.isImage(selectedMediaUris.first().fileType) -> {
-                ogTags = null
-                showAttachedImage()
+            DOCUMENT -> {
+                showAttachedMedia()
             }
 
-            selectedMediaUris.size == 1 && MediaType.isVideo(selectedMediaUris.first().fileType) -> {
-                ogTags = null
-                showAttachedVideo()
+            LINK -> {
+                ogTags = createPostExtras.linkOGTagsViewData
+                showLinkPreview()
             }
 
-            else -> {
-                val text = binding.etPostContent.text?.trim()
-                if (selectedMediaUris.size == 0 && text != null) {
-                    showLinkPreview(text.toString())
-                } else {
-                    clearPreviewLink()
-                }
-                handlePostButton(clickable = !text.isNullOrEmpty())
+            ARTICLE -> {
+                showAddArticle()
+            }
+
+            else -> {}
+        }
+    }
+
+    // shows view to select add media
+    private fun showAddMedia() {
+        binding.apply {
+            handlePostButton(visible = false)
+            grpMedia.hide()
+            llAddMedia.show()
+            selectedMediaUris.clear()
+            if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
+                ViewUtils.getMandatoryAsterisk(
+                    getString(R.string.select_video_to_share),
+                    tvAddMedia
+                )
+
+                ImageBindingUtil.loadImage(
+                    ivAddMedia,
+                    R.drawable.ic_add_video
+                )
+            } else if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.DOCUMENT) {
+                ViewUtils.getMandatoryAsterisk(
+                    getString(R.string.select_pdf_to_share),
+                    tvAddMedia
+                )
+
+                ImageBindingUtil.loadImage(
+                    ivAddMedia,
+                    R.drawable.ic_add_pdf
+                )
             }
         }
     }
 
-    // shows attached video in single video post type
-    private fun showAttachedVideo() {
-        handlePostButton(clickable = true)
+    // shows attached media in video/document post type
+    private fun showAttachedMedia() {
+        handlePostButton(visible = true)
         binding.apply {
-            // todo:
+            ivArticle.hide()
+            cvArticleImage.hide()
+            linkPreview.root.hide()
+            val selectedMedia = selectedMediaUris.firstOrNull()
+            if (selectedMedia == null) {
+                grpMedia.hide()
+            } else {
+                grpMedia.show()
+                tvMediaName.text = createPostExtras.attachmentUri?.mediaName
+                tvMediaSize.text =
+                    getString(
+                        R.string.d_MB,
+                        selectedMediaUris.firstOrNull()?.size?.sizeInMb
+                    )
+            }
         }
     }
 
-    // shows attached image in single image post type
-    private fun showAttachedImage() {
-        handlePostButton(clickable = true)
+    // shows add article view
+    private fun showAddArticle() {
         binding.apply {
-            // todo:
-        }
-    }
-
-    // shows document recycler view with attached files
-    private fun showAttachedDocuments() {
-        handlePostButton(clickable = true)
-        binding.apply {
-            // todo:
+            val selectedMedia = selectedMediaUris.firstOrNull()
+            if (selectedMedia == null) {
+                handlePostButton(visible = false)
+                cvArticleImage.show()
+                ivArticle.hide()
+            } else {
+                handlePostButton(visible = true)
+                cvArticleImage.hide()
+                ivArticle.show()
+                ImageBindingUtil.loadImage(
+                    ivArticle,
+                    selectedMedia.uri
+                )
+            }
+            grpMedia.hide()
+            linkPreview.root.hide()
+            ViewUtils.getMandatoryAsterisk(
+                getString(R.string.write_something_here_min_200),
+                etPostContent
+            )
+            ViewUtils.getMandatoryAsterisk(
+                getString(R.string.add_cover_photo),
+                tvAddCoverPhoto
+            )
         }
     }
 
@@ -471,62 +526,29 @@ class LMFeedCreatePostFragment :
     }
 
     // shows link preview for link post type
-    private fun showLinkPreview(text: String?) {
+    private fun showLinkPreview() {
         binding.linkPreview.apply {
-            if (text.isNullOrEmpty()) {
-                clearPreviewLink()
+            if (ogTags == null) {
                 return
             }
-            val link = text.getUrlIfExist()
-            if (ogTags != null && link.equals(ogTags?.url)) {
-                return
-            }
-            if (!link.isNullOrEmpty()) {
-                if (link == ogTags?.url) {
-                    return
-                }
-                clearPreviewLink()
-                helperViewModel.decodeUrl(link)
-            } else {
-                clearPreviewLink()
-            }
-        }
-    }
-
-    // renders data in the link view
-    private fun initLinkView(data: LinkOGTagsViewData) {
-        val link = data.url ?: ""
-        // sends link attached event with the link
-        helperViewModel.sendLinkAttachedEvent(link)
-        binding.linkPreview.apply {
-            root.show()
-            val isImageValid = data.image.isImageValid()
-            ivLink.isVisible = isImageValid
-            LinkUtil.handleLinkPreviewConstraints(
-                this,
-                isImageValid
+            handlePostButton(visible = true)
+            // sends link attached event with the link
+            helperViewModel.sendLinkAttachedEvent(ogTags?.url ?: "")
+            ImageBindingUtil.loadImage(
+                ivLink,
+                ogTags?.image
             )
 
-            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-                data.title
+            tvLinkTitle.text = if (ogTags?.title?.isNotBlank() == true) {
+                ogTags?.title
             } else {
                 root.context.getString(R.string.link)
             }
-            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-            tvLinkDescription.text = data.description
+            tvLinkDescription.isVisible = !ogTags?.description.isNullOrEmpty()
+            tvLinkDescription.text = ogTags?.description
+            tvLinkUrl.text = ogTags?.url?.lowercase(Locale.getDefault())
 
-            if (isImageValid) {
-                ImageBindingUtil.loadImage(
-                    ivLink,
-                    data.image,
-                    placeholder = R.drawable.ic_link_primary_40dp,
-                    cornerRadius = 8
-                )
-            }
-
-            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
-            ivCrossLink.setOnClickListener {
-                binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
+            ivDeleteLink.setOnClickListener {
                 clearPreviewLink()
             }
         }
@@ -534,34 +556,21 @@ class LMFeedCreatePostFragment :
 
     // clears link preview
     private fun clearPreviewLink() {
+        handlePostButton(visible = false)
         ogTags = null
         binding.linkPreview.apply {
             root.hide()
         }
     }
 
-    // handles Post Done button click-ability
-    private fun handlePostButton(
-        clickable: Boolean,
-        showProgress: Boolean? = null
-    ) {
+    // handles Post Done button visibility
+    private fun handlePostButton(visible: Boolean) {
         binding.apply {
-            // todo:
-            if (showProgress == true) {
+            if (visible) {
                 btnPost.hide()
             } else {
-                if (clickable) {
-                    btnPost.hide()
-                } else {
-                    btnPost.show()
-                }
+                btnPost.show()
             }
         }
-    }
-
-    // triggered when a document/media from view pager is removed
-    override fun onMediaRemoved(position: Int, mediaType: String) {
-        // todo:
-        showPostMedia()
     }
 }

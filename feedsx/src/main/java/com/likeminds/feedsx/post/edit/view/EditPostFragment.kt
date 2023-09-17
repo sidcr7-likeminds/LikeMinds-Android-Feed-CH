@@ -646,7 +646,7 @@ class EditPostFragment :
             }
 
             tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
-            ivCrossLink.setOnClickListener {
+            ivDeleteLink.setOnClickListener {
                 binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
                 clearPreviewLink()
             }
