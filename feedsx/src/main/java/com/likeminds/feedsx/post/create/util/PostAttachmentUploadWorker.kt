@@ -143,11 +143,13 @@ class PostAttachmentUploadWorker(
      */
     private fun uploadFile(request: GenericFileRequest, uuid: String? = null): AWSFileResponse? {
         val filePath = request.localFilePath ?: return null
+        Log.d("PUI", "uploadFile: ${filePath.toString()}")
         val file = if (request.fileType == IMAGE) {
             FileHelper.compressFile(applicationContext, filePath)
         } else {
             File(filePath)
         }
+        Log.d("PUI", "uploadFile: ${file?.absolutePath}")
         val observer = transferUtility.upload(
             request.awsFolderPath,
             file,

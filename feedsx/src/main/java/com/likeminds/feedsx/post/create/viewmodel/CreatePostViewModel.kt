@@ -176,11 +176,13 @@ class CreatePostViewModel @Inject constructor(
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
-                        "THUMB_${it.mediaName}",
+                        "THUMB_${thumbnailUri?.path}",
                         userPreferences.getUUID()
                     )
                     if (thumbnailUri != null) {
+                        val thumbnailLocalFilePath = FileUtil.getRealPath(context, thumbnailUri)
                         builder.thumbnailUri(thumbnailUri)
+                            .thumbnailLocalFilePath(thumbnailLocalFilePath)
                             .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
                             .build()
                     } else {

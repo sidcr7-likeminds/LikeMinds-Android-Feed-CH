@@ -854,7 +854,7 @@ object ViewDataConverter {
             .height(singleUriData.height)
             .thumbnailUrl(thumbnailUrl)
             .thumbnailAWSFolderPath(singleUriData.thumbnailAwsFolderPath)
-            .thumbnailLocalFilePath(singleUriData.thumbnailUri.toString())
+            .thumbnailLocalFilePath(singleUriData.thumbnailLocalFilePath)
             .build()
     }
 }
