@@ -115,6 +115,7 @@ object ViewDataConverter {
             .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .format(attachmentMeta.format)
+            .thumbnailUrl(attachmentMeta.thumbnailUrl)
             .build()
     }
 
@@ -405,6 +406,7 @@ object ViewDataConverter {
             .pageCount(attachmentMeta.pageCount)
             .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
             .entityId(attachmentMeta.entityId)
+            .thumbnailUrl(attachmentMeta.thumbnailUrl)
             .build()
     }
 
@@ -740,6 +742,7 @@ object ViewDataConverter {
             .workerUUID(post.uuid)
             .isPosted(post.isPosted)
             .attachments(convertAttachmentsEntity(attachments))
+            .heading(postWithAttachments.post.heading)
             .build()
     }
 
@@ -768,6 +771,7 @@ object ViewDataConverter {
             .uri(Uri.parse(attachmentMeta.uri))
             .width(attachmentMeta.width)
             .height(attachmentMeta.height)
+            .thumbnailUrl(attachmentMeta.thumbnailUrl)
             .build()
     }
 
@@ -779,7 +783,8 @@ object ViewDataConverter {
         temporaryId: Long,
         uuid: String,
         thumbnail: String,
-        text: String?
+        text: String?,
+        heading: String
     ): PostEntity {
         return PostEntity.Builder()
             .temporaryId(temporaryId)
@@ -787,6 +792,7 @@ object ViewDataConverter {
             .uuid(uuid)
             .thumbnail(thumbnail)
             .text(text)
+            .heading(heading)
             .build()
     }
 
@@ -825,6 +831,16 @@ object ViewDataConverter {
                 Base64.DEFAULT
             )
         ) + singleUriData.awsFolderPath
+
+        var thumbnailUrl: String? = null
+        if (!singleUriData.thumbnailAwsFolderPath.isNullOrEmpty()) {
+            thumbnailUrl = String(
+                Base64.decode(
+                    AWSKeys.getBucketBaseUrl(),
+                    Base64.DEFAULT
+                )
+            ) + singleUriData.thumbnailAwsFolderPath
+        }
         return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
             .url(url)
             .uri(singleUriData.uri.toString())
@@ -836,6 +852,9 @@ object ViewDataConverter {
             .localFilePath(singleUriData.localFilePath)
             .width(singleUriData.width)
             .height(singleUriData.height)
+            .thumbnailUrl(thumbnailUrl)
+            .thumbnailAWSFolderPath(singleUriData.thumbnailAwsFolderPath)
+            .thumbnailLocalFilePath(singleUriData.thumbnailUri.toString())
             .build()
     }
 }

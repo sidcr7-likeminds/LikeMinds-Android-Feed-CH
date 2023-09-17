@@ -162,4 +162,6 @@
     <string name="finish_creating_later">Want to finish creating this resource later? Save it as a draft or continue editing it.</string>
     <string name="discard_this_resource">Discard this resource</string>
     <string name="continue_creating_resource">Continue creating resource</string>
+    <string name="video_duration_must_be_less_than_10_min">Video duration must be less than 10 minutes</string>
+    <string name="pdf_must_be_less_than_8_MB">PDF must be less than 8 MB</string>
 </resources>

@@ -16,7 +16,6 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.model.IMAGE
 import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
@@ -148,13 +147,14 @@ class FeedViewModel @Inject constructor(
                 }
             val request = AddPostRequest.Builder()
                 .text(updatedText)
+                .heading(postingData.heading)
                 .attachments(createAttachments(postingData.attachments))
                 .build()
 
             val response = lmFeedClient.addPost(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
-                val postViewData = convertPost(
+                val postViewData = ViewDataConverter.convertPost(
                     data.post,
                     data.users,
                     data.widgets
@@ -191,7 +191,7 @@ class FeedViewModel @Inject constructor(
             } else {
                 val temporaryId = postWithAttachments.post.temporaryId
                 postPreferences.saveTemporaryId(temporaryId)
-                postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
+                postDataEventChannel.send(PostDataEvent.PostDbData(ViewDataConverter.convertPost(postWithAttachments)))
             }
         }
     }

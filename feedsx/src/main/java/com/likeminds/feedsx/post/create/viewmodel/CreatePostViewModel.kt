@@ -56,6 +56,7 @@ class CreatePostViewModel @Inject constructor(
     // calls AddPost API and posts the response in LiveData
     fun addPost(
         context: Context,
+        postTitle: String,
         postTextContent: String?,
         fileUris: List<SingleUriData>? = null,
         ogTags: LinkOGTagsViewData? = null
@@ -79,12 +80,14 @@ class CreatePostViewModel @Inject constructor(
                 // adds post data in local db
                 storePost(
                     uploadData,
+                    postTitle,
                     updatedText,
                     updatedFileUris
                 )
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
+                    .heading(postTitle)
                     .text(updatedText)
                 if (ogTags != null) {
                     // if the post has ogTags
@@ -109,6 +112,7 @@ class CreatePostViewModel @Inject constructor(
     //add post:{} into local db
     private fun storePost(
         uploadData: Pair<WorkContinuation, String>,
+        heading: String,
         text: String?,
         fileUris: List<SingleUriData>? = null
     ) {
@@ -123,7 +127,8 @@ class CreatePostViewModel @Inject constructor(
                 temporaryPostId,
                 uuid,
                 thumbnailUri.toString(),
-                text
+                text,
+                heading
             )
             val attachments = fileUris.map {
                 convertAttachment(
@@ -155,7 +160,7 @@ class CreatePostViewModel @Inject constructor(
             // generates awsFolderPath to upload the file
             val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
                 it.mediaName,
-                userPreferences.getUserUniqueId()
+                userPreferences.getUUID()
             )
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)
@@ -167,19 +172,32 @@ class CreatePostViewModel @Inject constructor(
                         .height(dimensions.second)
                         .build()
                 }
+
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
+                    val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                        "THUMB_${it.mediaName}",
+                        userPreferences.getUUID()
+                    )
                     if (thumbnailUri != null) {
-                        builder.thumbnailUri(thumbnailUri).build()
+                        builder.thumbnailUri(thumbnailUri)
+                            .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
+                            .build()
                     } else {
                         builder.build()
                     }
                 }
+
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
+                    val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                        "THUMB_${it.mediaName}",
+                        userPreferences.getUUID()
+                    )
                     val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
                     builder
                         .thumbnailUri(thumbnailUri)
+                        .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
                         .format(format)
                         .build()
                 }

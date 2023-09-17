@@ -17,7 +17,9 @@ class PostEntity constructor(
     @ColumnInfo(name = "is_posted")
     var isPosted: Boolean,
     @ColumnInfo(name = "post_id")
-    var postId: String
+    var postId: String,
+    @ColumnInfo(name = "heading")
+    var heading: String?
 ) {
     class Builder {
         private var temporaryId: Long = -1
@@ -26,6 +28,7 @@ class PostEntity constructor(
         private var uuid: String = ""
         private var isPosted: Boolean = false
         private var postId: String = temporaryId.toString()
+        private var heading: String? = null
 
         fun temporaryId(temporaryId: Long) = apply { this.temporaryId = temporaryId }
         fun text(text: String?) = apply { this.text = text }
@@ -33,6 +36,7 @@ class PostEntity constructor(
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
         fun postId(postId: String) = apply { this.postId = postId }
+        fun heading(heading: String?) = apply { this.heading = heading }
 
         fun build() =
             PostEntity(
@@ -41,7 +45,8 @@ class PostEntity constructor(
                 thumbnail,
                 uuid,
                 isPosted,
-                postId
+                postId,
+                heading
             )
     }
 
@@ -52,5 +57,6 @@ class PostEntity constructor(
             .uuid(uuid)
             .isPosted(isPosted)
             .postId(postId)
+            .heading(heading)
     }
 }

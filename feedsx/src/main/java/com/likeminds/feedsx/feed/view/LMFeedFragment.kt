@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
@@ -77,6 +78,8 @@ class LMFeedFragment :
     companion object {
         const val TAG = "LMFeedFragment"
         private const val LM_FEED_EXTRAS = "LM_FEED_EXTRAS"
+        const val VIDEO_DURATION_LIMIT = 600
+        const val PDF_SIZE_LIMIT = 8 * 1024 * 1024
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         private const val POST_NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS
@@ -109,6 +112,8 @@ class LMFeedFragment :
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
     private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
+
+    private var createPostDialog: LMFeedCreateResourceDialog? = null
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -607,7 +612,7 @@ class LMFeedFragment :
                         getString(R.string.a_post_is_already_uploading)
                     )
                 } else {
-                    LMFeedCreateResourceDialog.show(childFragmentManager)
+                    createPostDialog = LMFeedCreateResourceDialog.show(childFragmentManager)
                 }
             } else {
                 ViewUtils.showShortSnack(
@@ -697,12 +702,49 @@ class LMFeedFragment :
         viewModel.sendMediaAttachedEvent(data)
         if (data.isNotEmpty()) {
             val attachmentType = getAttachmentType(data.first().fileType)
-            val createPostExtras = CreatePostExtras.Builder()
-                .attachmentType(attachmentType)
-                .attachmentUri(data.first())
-                .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
-                .build()
-            startCreatePostActivity(createPostExtras)
+            if (checkForValidAttachment(data.first())) {
+                val createPostExtras = CreatePostExtras.Builder()
+                    .attachmentType(attachmentType)
+                    .attachmentUri(data.first())
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .build()
+                startCreatePostActivity(createPostExtras)
+            }
+        }
+    }
+
+    // checks if the selected attachment is allowed or not
+    private fun checkForValidAttachment(uri: SingleUriData?): Boolean {
+        return when (uri?.fileType) {
+            com.likeminds.feedsx.media.model.VIDEO -> {
+                if (uri.duration != null && uri.duration > VIDEO_DURATION_LIMIT) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.video_duration_must_be_less_than_10_min),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                } else {
+                    true
+                }
+            }
+
+            PDF -> {
+                if (uri.size > PDF_SIZE_LIMIT) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.pdf_must_be_less_than_8_MB),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                } else {
+                    true
+                }
+            }
+
+            else -> {
+                true
+            }
         }
     }
 
@@ -716,12 +758,14 @@ class LMFeedFragment :
             viewModel.sendMediaAttachedEvent(mediaUris)
             if (mediaUris.isNotEmpty()) {
                 val attachmentType = getAttachmentType(mediaUris.first().fileType)
-                val createPostExtras = CreatePostExtras.Builder()
-                    .attachmentType(attachmentType)
-                    .attachmentUri(mediaUris.first())
-                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
-                    .build()
-                startCreatePostActivity(createPostExtras)
+                if (checkForValidAttachment(mediaUris.first())) {
+                    val createPostExtras = CreatePostExtras.Builder()
+                        .attachmentType(attachmentType)
+                        .attachmentUri(mediaUris.first())
+                        .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                        .build()
+                    startCreatePostActivity(createPostExtras)
+                }
             }
         }
     }
@@ -736,12 +780,14 @@ class LMFeedFragment :
             viewModel.sendMediaAttachedEvent(mediaUris)
             if (mediaUris.isNotEmpty()) {
                 val attachmentType = getAttachmentType(mediaUris.first().fileType)
-                val createPostExtras = CreatePostExtras.Builder()
-                    .attachmentType(attachmentType)
-                    .attachmentUri(mediaUris.first())
-                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
-                    .build()
-                startCreatePostActivity(createPostExtras)
+                if (checkForValidAttachment(mediaUris.first())) {
+                    val createPostExtras = CreatePostExtras.Builder()
+                        .attachmentType(attachmentType)
+                        .attachmentUri(mediaUris.first())
+                        .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                        .build()
+                    startCreatePostActivity(createPostExtras)
+                }
             }
         }
     }
@@ -1227,6 +1273,7 @@ class LMFeedFragment :
     }
 
     override fun onResourceSelected(attachmentType: Int) {
+        createPostDialog?.dismiss()
         startPostCreation(attachmentType)
     }
 

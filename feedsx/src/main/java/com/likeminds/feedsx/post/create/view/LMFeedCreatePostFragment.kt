@@ -3,6 +3,7 @@ package com.likeminds.feedsx.post.create.view
 import android.app.Activity
 import android.content.Intent
 import android.text.TextWatcher
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -11,6 +12,7 @@ import androidx.recyclerview.widget.*
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentCreatePostBinding
+import com.likeminds.feedsx.feed.view.LMFeedFragment
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
@@ -243,8 +245,10 @@ class LMFeedCreatePostFragment :
         // sends media attached event with media type and count
         viewModel.sendMediaAttachedEvent(data)
         if (data.isNotEmpty()) {
-            selectedMediaUris.addAll(data)
-            showPostMedia()
+            if (checkForValidAttachment(data.first())) {
+                selectedMediaUris.addAll(data)
+                showPostMedia()
+            }
         }
     }
 
@@ -257,8 +261,10 @@ class LMFeedCreatePostFragment :
             // sends media attached event with media type and count
             viewModel.sendMediaAttachedEvent(mediaUris)
             if (mediaUris.isNotEmpty()) {
-                selectedMediaUris.addAll(mediaUris)
-                showPostMedia()
+                if (checkForValidAttachment(mediaUris.first())) {
+                    selectedMediaUris.addAll(mediaUris)
+                    showPostMedia()
+                }
             }
         }
     }
@@ -272,7 +278,45 @@ class LMFeedCreatePostFragment :
             // sends media attached event with media type and count
             viewModel.sendMediaAttachedEvent(mediaUris)
             if (mediaUris.isNotEmpty()) {
-                selectedMediaUris.addAll(mediaUris)
+                if (checkForValidAttachment(mediaUris.first())) {
+                    selectedMediaUris.addAll(mediaUris)
+                    showPostMedia()
+                }
+            }
+        }
+    }
+
+    // checks if the selected attachment is allowed or not
+    private fun checkForValidAttachment(uri: SingleUriData?): Boolean {
+        return when (uri?.fileType) {
+            com.likeminds.feedsx.media.model.VIDEO -> {
+                if (uri.duration != null && uri.duration > LMFeedFragment.VIDEO_DURATION_LIMIT) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.video_duration_must_be_less_than_10_min),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                } else {
+                    true
+                }
+            }
+
+            PDF -> {
+                if (uri.size > LMFeedFragment.PDF_SIZE_LIMIT) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.pdf_must_be_less_than_8_MB),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                } else {
+                    true
+                }
+            }
+
+            else -> {
+                true
             }
         }
     }
@@ -383,25 +427,17 @@ class LMFeedCreatePostFragment :
     private fun initPostDoneListener() {
         binding.apply {
             btnPost.setOnClickListener {
-
-                val text = binding.etPostContent.text
+                val text = etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
-                if (selectedMediaUris.isNotEmpty()) {
-                    handlePostButton(visible = true)
-                    viewModel.addPost(
-                        requireContext(),
-                        updatedText,
-                        selectedMediaUris,
-                        ogTags
-                    )
-                } else if (updatedText.isNotEmpty()) {
-                    handlePostButton(visible = true)
-                    viewModel.addPost(
-                        requireContext(),
-                        updatedText,
-                        ogTags = ogTags
-                    )
-                }
+                val postTitle = etPostTitle.text?.trim().toString()
+
+                viewModel.addPost(
+                    requireContext(),
+                    postTitle,
+                    updatedText,
+                    selectedMediaUris,
+                    ogTags
+                )
             }
         }
     }
