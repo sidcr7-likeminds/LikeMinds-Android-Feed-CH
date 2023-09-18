@@ -24,4 +24,9 @@
         <item name="android:windowSoftInputMode">adjustResize</item>
     </style>
 
+    <style name="LMFeedClickableImageView">
+        <item name="android:foreground">?attr/actionBarItemBackground</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
+    </style>
 </resources>

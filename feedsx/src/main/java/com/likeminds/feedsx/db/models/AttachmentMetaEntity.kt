@@ -30,7 +30,13 @@ class AttachmentMetaEntity constructor(
     @ColumnInfo(name = "thumbnail_aws_folder_path")
     val thumbnailAWSFolderPath: String?,
     @ColumnInfo(name = "thumbnail_local_file_path")
-    val thumbnailLocalFilePath: String?
+    val thumbnailLocalFilePath: String?,
+    @ColumnInfo(name = "cover_image_url")
+    val coverImageUrl: String?,
+    @ColumnInfo(name = "body")
+    val body: String?,
+    @ColumnInfo(name = "title")
+    val title: String?
 ) {
     class Builder {
         private var name: String? = null
@@ -47,6 +53,9 @@ class AttachmentMetaEntity constructor(
         private var thumbnailUrl: String? = null
         private var thumbnailAWSFolderPath: String? = null
         private var thumbnailLocalFilePath: String? = null
+        private var coverImageUrl: String? = null
+        private var body: String? = null
+        private var title: String? = null
 
         fun name(name: String?) = apply { this.name = name }
         fun url(url: String?) = apply { this.url = url }
@@ -66,6 +75,10 @@ class AttachmentMetaEntity constructor(
         fun thumbnailLocalFilePath(thumbnailLocalFilePath: String?) =
             apply { this.thumbnailLocalFilePath = thumbnailLocalFilePath }
 
+        fun coverImageUrl(coverImageUrl: String?) = apply { this.coverImageUrl = coverImageUrl }
+        fun body(body: String?) = apply { this.body = body }
+        fun title(title: String?) = apply { this.title = title }
+
         fun build() =
             AttachmentMetaEntity(
                 name,
@@ -81,7 +94,10 @@ class AttachmentMetaEntity constructor(
                 localFilePath,
                 thumbnailUrl,
                 thumbnailAWSFolderPath,
-                thumbnailLocalFilePath
+                thumbnailLocalFilePath,
+                coverImageUrl,
+                body,
+                title
             )
     }
 
@@ -100,5 +116,8 @@ class AttachmentMetaEntity constructor(
             .thumbnailUrl(thumbnailUrl)
             .thumbnailAWSFolderPath(thumbnailAWSFolderPath)
             .thumbnailLocalFilePath(thumbnailLocalFilePath)
+            .coverImageUrl(coverImageUrl)
+            .body(body)
+            .title(title)
     }
 }

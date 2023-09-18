@@ -74,12 +74,12 @@
                     app:fontType="medium"
                     app:layout_constrainedHeight="true"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/tv_delete"
+                    app:layout_constraintEnd_toStartOf="@+id/tv_remove"
                     app:layout_constraintTop_toBottomOf="@id/tv_description"
                     app:layout_constraintVertical_weight="1" />
 
                 <com.likeminds.feedsx.branding.customview.LMFeedTextView
-                    android:id="@+id/tv_delete"
+                    android:id="@+id/tv_remove"
                     android:layout_width="wrap_content"
                     android:layout_height="42dp"
                     android:layout_marginTop="28dp"

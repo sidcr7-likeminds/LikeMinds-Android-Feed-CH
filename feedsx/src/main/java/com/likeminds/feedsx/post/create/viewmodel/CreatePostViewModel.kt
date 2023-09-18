@@ -16,6 +16,7 @@ import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
+import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachmentForResource
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
@@ -123,21 +124,42 @@ class CreatePostViewModel @Inject constructor(
             }
             val temporaryPostId = temporaryPostId ?: -1
             val thumbnailUri = fileUris.first().thumbnailUri
-            val postEntity = ViewDataConverter.convertPost(
-                temporaryPostId,
-                uuid,
-                thumbnailUri.toString(),
-                text,
-                heading
-            )
-            val attachments = fileUris.map {
-                convertAttachment(
+            // means that it is article post
+            if (fileUris.first().fileType == IMAGE) {
+                val postEntity = ViewDataConverter.convertPost(
                     temporaryPostId,
-                    it
+                    uuid,
+                    thumbnailUri.toString(),
+                    null,
+                    null
                 )
+                val attachments = fileUris.map {
+                    convertAttachmentForResource(
+                        temporaryPostId,
+                        it,
+                        text ?: "",
+                        heading
+                    )
+                }
+                // add it to local db
+                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
+            } else {
+                val postEntity = ViewDataConverter.convertPost(
+                    temporaryPostId,
+                    uuid,
+                    thumbnailUri.toString(),
+                    text,
+                    heading
+                )
+                val attachments = fileUris.map {
+                    convertAttachment(
+                        temporaryPostId,
+                        it
+                    )
+                }
+                // add it to local db
+                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             }
-            // add it to local db
-            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             _postAdded.postValue(false)
             uploadData.first.enqueue()
         }

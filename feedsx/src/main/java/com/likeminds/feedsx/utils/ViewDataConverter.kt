@@ -87,6 +87,7 @@ object ViewDataConverter {
      * View Data Model -> Network Model
     --------------------------------*/
 
+    // creates attachment list of Network Model for attachments post
     fun createAttachments(
         attachments: List<AttachmentViewData>
     ): List<Attachment> {
@@ -95,6 +96,7 @@ object ViewDataConverter {
         }
     }
 
+    // creates attachment of Network Model for attachments post
     fun convertAttachment(
         attachment: AttachmentViewData
     ): Attachment {
@@ -104,6 +106,7 @@ object ViewDataConverter {
             .build()
     }
 
+    // creates attachment meta of Network Model for attachments post
     private fun convertAttachmentMeta(
         attachmentMeta: AttachmentMetaViewData
     ): AttachmentMeta {
@@ -115,6 +118,9 @@ object ViewDataConverter {
             .pageCount(attachmentMeta.pageCount)
             .format(attachmentMeta.format)
             .thumbnailUrl(attachmentMeta.thumbnailUrl)
+            .body(attachmentMeta.body)
+            .coverImageUrl(attachmentMeta.coverImageUrl)
+            .title(attachmentMeta.title)
             .build()
     }
 
@@ -807,6 +813,9 @@ object ViewDataConverter {
             .width(attachmentMeta.width)
             .height(attachmentMeta.height)
             .thumbnailUrl(attachmentMeta.thumbnailUrl)
+            .coverImageUrl(attachmentMeta.coverImageUrl)
+            .title(attachmentMeta.title)
+            .body(attachmentMeta.body)
             .build()
     }
 
@@ -819,7 +828,7 @@ object ViewDataConverter {
         uuid: String,
         thumbnail: String,
         text: String?,
-        heading: String
+        heading: String?
     ): PostEntity {
         return PostEntity.Builder()
             .temporaryId(temporaryId)
@@ -836,10 +845,6 @@ object ViewDataConverter {
         singleUriData: SingleUriData
     ): AttachmentEntity {
         val attachmentType = when (singleUriData.fileType) {
-            IMAGE -> {
-                com.likeminds.feedsx.posttypes.model.IMAGE
-            }
-
             VIDEO -> {
                 com.likeminds.feedsx.posttypes.model.VIDEO
             }
@@ -890,6 +895,67 @@ object ViewDataConverter {
             .thumbnailUrl(thumbnailUrl)
             .thumbnailAWSFolderPath(singleUriData.thumbnailAwsFolderPath)
             .thumbnailLocalFilePath(singleUriData.thumbnailLocalFilePath)
+            .build()
+    }
+
+    fun convertAttachmentForResource(
+        temporaryId: Long,
+        singleUriData: SingleUriData,
+        body: String,
+        title: String
+    ): AttachmentEntity {
+        return AttachmentEntity.Builder()
+            .temporaryId(temporaryId)
+            .postId(temporaryId.toString())
+            .attachmentType(ARTICLE)
+            .attachmentMeta(
+                convertAttachmentMetaForResource(
+                    singleUriData,
+                    body,
+                    title
+                )
+            )
+            .build()
+    }
+
+    private fun convertAttachmentMetaForResource(
+        singleUriData: SingleUriData,
+        body: String,
+        title: String
+    ): AttachmentMetaEntity {
+        val url = String(
+            Base64.decode(
+                AWSKeys.getBucketBaseUrl(),
+                Base64.DEFAULT
+            )
+        ) + singleUriData.awsFolderPath
+
+        var thumbnailUrl: String? = null
+        if (!singleUriData.thumbnailAwsFolderPath.isNullOrEmpty()) {
+            thumbnailUrl = String(
+                Base64.decode(
+                    AWSKeys.getBucketBaseUrl(),
+                    Base64.DEFAULT
+                )
+            ) + singleUriData.thumbnailAwsFolderPath
+        }
+        return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
+            .url(url)
+            .uri(singleUriData.uri.toString())
+            .pageCount(singleUriData.pdfPageCount)
+            .size(singleUriData.size)
+            .duration(singleUriData.duration)
+            .format(singleUriData.format)
+            .awsFolderPath(singleUriData.awsFolderPath)
+            .localFilePath(singleUriData.localFilePath)
+            .width(singleUriData.width)
+            .height(singleUriData.height)
+            .thumbnailUrl(thumbnailUrl)
+            .thumbnailAWSFolderPath(singleUriData.thumbnailAwsFolderPath)
+            .thumbnailLocalFilePath(singleUriData.thumbnailLocalFilePath)
+            .coverImageUrl(url)
+            .body(body)
+            .title(title)
             .build()
     }
 }

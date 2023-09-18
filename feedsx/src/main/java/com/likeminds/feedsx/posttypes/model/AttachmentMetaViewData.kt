@@ -19,7 +19,10 @@ class AttachmentMetaViewData private constructor(
     val entityId: String?,
     val thumbnailUrl: String?,
     val thumbnailAWSFolderPath: String?,
-    val thumbnailLocalFilePath: String?
+    val thumbnailLocalFilePath: String?,
+    val coverImageUrl: String?,
+    val body: String?,
+    val title: String?,
 ) : Parcelable {
     class Builder {
         private var name: String? = null
@@ -36,6 +39,9 @@ class AttachmentMetaViewData private constructor(
         private var thumbnailUrl: String? = null
         private var thumbnailAWSFolderPath: String? = null
         private var thumbnailLocalFilePath: String? = null
+        private var coverImageUrl: String? = null
+        private var body: String? = null
+        private var title: String? = null
 
         fun name(name: String?) = apply { this.name = name }
         fun url(url: String?) = apply { this.url = url }
@@ -55,6 +61,10 @@ class AttachmentMetaViewData private constructor(
         fun thumbnailLocalFilePath(thumbnailLocalFilePath: String?) =
             apply { this.thumbnailLocalFilePath = thumbnailLocalFilePath }
 
+        fun coverImageUrl(coverImageUrl: String?) = apply { this.coverImageUrl = coverImageUrl }
+        fun body(body: String?) = apply { this.body = body }
+        fun title(title: String?) = apply { this.title = title }
+
         fun build() = AttachmentMetaViewData(
             name,
             url,
@@ -69,7 +79,10 @@ class AttachmentMetaViewData private constructor(
             entityId,
             thumbnailUrl,
             thumbnailAWSFolderPath,
-            thumbnailLocalFilePath
+            thumbnailLocalFilePath,
+            coverImageUrl,
+            body,
+            title
         )
     }
 
@@ -89,5 +102,8 @@ class AttachmentMetaViewData private constructor(
             .thumbnailUrl(thumbnailUrl)
             .thumbnailAWSFolderPath(thumbnailAWSFolderPath)
             .thumbnailLocalFilePath(thumbnailLocalFilePath)
+            .coverImageUrl(coverImageUrl)
+            .body(body)
+            .title(title)
     }
 }

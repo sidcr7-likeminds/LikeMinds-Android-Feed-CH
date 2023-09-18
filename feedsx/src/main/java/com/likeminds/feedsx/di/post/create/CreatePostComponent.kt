@@ -14,4 +14,5 @@ interface CreatePostComponent {
     fun inject(lmFeedCreatePostFragment: LMFeedCreatePostFragment)
     fun inject(lmFeedCreatePostActivity: LMFeedCreatePostActivity)
     fun inject(lmFeedDiscardResourceDialog: LMFeedDiscardResourceDialog)
+    fun inject(lmFeedRemoveAttachmentDialogFragment: LMFeedRemoveAttachmentDialogFragment)
 }

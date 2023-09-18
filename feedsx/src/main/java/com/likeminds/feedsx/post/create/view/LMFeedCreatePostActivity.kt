@@ -107,9 +107,11 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
     // setups up on back pressed callback
     private fun setupOnBackPressedCallback() {
         onBackPressedDispatcher.addCallback(this) {
-            val fragment =
-                supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedCreatePostFragment
-            fragment.openBackPressedPopup()
+            if (supportFragmentManager.currentFragment(R.id.nav_host_fragment) is LMFeedCreatePostFragment) {
+                val fragment =
+                    supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedCreatePostFragment
+                fragment.openBackPressedPopup()
+            }
         }
     }
 

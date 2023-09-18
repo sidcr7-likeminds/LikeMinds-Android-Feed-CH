@@ -145,11 +145,17 @@ class FeedViewModel @Inject constructor(
                 } else {
                     postingData.text
                 }
-            val request = AddPostRequest.Builder()
-                .text(updatedText)
-                .heading(postingData.heading)
-                .attachments(createAttachments(postingData.attachments))
-                .build()
+            val request = if (postingData.attachments.first().attachmentType == ARTICLE) {
+                AddPostRequest.Builder()
+                    .attachments(createAttachments(postingData.attachments))
+                    .build()
+            } else {
+                AddPostRequest.Builder()
+                    .text(updatedText)
+                    .heading(postingData.heading)
+                    .attachments(createAttachments(postingData.attachments))
+                    .build()
+            }
 
             val response = lmFeedClient.addPost(request)
             if (response.success) {
@@ -191,7 +197,13 @@ class FeedViewModel @Inject constructor(
             } else {
                 val temporaryId = postWithAttachments.post.temporaryId
                 postPreferences.saveTemporaryId(temporaryId)
-                postDataEventChannel.send(PostDataEvent.PostDbData(ViewDataConverter.convertPost(postWithAttachments)))
+                postDataEventChannel.send(
+                    PostDataEvent.PostDbData(
+                        ViewDataConverter.convertPost(
+                            postWithAttachments
+                        )
+                    )
+                )
             }
         }
     }
