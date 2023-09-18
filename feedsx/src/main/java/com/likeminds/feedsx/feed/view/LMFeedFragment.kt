@@ -40,13 +40,12 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
+import com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.model.CreatePostExtras
 import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.edit.model.EditPostExtras
-import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.model.VIDEO
@@ -83,6 +82,7 @@ class LMFeedFragment :
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         private const val POST_NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS
+        private lateinit var lmFeedListener: LMFeedListener
 
         /**
          * creates a instance of fragment
@@ -90,9 +90,11 @@ class LMFeedFragment :
         @JvmStatic
         fun getInstance(
             extras: LMFeedExtras,
+            listener: LMFeedListener
         ): LMFeedFragment {
             val fragment = LMFeedFragment()
             val bundle = Bundle()
+            lmFeedListener = listener
             bundle.putParcelable(LM_FEED_EXTRAS, extras)
             fragment.arguments = bundle
             return fragment
@@ -203,7 +205,7 @@ class LMFeedFragment :
 
         // observe unread notification count
         viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { count ->
-            observeUnreadNotificationCount(count)
+            lmFeedListener.updateNotificationCount(count)
         }
 
         // observe universal feed
@@ -248,13 +250,6 @@ class LMFeedFragment :
     private fun observeUserResponse() {
         viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
-    }
-
-    // observe unread notification count
-    private fun observeUnreadNotificationCount(count: Int) {
-        binding.apply {
-            // todo:
-        }
     }
 
     //observe feed response
@@ -340,6 +335,12 @@ class LMFeedFragment :
                 recyclerView.hide()
             }
         }
+    }
+
+    // starts notification feed activity
+    fun startNotificationFeed() {
+        viewModel.sendNotificationPageOpenedEvent()
+        LMFeedNotificationFeedActivity.start(requireContext())
     }
 
     // finds the upload worker by UUID and observes the worker

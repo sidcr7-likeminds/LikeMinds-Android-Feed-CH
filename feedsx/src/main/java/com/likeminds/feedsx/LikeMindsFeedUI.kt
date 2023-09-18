@@ -18,7 +18,7 @@ object LikeMindsFeedUI {
     fun initLikeMindsFeedUI(
         application: Application,
         lmUICallback: LMFeedUICallback,
-        brandingRequest: SetFeedBrandingRequest
+        brandingRequest: SetFeedBrandingRequest,
     ) {
         Log.d(SDKApplication.LOG_TAG, "initiate LikeMindsFeedUI called")
 
@@ -46,7 +46,8 @@ object LikeMindsFeedUI {
         apiKey: String,
         userName: String,
         userId: String,
-        isGuest: Boolean
+        isGuest: Boolean,
+        lmFeedListener: LMFeedListener
     ): LMFeedFragment {
         Log.d(SDKApplication.LOG_TAG, "initiate feed called")
         Log.d(
@@ -64,7 +65,7 @@ object LikeMindsFeedUI {
             .isGuest(isGuest)
             .build()
 
-        return LMFeedFragment.getInstance(extras)
+        return LMFeedFragment.getInstance(extras, lmFeedListener)
     }
 
     /**
@@ -84,7 +85,8 @@ object LikeMindsFeedUI {
         apiKey: String,
         userName: String,
         userId: String,
-        isGuest: Boolean
+        isGuest: Boolean,
+        lmFeedListener: LMFeedListener
     ) {
         Log.d(SDKApplication.LOG_TAG, "initiate feed called")
         Log.d(
@@ -103,7 +105,7 @@ object LikeMindsFeedUI {
             .isGuest(isGuest)
             .build()
 
-        val fragment = LMFeedFragment.getInstance(extras)
+        val fragment = LMFeedFragment.getInstance(extras, lmFeedListener)
 
         val transaction = activity.supportFragmentManager.beginTransaction()
         transaction.replace(containerViewId, fragment, containerViewId.toString())
@@ -116,4 +118,8 @@ object LikeMindsFeedUI {
         val sdk = SDKApplication.getInstance()
         sdk.setupBranding(brandingRequest)
     }
+}
+
+interface LMFeedListener {
+    fun updateNotificationCount(count: Int)
 }
