@@ -11,6 +11,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedActivityCreatePostBinding
 import com.likeminds.feedsx.post.create.model.CreatePostExtras
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
@@ -78,10 +79,26 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
             fragment.openBackPressedPopup()
         }
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.label) {
-                LMFeedCreatePostFragment::class.simpleName -> {
-                    binding.toolbar.setTitle(R.string.create_a_post)
+        binding.tvToolbarTitle.apply {
+            when (createPostExtras?.attachmentType) {
+                VIDEO -> {
+                    text = getString(R.string.add_video_resource)
+                }
+
+                DOCUMENT -> {
+                    text = getString(R.string.add_pdf_resource)
+                }
+
+                LINK -> {
+                    text = getString(R.string.add_link_resource)
+                }
+
+                ARTICLE -> {
+                    text = getString(R.string.add_article)
+                }
+
+                else -> {
+                    text = getString(R.string.create_a_post)
                 }
             }
         }

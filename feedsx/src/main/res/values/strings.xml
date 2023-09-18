@@ -165,4 +165,7 @@
     <string name="video_duration_must_be_less_than_10_min">Video duration must be less than 10 minutes</string>
     <string name="pdf_must_be_less_than_8_MB">PDF must be less than 8 MB</string>
     <string name="not_mentioned">not mentioned</string>
+    <string name="add_link_resource">Add Link Resource</string>
+    <string name="add_video_resource">Add Video Resource</string>
+    <string name="add_pdf_resource">Add PDF Resource</string>
 </resources>
