@@ -2,9 +2,8 @@ package com.likeminds.feedsx.posttypes.util
 
 import android.net.Uri
 import android.text.util.Linkify
-import android.view.Menu.NONE
-import android.view.View
-import android.widget.*
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
@@ -17,7 +16,6 @@ import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.*
 import com.likeminds.feedsx.utils.*
@@ -59,6 +57,8 @@ object PostTypeUtil {
             val postCreatorUUID = user.sdkClientInfoViewData.uuid
             tvMemberName.text = user.name
 
+            val userPosition = data.user
+
             MemberImageUtil.setImage(
                 user.imageUrl,
                 user.name,
@@ -73,7 +73,7 @@ object PostTypeUtil {
     // initializes author data frame on the post on post detail
     private fun initAuthorFrame(
         binding: LmFeedLayoutAuthorFrameBinding,
-        data: PostViewData,
+        data: PostViewData
     ) {
         binding.apply {
             // sets button color variable in xml
@@ -94,17 +94,6 @@ object PostTypeUtil {
 
             val postCreatorUUID = data.user.sdkClientInfoViewData.uuid
 
-            // todo:
-//            ivPostMenu.setOnClickListener { view ->
-//                showMenu(
-//                    view,
-//                    data.id,
-//                    postCreatorUUID,
-//                    data.menuItems,
-//                    listener
-//                )
-//            }
-
             // creator data
             val user = data.user
             tvMemberName.text = user.name
@@ -117,42 +106,26 @@ object PostTypeUtil {
             MemberImageUtil.setImage(
                 user.imageUrl,
                 user.name,
-                user.userUniqueId,
+                postCreatorUUID,
                 memberImage,
                 showRoundImage = true
             )
+
+            val context = binding.root.context
+
+            //sets user position
+            val designation = user.listOfQuestionAnswerViewData?.first {
+                it.tag == "basic" && it.state == 1
+            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+
+            val communityName = user.listOfQuestionAnswerViewData?.first {
+                it.tag == "basic" && it.state == 0
+            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+
+            tvMemberPosition.text = "$designation @ $communityName"
+
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
         }
-    }
-
-    //to show overflow menu for post
-    private fun showMenu(
-        view: View,
-        postId: String,
-        postCreatorUUID: String,
-        menuItems: List<OverflowMenuItemViewData>,
-        listener: PostAdapterListener
-    ) {
-        val popup = PopupMenu(view.context, view)
-        menuItems.forEach { menuItem ->
-            popup.menu.add(
-                NONE,
-                menuItem.id,
-                NONE,
-                menuItem.title
-            )
-        }
-
-        popup.setOnMenuItemClickListener { menuItem ->
-            listener.onPostMenuItemClicked(
-                postId,
-                postCreatorUUID,
-                menuItem.itemId
-            )
-            true
-        }
-
-        popup.show()
     }
 
     // initializes the recyclerview with attached documents on feed
@@ -272,6 +245,13 @@ object PostTypeUtil {
                 tvMeta3.text = mediaType
                 viewMetaDot2.show()
             }
+
+            val shimmerDrawable = ViewUtils.getShimmer()
+            ImageBindingUtil.loadImage(
+                ivDocumentPreview,
+                attachmentMeta.thumbnailUrl,
+                shimmerDrawable
+            )
             root.setOnClickListener {
                 val pdfUri = Uri.parse(document.attachmentMeta.url ?: "")
                 AndroidUtils.startDocumentViewer(root.context, pdfUri)

@@ -988,39 +988,6 @@ class LMFeedFragment :
         }
     }
 
-    // callback when post menu items are clicked
-    override fun onPostMenuItemClicked(
-        postId: String,
-        postCreatorUUID: String,
-        menuId: Int
-    ) {
-        when (menuId) {
-            EDIT_POST_MENU_ITEM_ID -> {
-                val editPostExtras = EditPostExtras.Builder()
-                    .postId(postId)
-                    .build()
-                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
-                startActivity(intent)
-            }
-
-            DELETE_POST_MENU_ITEM_ID -> {
-                deletePost(postId, postCreatorUUID)
-            }
-
-            REPORT_POST_MENU_ITEM_ID -> {
-                reportPost(postId, postCreatorUUID)
-            }
-
-            PIN_POST_MENU_ITEM_ID -> {
-                pinPost(postId)
-            }
-
-            UNPIN_POST_MENU_ITEM_ID -> {
-                unpinPost(postId)
-            }
-        }
-    }
-
     // opens likes screen when likes count is clicked.
     override fun showLikesScreen(postId: String) {
         val likesScreenExtras = LikesScreenExtras.Builder()

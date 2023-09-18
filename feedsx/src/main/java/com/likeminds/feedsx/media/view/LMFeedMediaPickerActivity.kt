@@ -73,13 +73,13 @@ class LMFeedMediaPickerActivity : BaseAppCompatActivity() {
                 startMediaPickerFragment()
                 return
             }
-            val LMFeedPermissionExtras = LMFeedPermission.getGalleryPermissionExtras(this)
+            val lmFeedPermissionExtras = LMFeedPermission.getGalleryPermissionExtras(this)
 
             LMFeedPermissionManager.performTaskWithPermissionExtras(
                 this,
                 settingsPermissionLauncher,
                 { startMediaPickerFragment() },
-                LMFeedPermissionExtras,
+                lmFeedPermissionExtras,
                 showInitialPopup = true,
                 showDeniedPopup = true,
                 LMFeedPermissionDeniedCallback = object : LMFeedPermissionDeniedCallback {

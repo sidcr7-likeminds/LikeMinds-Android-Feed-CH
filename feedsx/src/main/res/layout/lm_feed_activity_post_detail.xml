@@ -38,8 +38,8 @@
                     android:layout_marginStart="12dp"
                     android:layout_marginTop="14dp"
                     android:layout_marginBottom="15dp"
-                    android:padding="4dp"
                     android:foreground="?selectableItemBackgroundBorderless"
+                    android:padding="4dp"
                     android:tint="@{toolbarColor}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -81,6 +81,20 @@
                     app:layout_constraintVertical_chainStyle="packed"
                     app:textType="subtitle"
                     tools:text="14 comments" />
+
+                <ImageView
+                    android:id="@+id/iv_post_menu"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:foreground="?selectableItemBackgroundBorderless"
+                    android:padding="4dp"
+                    android:tint="@{toolbarColor}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_vertical_overflow_menu"
+                    tools:ignore="ContentDescription,UnusedAttribute,UseAppTint" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

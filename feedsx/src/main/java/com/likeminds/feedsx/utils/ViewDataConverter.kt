@@ -26,8 +26,7 @@ import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
 import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
 import com.likeminds.likemindsfeed.post.model.*
-import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
-import com.likeminds.likemindsfeed.sdk.model.User
+import com.likeminds.likemindsfeed.sdk.model.*
 import com.likeminds.likemindsfeed.widgets.model.WidgetMetaData
 import com.likeminds.likemindsfeed.widgets.model.Widgets
 
@@ -171,15 +170,51 @@ object ViewDataConverter {
             .isDeleted(user.isDeleted)
             .uuid(user.uuid)
             .sdkClientInfoViewData(convertSDKClientInfo(user.sdkClientInfo))
+            .listOfQuestionAnswerViewData(convertQuestionAnswers(user.questionAnswers))
             .build()
     }
 
+    // converts SDKClientInfo network model to view data model
     private fun convertSDKClientInfo(sdkClientInfo: SDKClientInfo): SDKClientInfoViewData {
         return SDKClientInfoViewData.Builder()
             .user(sdkClientInfo.user)
             .uuid(sdkClientInfo.uuid)
             .userUniqueId(sdkClientInfo.userUniqueId)
             .community(sdkClientInfo.community)
+            .build()
+    }
+
+    // converts list of QuestionAnswer network model to view data model
+    private fun convertQuestionAnswers(questionAnswers: List<QuestionAnswer>?): List<QuestionViewData>? {
+        if (questionAnswers == null) {
+            return null
+        }
+        return questionAnswers.map {
+            convertQuestionAnswer(it)
+        }
+    }
+
+    // converts QuestionAnswer network model to view data model
+    private fun convertQuestionAnswer(questionAnswer: QuestionAnswer): QuestionViewData {
+        return QuestionViewData.Builder()
+            .id(questionAnswer.question.id.toString())
+            .questionTitle(questionAnswer.question.questionTitle)
+            .state(questionAnswer.question.state)
+            .value(questionAnswer.question.value)
+            .optional(questionAnswer.question.optional)
+            .helpText(questionAnswer.question.helpText)
+            .isCompulsory(questionAnswer.question.isCompulsory)
+            .isHidden(questionAnswer.question.isHidden)
+            .communityId(questionAnswer.question.communityId)
+            .memberId(questionAnswer.question.memberId)
+            .imageUrl(questionAnswer.question.imageUrl)
+            .canAddOtherOptions(questionAnswer.question.canAddOtherOptions)
+            .questionChangeState(questionAnswer.question.questionChangeState)
+            .isAnswerEditable(questionAnswer.question.isAnswerEditable)
+            .answerOfQuestion(questionAnswer.answer.answer)
+            .answerImageUrl(questionAnswer.answer.imageUrl)
+            .tag(questionAnswer.question.tag)
+            .rank(questionAnswer.question.rank)
             .build()
     }
 

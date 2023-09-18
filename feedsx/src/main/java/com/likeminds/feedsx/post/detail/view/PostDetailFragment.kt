@@ -2,6 +2,9 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
 import android.os.Build
+import android.view.Menu
+import android.view.View
+import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.*
@@ -733,6 +736,75 @@ class PostDetailFragment :
     * UI Block
     */
 
+    //to show overflow menu for post
+    fun showMenu(view: View) {
+        val popup = PopupMenu(requireContext(), view)
+        val postViewData = mPostDetailAdapter[postDataPosition] as PostViewData
+        postViewData.menuItems.forEach { menuItem ->
+            popup.menu.add(
+                Menu.NONE,
+                menuItem.id,
+                Menu.NONE,
+                menuItem.title
+            )
+        }
+
+        popup.setOnMenuItemClickListener { menuItem ->
+            onPostMenuItemClicked(
+                postViewData.id,
+                postViewData.user.sdkClientInfoViewData.uuid,
+                menuItem.itemId
+            )
+            true
+        }
+
+        popup.show()
+    }
+
+    // when post menu items are clicked
+    private fun onPostMenuItemClicked(
+        postId: String,
+        postCreatorUUID: String,
+        menuId: Int
+    ) {
+        when (menuId) {
+            EDIT_POST_MENU_ITEM_ID -> {
+                val editPostExtras = EditPostExtras.Builder()
+                    .postId(postId)
+                    .build()
+                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                editPostLauncher.launch(intent)
+            }
+
+            DELETE_POST_MENU_ITEM_ID -> {
+                deletePost(
+                    postId,
+                    postCreatorUUID
+                )
+            }
+
+            REPORT_POST_MENU_ITEM_ID -> {
+                val postData = mPostDetailAdapter[postDataPosition] as PostViewData
+                val postViewType = postData.viewType
+                reportEntity(
+                    postId,
+                    postCreatorUUID,
+                    REPORT_TYPE_POST,
+                    postId,
+                    postViewType = postViewType
+                )
+            }
+
+            PIN_POST_MENU_ITEM_ID -> {
+                pinPost()
+            }
+
+            UNPIN_POST_MENU_ITEM_ID -> {
+                unpinPost()
+            }
+        }
+    }
+
     // updates the comments count on toolbar
     private fun updateCommentsCount(commentsCount: Int) {
         (requireActivity() as PostDetailActivity).binding.tvToolbarSubTitle.text =
@@ -1230,50 +1302,6 @@ class PostDetailFragment :
             rvPostDetails.smoothScrollToPosition(
                 commentPosition
             )
-        }
-    }
-
-    // callback when post menu items are clicked
-    override fun onPostMenuItemClicked(
-        postId: String,
-        postCreatorUUID: String,
-        menuId: Int
-    ) {
-        when (menuId) {
-            EDIT_POST_MENU_ITEM_ID -> {
-                val editPostExtras = EditPostExtras.Builder()
-                    .postId(postId)
-                    .build()
-                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
-                editPostLauncher.launch(intent)
-            }
-
-            DELETE_POST_MENU_ITEM_ID -> {
-                deletePost(
-                    postId,
-                    postCreatorUUID
-                )
-            }
-
-            REPORT_POST_MENU_ITEM_ID -> {
-                val postData = mPostDetailAdapter[postDataPosition] as PostViewData
-                val postViewType = postData.viewType
-                reportEntity(
-                    postId,
-                    postCreatorUUID,
-                    REPORT_TYPE_POST,
-                    postId,
-                    postViewType = postViewType
-                )
-            }
-
-            PIN_POST_MENU_ITEM_ID -> {
-                pinPost()
-            }
-
-            UNPIN_POST_MENU_ITEM_ID -> {
-                unpinPost()
-            }
         }
     }
 

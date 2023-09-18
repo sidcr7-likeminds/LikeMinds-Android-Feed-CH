@@ -52,7 +52,7 @@ class PostDetailAdapter constructor(
         viewDataBinders.add(lmFeedItemPostArticleViewDataBinder)
 
         val lmFeedItemPostDocumentsViewDataBinder =
-            LMFeedItemPostDocumentsViewDataBinder(postAdapterListener)
+            LMFeedItemPostDetailDocumentsViewDataBinder(postAdapterListener)
         viewDataBinders.add(lmFeedItemPostDocumentsViewDataBinder)
 
         val itemPostMultipleMediaViewDataBinder =

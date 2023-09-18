@@ -24,7 +24,6 @@
             tools:listitem="@layout/lm_feed_item_document"
             tools:visibility="visible" />
 
-
         <include
             android:id="@+id/author_frame"
             layout="@layout/lm_feed_home_author_frame"

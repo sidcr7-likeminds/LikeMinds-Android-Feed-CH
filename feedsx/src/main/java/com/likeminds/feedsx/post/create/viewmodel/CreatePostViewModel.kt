@@ -175,11 +175,11 @@ class CreatePostViewModel @Inject constructor(
 
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
-                    val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
-                        "THUMB_${thumbnailUri?.path}",
-                        userPreferences.getUUID()
-                    )
                     if (thumbnailUri != null) {
+                        val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                            "THUMB_${thumbnailUri.path}",
+                            userPreferences.getUUID()
+                        )
                         val thumbnailLocalFilePath = FileUtil.getRealPath(context, thumbnailUri)
                         builder.thumbnailUri(thumbnailUri)
                             .thumbnailLocalFilePath(thumbnailLocalFilePath)
@@ -192,16 +192,22 @@ class CreatePostViewModel @Inject constructor(
 
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
-                    val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
-                        "THUMB_${it.mediaName}",
-                        userPreferences.getUUID()
-                    )
-                    val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
-                    builder
-                        .thumbnailUri(thumbnailUri)
-                        .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
-                        .format(format)
-                        .build()
+                    if (thumbnailUri != null) {
+                        val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                            "THUMB_${thumbnailUri.path}",
+                            userPreferences.getUUID()
+                        )
+                        val thumbnailLocalFilePath = FileUtil.getRealPath(context, thumbnailUri)
+                        val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
+                        builder
+                            .thumbnailUri(thumbnailUri)
+                            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+                            .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
+                            .format(format)
+                            .build()
+                    } else {
+                        builder.build()
+                    }
                 }
             }
         }

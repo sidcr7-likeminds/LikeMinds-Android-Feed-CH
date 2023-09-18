@@ -164,4 +164,5 @@
     <string name="continue_creating_resource">Continue creating resource</string>
     <string name="video_duration_must_be_less_than_10_min">Video duration must be less than 10 minutes</string>
     <string name="pdf_must_be_less_than_8_MB">PDF must be less than 8 MB</string>
+    <string name="not_mentioned">not mentioned</string>
 </resources>
