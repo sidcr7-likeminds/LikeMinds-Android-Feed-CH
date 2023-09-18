@@ -1,10 +1,13 @@
 package com.likeminds.feedsx.post.create.view
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
 import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
@@ -120,7 +123,7 @@ class LMFeedCreatePostFragment :
 
     companion object {
         const val TAG = "CreatePostFragment"
-        private const val MIN_ARTICLE_CONTENT = 200
+        const val MIN_ARTICLE_CONTENT = 200
     }
 
     override fun receiveExtras() {
@@ -172,7 +175,7 @@ class LMFeedCreatePostFragment :
     override fun setUpViews() {
         super.setUpViews()
         initView()
-        initTitleListener()
+        initEditTextListener()
         fetchUserFromDB()
         initMemberTaggingView()
         initPostDoneListener()
@@ -182,6 +185,7 @@ class LMFeedCreatePostFragment :
     private fun initView() {
         binding.apply {
             createPostExtras.attachmentUri?.let { selectedMediaUris.add(it) }
+            ogTags = createPostExtras.linkOGTagsViewData
 
             ViewUtils.getMandatoryAsterisk(
                 getString(R.string.add_title),
@@ -193,10 +197,34 @@ class LMFeedCreatePostFragment :
                     R.color.dark_grey
                 )
             )
-
+            initPostTextContentTouchListener()
             initLinkListener()
             showPostMedia()
             initClickListeners()
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initPostTextContentTouchListener() {
+        binding.etPostContent.apply {
+
+            /**
+             * As the scrollable edit text is inside a scroll view,
+             * this touch listener handles the scrolling of the edit text.
+             * When the edit text is touched and has focus then it disables scroll of scroll-view.
+             */
+            setOnTouchListener(View.OnTouchListener { v, event ->
+                if (hasFocus()) {
+                    v.parent.requestDisallowInterceptTouchEvent(true)
+                    when (event.action and MotionEvent.ACTION_MASK) {
+                        MotionEvent.ACTION_SCROLL -> {
+                            v.parent.requestDisallowInterceptTouchEvent(false)
+                            return@OnTouchListener true
+                        }
+                    }
+                }
+                false
+            })
         }
     }
 
@@ -217,8 +245,8 @@ class LMFeedCreatePostFragment :
             .launchIn(lifecycleScope)
     }
 
-    // initializes a listener to etTitle
-    private fun initTitleListener() {
+    // initializes a listener to edit text
+    private fun initEditTextListener() {
         binding.etPostTitle.doAfterTextChanged {
             showPostMedia()
         }
@@ -450,7 +478,7 @@ class LMFeedCreatePostFragment :
         // observes decodeUrlResponse and returns link ogTags
         helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
-            showLinkPreview()
+            showPostMedia()
         }
         // observes addPostResponse, once post is created
         viewModel.postAdded.observe(viewLifecycleOwner) { postAdded ->
@@ -580,7 +608,6 @@ class LMFeedCreatePostFragment :
             }
 
             LINK -> {
-                ogTags = createPostExtras.linkOGTagsViewData
                 showLinkPreview()
             }
 
@@ -598,6 +625,7 @@ class LMFeedCreatePostFragment :
             ivArticle.hide()
             cvArticleImage.hide()
             linkPreview.root.hide()
+            etPostLink.hide()
             val selectedMedia = selectedMediaUris.firstOrNull()
             if (selectedMedia == null) {
                 handlePostButton(visible = false)
@@ -673,6 +701,7 @@ class LMFeedCreatePostFragment :
             }
             grpMedia.hide()
             linkPreview.root.hide()
+            etPostLink.hide()
             ViewUtils.getMandatoryAsterisk(
                 getString(R.string.write_something_here_min_200),
                 etPostContent
@@ -732,8 +761,6 @@ class LMFeedCreatePostFragment :
                     .description(getString(R.string.are_you_sure_you_want_to_remove_the_attached_link))
                     .build()
                 showRemoveDialog(removeDialogExtras)
-                binding.etPostLink.text?.clear()
-                clearPreviewLink()
             }
         }
     }
@@ -806,12 +833,19 @@ class LMFeedCreatePostFragment :
         discardResourceDialog?.dismiss()
     }
 
+    // when user removes attachment
     override fun onRemoved() {
         selectedMediaUris.clear()
         showPostMedia()
+        ogTags = null
+        if (createPostExtras.attachmentType == LINK) {
+            binding.etPostLink.text?.clear()
+            clearPreviewLink()
+        }
         removeAttachmentDialogFragment?.dismiss()
     }
 
+    // when user removes attachment
     override fun onCancelled() {
         removeAttachmentDialogFragment?.dismiss()
     }
