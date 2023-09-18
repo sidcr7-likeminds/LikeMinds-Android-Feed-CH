@@ -36,6 +36,7 @@ object PostTypeUtil {
     private fun initAuthorFrame(
         binding: LmFeedHomeAuthorFrameBinding,
         data: PostViewData,
+        listener: PostAdapterListener
     ) {
         binding.apply {
             // sets button color variable in xml
@@ -52,12 +53,14 @@ object PostTypeUtil {
             //set post title
             setTitle(tvPostTitle, data)
 
+            root.setOnClickListener {
+                listener.postDetail(data.id)
+            }
+
             // creator data
             val user = data.user
             val postCreatorUUID = user.sdkClientInfoViewData.uuid
             tvMemberName.text = user.name
-
-            val userPosition = data.user
 
             MemberImageUtil.setImage(
                 user.imageUrl,
@@ -616,7 +619,8 @@ object PostTypeUtil {
             // sets data to the creator frame
             initAuthorFrame(
                 authorFrame,
-                data
+                data,
+                listener
             )
 
             executeBinder()

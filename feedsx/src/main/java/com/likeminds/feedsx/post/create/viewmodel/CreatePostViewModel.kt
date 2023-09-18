@@ -66,7 +66,7 @@ class CreatePostViewModel @Inject constructor(
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
-            if (fileUris != null) {
+            if (!fileUris.isNullOrEmpty()) {
                 // if the post has upload-able attachments
                 temporaryPostId = System.currentTimeMillis()
                 val postId = temporaryPostId ?: 0
@@ -118,7 +118,7 @@ class CreatePostViewModel @Inject constructor(
     ) {
         viewModelScope.launchIO {
             val uuid = uploadData.second
-            if (fileUris == null) {
+            if (fileUris.isNullOrEmpty()) {
                 return@launchIO
             }
             val temporaryPostId = temporaryPostId ?: -1

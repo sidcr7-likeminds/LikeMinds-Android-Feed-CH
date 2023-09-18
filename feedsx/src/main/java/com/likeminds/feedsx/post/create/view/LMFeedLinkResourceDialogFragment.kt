@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.post.create.view
 
 import android.content.Context
-import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -12,6 +11,7 @@ import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedDialogFragmentLinkResourceBinding
 import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.observeInLifecycle
 import kotlinx.coroutines.flow.onEach
@@ -98,10 +98,10 @@ class LMFeedLinkResourceDialogFragment :
     // processes the input link by the user
     private fun processInputLink() {
         val text = binding.etLink.text.toString()
-
-        if (URLUtil.isValidUrl(text)) {
+        val link = text.getUrlIfExist()
+        if (!link.isNullOrEmpty()) {
             showLoader(true)
-            helperViewModel.decodeUrl(text)
+            helperViewModel.decodeUrl(link)
         } else {
             Toast.makeText(
                 requireContext(),

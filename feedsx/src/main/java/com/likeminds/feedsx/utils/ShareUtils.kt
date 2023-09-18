@@ -2,10 +2,11 @@ package com.likeminds.feedsx.utils
 
 import android.content.Context
 import android.content.Intent
+import com.likeminds.feedsx.BuildConfig
 import com.likeminds.feedsx.R
 
 object ShareUtils {
-    const val domain = "https://www.sampleapp.com"
+    val domain = BuildConfig.URLS_MAP[BuildConfig.SHARE_DOMAIN] ?: ""
 
     /**
      * Share post with url using default sharing in Android OS

@@ -168,4 +168,5 @@
     <string name="add_link_resource">Add Link Resource</string>
     <string name="add_video_resource">Add Video Resource</string>
     <string name="add_pdf_resource">Add PDF Resource</string>
+    <string name="share_link_resource">Share link resource</string>
 </resources>

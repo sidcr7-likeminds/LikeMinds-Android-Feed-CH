@@ -2,12 +2,16 @@ package com.likeminds.feedsx.post.create.view
 
 import android.app.Activity
 import android.content.Intent
+import android.text.Editable
 import android.text.TextWatcher
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.CheckResult
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
@@ -22,6 +26,7 @@ import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -31,6 +36,9 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
@@ -50,9 +58,10 @@ class LMFeedCreatePostFragment :
 
     private lateinit var createPostExtras: CreatePostExtras
 
+    private lateinit var etLinkTextChangeListener: TextWatcher
+
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
-    private lateinit var etPostTextChangeListener: TextWatcher
     private lateinit var memberTagging: LMFeedMemberTaggingView
     private val videoPreviewAutoPlayHelper by lazy {
         VideoPreviewAutoPlayHelper.getInstance()
@@ -160,9 +169,27 @@ class LMFeedCreatePostFragment :
                 )
             )
 
+            initLinkListener()
             showPostMedia()
             initClickListeners()
         }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+    private fun initLinkListener() {
+        // text watcher with debounce to add delay in api calls for ogTags
+        binding.etPostLink.textChanges()
+            .debounce(500)
+            .distinctUntilChanged()
+            .onEach {
+                val text = binding.etPostLink.text?.trim().toString()
+                val link = text.getUrlIfExist()
+
+                if (!link.isNullOrEmpty()) {
+                    helperViewModel.decodeUrl(link)
+                }
+            }
+            .launchIn(lifecycleScope)
     }
 
     // initializes a listener to etTitle
@@ -382,7 +409,7 @@ class LMFeedCreatePostFragment :
         helperViewModel.errorEventFlow.onEach { response ->
             when (response) {
                 is HelperViewModel.ErrorMessageEvent.DecodeUrl -> {
-                    // todo:
+                    clearPreviewLink()
                 }
 
                 is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
@@ -584,6 +611,9 @@ class LMFeedCreatePostFragment :
             if (ogTags == null) {
                 return
             }
+            root.show()
+            binding.etPostLink.hide()
+            binding.etPostLink.removeTextChangedListener(etLinkTextChangeListener)
             val title = binding.etPostTitle.text?.trim()
             if (title.isNullOrEmpty()) {
                 handlePostButton(visible = false)
@@ -594,7 +624,8 @@ class LMFeedCreatePostFragment :
             helperViewModel.sendLinkAttachedEvent(ogTags?.url ?: "")
             ImageBindingUtil.loadImage(
                 ivLink,
-                ogTags?.image
+                ogTags?.image,
+                placeholder = R.drawable.ic_link_primary_40dp
             )
 
             tvLinkTitle.text = if (ogTags?.title?.isNotBlank() == true) {
@@ -607,17 +638,51 @@ class LMFeedCreatePostFragment :
             tvLinkUrl.text = ogTags?.url?.lowercase(Locale.getDefault())
 
             ivDeleteLink.setOnClickListener {
+                binding.etPostLink.text?.clear()
                 clearPreviewLink()
             }
         }
     }
 
+    /**
+     * Adds TextWatcher to edit text with Flow operators
+     * **/
+    @ExperimentalCoroutinesApi
+    @CheckResult
+    fun EditText.textChanges(): Flow<CharSequence?> {
+        return callbackFlow<CharSequence?> {
+            etLinkTextChangeListener = object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) = Unit
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) = Unit
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    (this@callbackFlow).trySend(s.toString())
+                }
+            }
+            addTextChangedListener(etLinkTextChangeListener)
+            awaitClose { removeTextChangedListener(etLinkTextChangeListener) }
+        }.onStart { emit(text) }
+    }
+
     // clears link preview
     private fun clearPreviewLink() {
-        handlePostButton(visible = false)
-        ogTags = null
-        binding.linkPreview.apply {
-            root.hide()
+        binding.apply {
+            handlePostButton(visible = false)
+            ogTags = null
+            linkPreview.apply {
+                root.hide()
+            }
+            ViewUtils.getMandatoryAsterisk(
+                getString(R.string.share_link_resource),
+                etPostLink
+            )
+            etPostLink.show()
+            etPostLink.addTextChangedListener(etLinkTextChangeListener)
         }
     }
 

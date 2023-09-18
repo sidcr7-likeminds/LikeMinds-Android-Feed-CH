@@ -5,7 +5,8 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/white">
 
         <androidx.core.widget.NestedScrollView
             android:id="@+id/nested_scroll"
@@ -28,7 +29,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
-
 
                 <ImageView
                     android:id="@+id/iv_article"
@@ -172,6 +172,32 @@
                     android:background="@color/cloudy_blue_50"
                     app:layout_constraintTop_toBottomOf="@+id/et_post_content" />
 
+                <com.likeminds.feedsx.branding.customview.LMFeedEditText
+                    android:id="@+id/et_post_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="24dp"
+                    android:background="@null"
+                    android:ellipsize="end"
+                    android:gravity="top"
+                    android:inputType="textMultiLine"
+                    android:maxHeight="96dp"
+                    android:minHeight="48dp"
+                    android:overScrollMode="always"
+                    android:scrollbarStyle="insideInset"
+                    android:scrollbars="vertical"
+                    android:textColor="@color/pure_blue"
+                    android:textColorHint="@color/maastricht_blue_40"
+                    android:textSize="16sp"
+                    android:visibility="gone"
+                    app:font_style="regular"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/input_media_separator"
+                    app:layout_goneMarginTop="8dp"
+                    tools:hint="@string/share_link_resource" />
+
                 <androidx.constraintlayout.widget.Group
                     android:id="@+id/grp_media"
                     android:layout_width="match_parent"
@@ -205,8 +231,8 @@
                     android:textStyle="normal"
                     android:visibility="visible"
                     app:fontType="medium"
-                    app:layout_constraintEnd_toStartOf="@id/iv_delete_media"
                     app:layout_constraintBottom_toTopOf="@id/tv_media_size"
+                    app:layout_constraintEnd_toStartOf="@id/iv_delete_media"
                     app:layout_constraintHorizontal_bias="0.0"
                     app:layout_constraintStart_toEndOf="@id/iv_media_icon"
                     app:layout_constraintTop_toTopOf="@id/iv_media_icon"
@@ -226,9 +252,9 @@
                     android:textStyle="normal"
                     android:visibility="gone"
                     app:fontType="medium"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_media_icon"
                     app:layout_constraintStart_toEndOf="@id/iv_media_icon"
                     app:layout_constraintTop_toBottomOf="@id/tv_media_name"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_media_icon"
                     tools:text="45MB" />
 
                 <ImageView
@@ -261,12 +287,14 @@
                     layout="@layout/lm_feed_layout_create_post_link"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
+                    android:layout_marginStart="16dp"
                     android:layout_marginTop="24dp"
+                    android:layout_marginEnd="10dp"
                     android:visibility="gone"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/et_post_content"
-                    tools:visibility="gone" />
+                    tools:visibility="visible" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cv_add_media"
