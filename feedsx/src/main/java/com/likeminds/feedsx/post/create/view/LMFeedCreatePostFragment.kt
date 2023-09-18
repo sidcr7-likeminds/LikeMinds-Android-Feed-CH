@@ -158,7 +158,6 @@ class LMFeedCreatePostFragment :
         super.handleResultListener()
 
         setFragmentResultListener(LMFeedImageCropFragment.REQUEST_KEY) { _, bundle ->
-            Log.d(TAG, "handleResultListener: ")
             val singleUriData =
                 ExtrasUtil.getParcelable(
                     bundle,
@@ -267,8 +266,8 @@ class LMFeedCreatePostFragment :
 
             ivDeleteArticle.setOnClickListener {
                 val removeExtras = RemoveDialogExtras.Builder()
-                    .title(getString(R.string.remove_attachment))
-                    .description(getString(R.string.are_you_sure_you_want_to_remove_the_attached_photo))
+                    .title(getString(R.string.remove_article_banner))
+                    .description(getString(R.string.are_you_sure_you_want_to_remove_the_article_banner))
                     .build()
                 showRemoveDialog(removeExtras)
             }
@@ -351,11 +350,6 @@ class LMFeedCreatePostFragment :
         viewModel.sendMediaAttachedEvent(data)
         if (data.isNotEmpty()) {
             if (data.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
-                Log.d(
-                    TAG, """11
-                    ${data.first().fileType}
-                """.trimIndent()
-                )
                 val imageCropExtras = ImageCropExtras.Builder()
                     .singleUriData(data.first())
                     .cropWidth(16)
@@ -383,11 +377,6 @@ class LMFeedCreatePostFragment :
             // sends media attached event with media type and count
             viewModel.sendMediaAttachedEvent(mediaUris)
             if (mediaUris.isNotEmpty()) {
-                Log.d(
-                    TAG, """
-                    ${mediaUris.first().fileType}
-                """.trimIndent()
-                )
                 if (mediaUris.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
                     val imageCropExtras = ImageCropExtras.Builder()
                         .singleUriData(mediaUris.first())

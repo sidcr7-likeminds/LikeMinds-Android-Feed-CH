@@ -96,6 +96,29 @@ object ViewDataConverter {
         }
     }
 
+    // creates attachment list of Network Model for attachments post from widgets
+    fun createAttachmentsForWidget(
+        title: String,
+        updatedText: String,
+        widget: WidgetsViewData
+    ): List<Attachment> {
+        return listOf(
+            Attachment.Builder()
+                .attachmentType(ARTICLE)
+                .attachmentMeta(
+                    AttachmentMeta.Builder()
+                        .coverImageUrl(widget.widgetMetaData?.coverImageUrl)
+                        .url(widget.widgetMetaData?.url)
+                        .size(widget.widgetMetaData?.size)
+                        .name(widget.widgetMetaData?.name)
+                        .title(title)
+                        .body(updatedText)
+                        .build()
+                )
+                .build()
+        )
+    }
+
     // creates attachment of Network Model for attachments post
     fun convertAttachment(
         attachment: AttachmentViewData
@@ -676,6 +699,9 @@ object ViewDataConverter {
             .body(widgetMeta.body)
             .coverImageUrl(widgetMeta.coverImageUrl)
             .title(widgetMeta.title)
+            .name(widgetMeta.name)
+            .size(widgetMeta.size)
+            .url(widgetMeta.url)
             .build()
     }
 

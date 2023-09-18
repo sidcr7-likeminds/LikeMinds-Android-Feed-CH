@@ -7,6 +7,7 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.widgets.model.WidgetsViewData
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.EditPostRequest
 import com.likeminds.likemindsfeed.post.model.GetPostRequest
@@ -70,27 +71,50 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
     // calls EditPost API and posts the response in LiveData
     fun editPost(
         postId: String,
+        postTitle: String?,
         postTextContent: String?,
         attachments: List<AttachmentViewData>? = null,
-        ogTags: LinkOGTagsViewData? = null
+        ogTags: LinkOGTagsViewData? = null,
+        widget: WidgetsViewData? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
-            val request =
-                if (attachments != null) {
+            val request = when {
+                widget != null -> {
                     // if the post has any file attachments
                     EditPostRequest.Builder()
                         .postId(postId)
                         .text(updatedText)
+                        .heading(postTitle)
+                        .entityId(widget.id)
+                        .attachments(
+                            ViewDataConverter.createAttachmentsForWidget(
+                                postTitle ?: "",
+                                updatedText ?: "",
+                                widget
+                            )
+                        )
+                        .build()
+                }
+
+                attachments != null -> {
+                    // if the post has any file attachments
+                    EditPostRequest.Builder()
+                        .postId(postId)
+                        .text(updatedText)
+                        .heading(postTitle)
                         .attachments(ViewDataConverter.createAttachments(attachments))
                         .build()
-                } else {
+                }
+
+                else -> {
                     // if the post does not have any file attachments
                     val requestBuilder = EditPostRequest.Builder()
                         .postId(postId)
+                        .heading(postTitle)
                         .text(updatedText)
                     if (ogTags != null) {
                         // if the post has ogTags
@@ -98,6 +122,7 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                     }
                     requestBuilder.build()
                 }
+            }
 
             // calls api
             val response = lmFeedClient.editPost(request)

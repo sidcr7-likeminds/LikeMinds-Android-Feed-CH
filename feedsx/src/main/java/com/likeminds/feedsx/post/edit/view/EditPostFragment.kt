@@ -16,8 +16,7 @@ import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentEditPostBinding
 import com.likeminds.feedsx.feed.util.PostEvent
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostFragment
-import com.likeminds.feedsx.post.create.view.LMFeedDiscardResourceDialog
+import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
 import com.likeminds.feedsx.post.edit.viewmodel.EditPostViewModel
@@ -34,6 +33,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.widgets.model.WidgetsViewData
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
@@ -49,6 +49,7 @@ class EditPostFragment :
     private lateinit var editPostExtras: EditPostExtras
 
     private var fileAttachments: List<AttachmentViewData>? = null
+    private var widget: WidgetsViewData? = null
     private var ogTags: LinkOGTagsViewData? = null
 
     private lateinit var memberTagging: LMFeedMemberTaggingView
@@ -182,12 +183,15 @@ class EditPostFragment :
             btnSave.setOnClickListener {
                 val text = etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
+                val title = etPostTitle.text?.trim().toString()
                 handleSaveButton(visible = true)
                 viewModel.editPost(
                     editPostExtras.postId,
+                    title,
                     updatedText,
                     attachments = fileAttachments,
-                    ogTags = ogTags
+                    ogTags = ogTags,
+                    widget = widget
                 )
             }
         }
@@ -345,13 +349,6 @@ class EditPostFragment :
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
 
-            // decodes the post text and sets to the edit text
-            MemberTaggingDecoder.decode(
-                etPostContent,
-                post.text,
-                LMFeedBranding.getTextLinkColor()
-            )
-
             val title = if (post.viewType == ITEM_POST_ARTICLE) {
                 post.widget.widgetMetaData?.title
             } else {
@@ -364,6 +361,13 @@ class EditPostFragment :
                 post.text
             } ?: ""
 
+            etPostTitle.setText(title)
+            // decodes the post text and sets to the edit text
+            MemberTaggingDecoder.decode(
+                etPostContent,
+                content,
+                LMFeedBranding.getTextLinkColor()
+            )
             showPostMedia(title, content)
             // sets the cursor to the end and opens keyboard
             etPostContent.setSelection(etPostContent.length())
@@ -380,6 +384,7 @@ class EditPostFragment :
         val attachments = post?.attachments
         when (post?.viewType) {
             ITEM_POST_ARTICLE -> {
+                widget = post?.widget
                 showArticlePost(
                     title,
                     content
@@ -414,7 +419,6 @@ class EditPostFragment :
     ) {
         binding.apply {
             cvArticleImage.show()
-            // todo: edit image flow
             if (title.isEmpty() || articleContent.length < LMFeedCreatePostFragment.MIN_ARTICLE_CONTENT) {
                 handleSaveButton(visible = false)
             } else {
@@ -422,7 +426,6 @@ class EditPostFragment :
             }
             llAddArticle.hide()
             ivArticle.show()
-            ivDeleteArticle.show()
             cvArticleImage.isClickable = false
             ImageBindingUtil.loadImage(
                 ivArticle,
@@ -513,6 +516,11 @@ class EditPostFragment :
         }
     }
 
+    // shows discard resource popup
+    fun openBackPressedPopup() {
+        discardResourceDialog = LMFeedDiscardResourceDialog.show(childFragmentManager)
+    }
+
     // when user clicks on discard resource
     override fun onResourceDiscarded() {
         requireActivity().finish()
@@ -521,10 +529,5 @@ class EditPostFragment :
     // when user clicks on continue resource creation
     override fun onResourceCreationContinued() {
         discardResourceDialog?.dismiss()
-    }
-
-    // shows discard resource popup
-    fun openBackPressedPopup() {
-        discardResourceDialog = LMFeedDiscardResourceDialog.show(childFragmentManager)
     }
 }

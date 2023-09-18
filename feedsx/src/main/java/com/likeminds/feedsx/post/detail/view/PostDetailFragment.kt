@@ -392,6 +392,7 @@ class PostDetailFragment :
             } else {
                 updatePostAndAddComments(post)
             }
+            (requireActivity() as PostDetailActivity).binding.ivPostMenu.show()
         }
 
         // observes deletePostResponse LiveData
