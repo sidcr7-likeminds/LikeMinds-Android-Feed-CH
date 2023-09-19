@@ -6,6 +6,7 @@
     <com.facebook.shimmer.ShimmerFrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:clipChildren="true"
         app:shimmer_auto_start="true"
         app:shimmer_clip_to_children="true">
@@ -13,8 +14,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:background="@color/white">
+            android:layout_marginHorizontal="16dp">
 
             <View
                 android:id="@+id/v1"

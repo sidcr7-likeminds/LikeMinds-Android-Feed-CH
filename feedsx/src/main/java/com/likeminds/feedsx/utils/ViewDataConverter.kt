@@ -41,18 +41,18 @@ object ViewDataConverter {
         val attachmentType: Int?
         val viewType = when (singleUriData.fileType) {
             IMAGE -> {
-                attachmentType = com.likeminds.feedsx.posttypes.model.IMAGE
-                ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
+                attachmentType = ARTICLE
+                ITEM_POST_ARTICLE
             }
 
             VIDEO -> {
                 attachmentType = com.likeminds.feedsx.posttypes.model.VIDEO
-                ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+                ITEM_POST_SINGLE_VIDEO
             }
 
             else -> {
                 attachmentType = DOCUMENT
-                ITEM_CREATE_POST_DOCUMENTS_ITEM
+                ITEM_POST_DOCUMENTS
             }
         }
         return AttachmentViewData.Builder()
@@ -60,6 +60,7 @@ object ViewDataConverter {
             .attachmentType(attachmentType)
             .attachmentMeta(
                 AttachmentMetaViewData.Builder()
+                    .url(singleUriData.uri.toString())
                     .name(singleUriData.mediaName)
                     .duration(singleUriData.duration)
                     .format(singleUriData.format)
@@ -814,7 +815,7 @@ object ViewDataConverter {
             .build()
     }
 
-    private fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
+    fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
         return attachments.map { attachment ->
             convertAttachment(attachment)
         }

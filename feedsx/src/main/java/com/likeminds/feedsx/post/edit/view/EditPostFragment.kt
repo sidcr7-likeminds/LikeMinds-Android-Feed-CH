@@ -2,20 +2,30 @@ package com.likeminds.feedsx.post.edit.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Intent
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentEditPostBinding
 import com.likeminds.feedsx.feed.util.PostEvent
+import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.MediaUtils
+import com.likeminds.feedsx.media.view.LMFeedImageCropFragment
+import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
+import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
 import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
@@ -41,7 +51,8 @@ import javax.inject.Inject
 class EditPostFragment :
     BaseFragment<LmFeedFragmentEditPostBinding, EditPostViewModel>(),
     LMFeedDiscardResourceDialog.DiscardResourceDialogListener,
-    PostAdapterListener {
+    PostAdapterListener,
+    LMFeedRemoveAttachmentDialogFragment.RemoveAttachmentDialogListener {
 
     @Inject
     lateinit var helperViewModel: HelperViewModel
@@ -52,14 +63,21 @@ class EditPostFragment :
     private var widget: WidgetsViewData? = null
     private var ogTags: LinkOGTagsViewData? = null
 
+    private var articleSingleUriData: SingleUriData? = null
+
     private lateinit var memberTagging: LMFeedMemberTaggingView
 
     // [postPublisher] to publish changes in the post
     private val postEvent = PostEvent.getPublisher()
 
+    private val workersMap by lazy { ArrayList<UUID>() }
+
     private var post: PostViewData? = null
 
     private var discardResourceDialog: LMFeedDiscardResourceDialog? = null
+    private var removeAttachmentDialogFragment: LMFeedRemoveAttachmentDialogFragment? = null
+
+    private var isEditingArticle: Boolean = false
 
     companion object {
         const val TAG = "EditPostFragment"
@@ -67,6 +85,26 @@ class EditPostFragment :
 
     override val useSharedViewModel: Boolean
         get() = true
+
+    // launcher to handle gallery (IMAGE/VIDEO) intent
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = ExtrasUtil.getParcelable(
+                    result.data?.extras,
+                    LMFeedMediaPickerActivity.ARG_MEDIA_PICKER_RESULT,
+                    MediaPickerResult::class.java
+                )
+                checkMediaPickedResult(data)
+            }
+        }
+
+    private val mediaBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onMediaPickedFromGallery(result.data)
+            }
+        }
 
     override fun getViewModelClass(): Class<EditPostViewModel> {
         return EditPostViewModel::class.java
@@ -92,6 +130,25 @@ class EditPostFragment :
             EDIT_POST_EXTRAS,
             EditPostExtras::class.java
         ) ?: throw emptyExtrasException(TAG)
+    }
+
+    override fun handleResultListener() {
+        super.handleResultListener()
+
+        setFragmentResultListener(LMFeedImageCropFragment.REQUEST_KEY) { _, bundle ->
+            articleSingleUriData =
+                ExtrasUtil.getParcelable(
+                    bundle,
+                    LMFeedImageCropFragment.BUNDLE_ARG_URI,
+                    SingleUriData::class.java
+                ) ?: return@setFragmentResultListener
+
+            isEditingArticle = false
+            showPostMedia(
+                binding.etPostTitle.text?.trim().toString(),
+                binding.etPostContent.text?.trim().toString()
+            )
+        }
     }
 
     override fun setUpViews() {
@@ -120,7 +177,103 @@ class EditPostFragment :
                     R.color.dark_grey
                 )
             )
+
+            ivDeleteArticle.setOnClickListener {
+                val removeExtras = RemoveDialogExtras.Builder()
+                    .title(getString(R.string.remove_article_banner))
+                    .description(getString(R.string.are_you_sure_you_want_to_remove_the_article_banner))
+                    .build()
+                showRemoveDialog(removeExtras)
+            }
+
+            cvArticleImage.setOnClickListener {
+                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.IMAGE))
+            }
         }
+    }
+
+    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
+    private fun initiateMediaPicker(list: List<String>) {
+        val extras = MediaPickerExtras.Builder()
+            .mediaTypes(list)
+            .allowMultipleSelect(true)
+            .build()
+        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
+        galleryLauncher.launch(intent)
+    }
+
+    private fun checkMediaPickedResult(result: MediaPickerResult?) {
+        if (result != null) {
+            when (result.mediaPickerResultType) {
+                MEDIA_RESULT_BROWSE -> {
+                    val intent = AndroidUtils.getExternalPickerIntent(
+                        result.mediaTypes,
+                        result.allowMultipleSelect,
+                        result.browseClassName
+                    )
+                    if (intent != null)
+                        mediaBrowseLauncher.launch(intent)
+                }
+
+                MEDIA_RESULT_PICKED -> {
+                    onMediaPicked(result)
+                }
+            }
+        }
+    }
+
+    // converts the picked media to SingleUriData and adds to the selected media
+    private fun onMediaPicked(result: MediaPickerResult) {
+        val data =
+            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+
+        if (data.isNotEmpty()) {
+            if (data.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
+                val imageCropExtras = ImageCropExtras.Builder()
+                    .singleUriData(data.first())
+                    .cropWidth(16)
+                    .cropHeight(9)
+                    .build()
+
+                findNavController().navigate(
+                    EditPostFragmentDirections.actionFragmentEditPostToImageCropFragment(
+                        imageCropExtras
+                    )
+                )
+            }
+        }
+    }
+
+    private fun onMediaPickedFromGallery(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            if (mediaUris.isNotEmpty()) {
+                if (mediaUris.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
+                    val imageCropExtras = ImageCropExtras.Builder()
+                        .singleUriData(mediaUris.first())
+                        .cropWidth(16)
+                        .cropHeight(9)
+                        .build()
+
+                    findNavController().navigate(
+                        LMFeedCreatePostFragmentDirections.actionFragmentCreatePostToImageCropFragment(
+                            imageCropExtras
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    // shows media remove dialog
+    private fun showRemoveDialog(removeDialogExtras: RemoveDialogExtras) {
+        removeAttachmentDialogFragment = LMFeedRemoveAttachmentDialogFragment.showDialog(
+            childFragmentManager,
+            removeDialogExtras
+        )
     }
 
     // fetches user data from local db
@@ -206,15 +359,25 @@ class EditPostFragment :
                 val text = etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 val title = etPostTitle.text?.trim().toString()
-                handleSaveButton(visible = true)
-                viewModel.editPost(
-                    editPostExtras.postId,
-                    title,
-                    updatedText,
-                    attachments = fileAttachments,
-                    ogTags = ogTags,
-                    widget = widget
-                )
+
+                progressBar.root.show()
+                if (articleSingleUriData != null) {
+                    viewModel.uploadArticleImage(
+                        requireContext(),
+                        etPostTitle.text?.trim().toString(),
+                        etPostContent.text?.trim().toString(),
+                        articleSingleUriData
+                    )
+                } else {
+                    viewModel.editPost(
+                        editPostExtras.postId,
+                        title,
+                        updatedText,
+                        attachments = fileAttachments,
+                        ogTags = ogTags,
+                        widget = widget
+                    )
+                }
             }
         }
     }
@@ -240,14 +403,6 @@ class EditPostFragment :
                 }
                 false
             })
-
-            // text watcher to handleSaveButton click-ability
-            addTextChangedListener {
-                val text = it?.toString()?.trim()
-                if (text.isNullOrEmpty()) {
-                } else {
-                }
-            }
         }
     }
 
@@ -274,6 +429,10 @@ class EditPostFragment :
         // observes userData and initializes the user view
         helperViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
+        }
+
+        viewModel.uploadingData.observe(viewLifecycleOwner) {
+            observeUploading(it)
         }
 
         // observes postResponse live data
@@ -330,6 +489,7 @@ class EditPostFragment :
             when (response) {
                 is EditPostViewModel.ErrorMessageEvent.EditPost -> {
                     handleSaveButton(visible = true)
+                    binding.progressBar.root.show()
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
@@ -441,18 +601,29 @@ class EditPostFragment :
     ) {
         binding.apply {
             cvArticleImage.show()
-            if (title.isEmpty() || articleContent.length < LMFeedCreatePostFragment.MIN_ARTICLE_CONTENT) {
+            if (isEditingArticle) {
                 handleSaveButton(visible = false)
+                ivArticle.hide()
+                ivDeleteArticle.hide()
+                llAddArticle.show()
+                cvArticleImage.isClickable = true
             } else {
-                handleSaveButton(visible = true)
+                if (title.isEmpty() || articleContent.length < LMFeedCreatePostFragment.MIN_ARTICLE_CONTENT) {
+                    handleSaveButton(visible = false)
+                } else {
+                    handleSaveButton(visible = true)
+                }
+                llAddArticle.hide()
+                ivArticle.show()
+                ivDeleteArticle.show()
+                cvArticleImage.isClickable = false
+                val imageUrl =
+                    articleSingleUriData?.uri ?: post?.widget?.widgetMetaData?.coverImageUrl
+                ImageBindingUtil.loadImage(
+                    ivArticle,
+                    imageUrl
+                )
             }
-            llAddArticle.hide()
-            ivArticle.show()
-            cvArticleImage.isClickable = false
-            ImageBindingUtil.loadImage(
-                ivArticle,
-                post?.widget?.widgetMetaData?.coverImageUrl
-            )
             grpMedia.hide()
             linkPreview.root.hide()
             ViewUtils.getMandatoryAsterisk(
@@ -538,6 +709,53 @@ class EditPostFragment :
         }
     }
 
+    // observes post uploading
+    private fun observeUploading(uploadingData: Pair<String, AttachmentViewData>) {
+        val uuid = UUID.fromString(uploadingData.first)
+        if (!workersMap.contains(uuid)) {
+            workersMap.add(uuid)
+            WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
+                .observe(viewLifecycleOwner) { workInfo ->
+                    observeMediaWorker(workInfo, uploadingData.second)
+                }
+        }
+    }
+
+    // observes the media worker through various worker lifecycle
+    private fun observeMediaWorker(
+        workInfo: WorkInfo,
+        attachmentViewData: AttachmentViewData
+    ) {
+        when (workInfo.state) {
+            WorkInfo.State.SUCCEEDED -> {
+                // uploading completed, call the edit post api
+                val updatedWidget = widget?.toBuilder()
+                    ?.metaData(
+                        widget?.widgetMetaData?.toBuilder()
+                            ?.url(attachmentViewData.attachmentMeta.url ?: "")
+                            ?.name(attachmentViewData.attachmentMeta.name ?: "")
+                            ?.coverImageUrl(attachmentViewData.attachmentMeta.coverImageUrl ?: "")
+                            ?.size(attachmentViewData.attachmentMeta.size)
+                            ?.build()
+                    )
+                    ?.build()
+                viewModel.editPost(
+                    editPostExtras.postId,
+                    attachmentViewData.attachmentMeta.title ?: "",
+                    attachmentViewData.attachmentMeta.body ?: "",
+                    widget = updatedWidget
+                )
+            }
+
+            WorkInfo.State.FAILED -> {
+                binding.progressBar.root.hide()
+                ViewUtils.showShortToast(requireContext(), getString(R.string.something_went_wrong))
+            }
+
+            else -> {}
+        }
+    }
+
     // shows discard resource popup
     fun openBackPressedPopup() {
         discardResourceDialog = LMFeedDiscardResourceDialog.show(childFragmentManager)
@@ -551,5 +769,20 @@ class EditPostFragment :
     // when user clicks on continue resource creation
     override fun onResourceCreationContinued() {
         discardResourceDialog?.dismiss()
+    }
+
+    // when user removes attachment
+    override fun onRemoved() {
+        isEditingArticle = true
+        showPostMedia(
+            binding.etPostTitle.text?.trim().toString(),
+            binding.etPostContent.text?.trim().toString()
+        )
+        removeAttachmentDialogFragment?.dismiss()
+    }
+
+    // when user removes attachment
+    override fun onCancelled() {
+        removeAttachmentDialogFragment?.dismiss()
     }
 }

@@ -69,7 +69,7 @@
                     android:singleLine="true"
                     android:text="@string/edit_post"
                     android:textSize="20sp"
-                    app:fontType="medium"
+                    app:fontType="regular"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/iv_back"
                     app:layout_constraintTop_toTopOf="parent"
@@ -178,6 +178,19 @@
                             tools:text="@string/add_cover_photo" />
 
                     </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/iv_delete_article"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="end"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:padding="8dp"
+                        android:src="@drawable/ic_delete_bin"
+                        android:visibility="gone"
+                        tools:ignore="ContentDescription"
+                        tools:visibility="visible" />
 
                 </androidx.cardview.widget.CardView>
 
@@ -347,22 +360,23 @@
                     app:font_type="medium"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.498"
                     app:layout_constraintStart_toStartOf="parent"
                     app:text_type="normal"
                     tools:visibility="visible" />
 
+                <include
+                    android:id="@+id/progress_bar"
+                    layout="@layout/lm_feed_progress_bar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.core.widget.NestedScrollView>
-
-        <include
-            android:id="@+id/progress_bar"
-            layout="@layout/lm_feed_progress_bar"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

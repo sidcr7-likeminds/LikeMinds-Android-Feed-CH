@@ -181,7 +181,6 @@ class LMFeedCreatePostFragment :
                     LMFeedImageCropFragment.BUNDLE_ARG_URI,
                     SingleUriData::class.java
                 ) ?: return@setFragmentResultListener
-            Log.d(TAG, "handleResultListener: ${singleUriData.width} ${singleUriData.height}")
 
             selectedMediaUris.add(singleUriData)
             initAuthorFrame()
@@ -333,6 +332,7 @@ class LMFeedCreatePostFragment :
         initAuthorFrame()
     }
 
+    // shows media remove dialog
     private fun showRemoveDialog(removeDialogExtras: RemoveDialogExtras) {
         removeAttachmentDialogFragment = LMFeedRemoveAttachmentDialogFragment.showDialog(
             childFragmentManager,
@@ -511,6 +511,7 @@ class LMFeedCreatePostFragment :
         // observes addPostResponse, once post is created
         viewModel.postAdded.observe(viewLifecycleOwner) { postAdded ->
             requireActivity().apply {
+                handleProgressBar(false)
                 if (postAdded) {
                     // post is already posted
                     setResult(Activity.RESULT_OK)
@@ -539,7 +540,7 @@ class LMFeedCreatePostFragment :
         viewModel.errorEventFlow.onEach { response ->
             when (response) {
                 is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
-                    handlePostButton(visible = true)
+                    handleProgressBar(false)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
@@ -597,6 +598,7 @@ class LMFeedCreatePostFragment :
                 val text = etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 val postTitle = etPostTitle.text?.trim().toString()
+                handleProgressBar(true)
 
                 viewModel.addPost(
                     requireContext(),
@@ -608,6 +610,12 @@ class LMFeedCreatePostFragment :
                 )
             }
         }
+    }
+
+    // shows/hides progress when required
+    private fun handleProgressBar(showProgress: Boolean) {
+        binding.progressBar.root.isVisible = showProgress
+        handlePostButton(!showProgress)
     }
 
     // sets data to the author frame

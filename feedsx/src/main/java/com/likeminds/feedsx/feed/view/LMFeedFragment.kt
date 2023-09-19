@@ -322,6 +322,7 @@ class LMFeedFragment :
                         removePostingView()
                         scrollToPositionWithOffset(0)
                         mPostAdapter.add(0, response.post)
+                        refreshAutoPlayer()
                     }
                 }
             }

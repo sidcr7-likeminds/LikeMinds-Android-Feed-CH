@@ -1,12 +1,21 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.annotation.SuppressLint
+import android.content.Context
+import android.net.Uri
+import androidx.lifecycle.*
+import androidx.work.WorkContinuation
+import androidx.work.WorkManager
 import com.likeminds.feedsx.LMFeedAnalytics
+import com.likeminds.feedsx.media.MediaRepository
+import com.likeminds.feedsx.media.model.MediaViewData
+import com.likeminds.feedsx.media.model.SingleUriData
+import com.likeminds.feedsx.post.PostWithAttachmentsRepository
+import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.*
-import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.coroutine.launchIO
+import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.widgets.model.WidgetsViewData
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.EditPostRequest
@@ -15,7 +24,11 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-class EditPostViewModel @Inject constructor() : ViewModel() {
+class EditPostViewModel @Inject constructor(
+    private val userPreferences: LMFeedUserPreferences,
+    private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
+    private val mediaRepository: MediaRepository
+) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
@@ -28,6 +41,10 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
     private val postDataEventChannel = Channel<PostDataEvent>(Channel.BUFFERED)
     val postDataEventFlow = postDataEventChannel.receiveAsFlow()
 
+    // Pair -> [uploadWorkerUUID, attachment]
+    private val _uploadingData = MutableLiveData<Pair<String, AttachmentViewData>>()
+    val uploadingData: LiveData<Pair<String, AttachmentViewData>> = _uploadingData
+
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()
         data class EditPost(val errorMessage: String?) : ErrorMessageEvent()
@@ -35,6 +52,14 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorEventFlow = errorEventChannel.receiveAsFlow()
+
+    fun fetchUriDetails(
+        context: Context,
+        uris: List<Uri>,
+        callback: (media: List<MediaViewData>) -> Unit,
+    ) {
+        mediaRepository.getLocalUrisDetails(context, uris, callback)
+    }
 
     // to get the Post to be edited
     fun getPost(postId: String) {
@@ -68,6 +93,114 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    // starts worker to upload article image
+    fun uploadArticleImage(
+        context: Context,
+        postTitle: String,
+        updatedText: String,
+        fileUri: SingleUriData?
+    ) {
+        if (fileUri == null) {
+            return
+        }
+        val updatedFileUri = includeAttachmentMetaData(
+            context,
+            fileUri
+        )
+
+        val temporaryId = System.currentTimeMillis()
+
+        val uploadData = startMediaUploadWorker(
+            context,
+            temporaryId
+        )
+
+        // adds post data in local db
+        storePost(
+            uploadData,
+            temporaryId,
+            postTitle,
+            updatedText,
+            updatedFileUri
+        )
+    }
+
+    /**
+     * Includes attachment's meta data such as dimensions, etc
+     * @param context
+     * @param file SingleUriData?
+     */
+    private fun includeAttachmentMetaData(
+        context: Context,
+        fileUri: SingleUriData
+    ): SingleUriData {
+        // generates localFilePath from the ContentUri provided by client
+        val localFilePath =
+            FileUtil.getRealPath(context, fileUri.uri)
+
+        // generates awsFolderPath to upload the file
+        val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+            fileUri.mediaName,
+            userPreferences.getUUID()
+        )
+        val builder = fileUri.toBuilder().localFilePath(localFilePath)
+            .awsFolderPath(awsFolderPath)
+
+        val dimensions = FileUtil.getImageDimensions(context, fileUri.uri)
+        return builder.width(dimensions.first)
+            .thumbnailUri(fileUri.uri)
+            .height(dimensions.second)
+            .build()
+    }
+
+    //add post:{} into local db
+    private fun storePost(
+        uploadData: Pair<WorkContinuation, String>,
+        temporaryId: Long,
+        heading: String,
+        text: String?,
+        fileUri: SingleUriData
+    ) {
+        viewModelScope.launchIO {
+            val uuid = uploadData.second
+            // means that it is article post
+            val postEntity = ViewDataConverter.convertPost(
+                temporaryId,
+                uuid,
+                "",
+                null,
+                null,
+                null
+            )
+            val attachments = listOf(
+                ViewDataConverter.convertAttachmentForResource(
+                    temporaryId,
+                    fileUri,
+                    text ?: "",
+                    heading
+                )
+            )
+
+            val attachmentsViewData = ViewDataConverter.convertAttachmentsEntity(attachments)
+
+            // add it to local db
+            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
+            _uploadingData.postValue(Pair(uuid, attachmentsViewData.first()))
+            uploadData.first.enqueue()
+        }
+    }
+
+    // creates PostAttachmentUploadWorker to start media upload
+    @SuppressLint("EnqueueWork")
+    private fun startMediaUploadWorker(
+        context: Context,
+        postId: Long
+    ): Pair<WorkContinuation, String> {
+        val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, 1)
+        val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
+        return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
+
     // calls EditPost API and posts the response in LiveData
     fun editPost(
         postId: String,
@@ -87,8 +220,6 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                     // if the post has any file attachments
                     EditPostRequest.Builder()
                         .postId(postId)
-                        .text(updatedText)
-                        .heading(postTitle)
                         .entityId(widget.id)
                         .attachments(
                             ViewDataConverter.createAttachmentsForWidget(
