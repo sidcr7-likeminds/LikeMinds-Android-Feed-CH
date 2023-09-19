@@ -72,6 +72,8 @@ class LMFeedCreatePostFragment :
     private var onBehalfOfUUID: String? = null
     private var loggedInUserUUID: String = ""
 
+    private var user: UserViewData? = null
+
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
     private lateinit var memberTagging: LMFeedMemberTaggingView
@@ -114,12 +116,12 @@ class LMFeedCreatePostFragment :
     private val selectAuthorLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data = ExtrasUtil.getParcelable(
+                user = ExtrasUtil.getParcelable(
                     result.data?.extras,
                     LMFeedSelectAuthorFragment.ARG_SELECT_AUTHOR_RESULT,
                     UserViewData::class.java
-                )
-                onAuthorChanged(data ?: UserViewData.Builder().build())
+                ) ?: UserViewData.Builder().build()
+                onAuthorChanged()
             }
         }
 
@@ -182,6 +184,7 @@ class LMFeedCreatePostFragment :
             Log.d(TAG, "handleResultListener: ${singleUriData.width} ${singleUriData.height}")
 
             selectedMediaUris.add(singleUriData)
+            initAuthorFrame()
             showPostMedia()
         }
     }
@@ -323,11 +326,11 @@ class LMFeedCreatePostFragment :
         }
     }
 
-    private fun onAuthorChanged(user: UserViewData) {
-        if (loggedInUserUUID != user.sdkClientInfoViewData.uuid) {
-            onBehalfOfUUID = user.sdkClientInfoViewData.uuid
+    private fun onAuthorChanged() {
+        if (loggedInUserUUID != user?.sdkClientInfoViewData?.uuid) {
+            onBehalfOfUUID = user?.sdkClientInfoViewData?.uuid
         }
-        initAuthorFrame(user)
+        initAuthorFrame()
     }
 
     private fun showRemoveDialog(removeDialogExtras: RemoveDialogExtras) {
@@ -495,7 +498,10 @@ class LMFeedCreatePostFragment :
         // observes userData and initializes the user view
         helperViewModel.userData.observe(viewLifecycleOwner) {
             loggedInUserUUID = it.sdkClientInfoViewData.uuid
-            initAuthorFrame(it)
+            if (user == null) {
+                user = it
+                initAuthorFrame()
+            }
         }
         // observes decodeUrlResponse and returns link ogTags
         helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
@@ -605,16 +611,17 @@ class LMFeedCreatePostFragment :
     }
 
     // sets data to the author frame
-    private fun initAuthorFrame(user: UserViewData) {
+    private fun initAuthorFrame() {
+        Log.d("PUI", "${user?.name}")
         binding.authorFrame.apply {
-            tvCreatorName.text = user.name
+            tvCreatorName.text = user?.name
             MemberImageUtil.setImage(
-                user.imageUrl,
-                user.name,
-                user.userUniqueId,
+                user?.imageUrl,
+                user?.name,
+                user?.userUniqueId,
                 creatorImage,
                 showRoundImage = true,
-                objectKey = user.updatedAt
+                objectKey = user?.updatedAt
             )
         }
     }
