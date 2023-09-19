@@ -810,6 +810,7 @@ object ViewDataConverter {
             .isPosted(post.isPosted)
             .attachments(convertAttachmentsEntity(attachments))
             .heading(postWithAttachments.post.heading)
+            .onBehalfOfUUID(postWithAttachments.post.onBehalfOfUUID)
             .build()
     }
 
@@ -854,7 +855,8 @@ object ViewDataConverter {
         uuid: String,
         thumbnail: String,
         text: String?,
-        heading: String?
+        heading: String?,
+        onBehalfOfUUID: String?
     ): PostEntity {
         return PostEntity.Builder()
             .temporaryId(temporaryId)
@@ -863,6 +865,7 @@ object ViewDataConverter {
             .thumbnail(thumbnail)
             .text(text)
             .heading(heading)
+            .onBehalfOfUUID(onBehalfOfUUID)
             .build()
     }
 

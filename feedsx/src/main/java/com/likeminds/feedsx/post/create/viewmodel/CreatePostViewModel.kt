@@ -60,7 +60,8 @@ class CreatePostViewModel @Inject constructor(
         postTitle: String,
         postTextContent: String?,
         fileUris: List<SingleUriData>? = null,
-        ogTags: LinkOGTagsViewData? = null
+        ogTags: LinkOGTagsViewData? = null,
+        onBehalfOfUUID: String? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
@@ -83,12 +84,14 @@ class CreatePostViewModel @Inject constructor(
                     uploadData,
                     postTitle,
                     updatedText,
-                    updatedFileUris
+                    updatedFileUris,
+                    onBehalfOfUUID
                 )
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
                     .heading(postTitle)
+                    .onBehalfOfUUID(onBehalfOfUUID)
                     .text(updatedText)
                 if (ogTags != null) {
                     // if the post has ogTags
@@ -115,7 +118,8 @@ class CreatePostViewModel @Inject constructor(
         uploadData: Pair<WorkContinuation, String>,
         heading: String,
         text: String?,
-        fileUris: List<SingleUriData>? = null
+        fileUris: List<SingleUriData>? = null,
+        onBehalfOfUUID: String?
     ) {
         viewModelScope.launchIO {
             val uuid = uploadData.second
@@ -131,7 +135,8 @@ class CreatePostViewModel @Inject constructor(
                     uuid,
                     thumbnailUri.toString(),
                     null,
-                    null
+                    null,
+                    onBehalfOfUUID
                 )
                 val attachments = fileUris.map {
                     convertAttachmentForResource(
@@ -149,7 +154,8 @@ class CreatePostViewModel @Inject constructor(
                     uuid,
                     thumbnailUri.toString(),
                     text,
-                    heading
+                    heading,
+                    onBehalfOfUUID
                 )
                 val attachments = fileUris.map {
                     convertAttachment(

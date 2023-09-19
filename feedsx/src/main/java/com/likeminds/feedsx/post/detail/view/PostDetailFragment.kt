@@ -754,6 +754,7 @@ class PostDetailFragment :
             onPostMenuItemClicked(
                 postViewData.id,
                 postViewData.user.sdkClientInfoViewData.uuid,
+                postViewData.viewType,
                 menuItem.itemId
             )
             true
@@ -766,12 +767,14 @@ class PostDetailFragment :
     private fun onPostMenuItemClicked(
         postId: String,
         postCreatorUUID: String,
+        viewType: Int?,
         menuId: Int
     ) {
         when (menuId) {
             EDIT_POST_MENU_ITEM_ID -> {
                 val editPostExtras = EditPostExtras.Builder()
                     .postId(postId)
+                    .viewType(viewType)
                     .build()
                 val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
                 editPostLauncher.launch(intent)

@@ -35,7 +35,8 @@ class PostViewData private constructor(
     val temporaryId: Long?,
     val uuid: String,
     val widget: WidgetsViewData,
-    val heading: String?
+    val heading: String?,
+    val onBehalfOfUUID: String?
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -98,6 +99,7 @@ class PostViewData private constructor(
         private var uuid: String = ""
         private var widget: WidgetsViewData = WidgetsViewData.Builder().build()
         private var heading: String? = null
+        private var onBehalfOfUUID: String? = null
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String?) = apply { this.text = text }
@@ -138,6 +140,7 @@ class PostViewData private constructor(
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun widget(widget: WidgetsViewData) = apply { this.widget = widget }
         fun heading(heading: String?) = apply { this.heading = heading }
+        fun onBehalfOfUUID(onBehalfOfUUID: String?) = apply { this.onBehalfOfUUID = onBehalfOfUUID }
 
         fun build() = PostViewData(
             id,
@@ -167,7 +170,8 @@ class PostViewData private constructor(
             temporaryId,
             uuid,
             widget,
-            heading
+            heading,
+            onBehalfOfUUID
         )
     }
 
@@ -200,5 +204,6 @@ class PostViewData private constructor(
             .uuid(uuid)
             .widget(widget)
             .heading(heading)
+            .onBehalfOfUUID(onBehalfOfUUID)
     }
 }

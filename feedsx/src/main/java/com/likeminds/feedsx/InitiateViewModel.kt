@@ -39,6 +39,9 @@ class InitiateViewModel @Inject constructor(
     private val _initiateErrorMessage = MutableLiveData<String?>()
     val initiateErrorMessage: LiveData<String?> = _initiateErrorMessage
 
+    private val _isAdmin = MutableLiveData<Boolean>()
+    val isAdmin: LiveData<Boolean> = _isAdmin
+
     /***
      * calls InitiateUser API
      * store user:{} in db
@@ -133,6 +136,9 @@ class InitiateViewModel @Inject constructor(
 
             //updated userEntity
             userEntity = userEntity.toBuilder().state(memberState).isOwner(isOwner).build()
+
+            // post the value if the user is admin or not
+            _isAdmin.postValue(isOwner || (memberState == 1))
 
             // creates list of [MemberRightsEntity]
             val memberRightsEntity = ViewDataConverter.createMemberRightsEntity(

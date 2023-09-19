@@ -148,11 +148,13 @@ class FeedViewModel @Inject constructor(
             val request = if (postingData.attachments.first().attachmentType == ARTICLE) {
                 AddPostRequest.Builder()
                     .attachments(createAttachments(postingData.attachments))
+                    .onBehalfOfUUID(postingData.onBehalfOfUUID)
                     .build()
             } else {
                 AddPostRequest.Builder()
                     .text(updatedText)
                     .heading(postingData.heading)
+                    .onBehalfOfUUID(postingData.onBehalfOfUUID)
                     .attachments(createAttachments(postingData.attachments))
                     .build()
             }

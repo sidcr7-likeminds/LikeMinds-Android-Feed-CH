@@ -69,6 +69,9 @@ class LMFeedCreatePostFragment :
 
     private lateinit var etLinkTextChangeListener: TextWatcher
 
+    private var onBehalfOfUUID: String? = null
+    private var loggedInUserUUID: String = ""
+
     private var selectedMediaUris: ArrayList<SingleUriData> = arrayListOf()
     private var ogTags: LinkOGTagsViewData? = null
     private lateinit var memberTagging: LMFeedMemberTaggingView
@@ -105,6 +108,18 @@ class LMFeedCreatePostFragment :
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 onPdfPicked(result.data)
+            }
+        }
+
+    private val selectAuthorLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = ExtrasUtil.getParcelable(
+                    result.data?.extras,
+                    LMFeedSelectAuthorFragment.ARG_SELECT_AUTHOR_RESULT,
+                    UserViewData::class.java
+                )
+                onAuthorChanged(data ?: UserViewData.Builder().build())
             }
         }
 
@@ -185,6 +200,12 @@ class LMFeedCreatePostFragment :
         binding.apply {
             createPostExtras.attachmentUri?.let { selectedMediaUris.add(it) }
             ogTags = createPostExtras.linkOGTagsViewData
+
+            if (createPostExtras.isAdmin) {
+                authorFrame.ivChangeAuthor.show()
+            } else {
+                authorFrame.ivChangeAuthor.hide()
+            }
 
             ViewUtils.getMandatoryAsterisk(
                 getString(R.string.add_title),
@@ -295,7 +316,18 @@ class LMFeedCreatePostFragment :
                     initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.PDF))
                 }
             }
+
+            authorFrame.ivChangeAuthor.setOnClickListener {
+                selectAuthorLauncher.launch(LMFeedSelectAuthorActivity.getIntent(requireContext()))
+            }
         }
+    }
+
+    private fun onAuthorChanged(user: UserViewData) {
+        if (loggedInUserUUID != user.sdkClientInfoViewData.uuid) {
+            onBehalfOfUUID = user.sdkClientInfoViewData.uuid
+        }
+        initAuthorFrame(user)
     }
 
     private fun showRemoveDialog(removeDialogExtras: RemoveDialogExtras) {
@@ -462,6 +494,7 @@ class LMFeedCreatePostFragment :
         observeMembersTaggingList()
         // observes userData and initializes the user view
         helperViewModel.userData.observe(viewLifecycleOwner) {
+            loggedInUserUUID = it.sdkClientInfoViewData.uuid
             initAuthorFrame(it)
         }
         // observes decodeUrlResponse and returns link ogTags
@@ -564,7 +597,8 @@ class LMFeedCreatePostFragment :
                     postTitle,
                     updatedText,
                     selectedMediaUris,
-                    ogTags
+                    ogTags,
+                    onBehalfOfUUID
                 )
             }
         }

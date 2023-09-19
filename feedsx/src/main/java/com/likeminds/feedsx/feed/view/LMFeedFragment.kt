@@ -708,6 +708,7 @@ class LMFeedFragment :
                     .attachmentType(attachmentType)
                     .attachmentUri(data.first())
                     .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .isAdmin(initiateViewModel.isAdmin.value ?: false)
                     .build()
                 startCreatePostActivity(createPostExtras)
             }
@@ -764,6 +765,7 @@ class LMFeedFragment :
                         .attachmentType(attachmentType)
                         .attachmentUri(mediaUris.first())
                         .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                        .isAdmin(initiateViewModel.isAdmin.value ?: false)
                         .build()
                     startCreatePostActivity(createPostExtras)
                 }
@@ -786,6 +788,7 @@ class LMFeedFragment :
                         .attachmentType(attachmentType)
                         .attachmentUri(mediaUris.first())
                         .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                        .isAdmin(initiateViewModel.isAdmin.value ?: false)
                         .build()
                     startCreatePostActivity(createPostExtras)
                 }
@@ -1251,6 +1254,7 @@ class LMFeedFragment :
             .attachmentType(LINK)
             .linkOGTagsViewData(linkOGTags)
             .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+            .isAdmin(initiateViewModel.isAdmin.value ?: false)
             .build()
 
         startCreatePostActivity(createPostExtras)
@@ -1274,6 +1278,7 @@ class LMFeedFragment :
                 val createPostExtras = CreatePostExtras.Builder()
                     .attachmentType(ARTICLE)
                     .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .isAdmin(initiateViewModel.isAdmin.value ?: false)
                     .build()
                 startCreatePostActivity(createPostExtras)
             }

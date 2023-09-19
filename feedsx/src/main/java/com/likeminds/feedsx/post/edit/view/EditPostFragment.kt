@@ -168,6 +168,28 @@ class EditPostFragment :
             ivBack.setOnClickListener {
                 openBackPressedPopup()
             }
+
+            when (editPostExtras.viewType) {
+                ITEM_POST_SINGLE_VIDEO -> {
+                    tvToolbarTitle.text = getString(R.string.edit_video_resource)
+                }
+
+                ITEM_POST_DOCUMENTS -> {
+                    tvToolbarTitle.text = getString(R.string.edit_pdf_resource)
+                }
+
+                ITEM_POST_LINK -> {
+                    tvToolbarTitle.text = getString(R.string.edit_link_resource)
+                }
+
+                ITEM_POST_ARTICLE -> {
+                    tvToolbarTitle.text = getString(R.string.edit_article)
+                }
+
+                else -> {
+                    tvToolbarTitle.text = getString(R.string.edit_post)
+                }
+            }
         }
     }
 

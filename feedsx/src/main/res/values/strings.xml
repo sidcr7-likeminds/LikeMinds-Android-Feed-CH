@@ -134,8 +134,8 @@
     <string name="unpin_this_post">Unpin This Post</string>
     <string name="you_do_not_have_permission_to_create_a_post">You do not have permission to create a post</string>
     <string name="you_do_not_have_permission_to_comment">You do not have permission to comment</string>
-    <string name="share_post">Share Post</string>
-    <string name="edit_post">Edit Post</string>
+    <string name="share_post">Share Resource</string>
+    <string name="edit_post">Edit Resource</string>
     <string name="no_activities_to_showno_activities_to_show">No activities to show</string>
     <string name="nine_nine_plus">99+</string>
     <string name="no_notifications_yet">Oops! You don\'t have any notifications yet!</string>
@@ -174,4 +174,10 @@
     <string name="add_video_resource">Add Video Resource</string>
     <string name="add_pdf_resource">Add PDF Resource</string>
     <string name="share_link_resource">Share link resource</string>
+    <string name="edit_link_resource">Edit Link Resource</string>
+    <string name="edit_video_resource">Edit Video Resource</string>
+    <string name="edit_article">Edit Article</string>
+    <string name="edit_pdf_resource">Edit PDF Resource</string>
+    <string name="select_author">Select author</string>
+    <string name="select_new_author_for_this_resource">Select the new author for this resource.</string>
 </resources>

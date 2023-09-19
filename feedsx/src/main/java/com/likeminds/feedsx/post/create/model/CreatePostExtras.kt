@@ -11,13 +11,15 @@ class CreatePostExtras private constructor(
     val attachmentType: Int,
     val source: String?,
     val linkOGTagsViewData: LinkOGTagsViewData?,
-    val attachmentUri: SingleUriData?
+    val attachmentUri: SingleUriData?,
+    val isAdmin: Boolean
 ) : Parcelable {
     class Builder {
         private var attachmentType: Int = VIDEO
         private var source: String? = null
         private var linkOGTagsViewData: LinkOGTagsViewData? = null
         private var attachmentUri: SingleUriData? = null
+        private var isAdmin: Boolean = false
 
         fun attachmentType(@AttachmentType attachmentType: Int) =
             apply { this.attachmentType = attachmentType }
@@ -29,11 +31,14 @@ class CreatePostExtras private constructor(
         fun attachmentUri(attachmentUri: SingleUriData?) =
             apply { this.attachmentUri = attachmentUri }
 
+        fun isAdmin(isAdmin: Boolean) = apply { this.isAdmin = isAdmin }
+
         fun build() = CreatePostExtras(
             attachmentType,
             source,
             linkOGTagsViewData,
-            attachmentUri
+            attachmentUri,
+            isAdmin
         )
     }
 
@@ -42,5 +47,6 @@ class CreatePostExtras private constructor(
             .source(source)
             .linkOGTagsViewData(linkOGTagsViewData)
             .attachmentUri(attachmentUri)
+            .isAdmin(isAdmin)
     }
 }
