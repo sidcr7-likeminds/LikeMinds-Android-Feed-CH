@@ -16,7 +16,7 @@ class PostAdapter constructor(
     }
 
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
-        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(6)
+        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(8)
 
         val itemPostTextOnlyBinder = LMFeedItemPostTextOnlyViewDataBinder(listener)
         viewDataBinders.add(itemPostTextOnlyBinder)
@@ -39,6 +39,9 @@ class PostAdapter constructor(
         val itemPostMultipleMediaViewDataBinder =
             LMFeedItemPostMultipleMediaViewDataBinder(listener)
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
+
+        val lmFeedItemPostShimmerViewDataBinder = LMFeedItemPostShimmerViewDataBinder()
+        viewDataBinders.add(lmFeedItemPostShimmerViewDataBinder)
 
         return viewDataBinders
     }

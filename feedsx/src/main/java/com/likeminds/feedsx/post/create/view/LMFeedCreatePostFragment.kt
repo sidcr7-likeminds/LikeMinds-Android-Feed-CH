@@ -612,7 +612,6 @@ class LMFeedCreatePostFragment :
 
     // sets data to the author frame
     private fun initAuthorFrame() {
-        Log.d("PUI", "${user?.name}")
         binding.authorFrame.apply {
             tvCreatorName.text = user?.name
             MemberImageUtil.setImage(

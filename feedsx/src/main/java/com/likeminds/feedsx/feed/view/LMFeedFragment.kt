@@ -7,8 +7,7 @@ import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
-import android.os.Bundle
+import android.os.*
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
@@ -199,7 +198,7 @@ class LMFeedFragment :
         }
 
         initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
-            ProgressHelper.hideProgress(binding.progressBar)
+            removeShimmer()
             ViewUtils.showErrorMessageToast(requireContext(), it)
         }
 
@@ -254,8 +253,8 @@ class LMFeedFragment :
 
     //observe feed response
     private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
-        //hide progress bar
-        ProgressHelper.hideProgress(binding.progressBar)
+        removeShimmer()
+
         //page in api send
         val page = pair.first
 
@@ -269,6 +268,11 @@ class LMFeedFragment :
             mSwipeRefreshLayout.isRefreshing = false
             return
         }
+
+        attachScrollListener(
+            binding.recyclerView,
+            (binding.recyclerView.layoutManager as LinearLayoutManager)
+        )
 
         //normal adding
         if (page == 1) {
@@ -305,6 +309,9 @@ class LMFeedFragment :
                         postingProgress.show()
                         ivPosted.hide()
                         tvRetry.hide()
+                        if (!isFirstItemShimmer()) {
+                            addShimmer()
+                        }
                         observeMediaUpload(post)
                     }
                 }
@@ -312,8 +319,9 @@ class LMFeedFragment :
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
                         ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
-                        refreshFeed()
                         removePostingView()
+                        scrollToPositionWithOffset(0)
+                        mPostAdapter.add(0, response.post)
                     }
                 }
             }
@@ -322,14 +330,12 @@ class LMFeedFragment :
 
     // checks if there is any post or not
     private fun checkForNoPost(feed: List<BaseViewType>) {
-        if (feed.isNotEmpty()) {
-            binding.apply {
+        binding.apply {
+            if (feed.isNotEmpty()) {
                 layoutNoPost.root.hide()
                 newPostButton.show()
                 recyclerView.show()
-            }
-        } else {
-            binding.apply {
+            } else {
                 layoutNoPost.root.show()
                 newPostButton.hide()
                 recyclerView.hide()
@@ -383,6 +389,7 @@ class LMFeedFragment :
                     postingData.temporaryId,
                     indexList.size
                 )
+                removeShimmer()
             }
 
             else -> {
@@ -419,7 +426,7 @@ class LMFeedFragment :
             is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
                 val errorMessage = response.errorMessage
                 mSwipeRefreshLayout.isRefreshing = false
-                ProgressHelper.hideProgress(binding.progressBar)
+                removeShimmer()
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
 
@@ -542,7 +549,7 @@ class LMFeedFragment :
 
     // initiates SDK
     private fun initiateSDK() {
-        ProgressHelper.showProgress(binding.progressBar)
+        addShimmer()
         initiateViewModel.initiateUser(
             requireContext(),
             lmFeedExtras.apiKey,
@@ -552,11 +559,32 @@ class LMFeedFragment :
         )
     }
 
+    // add shimmer items
+    private fun addShimmer() {
+        scrollToPositionWithOffset(0)
+        mPostAdapter.add(0, PostShimmerViewData.Builder().build())
+    }
+
+    // remove shimmer
+    private fun removeShimmer() {
+        if (isFirstItemShimmer()) {
+            mPostAdapter.removeIndex(0)
+        }
+    }
+
+    // checks whether first item in adapter is shimmer or not
+    private fun isFirstItemShimmer(): Boolean {
+        if (mPostAdapter.itemCount > 0 && mPostAdapter.items().first() is PostShimmerViewData) {
+            return true
+        }
+        return false
+    }
+
     /**
      * UI Block
      **/
 
-    // initializes various UI components
+// initializes various UI components
     private fun initUI() {
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
 
@@ -836,11 +864,6 @@ class LMFeedFragment :
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             addItemDecoration(dividerItemDecorator)
             show()
-
-            attachScrollListener(
-                this,
-                linearLayoutManager
-            )
         }
     }
 
@@ -913,16 +936,16 @@ class LMFeedFragment :
     // shows invalid access error and logs out invalid user
     private fun showInvalidAccess() {
         binding.apply {
-            ProgressHelper.hideProgress(progressBar)
+            removeShimmer()
             recyclerView.hide()
             layoutAccessRemoved.root.show()
         }
     }
 
-    // todo: hide shimmer
     // removes the posting view and shows create post button
     private fun removePostingView() {
         binding.apply {
+            removeShimmer()
             alreadyPosting = false
             layoutPosting.root.hide()
         }
@@ -1312,7 +1335,7 @@ class LMFeedFragment :
      * Adapter Util Block
      **/
 
-    //get index and post from the adapter using postId
+//get index and post from the adapter using postId
     private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData>? {
         val index = mPostAdapter.items().indexOfFirst {
             (it is PostViewData) && (it.id == postId)

@@ -3,7 +3,6 @@ package com.likeminds.feedsx.media.view
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.os.bundleOf
@@ -42,11 +41,8 @@ class LMFeedImageCropFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("CreatePostFragment", "onCreate: ")
         if (arguments == null) return
-        Log.d("CreatePostFragment", "onCreate: 1")
         extras = LMFeedImageCropFragmentArgs.fromBundle(requireArguments()).cropExtras
-        Log.d("CreatePostFragment", "onCreate: ${extras.cropHeight}")
     }
 
     override fun onCreateView(

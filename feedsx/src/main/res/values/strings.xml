@@ -116,8 +116,8 @@
     <string name="post_unpinned">Resource unpinned!</string>
     <string name="no_comment_found">No comment found</string>
     <string name="be_the_first_one_to_comment">Be the first one to comment</string>
-    <string name="general_channel_name">General notifications</string>
-    <string name="general_channel_description">All general notifications</string>
+    <string name="general_channel_name">Resource notifications</string>
+    <string name="general_channel_description">All resource notifications</string>
     <string name="login_details">Login Details</string>
     <string name="api_key">Api Key</string>
     <string name="enter_api_key">Enter API Key</string>

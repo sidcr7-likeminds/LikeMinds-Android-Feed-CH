@@ -193,11 +193,13 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
             when (this) {
                 is PostAdapter -> {
                     val item = this[pos]
-                    handleVideoPlayAtHome(
-                        pos,
-                        (item?.viewType ?: 0),
-                        item as PostViewData
-                    )
+                    if (item is PostViewData) {
+                        handleVideoPlayAtHome(
+                            pos,
+                            (item.viewType),
+                            item
+                        )
+                    }
                 }
 
                 is PostDetailAdapter -> {
@@ -205,11 +207,13 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                         return
                     }
                     val item = this[pos]
-                    handleVideoPlayInPostDetail(
-                        pos,
-                        (item?.viewType ?: 0),
-                        item as PostViewData
-                    )
+                    if (item is PostViewData) {
+                        handleVideoPlayInPostDetail(
+                            pos,
+                            (item.viewType),
+                            item
+                        )
+                    }
                 }
             }
         }

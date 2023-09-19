@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipChildren="true"
+        app:shimmer_auto_start="true"
+        app:shimmer_clip_to_children="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:background="@color/white">
+
+            <View
+                android:id="@+id/v1"
+                android:layout_width="match_parent"
+                android:layout_height="216dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/background_shimmer"
+                android:elevation="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/v2"
+                android:layout_width="0dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/background_shimmer_radius_4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/v1"
+                app:layout_constraintWidth_percent="0.7" />
+
+            <View
+                android:id="@+id/v3"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/background_shimmer_radius_4"
+                app:layout_constraintTop_toBottomOf="@id/v2" />
+
+            <View
+                android:id="@+id/v4"
+                android:layout_width="80dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/background_shimmer_radius_4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/v3" />
+
+            <ImageView
+                android:id="@+id/iv_like"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginVertical="10dp"
+                android:layout_marginStart="2dp"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:tint="@color/light_grayish_blue"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/v4"
+                app:srcCompat="@drawable/ic_like_unfilled"
+                tools:ignore="ContentDescription" />
+
+            <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                android:id="@+id/likes_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:foreground="?selectableItemBackground"
+                android:paddingVertical="4dp"
+                android:text="@string/like"
+                android:textColor="@color/light_grayish_blue"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:fontType="regular"
+                app:layout_constraintBottom_toBottomOf="@id/iv_like"
+                app:layout_constraintStart_toEndOf="@id/iv_like"
+                app:layout_constraintTop_toTopOf="@id/iv_like"
+                tools:fontFamily="@font/roboto_regular"
+                tools:ignore="UnusedAttribute"
+                tools:text="Like" />
+
+            <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                android:id="@+id/comments_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="19dp"
+                android:drawableStart="@drawable/ic_comment"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/light_grayish_blue"
+                android:foreground="?selectableItemBackground"
+                android:gravity="center"
+                android:paddingVertical="4dp"
+                android:text="@string/add_comment"
+                android:textAlignment="center"
+                android:textColor="@color/light_grayish_blue"
+                android:textSize="14sp"
+                android:textStyle="normal"
+                app:fontType="regular"
+                app:layout_constraintBottom_toBottomOf="@id/iv_like"
+                app:layout_constraintStart_toEndOf="@id/likes_count"
+                app:layout_constraintTop_toTopOf="@id/iv_like"
+                tools:fontFamily="@font/roboto_regular"
+                tools:ignore="UnusedAttribute" />
+
+            <ImageView
+                android:id="@+id/iv_bookmark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="18dp"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/iv_share"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_bookmark_filled"
+                tools:ignore="ContentDescription" />
+
+            <ImageView
+                android:id="@+id/iv_share"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:foreground="?selectableItemBackground"
+                android:padding="4dp"
+                android:scaleType="fitCenter"
+                android:tint="@color/light_grayish_blue"
+                android:visibility="visible"
+                app:layout_constraintBottom_toBottomOf="@id/iv_like"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/iv_like"
+                app:srcCompat="@drawable/ic_share_post"
+                tools:ignore="ContentDescription,UnusedAttribute" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+</layout>

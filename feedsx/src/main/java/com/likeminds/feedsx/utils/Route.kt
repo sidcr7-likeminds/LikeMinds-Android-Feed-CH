@@ -4,15 +4,14 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import com.likeminds.feedsx.LMFeedAnalytics
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 
 object Route {
 
-    private const val ROUTE_POST_DETAIL = "post_detail"
-    private const val ROUTE_FEED = "feed"
-    private const val ROUTE_CREATE_POST = "create_post"
+    const val ROUTE_POST_DETAIL = "post_detail"
+    const val ROUTE_FEED = "feed"
+    const val ROUTE_CREATE_POST = "create_post"
     private const val PARAM_POST_ID = "post_id"
     private const val ROUTE_BROWSER = "browser"
     private const val PARAM_COMMENT_ID = "comment_id"
@@ -39,12 +38,15 @@ object Route {
                     source
                 )
             }
+
             ROUTE_FEED -> {
                 // navigation to feed
             }
+
             ROUTE_CREATE_POST -> {
 //                intent = getRouteToCreatePost(context, source)
             }
+
             ROUTE_BROWSER -> {
                 intent = getRouteToBrowser(route)
             }
@@ -102,6 +104,7 @@ object Route {
             DEEP_LINK_POST -> {
                 createPostDetailRoute(data)
             }
+
             else -> {
                 createWebsiteRoute(data)
             }
