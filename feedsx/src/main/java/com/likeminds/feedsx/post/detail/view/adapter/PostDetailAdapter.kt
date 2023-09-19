@@ -20,7 +20,7 @@ class PostDetailAdapter constructor(
     }
 
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
-        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(8)
+        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(10)
 
         val itemPostDetailCommentsCountViewDataBinder = ItemPostDetailCommentsCountViewDataBinder()
         viewDataBinders.add(itemPostDetailCommentsCountViewDataBinder)
