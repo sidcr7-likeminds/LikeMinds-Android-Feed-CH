@@ -148,6 +148,7 @@ class LMFeedNotificationFeedFragment :
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
                 requireActivity().finish()
             }
+
             is NotificationFeedViewModel.ErrorMessageEvent.MarkReadNotification -> {
                 val errorMessage = response.errorMessage
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)

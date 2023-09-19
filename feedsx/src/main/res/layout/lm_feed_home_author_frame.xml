@@ -31,6 +31,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
+            android:layout_marginEnd="8dp"
             android:ellipsize="end"
             android:includeFontPadding="false"
             android:lineHeight="20dp"
@@ -39,7 +40,7 @@
             app:fontType="medium"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@id/tv_member_name"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/iv_pin"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/member_image"
             app:layout_constraintTop_toTopOf="@+id/member_image"
@@ -113,6 +114,19 @@
             app:layout_constraintStart_toEndOf="@+id/view_dot_edited"
             app:layout_constraintTop_toTopOf="@+id/tv_time"
             tools:fontFamily="@font/roboto_regular"
+            tools:visibility="visible" />
+
+        <ImageView
+            android:id="@+id/iv_pin"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingHorizontal="2dp"
+            android:scaleType="fitCenter"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tv_post_title"
+            app:srcCompat="@drawable/ic_post_pin"
+            tools:ignore="ContentDescription"
             tools:visibility="visible" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,7 @@ package com.likeminds.feedsx.pushnotification
 import android.app.*
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.likeminds.feedsx.LMFeedAnalytics
@@ -169,6 +170,8 @@ class LMFeedNotificationHandler {
             0,
             LMFeedAnalytics.Source.NOTIFICATION
         )
+
+        Log.d("PUI", "getRoutePendingIntent: ${intent?.getBundleExtra("bundle")}")
 
         if (intent?.getBundleExtra("bundle") != null) {
             intent.getBundleExtra("bundle")!!.putParcelable(

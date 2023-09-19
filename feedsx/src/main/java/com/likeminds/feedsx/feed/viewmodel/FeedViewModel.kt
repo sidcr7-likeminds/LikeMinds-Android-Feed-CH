@@ -100,7 +100,6 @@ class FeedViewModel @Inject constructor(
         }
     }
 
-
     //get universal feed
     fun getUniversalFeed(page: Int) {
         viewModelScope.launchIO {

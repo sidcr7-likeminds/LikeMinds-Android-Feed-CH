@@ -42,6 +42,12 @@ object PostTypeUtil {
             // sets button color variable in xml
             buttonColor = LMFeedBranding.getButtonsColor()
 
+            if (data.isPinned) {
+                ivPin.show()
+            } else {
+                ivPin.hide()
+            }
+
             if (data.isEdited) {
                 viewDotEdited.show()
                 tvEdited.show()
@@ -532,8 +538,6 @@ object PostTypeUtil {
             } else {
                 root.context.getString(R.string.link)
             }
-            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-            tvLinkDescription.text = data.description
 
             val isImageValid = data.image.isImageValid()
             if (isImageValid) {
