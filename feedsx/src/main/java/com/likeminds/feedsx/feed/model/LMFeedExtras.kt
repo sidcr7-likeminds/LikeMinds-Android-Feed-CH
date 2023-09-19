@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 class LMFeedExtras private constructor(
     val apiKey: String,
     val userName: String,
-    val userId: String,
+    val uuid: String,
     val isGuest: Boolean
 ) : Parcelable {
 
@@ -15,18 +15,18 @@ class LMFeedExtras private constructor(
 
         private var apiKey: String = ""
         private var userName: String = ""
-        private var userId: String = ""
+        private var uuid: String = ""
         private var isGuest: Boolean = false
 
         fun apiKey(apiKey: String) = apply { this.apiKey = apiKey }
         fun userName(userName: String) = apply { this.userName = userName }
-        fun userId(userId: String) = apply { this.userId = userId }
+        fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isGuest(isGuest: Boolean) = apply { this.isGuest = isGuest }
 
         fun build() = LMFeedExtras(
             apiKey,
             userName,
-            userId,
+            uuid,
             isGuest
         )
     }
@@ -34,7 +34,7 @@ class LMFeedExtras private constructor(
     fun toBuilder(): Builder {
         return Builder().apiKey(apiKey)
             .userName(userName)
-            .userId(userId)
+            .uuid(uuid)
             .isGuest(isGuest)
     }
 }

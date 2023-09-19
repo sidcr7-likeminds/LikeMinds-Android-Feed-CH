@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsampleapp.R
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
 import com.likeminds.feedsampleapp.databinding.ActivityAfterLoginBinding
-import com.likeminds.feedsx.LMFeedUI
+import com.likeminds.feedsx.LikeMindsFeedUI
 
 class AfterLoginActivity : AppCompatActivity() {
 
@@ -25,7 +25,7 @@ class AfterLoginActivity : AppCompatActivity() {
 
     private fun initFeedFragment() {
         Log.d("PUI", "onCreate: initFeedFragment")
-        LMFeedUI.initFeed(
+        LikeMindsFeedUI.initFeed(
             this,
             R.id.frameLayout,
             authPreferences.getApiKey(),
