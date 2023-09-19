@@ -193,18 +193,19 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
             when (this) {
                 is PostAdapter -> {
                     val item = this[pos]
-                    handleVideoPlay(
+                    handleVideoPlayAtHome(
                         pos,
                         (item?.viewType ?: 0),
                         item as PostViewData
                     )
                 }
+
                 is PostDetailAdapter -> {
                     if (pos != 0) {
                         return
                     }
                     val item = this[pos]
-                    handleVideoPlay(
+                    handleVideoPlayInPostDetail(
                         pos,
                         (item?.viewType ?: 0),
                         item as PostViewData
@@ -214,8 +215,8 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
         }
     }
 
-    // handles main logic to play the video at specified position
-    private fun handleVideoPlay(
+    // handles main logic to play the video at specified position in home feed
+    private fun handleVideoPlayAtHome(
         pos: Int,
         viewType: Int,
         data: PostViewData
@@ -237,6 +238,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 }
                 lastPlayerView = itemPostSingleVideoBinding.videoPost
             }
+
             ITEM_POST_MULTIPLE_MEDIA -> {
                 // if the post is of type [ITEM_POST_MULTIPLE_MEDIA]
                 val itemMultipleMediaBinding =
@@ -266,6 +268,68 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                     lastPlayerView = itemMultipleMediaVideoBinding.videoPost
                 }
             }
+
+            else -> {
+                // if the post is does not have any video, simply remove the player
+                removePlayer()
+            }
+        }
+    }
+
+    // handles main logic to play the video at specified position in post detail screen
+    private fun handleVideoPlayInPostDetail(
+        pos: Int,
+        viewType: Int,
+        data: PostViewData
+    ) {
+        when (viewType) {
+            ITEM_POST_SINGLE_VIDEO -> {
+                // if the post is of type [ITEM_POST_SINGLE_VIDEO]
+                val itemPostSingleVideoBinding =
+                    (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
+                        ?.binding as? LmFeedItemPostDetailSingleVideoBinding ?: return
+
+                if (lastPlayerView == null || lastPlayerView != itemPostSingleVideoBinding.videoPost) {
+                    val meta = data.attachments.first().attachmentMeta
+                    startNewPlayer(
+                        itemPostSingleVideoBinding.videoPost,
+                        itemPostSingleVideoBinding.pbVideoLoader,
+                        meta.url
+                    )
+                }
+                lastPlayerView = itemPostSingleVideoBinding.videoPost
+            }
+
+            ITEM_POST_MULTIPLE_MEDIA -> {
+                // if the post is of type [ITEM_POST_MULTIPLE_MEDIA]
+                val itemMultipleMediaBinding =
+                    (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
+                        ?.binding as? LmFeedItemPostMultipleMediaBinding ?: return
+
+                val viewPager = itemMultipleMediaBinding.viewpagerMultipleMedia
+                val currentItem = viewPager.currentItem
+
+                // gets the video binding from view pager
+                val itemMultipleMediaVideoBinding =
+                    ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(currentItem) as? DataBoundViewHolder<*>)
+                        ?.binding as? LmFeedItemMultipleMediaVideoBinding
+
+                if (itemMultipleMediaVideoBinding == null) {
+                    // if itemMultipleMediaVideoBinding, that means it is an image
+                    removePlayer()
+                } else {
+                    if (lastPlayerView == null || lastPlayerView != itemMultipleMediaVideoBinding.videoPost) {
+                        val meta = data.attachments[currentItem].attachmentMeta
+                        startNewPlayer(
+                            itemMultipleMediaVideoBinding.videoPost,
+                            itemMultipleMediaVideoBinding.pbVideoLoader,
+                            meta.url
+                        )
+                    }
+                    lastPlayerView = itemMultipleMediaVideoBinding.videoPost
+                }
+            }
+
             else -> {
                 // if the post is does not have any video, simply remove the player
                 removePlayer()
