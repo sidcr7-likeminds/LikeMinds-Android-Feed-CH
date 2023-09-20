@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.net.Uri
 import android.os.*
 import android.util.Log
 import android.view.View
@@ -57,8 +56,6 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
 import java.util.*
@@ -292,28 +289,10 @@ class LMFeedFragment :
                 is FeedViewModel.PostDataEvent.PostDbData -> {
                     alreadyPosting = true
                     val post = response.post
-                    binding.layoutPosting.apply {
-                        root.show()
-                        if (post.thumbnail.isNullOrEmpty()) {
-                            ivPostThumbnail.hide()
-                        } else {
-                            val shimmer = ViewUtils.getShimmer()
-                            ivPostThumbnail.show()
-                            ImageBindingUtil.loadImage(
-                                ivPostThumbnail,
-                                Uri.parse(post.thumbnail),
-                                shimmer
-                            )
-                        }
-                        postingProgress.progress = 0
-                        postingProgress.show()
-                        ivPosted.hide()
-                        tvRetry.hide()
-                        if (!isFirstItemShimmer()) {
-                            addShimmer()
-                        }
-                        observeMediaUpload(post)
+                    if (!isFirstItemShimmer()) {
+                        addShimmer()
                     }
+                    observeMediaUpload(post)
                 }
                 // when the post data comes from api response
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
@@ -373,51 +352,16 @@ class LMFeedFragment :
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
                 // uploading completed, call the add post api
-                binding.layoutPosting.apply {
-                    postingProgress.hide()
-                    tvRetry.hide()
-                    ivPosted.show()
-                }
                 viewModel.addPost(postingData)
             }
 
             WorkInfo.State.FAILED -> {
-                // uploading failed, initiate retry mechanism
-                val indexList = workInfo.outputData.getIntArray(
-                    MediaUploadWorker.ARG_MEDIA_INDEX_LIST
-                ) ?: return
-                initRetryAction(
-                    postingData.temporaryId,
-                    indexList.size
-                )
-                removeShimmer()
+                ViewUtils.showShortToast(requireContext(), getString(R.string.something_went_wrong))
+                viewModel.deletePostFromDB(postingData.temporaryId ?: 0L)
+                removePostingView()
             }
 
-            else -> {
-                // uploading in progress, map the progress to progress bar
-                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
-                binding.layoutPosting.apply {
-                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
-                    val progressValue = percentage.toInt()
-                    postingProgress.progress = progressValue
-                }
-            }
-        }
-    }
-
-    // initializes retry mechanism for attachments uploading
-    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
-        binding.layoutPosting.apply {
-            ivPosted.hide()
-            postingProgress.hide()
-            tvRetry.show()
-            tvRetry.setOnClickListener {
-                viewModel.createRetryPostMediaWorker(
-                    requireContext(),
-                    temporaryId,
-                    attachmentCount
-                )
-            }
+            else -> {}
         }
     }
 
@@ -948,7 +892,6 @@ class LMFeedFragment :
         binding.apply {
             removeShimmer()
             alreadyPosting = false
-            layoutPosting.root.hide()
         }
     }
 

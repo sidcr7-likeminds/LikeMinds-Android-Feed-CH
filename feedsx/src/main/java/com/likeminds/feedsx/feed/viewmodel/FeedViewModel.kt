@@ -3,7 +3,6 @@ package com.likeminds.feedsx.feed.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
@@ -207,6 +206,13 @@ class FeedViewModel @Inject constructor(
                     )
                 )
             }
+        }
+    }
+
+    // deletes failed post from db
+    fun deletePostFromDB(temporaryId: Long) {
+        viewModelScope.launchIO {
+            postWithAttachmentsRepository.deletePostWithTemporaryId(temporaryId)
         }
     }
 

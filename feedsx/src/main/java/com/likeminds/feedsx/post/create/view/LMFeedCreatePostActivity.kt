@@ -74,9 +74,10 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         //Toolbar
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            val fragment =
-                supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedCreatePostFragment
-            fragment.openBackPressedPopup()
+            val fragment = supportFragmentManager.currentFragment(R.id.nav_host_fragment)
+            if (fragment is LMFeedCreatePostFragment) {
+                fragment.openBackPressedPopup()
+            }
         }
 
         binding.tvToolbarTitle.apply {

@@ -16,7 +16,7 @@ object Route {
     private const val ROUTE_BROWSER = "browser"
     private const val PARAM_COMMENT_ID = "comment_id"
 
-    private const val DEEP_LINK_POST = "post"
+    const val DEEP_LINK_POST = "post"
 
     private const val HTTPS_SCHEME = "https"
     private const val HTTP_SCHEME = "http"

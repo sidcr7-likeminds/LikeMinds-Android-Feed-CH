@@ -15,17 +15,6 @@
         android:layout_height="match_parent"
         android:background="@color/cultured">
 
-        <include
-            android:id="@+id/layout_posting"
-            layout="@layout/lm_feed_layout_posting"
-            android:layout_width="match_parent"
-            android:layout_height="55dp"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
             android:layout_width="match_parent"
@@ -34,7 +23,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/layout_posting">
+            app:layout_constraintTop_toTopOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -87,9 +76,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:paddingVertical="16dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingVertical="13dp"
+            android:paddingHorizontal="16dp"
             android:text="@string/new_resource"
             android:textAllCaps="true"
             android:textColor="@color/white"

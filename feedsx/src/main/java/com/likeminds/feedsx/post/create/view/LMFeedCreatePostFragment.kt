@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
@@ -175,6 +174,7 @@ class LMFeedCreatePostFragment :
         super.handleResultListener()
 
         setFragmentResultListener(LMFeedImageCropFragment.REQUEST_KEY) { _, bundle ->
+            initAuthorFrame()
             val singleUriData =
                 ExtrasUtil.getParcelable(
                     bundle,
@@ -183,7 +183,6 @@ class LMFeedCreatePostFragment :
                 ) ?: return@setFragmentResultListener
 
             selectedMediaUris.add(singleUriData)
-            initAuthorFrame()
             showPostMedia()
         }
     }
@@ -752,6 +751,7 @@ class LMFeedCreatePostFragment :
 
     override fun onResume() {
         super.onResume()
+        initAuthorFrame()
         showPostMedia()
     }
 

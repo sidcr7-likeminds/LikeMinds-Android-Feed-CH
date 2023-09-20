@@ -5,12 +5,12 @@ ext.keys = keys
 
 ext.urls = [:]
 def urls = [:]
-urls."$keys.SHARE_DOMAIN" = "\"https://web.likeminds.community\""
+urls."$keys.SHARE_DOMAIN" = "\"https://www.likeminds.community\""
 ext.urls = urls
 
 ext.beta_urls = [:]
 def beta_urls = [:]
-beta_urls."$keys.SHARE_DOMAIN" = "\"https://betaweb.likeminds.community\""
+beta_urls."$keys.SHARE_DOMAIN" = "\"https://beta.likeminds.community\""
 ext.beta_urls = beta_urls
 
 dependencies {
