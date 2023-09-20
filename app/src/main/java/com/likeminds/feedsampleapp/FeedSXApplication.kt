@@ -2,8 +2,8 @@ package com.likeminds.feedsampleapp
 
 import android.app.Application
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
-import com.likeminds.feedsx.LMFeedUI
 import com.likeminds.feedsx.LMFeedUICallback
+import com.likeminds.feedsx.LikeMindsFeedUI
 import com.likeminds.feedsx.branding.model.LMFeedFonts
 import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 
@@ -42,7 +42,7 @@ class FeedSXApplication : Application(), LMFeedUICallback {
             )
             .build()
 
-        LMFeedUI.initLikeMindsFeedUI(
+        LikeMindsFeedUI.initLikeMindsFeedUI(
             this,
             this,
             brandingRequest

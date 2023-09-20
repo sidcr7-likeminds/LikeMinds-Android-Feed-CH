@@ -10,7 +10,7 @@ import com.github.dhaval2404.colorpicker.model.ColorSwatch
 import com.likeminds.feedsampleapp.R
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
 import com.likeminds.feedsampleapp.databinding.ActivityAuthBinding
-import com.likeminds.feedsx.LMFeedUI
+import com.likeminds.feedsx.LikeMindsFeedUI
 import com.likeminds.feedsx.branding.model.LMFeedFonts
 import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 import com.likeminds.feedsx.utils.Route
@@ -152,7 +152,7 @@ class AuthActivity : AppCompatActivity() {
                     )
                     .build()
 
-                LMFeedUI.setBranding(brandingRequest)
+                LikeMindsFeedUI.setBranding(brandingRequest)
 
                 navigateToAfterLogin()
             }
