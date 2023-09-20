@@ -3,21 +3,21 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import com.likeminds.feedsx.LMFeedAnalytics
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 
 object Route {
 
-    private const val ROUTE_POST_DETAIL = "post_detail"
-    private const val ROUTE_FEED = "feed"
-    private const val ROUTE_CREATE_POST = "create_post"
+    const val ROUTE_POST_DETAIL = "post_detail"
+    const val ROUTE_FEED = "feed"
+    const val ROUTE_CREATE_POST = "create_post"
     private const val PARAM_POST_ID = "post_id"
     private const val ROUTE_BROWSER = "browser"
     private const val PARAM_COMMENT_ID = "comment_id"
 
-    private const val DEEP_LINK_POST = "post"
+    const val DEEP_LINK_POST = "post"
 
     private const val HTTPS_SCHEME = "https"
     private const val HTTP_SCHEME = "http"
@@ -39,12 +39,15 @@ object Route {
                     source
                 )
             }
+
             ROUTE_FEED -> {
                 // navigation to feed
             }
+
             ROUTE_CREATE_POST -> {
-                intent = getRouteToCreatePost(context, source)
+//                intent = getRouteToCreatePost(context, source)
             }
+
             ROUTE_BROWSER -> {
                 intent = getRouteToBrowser(route)
             }
@@ -60,7 +63,7 @@ object Route {
     }
 
     // route://post_detail?post_id=<post_id>&comment_id=<comment_id of new comment>
-    private fun getRouteToPostDetail(
+    fun getRouteToPostDetail(
         context: Context,
         route: Uri,
         source: String?
@@ -94,7 +97,7 @@ object Route {
     }
 
     //create route string as per uri
-    private fun getRouteFromDeepLink(data: Uri?): String? {
+    fun getRouteFromDeepLink(data: Uri?): String? {
         if (data == null) {
             return null
         }
@@ -102,6 +105,7 @@ object Route {
             DEEP_LINK_POST -> {
                 createPostDetailRoute(data)
             }
+
             else -> {
                 createWebsiteRoute(data)
             }
@@ -132,11 +136,12 @@ object Route {
         return null
     }
 
+    // todo:
     // route://create_post
-    private fun getRouteToCreatePost(
-        context: Context,
-        source: String?
-    ): Intent {
-        return LMFeedCreatePostActivity.getIntent(context, source)
-    }
+//    private fun getRouteToCreatePost(
+//        context: Context,
+//        source: String?
+//    ): Intent {
+//        return LMFeedCreatePostActivity.getIntent(context, source)
+//    }
 }

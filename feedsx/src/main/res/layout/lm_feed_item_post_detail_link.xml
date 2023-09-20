@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:paddingHorizontal="16dp">
+
+        <include
+            android:id="@+id/author_frame"
+            layout="@layout/lm_feed_layout_author_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cv_link_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="@color/white"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/author_frame"
+            app:strokeColor="@color/light_grayish_blue"
+            app:strokeWidth="2dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/cl_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?selectableItemBackground">
+
+                <ImageView
+                    android:id="@+id/iv_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="216dp"
+                    android:scaleType="center"
+                    android:src="@drawable/ic_link_primary_40dp"
+                    android:visibility="visible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription" />
+
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                    android:id="@+id/tv_link_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:textColor="@color/dark_grey"
+                    android:textSize="16sp"
+                    app:fontType="medium"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/iv_link"
+                    tools:text="Twitter will soon let you schedule your tweets" />
+
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                    android:id="@+id/tv_link_description"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:lineSpacingExtra="2sp"
+                    android:maxLines="2"
+                    android:textColor="@color/grey"
+                    android:textSize="12sp"
+                    app:fontType="regular"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_link_title"
+                    app:layout_constraintStart_toStartOf="@+id/tv_link_title"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_link_title"
+                    tools:text="The new feature has already been implemented in the United States and Other Eu…" />
+
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                    android:id="@+id/tv_link_url"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="@color/grey"
+                    android:textSize="12sp"
+                    app:fontType="regular"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/tv_link_title"
+                    app:layout_constraintStart_toStartOf="@+id/tv_link_title"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_link_description"
+                    tools:text="www.youtube.com" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_post_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="1sp"
+            android:textColor="@color/dark_grey"
+            android:textSize="16sp"
+            app:fontType="medium"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/cv_link_preview"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="5 tips to position your community beyond just an online group" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_post_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:lineSpacingExtra="1sp"
+            android:textColor="@color/grey"
+            android:textSize="16sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_post_title"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="We curated a list of different types of tools and formats for creating content for your community. It will definitely help you with some ideas for your community. Give it a read :) \n \n Amet minim mollit non deserunt ullamco est sit aliqua dolor do amet sint. Velit officia consequat duis enim velit mollit. Exercitation veniam consequat sunt nostrud amet. \n \n Nulla Lorem mollit cupidatat irure. Laborum magna nulla duis ullamco cillum dolor. Voluptate exercitation incididunt aliquip deserunt reprehenderit elit laborum. " />
+
+        <include
+            android:id="@+id/post_actions_layout"
+            layout="@layout/lm_feed_layout_post_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="-4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_post_content" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

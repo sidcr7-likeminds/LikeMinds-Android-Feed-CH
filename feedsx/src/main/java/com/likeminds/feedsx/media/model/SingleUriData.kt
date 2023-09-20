@@ -17,6 +17,8 @@ class SingleUriData private constructor(
     val duration: Int?,
     val awsFolderPath: String?,
     val localFilePath: String?,
+    val thumbnailAwsFolderPath: String?,
+    val thumbnailLocalFilePath: String?,
     val format: String?
 ) : Parcelable {
     class Builder {
@@ -31,6 +33,8 @@ class SingleUriData private constructor(
         private var duration: Int? = null
         private var awsFolderPath: String? = null
         private var localFilePath: String? = null
+        private var thumbnailAwsFolderPath: String? = null
+        private var thumbnailLocalFilePath: String? = null
         private var format: String? = null
 
         fun uri(uri: Uri) = apply { this.uri = uri }
@@ -44,6 +48,12 @@ class SingleUriData private constructor(
         fun duration(duration: Int?) = apply { this.duration = duration }
         fun awsFolderPath(awsFolderPath: String?) = apply { this.awsFolderPath = awsFolderPath }
         fun localFilePath(localFilePath: String?) = apply { this.localFilePath = localFilePath }
+        fun thumbnailAwsFolderPath(thumbnailAwsFolderPath: String?) =
+            apply { this.thumbnailAwsFolderPath = thumbnailAwsFolderPath }
+
+        fun thumbnailLocalFilePath(thumbnailLocalFilePath: String?) =
+            apply { this.thumbnailLocalFilePath = thumbnailLocalFilePath }
+
         fun format(format: String?) = apply { this.format = format }
 
 
@@ -59,6 +69,8 @@ class SingleUriData private constructor(
             duration,
             awsFolderPath,
             localFilePath,
+            thumbnailAwsFolderPath,
+            thumbnailLocalFilePath,
             format
         )
     }
@@ -75,6 +87,8 @@ class SingleUriData private constructor(
             .duration(duration)
             .awsFolderPath(awsFolderPath)
             .localFilePath(localFilePath)
+            .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
+            .thumbnailLocalFilePath(thumbnailLocalFilePath)
             .format(format)
     }
 }

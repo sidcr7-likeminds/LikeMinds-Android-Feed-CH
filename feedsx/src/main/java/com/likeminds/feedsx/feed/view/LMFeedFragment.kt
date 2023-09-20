@@ -2,22 +2,19 @@ package com.likeminds.feedsx.feed.view
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.net.Uri
-import android.os.Build
-import android.os.Bundle
+import android.os.*
 import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import androidx.work.WorkInfo
@@ -37,17 +34,19 @@ import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
+import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
+import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
 import com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
+import com.likeminds.feedsx.post.create.model.CreatePostExtras
+import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.edit.model.EditPostExtras
-import com.likeminds.feedsx.post.edit.view.EditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
@@ -57,8 +56,6 @@ import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
 import kotlinx.coroutines.flow.onEach
 import java.util.*
@@ -69,14 +66,19 @@ class LMFeedFragment :
     PostAdapterListener,
     LMFeedAdminDeleteDialogFragment.DeleteDialogListener,
     LMFeedSelfDeleteDialogFragment.DeleteAlertDialogListener,
-    PostObserver {
+    PostObserver,
+    LMFeedCreateResourceDialog.CreateResourceDialogListener,
+    LMFeedLinkResourceDialogFragment.LinkResourceDialogListener {
 
     companion object {
         const val TAG = "LMFeedFragment"
         private const val LM_FEED_EXTRAS = "LM_FEED_EXTRAS"
+        const val VIDEO_DURATION_LIMIT = 600
+        const val PDF_SIZE_LIMIT = 8 * 1024 * 1024
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         private const val POST_NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS
+        private lateinit var lmFeedListener: LMFeedListener
 
         /**
          * creates a instance of fragment
@@ -84,9 +86,11 @@ class LMFeedFragment :
         @JvmStatic
         fun getInstance(
             extras: LMFeedExtras,
+            listener: LMFeedListener
         ): LMFeedFragment {
             val fragment = LMFeedFragment()
             val bundle = Bundle()
+            lmFeedListener = listener
             bundle.putParcelable(LM_FEED_EXTRAS, extras)
             fragment.arguments = bundle
             return fragment
@@ -106,6 +110,8 @@ class LMFeedFragment :
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
     private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
+
+    private var createPostDialog: LMFeedCreateResourceDialog? = null
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -149,7 +155,6 @@ class LMFeedFragment :
         checkNotificationPermission()
         initUI()
         initiateSDK()
-        initToolbar()
     }
 
     private val notificationPermissionLauncher = registerForActivityResult(
@@ -171,8 +176,8 @@ class LMFeedFragment :
         observePosting()
 
         // observes userResponse LiveData
-        initiateViewModel.userResponse.observe(viewLifecycleOwner) { response ->
-            observeUserResponse(response)
+        initiateViewModel.userResponse.observe(viewLifecycleOwner) {
+            observeUserResponse()
         }
 
         // observes hasCreatePostRights LiveData
@@ -190,13 +195,13 @@ class LMFeedFragment :
         }
 
         initiateViewModel.initiateErrorMessage.observe(viewLifecycleOwner) {
-            ProgressHelper.hideProgress(binding.progressBar)
+            removeShimmer()
             ViewUtils.showErrorMessageToast(requireContext(), it)
         }
 
         // observe unread notification count
         viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { count ->
-            observeUnreadNotificationCount(count)
+            lmFeedListener.updateNotificationCount(count)
         }
 
         // observe universal feed
@@ -238,53 +243,15 @@ class LMFeedFragment :
     }
 
     // observes user response from InitiateUser
-    private fun observeUserResponse(user: UserViewData?) {
-        initToolbar()
-        setUserImage(user)
+    private fun observeUserResponse() {
         viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
     }
 
-    // observe unread notification count
-    private fun observeUnreadNotificationCount(count: Int) {
-        binding.apply {
-            ivNotification.show()
-            when (count) {
-                0 -> {
-                    tvNotificationCount.isVisible = false
-                }
-
-                in 1..99 -> {
-                    configureNotificationBadge(count.toString())
-                }
-
-                else -> {
-                    configureNotificationBadge(getString(R.string.nine_nine_plus))
-                }
-            }
-        }
-    }
-
-    /**
-     * Configure the notification badge based on the text length and visibility
-     * @param text Text to show on the counter, eg - 99+, 8, etc
-     */
-    private fun configureNotificationBadge(text: String) {
-        binding.tvNotificationCount.apply {
-            if (text.length > 2) {
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 7f)
-            } else {
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
-            }
-            this.text = text
-            visibility = View.VISIBLE
-        }
-    }
-
     //observe feed response
     private fun observeFeedUniversal(pair: Pair<Int, List<PostViewData>>) {
-        //hide progress bar
-        ProgressHelper.hideProgress(binding.progressBar)
+        removeShimmer()
+
         //page in api send
         val page = pair.first
 
@@ -298,6 +265,11 @@ class LMFeedFragment :
             mSwipeRefreshLayout.isRefreshing = false
             return
         }
+
+        attachScrollListener(
+            binding.recyclerView,
+            (binding.recyclerView.layoutManager as LinearLayoutManager)
+        )
 
         //normal adding
         if (page == 1) {
@@ -317,32 +289,19 @@ class LMFeedFragment :
                 is FeedViewModel.PostDataEvent.PostDbData -> {
                     alreadyPosting = true
                     val post = response.post
-                    binding.layoutPosting.apply {
-                        root.show()
-                        if (post.thumbnail.isNullOrEmpty()) {
-                            ivPostThumbnail.hide()
-                        } else {
-                            val shimmer = ViewUtils.getShimmer()
-                            ivPostThumbnail.show()
-                            ImageBindingUtil.loadImage(
-                                ivPostThumbnail,
-                                Uri.parse(post.thumbnail),
-                                shimmer
-                            )
-                        }
-                        postingProgress.progress = 0
-                        postingProgress.show()
-                        ivPosted.hide()
-                        tvRetry.hide()
-                        observeMediaUpload(post)
+                    if (!isFirstItemShimmer()) {
+                        addShimmer()
                     }
+                    observeMediaUpload(post)
                 }
                 // when the post data comes from api response
                 is FeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
                         ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
-                        refreshFeed()
                         removePostingView()
+                        scrollToPositionWithOffset(0)
+                        mPostAdapter.add(0, response.post)
+                        refreshAutoPlayer()
                     }
                 }
             }
@@ -351,19 +310,23 @@ class LMFeedFragment :
 
     // checks if there is any post or not
     private fun checkForNoPost(feed: List<BaseViewType>) {
-        if (feed.isNotEmpty()) {
-            binding.apply {
+        binding.apply {
+            if (feed.isNotEmpty()) {
                 layoutNoPost.root.hide()
                 newPostButton.show()
                 recyclerView.show()
-            }
-        } else {
-            binding.apply {
+            } else {
                 layoutNoPost.root.show()
                 newPostButton.hide()
                 recyclerView.hide()
             }
         }
+    }
+
+    // starts notification feed activity
+    fun startNotificationFeed() {
+        viewModel.sendNotificationPageOpenedEvent()
+        LMFeedNotificationFeedActivity.start(requireContext())
     }
 
     // finds the upload worker by UUID and observes the worker
@@ -389,50 +352,16 @@ class LMFeedFragment :
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
                 // uploading completed, call the add post api
-                binding.layoutPosting.apply {
-                    postingProgress.hide()
-                    tvRetry.hide()
-                    ivPosted.show()
-                }
                 viewModel.addPost(postingData)
             }
 
             WorkInfo.State.FAILED -> {
-                // uploading failed, initiate retry mechanism
-                val indexList = workInfo.outputData.getIntArray(
-                    MediaUploadWorker.ARG_MEDIA_INDEX_LIST
-                ) ?: return
-                initRetryAction(
-                    postingData.temporaryId,
-                    indexList.size
-                )
+                ViewUtils.showShortToast(requireContext(), getString(R.string.something_went_wrong))
+                viewModel.deletePostFromDB(postingData.temporaryId ?: 0L)
+                removePostingView()
             }
 
-            else -> {
-                // uploading in progress, map the progress to progress bar
-                val progress = MediaUploadWorker.getProgress(workInfo) ?: return
-                binding.layoutPosting.apply {
-                    val percentage = (((1.0 * progress.first) / progress.second) * 100)
-                    val progressValue = percentage.toInt()
-                    postingProgress.progress = progressValue
-                }
-            }
-        }
-    }
-
-    // initializes retry mechanism for attachments uploading
-    private fun initRetryAction(temporaryId: Long?, attachmentCount: Int) {
-        binding.layoutPosting.apply {
-            ivPosted.hide()
-            postingProgress.hide()
-            tvRetry.show()
-            tvRetry.setOnClickListener {
-                viewModel.createRetryPostMediaWorker(
-                    requireContext(),
-                    temporaryId,
-                    attachmentCount
-                )
-            }
+            else -> {}
         }
     }
 
@@ -442,7 +371,7 @@ class LMFeedFragment :
             is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
                 val errorMessage = response.errorMessage
                 mSwipeRefreshLayout.isRefreshing = false
-                ProgressHelper.hideProgress(binding.progressBar)
+                removeShimmer()
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
 
@@ -452,7 +381,6 @@ class LMFeedFragment :
             }
 
             is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
-                binding.tvNotificationCount.hide()
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
         }
@@ -566,7 +494,7 @@ class LMFeedFragment :
 
     // initiates SDK
     private fun initiateSDK() {
-        ProgressHelper.showProgress(binding.progressBar)
+        addShimmer()
         initiateViewModel.initiateUser(
             requireContext(),
             lmFeedExtras.apiKey,
@@ -574,6 +502,27 @@ class LMFeedFragment :
             lmFeedExtras.uuid,
             lmFeedExtras.isGuest
         )
+    }
+
+    // add shimmer items
+    private fun addShimmer() {
+        scrollToPositionWithOffset(0)
+        mPostAdapter.add(0, PostShimmerViewData.Builder().build())
+    }
+
+    // remove shimmer
+    private fun removeShimmer() {
+        if (isFirstItemShimmer()) {
+            mPostAdapter.removeIndex(0)
+        }
+    }
+
+    // checks whether first item in adapter is shimmer or not
+    private fun isFirstItemShimmer(): Boolean {
+        if (mPostAdapter.itemCount > 0 && mPostAdapter.items().first() is PostShimmerViewData) {
+            return true
+        }
+        return false
     }
 
     /**
@@ -637,14 +586,7 @@ class LMFeedFragment :
                         getString(R.string.a_post_is_already_uploading)
                     )
                 } else {
-                    // sends post creation started event
-                    viewModel.sendPostCreationStartedEvent()
-
-                    val intent = LMFeedCreatePostActivity.getIntent(
-                        requireContext(),
-                        LMFeedAnalytics.Source.UNIVERSAL_FEED
-                    )
-                    createPostLauncher.launch(intent)
+                    createPostDialog = LMFeedCreateResourceDialog.show(childFragmentManager)
                 }
             } else {
                 ViewUtils.showShortSnack(
@@ -671,6 +613,182 @@ class LMFeedFragment :
             }
         }
 
+    // launcher to handle gallery (IMAGE/VIDEO) intent
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = ExtrasUtil.getParcelable(
+                    result.data?.extras,
+                    LMFeedMediaPickerActivity.ARG_MEDIA_PICKER_RESULT,
+                    MediaPickerResult::class.java
+                )
+                checkMediaPickedResult(data)
+            }
+        }
+
+    private val mediaBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onMediaPickedFromGallery(result.data)
+            }
+        }
+
+    private val documentBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onPdfPicked(result.data)
+            }
+        }
+
+    // process the result obtained from media picker
+    private fun checkMediaPickedResult(result: MediaPickerResult?) {
+        if (result != null) {
+            when (result.mediaPickerResultType) {
+                MEDIA_RESULT_BROWSE -> {
+                    if (MediaType.isPDF(result.mediaTypes)) {
+                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
+                            allowMultipleSelect = result.allowMultipleSelect
+                        )
+                        documentBrowseLauncher.launch(intent)
+                    } else {
+                        val intent = AndroidUtils.getExternalPickerIntent(
+                            result.mediaTypes,
+                            result.allowMultipleSelect,
+                            result.browseClassName
+                        )
+                        if (intent != null)
+                            mediaBrowseLauncher.launch(intent)
+                    }
+                }
+
+                MEDIA_RESULT_PICKED -> {
+                    onMediaPicked(result)
+                }
+            }
+        }
+    }
+
+    // converts the picked media to SingleUriData and adds to the selected media
+    private fun onMediaPicked(result: MediaPickerResult) {
+        val data =
+            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        // sends media attached event with media type and count
+        viewModel.sendMediaAttachedEvent(data)
+        if (data.isNotEmpty()) {
+            val attachmentType = getAttachmentType(data.first().fileType)
+            if (checkForValidAttachment(data.first())) {
+                val createPostExtras = CreatePostExtras.Builder()
+                    .attachmentType(attachmentType)
+                    .attachmentUri(data.first())
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .isAdmin(initiateViewModel.isAdmin.value ?: false)
+                    .build()
+                startCreatePostActivity(createPostExtras)
+            }
+        }
+    }
+
+    // checks if the selected attachment is allowed or not
+    private fun checkForValidAttachment(uri: SingleUriData?): Boolean {
+        return when (uri?.fileType) {
+            com.likeminds.feedsx.media.model.VIDEO -> {
+                if (uri.duration != null && uri.duration > VIDEO_DURATION_LIMIT) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.video_duration_must_be_less_than_10_min),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                } else {
+                    true
+                }
+            }
+
+            PDF -> {
+                if (uri.size > PDF_SIZE_LIMIT) {
+                    Toast.makeText(
+                        requireContext(),
+                        getString(R.string.pdf_must_be_less_than_8_MB),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    false
+                } else {
+                    true
+                }
+            }
+
+            else -> {
+                true
+            }
+        }
+    }
+
+    private fun onMediaPickedFromGallery(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            // sends media attached event with media type and count
+            viewModel.sendMediaAttachedEvent(mediaUris)
+            if (mediaUris.isNotEmpty()) {
+                val attachmentType = getAttachmentType(mediaUris.first().fileType)
+                if (checkForValidAttachment(mediaUris.first())) {
+                    val createPostExtras = CreatePostExtras.Builder()
+                        .attachmentType(attachmentType)
+                        .attachmentUri(mediaUris.first())
+                        .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                        .isAdmin(initiateViewModel.isAdmin.value ?: false)
+                        .build()
+                    startCreatePostActivity(createPostExtras)
+                }
+            }
+        }
+    }
+
+    private fun onPdfPicked(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            // sends media attached event with media type and count
+            viewModel.sendMediaAttachedEvent(mediaUris)
+            if (mediaUris.isNotEmpty()) {
+                val attachmentType = getAttachmentType(mediaUris.first().fileType)
+                if (checkForValidAttachment(mediaUris.first())) {
+                    val createPostExtras = CreatePostExtras.Builder()
+                        .attachmentType(attachmentType)
+                        .attachmentUri(mediaUris.first())
+                        .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                        .isAdmin(initiateViewModel.isAdmin.value ?: false)
+                        .build()
+                    startCreatePostActivity(createPostExtras)
+                }
+            }
+        }
+    }
+
+    private fun getAttachmentType(fileType: String): Int {
+        return when (fileType) {
+            com.likeminds.feedsx.media.model.IMAGE -> {
+                ARTICLE
+            }
+
+            com.likeminds.feedsx.media.model.VIDEO -> {
+                VIDEO
+            }
+
+            PDF -> {
+                DOCUMENT
+            }
+
+            else -> {
+                ARTICLE
+            }
+        }
+    }
+
     // initializes universal feed recyclerview
     private fun initRecyclerView() {
         // item decorator to add spacing between items
@@ -691,11 +809,6 @@ class LMFeedFragment :
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             addItemDecoration(dividerItemDecorator)
             show()
-
-            attachScrollListener(
-                this,
-                linearLayoutManager
-            )
         }
     }
 
@@ -765,60 +878,20 @@ class LMFeedFragment :
         recyclerView.addOnScrollListener(mScrollListener)
     }
 
-    private fun initToolbar() {
-        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
-
-        binding.apply {
-            //if user is guest user hide, profile icon from toolbar
-            memberImage.isVisible = !isGuestUser
-
-            //click listener -> open profile screen
-            memberImage.setOnClickListener {
-                // open profile on click
-            }
-
-            ivNotification.setOnClickListener {
-                viewModel.sendNotificationPageOpenedEvent()
-                LMFeedNotificationFeedActivity.start(requireContext())
-            }
-
-            ivSearch.setOnClickListener {
-                // perform search in feed
-            }
-        }
-    }
-
     // shows invalid access error and logs out invalid user
     private fun showInvalidAccess() {
         binding.apply {
-            ProgressHelper.hideProgress(progressBar)
+            removeShimmer()
             recyclerView.hide()
             layoutAccessRemoved.root.show()
-            memberImage.hide()
-            ivSearch.hide()
-            ivNotification.hide()
-        }
-    }
-
-    // sets user profile image
-    private fun setUserImage(user: UserViewData?) {
-        if (user != null) {
-            MemberImageUtil.setImage(
-                user.imageUrl,
-                user.name,
-                user.userUniqueId,
-                binding.memberImage,
-                showRoundImage = true,
-                objectKey = user.updatedAt
-            )
         }
     }
 
     // removes the posting view and shows create post button
     private fun removePostingView() {
         binding.apply {
+            removeShimmer()
             alreadyPosting = false
-            layoutPosting.root.hide()
         }
     }
 
@@ -883,39 +956,6 @@ class LMFeedFragment :
             postActionsViewModel.likePost(newViewData.id)
             //update recycler
             mPostAdapter.update(position, newViewData)
-        }
-    }
-
-    // callback when post menu items are clicked
-    override fun onPostMenuItemClicked(
-        postId: String,
-        postCreatorUUID: String,
-        menuId: Int
-    ) {
-        when (menuId) {
-            EDIT_POST_MENU_ITEM_ID -> {
-                val editPostExtras = EditPostExtras.Builder()
-                    .postId(postId)
-                    .build()
-                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
-                startActivity(intent)
-            }
-
-            DELETE_POST_MENU_ITEM_ID -> {
-                deletePost(postId, postCreatorUUID)
-            }
-
-            REPORT_POST_MENU_ITEM_ID -> {
-                reportPost(postId, postCreatorUUID)
-            }
-
-            PIN_POST_MENU_ITEM_ID -> {
-                pinPost(postId)
-            }
-
-            UNPIN_POST_MENU_ITEM_ID -> {
-                unpinPost(postId)
-            }
         }
     }
 
@@ -1168,6 +1208,71 @@ class LMFeedFragment :
             // Post was updated
             mPostAdapter.update(postIndex, updatedPost)
         }
+    }
+
+    override fun onResourceSelected(attachmentType: Int) {
+        createPostDialog?.dismiss()
+        startPostCreation(attachmentType)
+    }
+
+    override fun linkOgTags(linkOGTags: LinkOGTagsViewData) {
+        val createPostExtras = CreatePostExtras.Builder()
+            .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+            .attachmentType(LINK)
+            .linkOGTagsViewData(linkOGTags)
+            .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+            .isAdmin(initiateViewModel.isAdmin.value ?: false)
+            .build()
+
+        startCreatePostActivity(createPostExtras)
+    }
+
+    // starts post creation process as per the type if attachment selected
+    private fun startPostCreation(attachmentType: Int) {
+        // sends post creation started event
+        viewModel.sendPostCreationStartedEvent()
+
+        when (attachmentType) {
+            VIDEO -> {
+                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
+            }
+
+            LINK -> {
+                LMFeedLinkResourceDialogFragment.showDialog(childFragmentManager)
+            }
+
+            ARTICLE -> {
+                val createPostExtras = CreatePostExtras.Builder()
+                    .attachmentType(ARTICLE)
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .isAdmin(initiateViewModel.isAdmin.value ?: false)
+                    .build()
+                startCreatePostActivity(createPostExtras)
+            }
+
+            DOCUMENT -> {
+                initiateMediaPicker(listOf(PDF))
+            }
+        }
+    }
+
+    // starts create post activity with the required extras
+    private fun startCreatePostActivity(createPostExtras: CreatePostExtras) {
+        val intent = LMFeedCreatePostActivity.getIntent(
+            requireContext(),
+            createPostExtras
+        )
+        createPostLauncher.launch(intent)
+    }
+
+    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
+    private fun initiateMediaPicker(list: List<String>) {
+        val extras = MediaPickerExtras.Builder()
+            .mediaTypes(list)
+            .allowMultipleSelect(true)
+            .build()
+        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
+        galleryLauncher.launch(intent)
     }
 
     /**

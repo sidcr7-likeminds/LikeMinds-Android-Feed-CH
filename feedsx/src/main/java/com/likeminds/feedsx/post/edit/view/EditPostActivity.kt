@@ -3,13 +3,16 @@ package com.likeminds.feedsx.post.edit.view
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.LmFeedActivityEditPostBinding
+import com.likeminds.feedsx.post.create.view.LMFeedCreatePostFragment
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class EditPostActivity : BaseAppCompatActivity() {
@@ -50,6 +53,8 @@ class EditPostActivity : BaseAppCompatActivity() {
         binding = LmFeedActivityEditPostBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupOnBackPressedCallback()
+
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
@@ -80,6 +85,17 @@ class EditPostActivity : BaseAppCompatActivity() {
         supportFragmentManager.popBackStack()
         onBackPressedDispatcher.onBackPressed()
         overridePendingTransition(R.anim.lm_feed_slide_from_left, R.anim.lm_feed_slide_to_right)
+    }
+
+    // setups up on back pressed callback
+    private fun setupOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(this) {
+            if (supportFragmentManager.currentFragment(R.id.nav_host_fragment) is EditPostFragment) {
+                val fragment =
+                    supportFragmentManager.currentFragment(R.id.nav_host_fragment) as EditPostFragment
+                fragment.openBackPressedPopup()
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

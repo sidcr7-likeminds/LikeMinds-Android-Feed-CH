@@ -3,6 +3,7 @@ package com.likeminds.feedsx.posttypes.model
 import android.os.Parcelable
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.widgets.model.WidgetsViewData
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -32,7 +33,10 @@ class PostViewData private constructor(
     val workerUUID: String,
     val isPosted: Boolean,
     val temporaryId: Long?,
-    val uuid: String
+    val uuid: String,
+    val widget: WidgetsViewData,
+    val heading: String?,
+    val onBehalfOfUUID: String?
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -55,6 +59,10 @@ class PostViewData private constructor(
 
             (attachments.size == 1 && attachments.first().attachmentType == LINK) -> {
                 ITEM_POST_LINK
+            }
+
+            (attachments.size == 1 && attachments.first().attachmentType == ARTICLE) -> {
+                ITEM_POST_ARTICLE
             }
 
             else -> {
@@ -89,6 +97,9 @@ class PostViewData private constructor(
         private var temporaryId: Long? = null
         private var fromVideoAction: Boolean = false
         private var uuid: String = ""
+        private var widget: WidgetsViewData = WidgetsViewData.Builder().build()
+        private var heading: String? = null
+        private var onBehalfOfUUID: String? = null
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String?) = apply { this.text = text }
@@ -127,6 +138,9 @@ class PostViewData private constructor(
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
         fun temporaryId(temporaryId: Long?) = apply { this.temporaryId = temporaryId }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun widget(widget: WidgetsViewData) = apply { this.widget = widget }
+        fun heading(heading: String?) = apply { this.heading = heading }
+        fun onBehalfOfUUID(onBehalfOfUUID: String?) = apply { this.onBehalfOfUUID = onBehalfOfUUID }
 
         fun build() = PostViewData(
             id,
@@ -154,7 +168,10 @@ class PostViewData private constructor(
             workerUUID,
             isPosted,
             temporaryId,
-            uuid
+            uuid,
+            widget,
+            heading,
+            onBehalfOfUUID
         )
     }
 
@@ -185,5 +202,8 @@ class PostViewData private constructor(
             .isPosted(isPosted)
             .temporaryId(temporaryId)
             .uuid(uuid)
+            .widget(widget)
+            .heading(heading)
+            .onBehalfOfUUID(onBehalfOfUUID)
     }
 }

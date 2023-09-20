@@ -2,62 +2,57 @@ package com.likeminds.feedsx.post.edit.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.graphics.Color
-import android.text.Editable
-import android.text.TextWatcher
+import android.content.Intent
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.widget.EditText
-import androidx.annotation.CheckResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.get
 import androidx.core.view.isVisible
-import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.lifecycleScope
+import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.setFragmentResultListener
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.*
-import androidx.viewpager2.widget.ViewPager2
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentEditPostBinding
-import com.likeminds.feedsx.databinding.LmFeedItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.feed.util.PostEvent
-import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
+import com.likeminds.feedsx.media.model.*
+import com.likeminds.feedsx.media.util.MediaUtils
+import com.likeminds.feedsx.media.view.LMFeedImageCropFragment
+import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
+import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
+import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.edit.model.EditPostExtras
 import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
-import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
 import com.likeminds.feedsx.post.edit.viewmodel.EditPostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
-import com.likeminds.feedsx.posttypes.util.PostTypeUtil
-import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.*
-import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
-import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.feedsx.utils.customview.DataBoundViewHolder
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
-import com.likeminds.feedsx.utils.link.util.LinkUtil
 import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.*
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.awaitClose
+import com.likeminds.feedsx.widgets.model.WidgetsViewData
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
 
 class EditPostFragment :
     BaseFragment<LmFeedFragmentEditPostBinding, EditPostViewModel>(),
-    PostAdapterListener {
+    LMFeedDiscardResourceDialog.DiscardResourceDialogListener,
+    PostAdapterListener,
+    LMFeedRemoveAttachmentDialogFragment.RemoveAttachmentDialogListener {
 
     @Inject
     lateinit var helperViewModel: HelperViewModel
@@ -65,20 +60,24 @@ class EditPostFragment :
     private lateinit var editPostExtras: EditPostExtras
 
     private var fileAttachments: List<AttachmentViewData>? = null
+    private var widget: WidgetsViewData? = null
     private var ogTags: LinkOGTagsViewData? = null
 
-    private lateinit var etPostTextChangeListener: TextWatcher
+    private var articleSingleUriData: SingleUriData? = null
 
     private lateinit var memberTagging: LMFeedMemberTaggingView
 
     // [postPublisher] to publish changes in the post
     private val postEvent = PostEvent.getPublisher()
 
+    private val workersMap by lazy { ArrayList<UUID>() }
+
     private var post: PostViewData? = null
 
-    private val videoPreviewAutoPlayHelper by lazy {
-        VideoPreviewAutoPlayHelper.getInstance()
-    }
+    private var discardResourceDialog: LMFeedDiscardResourceDialog? = null
+    private var removeAttachmentDialogFragment: LMFeedRemoveAttachmentDialogFragment? = null
+
+    private var isEditingArticle: Boolean = false
 
     companion object {
         const val TAG = "EditPostFragment"
@@ -86,6 +85,26 @@ class EditPostFragment :
 
     override val useSharedViewModel: Boolean
         get() = true
+
+    // launcher to handle gallery (IMAGE/VIDEO) intent
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val data = ExtrasUtil.getParcelable(
+                    result.data?.extras,
+                    LMFeedMediaPickerActivity.ARG_MEDIA_PICKER_RESULT,
+                    MediaPickerResult::class.java
+                )
+                checkMediaPickedResult(data)
+            }
+        }
+
+    private val mediaBrowseLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                onMediaPickedFromGallery(result.data)
+            }
+        }
 
     override fun getViewModelClass(): Class<EditPostViewModel> {
         return EditPostViewModel::class.java
@@ -113,30 +132,28 @@ class EditPostFragment :
         ) ?: throw emptyExtrasException(TAG)
     }
 
-    override fun onResume() {
-        super.onResume()
-        when (post?.viewType) {
-            ITEM_POST_SINGLE_VIDEO -> {
-                showSingleVideoPreview()
-            }
-            ITEM_POST_MULTIPLE_MEDIA -> {
-                showMultimediaPreview()
-            }
-            else -> {
-                return
-            }
-        }
-    }
+    override fun handleResultListener() {
+        super.handleResultListener()
 
-    override fun onPause() {
-        super.onPause()
-        videoPreviewAutoPlayHelper.removePlayer()
+        setFragmentResultListener(LMFeedImageCropFragment.REQUEST_KEY) { _, bundle ->
+            articleSingleUriData =
+                ExtrasUtil.getParcelable(
+                    bundle,
+                    LMFeedImageCropFragment.BUNDLE_ARG_URI,
+                    SingleUriData::class.java
+                ) ?: return@setFragmentResultListener
+
+            isEditingArticle = false
+            showPostMedia(
+                binding.etPostTitle.text?.trim().toString(),
+                binding.etPostContent.text?.trim().toString()
+            )
+        }
     }
 
     override fun setUpViews() {
         super.setUpViews()
-
-        setBindingVariables()
+        initView()
         fetchUserFromDB()
         initMemberTaggingView()
         initToolbar()
@@ -144,12 +161,120 @@ class EditPostFragment :
         initPostSaveListener()
     }
 
-    // sets the binding variables
-    private fun setBindingVariables() {
-        binding.toolbarColor = LMFeedBranding.getToolbarColor()
-        binding.buttonColor = LMFeedBranding.getButtonsColor()
+    // initializes the view
+    private fun initView() {
+        binding.apply {
+            toolbarColor = LMFeedBranding.getToolbarColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
+
+            ViewUtils.getMandatoryAsterisk(
+                getString(R.string.add_title),
+                etPostTitle
+            )
+            etPostTitle.setHintTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.dark_grey
+                )
+            )
+
+            ivDeleteArticle.setOnClickListener {
+                val removeExtras = RemoveDialogExtras.Builder()
+                    .title(getString(R.string.remove_article_banner))
+                    .description(getString(R.string.are_you_sure_you_want_to_remove_the_article_banner))
+                    .build()
+                showRemoveDialog(removeExtras)
+            }
+
+            cvArticleImage.setOnClickListener {
+                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.IMAGE))
+            }
+        }
     }
 
+    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
+    private fun initiateMediaPicker(list: List<String>) {
+        val extras = MediaPickerExtras.Builder()
+            .mediaTypes(list)
+            .allowMultipleSelect(true)
+            .build()
+        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
+        galleryLauncher.launch(intent)
+    }
+
+    private fun checkMediaPickedResult(result: MediaPickerResult?) {
+        if (result != null) {
+            when (result.mediaPickerResultType) {
+                MEDIA_RESULT_BROWSE -> {
+                    val intent = AndroidUtils.getExternalPickerIntent(
+                        result.mediaTypes,
+                        result.allowMultipleSelect,
+                        result.browseClassName
+                    )
+                    if (intent != null)
+                        mediaBrowseLauncher.launch(intent)
+                }
+
+                MEDIA_RESULT_PICKED -> {
+                    onMediaPicked(result)
+                }
+            }
+        }
+    }
+
+    // converts the picked media to SingleUriData and adds to the selected media
+    private fun onMediaPicked(result: MediaPickerResult) {
+        val data =
+            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+
+        if (data.isNotEmpty()) {
+            if (data.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
+                val imageCropExtras = ImageCropExtras.Builder()
+                    .singleUriData(data.first())
+                    .cropWidth(16)
+                    .cropHeight(9)
+                    .build()
+
+                findNavController().navigate(
+                    EditPostFragmentDirections.actionFragmentEditPostToImageCropFragment(
+                        imageCropExtras
+                    )
+                )
+            }
+        }
+    }
+
+    private fun onMediaPickedFromGallery(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
+            )
+            if (mediaUris.isNotEmpty()) {
+                if (mediaUris.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
+                    val imageCropExtras = ImageCropExtras.Builder()
+                        .singleUriData(mediaUris.first())
+                        .cropWidth(16)
+                        .cropHeight(9)
+                        .build()
+
+                    findNavController().navigate(
+                        LMFeedCreatePostFragmentDirections.actionFragmentCreatePostToImageCropFragment(
+                            imageCropExtras
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    // shows media remove dialog
+    private fun showRemoveDialog(removeDialogExtras: RemoveDialogExtras) {
+        removeAttachmentDialogFragment = LMFeedRemoveAttachmentDialogFragment.showDialog(
+            childFragmentManager,
+            removeDialogExtras
+        )
+    }
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
@@ -194,7 +319,29 @@ class EditPostFragment :
             (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
 
             ivBack.setOnClickListener {
-                requireActivity().finish()
+                openBackPressedPopup()
+            }
+
+            when (editPostExtras.viewType) {
+                ITEM_POST_SINGLE_VIDEO -> {
+                    tvToolbarTitle.text = getString(R.string.edit_video_resource)
+                }
+
+                ITEM_POST_DOCUMENTS -> {
+                    tvToolbarTitle.text = getString(R.string.edit_pdf_resource)
+                }
+
+                ITEM_POST_LINK -> {
+                    tvToolbarTitle.text = getString(R.string.edit_link_resource)
+                }
+
+                ITEM_POST_ARTICLE -> {
+                    tvToolbarTitle.text = getString(R.string.edit_article)
+                }
+
+                else -> {
+                    tvToolbarTitle.text = getString(R.string.edit_post)
+                }
             }
         }
     }
@@ -208,23 +355,35 @@ class EditPostFragment :
     // initializes post done button click listener
     private fun initPostSaveListener() {
         binding.apply {
-            tvSave.setOnClickListener {
+            btnSave.setOnClickListener {
                 val text = etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
-                handleSaveButton(clickable = true, showProgress = true)
-                viewModel.editPost(
-                    editPostExtras.postId,
-                    updatedText,
-                    attachments = fileAttachments,
-                    ogTags = ogTags
-                )
+                val title = etPostTitle.text?.trim().toString()
+
+                progressBar.root.show()
+                if (articleSingleUriData != null) {
+                    viewModel.uploadArticleImage(
+                        requireContext(),
+                        etPostTitle.text?.trim().toString(),
+                        etPostContent.text?.trim().toString(),
+                        articleSingleUriData
+                    )
+                } else {
+                    viewModel.editPost(
+                        editPostExtras.postId,
+                        title,
+                        updatedText,
+                        attachments = fileAttachments,
+                        ogTags = ogTags,
+                        widget = widget
+                    )
+                }
             }
         }
     }
 
     // adds text watcher on post content edit text
     @SuppressLint("ClickableViewAccessibility")
-    @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
     private fun initPostContentTextListener() {
         binding.etPostContent.apply {
             /**
@@ -244,113 +403,19 @@ class EditPostFragment :
                 }
                 false
             })
-
-            if (fileAttachments == null) {
-                // text watcher with debounce to add delay in api calls for ogTags
-                textChanges()
-                    .debounce(500)
-                    .distinctUntilChanged()
-                    .onEach {
-                        val text = it?.toString()?.trim()
-                        if (!text.isNullOrEmpty()) {
-                            showLinkPreview(text)
-                        }
-                    }
-                    .launchIn(lifecycleScope)
-            }
-
-            // text watcher to handleSaveButton click-ability
-            addTextChangedListener {
-                val text = it?.toString()?.trim()
-                if (text.isNullOrEmpty()) {
-                    clearPreviewLink()
-                    if (fileAttachments != null) {
-                        handleSaveButton(clickable = true)
-                    } else {
-                        handleSaveButton(clickable = false)
-                    }
-                } else {
-                    handleSaveButton(clickable = true)
-                }
-            }
         }
     }
 
     // handles Save Done button click-ability
     private fun handleSaveButton(
-        clickable: Boolean,
-        showProgress: Boolean? = null
+        visible: Boolean
     ) {
         binding.apply {
-            if (showProgress == true) {
-                pbSaving.show()
-                tvSave.hide()
+            if (visible) {
+                btnSave.show()
             } else {
-                pbSaving.hide()
-                if (clickable) {
-                    tvSave.isClickable = true
-                    tvSave.setTextColor(LMFeedBranding.getButtonsColor())
-                } else {
-                    tvSave.isClickable = false
-                    tvSave.setTextColor(Color.parseColor("#666666"))
-                }
+                btnSave.hide()
             }
-        }
-    }
-
-    /**
-     * Adds TextWatcher to edit text with Flow operators
-     * **/
-    @ExperimentalCoroutinesApi
-    @CheckResult
-    fun EditText.textChanges(): Flow<CharSequence?> {
-        return callbackFlow<CharSequence?> {
-            etPostTextChangeListener = object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) = Unit
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) = Unit
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    (this@callbackFlow).trySend(s.toString())
-                }
-            }
-            addTextChangedListener(etPostTextChangeListener)
-            awaitClose { removeTextChangedListener(etPostTextChangeListener) }
-        }.onStart { emit(text) }
-    }
-
-    // shows link preview for link post type
-    private fun showLinkPreview(text: String?) {
-        binding.linkPreview.apply {
-            if (text.isNullOrEmpty()) {
-                clearPreviewLink()
-                return
-            }
-            val link = text.getUrlIfExist()
-            if (ogTags != null && link.equals(ogTags?.url)) {
-                return
-            }
-            if (!link.isNullOrEmpty()) {
-                if (link == ogTags?.url) {
-                    return
-                }
-                clearPreviewLink()
-                helperViewModel.decodeUrl(link)
-            } else {
-                clearPreviewLink()
-            }
-        }
-    }
-
-    // clears link preview
-    private fun clearPreviewLink() {
-        ogTags = null
-        binding.linkPreview.apply {
-            root.hide()
         }
     }
 
@@ -364,6 +429,10 @@ class EditPostFragment :
         // observes userData and initializes the user view
         helperViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
+        }
+
+        viewModel.uploadingData.observe(viewLifecycleOwner) {
+            observeUploading(it)
         }
 
         // observes postResponse live data
@@ -382,18 +451,35 @@ class EditPostFragment :
                         finish()
                     }
                 }
+
                 is EditPostViewModel.PostDataEvent.GetPost -> {
                     // post from getPost response
-                    setPostData(response.post)
                     post = response.post
+                    initEditTextListener()
+                    setPostData(response.post)
                 }
             }
         }.observeInLifecycle(viewLifecycleOwner)
+    }
 
-        // observes decodeUrlResponse and returns link ogTags
-        helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
-            this.ogTags = ogTags
-            initLinkView()
+    // initializes a listener to edit text
+    private fun initEditTextListener() {
+        binding.apply {
+            etPostTitle.doAfterTextChanged {
+                showPostMedia(
+                    etPostTitle.text?.trim().toString(),
+                    etPostContent.text?.trim().toString()
+                )
+            }
+
+            if (post?.viewType == ITEM_POST_ARTICLE) {
+                etPostContent.doAfterTextChanged {
+                    showPostMedia(
+                        etPostTitle.text?.trim().toString(),
+                        etPostContent.text?.trim().toString()
+                    )
+                }
+            }
         }
     }
 
@@ -402,9 +488,11 @@ class EditPostFragment :
         viewModel.errorEventFlow.onEach { response ->
             when (response) {
                 is EditPostViewModel.ErrorMessageEvent.EditPost -> {
-                    handleSaveButton(clickable = true, showProgress = false)
+                    handleSaveButton(visible = true)
+                    binding.progressBar.root.show()
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
                 is EditPostViewModel.ErrorMessageEvent.GetPost -> {
                     requireActivity().apply {
                         ViewUtils.showErrorMessageToast(this, response.errorMessage)
@@ -417,16 +505,11 @@ class EditPostFragment :
 
         helperViewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is HelperViewModel.ErrorMessageEvent.DecodeUrl -> {
-                    val postText = binding.etPostContent.text.toString()
-                    val link = postText.getUrlIfExist()
-                    if (link != ogTags?.url) {
-                        clearPreviewLink()
-                    }
-                }
                 is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
+
+                else -> {}
             }
         }.observeInLifecycle(viewLifecycleOwner)
     }
@@ -445,211 +528,169 @@ class EditPostFragment :
     // sets the post data in view
     private fun setPostData(post: PostViewData) {
         binding.apply {
-            val attachments = post.attachments
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
 
+            val title = if (post.viewType == ITEM_POST_ARTICLE) {
+                post.widget.widgetMetaData?.title
+            } else {
+                post.heading
+            } ?: ""
+
+            val content = if (post.viewType == ITEM_POST_ARTICLE) {
+                post.widget.widgetMetaData?.body
+            } else {
+                post.text
+            } ?: ""
+
+            etPostTitle.setText(title)
             // decodes the post text and sets to the edit text
             MemberTaggingDecoder.decode(
                 etPostContent,
-                post.text,
+                content,
                 LMFeedBranding.getTextLinkColor()
             )
-
+            showPostMedia(title, content)
             // sets the cursor to the end and opens keyboard
             etPostContent.setSelection(etPostContent.length())
             etPostContent.focusAndShowKeyboard()
-
-            when (post.viewType) {
-                ITEM_POST_SINGLE_IMAGE -> {
-                    fileAttachments = attachments
-                    showSingleImagePreview()
-                }
-                ITEM_POST_SINGLE_VIDEO -> {
-                    fileAttachments = attachments
-                    showSingleVideoPreview()
-                }
-                ITEM_POST_DOCUMENTS -> {
-                    fileAttachments = attachments
-                    showDocumentsPreview()
-                }
-                ITEM_POST_MULTIPLE_MEDIA -> {
-                    fileAttachments = attachments
-                    showMultimediaPreview()
-                }
-                ITEM_POST_LINK -> {
-                    ogTags = attachments.first().attachmentMeta.ogTags
-                    initLinkView()
-                }
-                else -> {
-                    Log.e(SDKApplication.LOG_TAG, "invalid view type")
-
-                }
-            }
             initPostContentTextListener()
         }
     }
 
-    // shows single image preview
-    private fun showSingleImagePreview() {
-        handleSaveButton(clickable = true)
-        val attachmentUrl = fileAttachments?.first()?.attachmentMeta?.url ?: return
-        // gets the shimmer drawable for placeholder
-        val shimmerDrawable = ViewUtils.getShimmer()
-        binding.apply {
-            singleImageAttachment.root.show()
-            ImageBindingUtil.loadImage(
-                singleImageAttachment.ivSingleImagePost,
-                attachmentUrl,
-                placeholder = shimmerDrawable
-            )
-        }
-    }
-
-    // shows single video preview
-    private fun showSingleVideoPreview() {
-        val videoAttachment = fileAttachments?.first()
-        binding.singleVideoAttachment.apply {
-            root.show()
-            val meta = videoAttachment?.attachmentMeta
-            videoPreviewAutoPlayHelper.playVideo(
-                videoPost,
-                pbVideoLoader,
-                url = meta?.url
-            )
-        }
-    }
-
-    // shows documents preview
-    private fun showDocumentsPreview() {
-        binding.apply {
-            handleSaveButton(clickable = true)
-            documentsAttachment.root.show()
-            val mDocumentsAdapter = EditPostDocumentsAdapter()
-            // item decorator to add spacing between items
-            val dividerItemDecorator =
-                DividerItemDecoration(root.context, DividerItemDecoration.VERTICAL)
-            dividerItemDecorator.setDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.document_item_divider
-                ) ?: return
-            )
-            documentsAttachment.rvDocuments.apply {
-                adapter = mDocumentsAdapter
-                layoutManager = LinearLayoutManager(root.context)
-                // if separator is not there already, then only add
-                if (itemDecorationCount < 1) {
-                    addItemDecoration(dividerItemDecorator)
-                }
-            }
-
-            val documents = fileAttachments ?: return
-
-            if (documents.size <= PostTypeUtil.SHOW_MORE_COUNT) {
-                documentsAttachment.tvShowMore.hide()
-                mDocumentsAdapter.replace(documents)
-            } else {
-                documentsAttachment.tvShowMore.show()
-                "+${documents.size - PostTypeUtil.SHOW_MORE_COUNT} more".also {
-                    documentsAttachment.tvShowMore.text = it
-                }
-                mDocumentsAdapter.replace(documents.take(PostTypeUtil.SHOW_MORE_COUNT))
-            }
-
-            documentsAttachment.tvShowMore.setOnClickListener {
-                documentsAttachment.tvShowMore.hide()
-                mDocumentsAdapter.replace(documents)
-            }
-        }
-    }
-
-    // shows multimedia preview
-    private fun showMultimediaPreview() {
-        handleSaveButton(clickable = true)
-        binding.apply {
-            multipleMediaAttachment.root.show()
-            multipleMediaAttachment.buttonColor = LMFeedBranding.getButtonsColor()
-            val multiMediaAdapter = MultipleMediaPostAdapter(this@EditPostFragment)
-            val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
-            viewPager.adapter = multiMediaAdapter
-            multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)
-            val attachments = fileAttachments?.map {
-                when (it.attachmentType) {
-                    IMAGE -> {
-                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_IMAGE).build()
-                    }
-                    VIDEO -> {
-                        it.toBuilder().dynamicViewType(ITEM_MULTIPLE_MEDIA_VIDEO).build()
-                    }
-                    else -> {
-                        it
-                    }
-                }
-            } ?: return
-            multiMediaAdapter.replace(attachments)
-            viewPager.registerOnPageChangeCallback(object :
-                ViewPager2.OnPageChangeCallback() {
-                override fun onPageSelected(position: Int) {
-                    super.onPageSelected(position)
-
-                    // processes the current video whenever view pager's page is changed
-                    val itemMultipleMediaVideoBinding =
-                        ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(position) as? DataBoundViewHolder<*>)
-                            ?.binding as? LmFeedItemMultipleMediaVideoBinding
-
-                    if (itemMultipleMediaVideoBinding == null) {
-                        // in case the item is not a video
-                        videoPreviewAutoPlayHelper.removePlayer()
-                    } else {
-                        // processes the current video item
-                        val meta = attachments[position].attachmentMeta
-                        videoPreviewAutoPlayHelper.playVideo(
-                            itemMultipleMediaVideoBinding.videoPost,
-                            itemMultipleMediaVideoBinding.pbVideoLoader,
-                            url = meta.url
-                        )
-                    }
-                }
-            })
-        }
-    }
-
-    // renders data in the link view
-    private fun initLinkView() {
-        val data = ogTags ?: return
-        val link = data.url ?: ""
-        // sends link attached event with the link
-        helperViewModel.sendLinkAttachedEvent(link)
-        binding.linkPreview.apply {
-            root.show()
-
-            val isImageValid = data.image.isImageValid()
-            ivLink.isVisible = isImageValid
-            LinkUtil.handleLinkPreviewConstraints(this, isImageValid)
-
-            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-                data.title
-            } else {
-                root.context.getString(R.string.link)
-            }
-            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-            tvLinkDescription.text = data.description
-
-            if (isImageValid) {
-                ImageBindingUtil.loadImage(
-                    ivLink,
-                    data.image,
-                    placeholder = R.drawable.ic_link_primary_40dp,
-                    cornerRadius = 8
+    // handles the logic to show the type of post
+    private fun showPostMedia(
+        title: String,
+        content: String
+    ) {
+        val attachments = post?.attachments
+        when (post?.viewType) {
+            ITEM_POST_ARTICLE -> {
+                widget = post?.widget
+                showArticlePost(
+                    title,
+                    content
                 )
             }
 
-            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
-            ivCrossLink.setOnClickListener {
-                binding.etPostContent.removeTextChangedListener(etPostTextChangeListener)
-                clearPreviewLink()
+            ITEM_POST_SINGLE_VIDEO -> {
+                fileAttachments = attachments
+                showMediaPost(title)
             }
+
+            ITEM_POST_DOCUMENTS -> {
+                fileAttachments = attachments
+                showMediaPost(title)
+            }
+
+            ITEM_POST_LINK -> {
+                ogTags = attachments?.first()?.attachmentMeta?.ogTags
+                showLinkPreview(title)
+            }
+
+            else -> {
+                Log.e(SDKApplication.LOG_TAG, "invalid view type")
+            }
+        }
+    }
+
+    // shows add article view
+    private fun showArticlePost(
+        title: String,
+        articleContent: String
+    ) {
+        binding.apply {
+            cvArticleImage.show()
+            if (isEditingArticle) {
+                handleSaveButton(visible = false)
+                ivArticle.hide()
+                ivDeleteArticle.hide()
+                llAddArticle.show()
+                cvArticleImage.isClickable = true
+            } else {
+                if (title.isEmpty() || articleContent.length < LMFeedCreatePostFragment.MIN_ARTICLE_CONTENT) {
+                    handleSaveButton(visible = false)
+                } else {
+                    handleSaveButton(visible = true)
+                }
+                llAddArticle.hide()
+                ivArticle.show()
+                ivDeleteArticle.show()
+                cvArticleImage.isClickable = false
+                val imageUrl =
+                    articleSingleUriData?.uri ?: post?.widget?.widgetMetaData?.coverImageUrl
+                ImageBindingUtil.loadImage(
+                    ivArticle,
+                    imageUrl
+                )
+            }
+            grpMedia.hide()
+            linkPreview.root.hide()
+            ViewUtils.getMandatoryAsterisk(
+                getString(R.string.write_something_here_min_200),
+                etPostContent
+            )
+            ViewUtils.getMandatoryAsterisk(
+                getString(R.string.add_cover_photo),
+                tvAddCoverPhoto
+            )
+        }
+    }
+
+    // shows attached media in video/document post type
+    private fun showMediaPost(
+        title: String
+    ) {
+        binding.apply {
+            ivArticle.hide()
+            cvArticleImage.hide()
+            linkPreview.root.hide()
+            val selectedMedia = fileAttachments?.firstOrNull()
+            if (selectedMedia != null) {
+                if (title.isEmpty()) {
+                    handleSaveButton(visible = false)
+                } else {
+                    handleSaveButton(visible = true)
+                }
+                grpMedia.show()
+                tvMediaName.text = selectedMedia.attachmentMeta.name
+                tvMediaSize.text =
+                    getString(
+                        R.string.f_MB,
+                        (selectedMedia.attachmentMeta.size?.div(1000000.0))
+                    )
+            }
+        }
+    }
+
+    // shows link preview for link post type
+    private fun showLinkPreview(title: String) {
+        binding.linkPreview.apply {
+            if (ogTags == null) {
+                return
+            }
+            root.show()
+            ivDeleteLink.hide()
+
+            if (title.isEmpty()) {
+                handleSaveButton(visible = false)
+            } else {
+                handleSaveButton(visible = true)
+            }
+            ImageBindingUtil.loadImage(
+                ivLink,
+                ogTags?.image,
+                placeholder = R.drawable.ic_link_primary_40dp
+            )
+
+            tvLinkTitle.text = if (ogTags?.title?.isNotBlank() == true) {
+                ogTags?.title
+            } else {
+                root.context.getString(R.string.link)
+            }
+            tvLinkDescription.isVisible = !ogTags?.description.isNullOrEmpty()
+            tvLinkDescription.text = ogTags?.description
+            tvLinkUrl.text = ogTags?.url?.lowercase(Locale.getDefault())
         }
     }
 
@@ -660,11 +701,88 @@ class EditPostFragment :
             MemberImageUtil.setImage(
                 user.imageUrl,
                 user.name,
-                user.userUniqueId,
+                user.sdkClientInfoViewData.uuid,
                 creatorImage,
                 showRoundImage = true,
                 objectKey = user.updatedAt
             )
         }
+    }
+
+    // observes post uploading
+    private fun observeUploading(uploadingData: Pair<String, AttachmentViewData>) {
+        val uuid = UUID.fromString(uploadingData.first)
+        if (!workersMap.contains(uuid)) {
+            workersMap.add(uuid)
+            WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
+                .observe(viewLifecycleOwner) { workInfo ->
+                    observeMediaWorker(workInfo, uploadingData.second)
+                }
+        }
+    }
+
+    // observes the media worker through various worker lifecycle
+    private fun observeMediaWorker(
+        workInfo: WorkInfo,
+        attachmentViewData: AttachmentViewData
+    ) {
+        when (workInfo.state) {
+            WorkInfo.State.SUCCEEDED -> {
+                // uploading completed, call the edit post api
+                val updatedWidget = widget?.toBuilder()
+                    ?.metaData(
+                        widget?.widgetMetaData?.toBuilder()
+                            ?.url(attachmentViewData.attachmentMeta.url ?: "")
+                            ?.name(attachmentViewData.attachmentMeta.name ?: "")
+                            ?.coverImageUrl(attachmentViewData.attachmentMeta.coverImageUrl ?: "")
+                            ?.size(attachmentViewData.attachmentMeta.size)
+                            ?.build()
+                    )
+                    ?.build()
+                viewModel.editPost(
+                    editPostExtras.postId,
+                    attachmentViewData.attachmentMeta.title ?: "",
+                    attachmentViewData.attachmentMeta.body ?: "",
+                    widget = updatedWidget
+                )
+            }
+
+            WorkInfo.State.FAILED -> {
+                binding.progressBar.root.hide()
+                ViewUtils.showShortToast(requireContext(), getString(R.string.something_went_wrong))
+            }
+
+            else -> {}
+        }
+    }
+
+    // shows discard resource popup
+    fun openBackPressedPopup() {
+        discardResourceDialog = LMFeedDiscardResourceDialog.show(childFragmentManager)
+    }
+
+    // when user clicks on discard resource
+    override fun onResourceDiscarded() {
+        requireActivity().finish()
+    }
+
+    // when user clicks on continue resource creation
+    override fun onResourceCreationContinued() {
+        discardResourceDialog?.dismiss()
+    }
+
+    // when user removes attachment
+    override fun onRemoved() {
+        isEditingArticle = true
+        showPostMedia(
+            binding.etPostTitle.text?.trim().toString(),
+            binding.etPostContent.text?.trim().toString()
+        )
+        removeAttachmentDialogFragment?.dismiss()
+    }
+
+    // when user removes attachment
+    override fun onCancelled() {
+        removeAttachmentDialogFragment?.dismiss()
     }
 }

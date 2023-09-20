@@ -20,7 +20,7 @@ class PostDetailAdapter constructor(
     }
 
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
-        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(8)
+        val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(10)
 
         val itemPostDetailCommentsCountViewDataBinder = ItemPostDetailCommentsCountViewDataBinder()
         viewDataBinders.add(itemPostDetailCommentsCountViewDataBinder)
@@ -32,22 +32,27 @@ class PostDetailAdapter constructor(
             )
         viewDataBinders.add(itemPostDetailCommentViewDataBinder)
 
-        val itemPostTextOnlyBinder = LMFeedItemPostTextOnlyViewDataBinder(postAdapterListener)
-        viewDataBinders.add(itemPostTextOnlyBinder)
+        val lmFeedItemPostTextOnlyBinder = LMFeedItemPostTextOnlyViewDataBinder(postAdapterListener)
+        viewDataBinders.add(lmFeedItemPostTextOnlyBinder)
 
-        val itemPostSingleImageViewDataBinder =
+        val lmFeedItemPostSingleImageViewDataBinder =
             LMFeedItemPostSingleImageViewDataBinder(postAdapterListener)
-        viewDataBinders.add(itemPostSingleImageViewDataBinder)
+        viewDataBinders.add(lmFeedItemPostSingleImageViewDataBinder)
 
-        val itemPostSingleVideoViewDataBinder =
-            LMFeedItemPostSingleVideoViewDataBinder(postAdapterListener)
-        viewDataBinders.add(itemPostSingleVideoViewDataBinder)
+        val lmFeedItemPostSingleVideoViewDataBinder =
+            LMFeedItemPostDetailSingleVideoViewDataBinder(postAdapterListener)
+        viewDataBinders.add(lmFeedItemPostSingleVideoViewDataBinder)
 
-        val itemPostLinkViewDataBinder = LMFeedItemPostLinkViewDataBinder(postAdapterListener)
-        viewDataBinders.add(itemPostLinkViewDataBinder)
+        val lmFeedItemPostLinkViewDataBinder =
+            LMFeedItemPostDetailLinkViewDataBinder(postAdapterListener)
+        viewDataBinders.add(lmFeedItemPostLinkViewDataBinder)
+
+        val lmFeedItemPostArticleViewDataBinder =
+            LMFeedItemPostDetailArticleViewDataBinder(postAdapterListener)
+        viewDataBinders.add(lmFeedItemPostArticleViewDataBinder)
 
         val lmFeedItemPostDocumentsViewDataBinder =
-            LMFeedItemPostDocumentsViewDataBinder(postAdapterListener)
+            LMFeedItemPostDetailDocumentsViewDataBinder(postAdapterListener)
         viewDataBinders.add(lmFeedItemPostDocumentsViewDataBinder)
 
         val itemPostMultipleMediaViewDataBinder =

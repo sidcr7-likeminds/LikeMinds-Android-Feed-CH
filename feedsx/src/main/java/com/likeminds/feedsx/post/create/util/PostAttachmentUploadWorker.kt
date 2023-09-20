@@ -69,19 +69,33 @@ class PostAttachmentUploadWorker(
     // creates/resumes AWS uploads for each attachment
     override fun uploadFiles(continuation: Continuation<Int>) {
         val attachmentsToUpload = if (failedIndex.isNotEmpty()) {
-            postWithAttachments.attachments.filterIndexed { index, _ ->
-                failedIndex.contains(index)
+            postWithAttachments.attachments.filterIndexed { index, it ->
+                !(it.attachmentMeta.awsFolderPath.isNullOrEmpty())
+                        && failedIndex.contains(index)
             }
         } else {
-            postWithAttachments.attachments
+            postWithAttachments.attachments.filter {
+                !(it.attachmentMeta.awsFolderPath.isNullOrEmpty())
+            }
         }
 
-        if (attachmentsToUpload.isEmpty()) {
+        val thumbnailsToUpload = if (failedIndex.isNotEmpty()) {
+            postWithAttachments.attachments.filterIndexed { index, it ->
+                !(it.attachmentMeta.awsFolderPath.isNullOrEmpty())
+                        && failedIndex.contains(index)
+            }
+        } else {
+            postWithAttachments.attachments.filter {
+                !(it.attachmentMeta.thumbnailAWSFolderPath.isNullOrEmpty())
+            }
+        }
+
+        if (thumbnailsToUpload.isEmpty() && attachmentsToUpload.isEmpty()) {
             continuation.resume(WORKER_SUCCESS)
             return
         }
 
-        uploadList = createAWSRequestList(attachmentsToUpload)
+        uploadList = createAWSRequestList(thumbnailsToUpload, attachmentsToUpload)
         uploadList.forEach { request ->
             val resumeAWSFileResponse =
                 UploadHelper.getInstance().getAWSFileResponse(request.awsFolderPath)
@@ -147,6 +161,8 @@ class PostAttachmentUploadWorker(
             .fileType(request.fileType)
             .width(request.width)
             .height(request.height)
+            .isThumbnail(request.isThumbnail)
+            .hasThumbnail(request.hasThumbnail)
             .pageCount(request.pageCount)
             .size(request.size)
             .duration(request.duration)

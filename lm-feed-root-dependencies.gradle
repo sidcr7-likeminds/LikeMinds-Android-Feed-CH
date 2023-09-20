@@ -33,6 +33,7 @@ feed_versions.gson = '2.10.1'
 feed_versions.aws_s3 = '2.73.0'
 feed_versions.room = '2.5.2'
 feed_versions.firebase = '32.2.3'
+feed_versions.cropper = '3.1.2'
 ext.feed_versions = feed_versions
 
 
@@ -123,5 +124,9 @@ def firebase = [:]
 firebase.bom = "com.google.firebase:firebase-bom:$feed_versions.firebase"
 firebase.messaging = "com.google.firebase:firebase-messaging-ktx"
 feed_deps.firebase = firebase
+
+def cropper = [:]
+cropper.main = "com.github.CanHub:Android-Image-Cropper:$versions.cropper"
+feed_deps.cropper = cropper
 
 ext.feed_deps = feed_deps

@@ -43,7 +43,6 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
             // checks whether to bind complete data or not and execute corresponding lambda function
             PostTypeUtil.initPostTypeBindData(
                 authorFrame,
-                tvPostContent,
                 data,
                 position,
                 listener,

@@ -4,11 +4,16 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedActivityCreatePostBinding
+import com.likeminds.feedsx.post.create.model.CreatePostExtras
+import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.utils.ExtrasUtil
+import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class LMFeedCreatePostActivity : BaseAppCompatActivity() {
@@ -20,20 +25,24 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
     private lateinit var navController: NavController
 
     companion object {
-
-        const val POST_ATTACHMENTS_LIMIT = 10
+        const val CREATE_POST_EXTRAS = "CREATE_POST_EXTRAS"
         const val RESULT_UPLOAD_POST = Activity.RESULT_FIRST_USER + 1
-        const val SOURCE_EXTRA = "SOURCE_EXTRA"
 
         @JvmStatic
-        fun start(context: Context) {
-            context.startActivity(Intent(context, LMFeedCreatePostActivity::class.java))
+        fun start(context: Context, extras: CreatePostExtras) {
+            val intent = Intent(context, LMFeedCreatePostActivity::class.java)
+            val bundle = Bundle()
+            bundle.putParcelable(CREATE_POST_EXTRAS, extras)
+            intent.putExtra("bundle", bundle)
+            context.startActivity(intent)
         }
 
         @JvmStatic
-        fun getIntent(context: Context, source: String?): Intent {
+        fun getIntent(context: Context, extras: CreatePostExtras): Intent {
             val intent = Intent(context, LMFeedCreatePostActivity::class.java)
-            intent.putExtra(SOURCE_EXTRA, source)
+            val bundle = Bundle()
+            bundle.putParcelable(CREATE_POST_EXTRAS, extras)
+            intent.putExtra("bundle", bundle)
             return intent
         }
     }
@@ -44,10 +53,18 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
         setContentView(binding.root)
 
-        val source = intent.getStringExtra(SOURCE_EXTRA)
+        setupOnBackPressedCallback()
+
+        val createPostExtras = ExtrasUtil.getParcelable(
+            intent.getBundleExtra("bundle"),
+            CREATE_POST_EXTRAS,
+            CreatePostExtras::class.java
+        )
+
         val args = Bundle().apply {
-            putString(SOURCE_EXTRA, source)
+            putParcelable(CREATE_POST_EXTRAS, createPostExtras)
         }
+
         //Navigation
         navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
@@ -57,14 +74,44 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         //Toolbar
         setSupportActionBar(binding.toolbar)
         binding.ivBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+            val fragment = supportFragmentManager.currentFragment(R.id.nav_host_fragment)
+            if (fragment is LMFeedCreatePostFragment) {
+                fragment.openBackPressedPopup()
+            }
         }
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.label) {
-                LMFeedCreatePostFragment::class.simpleName -> {
-                    binding.toolbar.setTitle(R.string.create_a_post)
+        binding.tvToolbarTitle.apply {
+            when (createPostExtras?.attachmentType) {
+                VIDEO -> {
+                    text = getString(R.string.add_video_resource)
                 }
+
+                DOCUMENT -> {
+                    text = getString(R.string.add_pdf_resource)
+                }
+
+                LINK -> {
+                    text = getString(R.string.add_link_resource)
+                }
+
+                ARTICLE -> {
+                    text = getString(R.string.add_article)
+                }
+
+                else -> {
+                    text = getString(R.string.create_a_post)
+                }
+            }
+        }
+    }
+
+    // setups up on back pressed callback
+    private fun setupOnBackPressedCallback() {
+        onBackPressedDispatcher.addCallback(this) {
+            if (supportFragmentManager.currentFragment(R.id.nav_host_fragment) is LMFeedCreatePostFragment) {
+                val fragment =
+                    supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedCreatePostFragment
+                fragment.openBackPressedPopup()
             }
         }
     }
@@ -72,5 +119,4 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp()
     }
-
 }

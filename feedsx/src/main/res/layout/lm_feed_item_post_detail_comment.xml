@@ -62,7 +62,7 @@
             android:id="@+id/iv_like"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="8dp"
             android:layout_marginTop="10dp"
             android:padding="4dp"
             android:scaleType="fitCenter"
@@ -88,13 +88,15 @@
             tools:fontFamily="@font/roboto_regular"
             tools:text="39 likes"
             tools:ignore="UnusedAttribute"
-            tools:visibility="visible" />
+            tools:visibility="gone" />
 
         <View
             android:id="@+id/likes_separator"
             android:layout_width="1dp"
             android:layout_height="16dp"
             android:layout_marginStart="8dp"
+            app:layout_goneMarginStart="4dp"
+            app:layout_constraintEnd_toStartOf="@id/tv_reply"
             android:background="@color/maastricht_blue_40"
             app:layout_constraintBottom_toBottomOf="@id/likes_count"
             app:layout_constraintStart_toEndOf="@id/likes_count"

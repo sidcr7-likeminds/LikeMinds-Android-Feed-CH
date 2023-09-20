@@ -15,7 +15,9 @@ class AWSFileResponse private constructor(
     var pageCount: Int?,
     var size: Long?,
     var duration: Int?,
-    var uuid: String?
+    var uuid: String?,
+    val isThumbnail: Boolean?,
+    val hasThumbnail: Boolean?
 ) {
     val downloadUrl: String
         get() = String(Base64.decode(AWSKeys.getBucketBaseUrl(), Base64.DEFAULT)) + awsFolderPath
@@ -33,6 +35,8 @@ class AWSFileResponse private constructor(
         private var size: Long? = null
         private var duration: Int? = null
         private var uuid: String? = null
+        private var isThumbnail: Boolean? = null
+        private var hasThumbnail: Boolean? = null
 
         fun name(name: String) = apply { this.name = name }
         fun awsFolderPath(awsFolderPath: String) = apply { this.awsFolderPath = awsFolderPath }
@@ -47,6 +51,8 @@ class AWSFileResponse private constructor(
         fun size(size: Long?) = apply { this.size = size }
         fun duration(duration: Int?) = apply { this.duration = duration }
         fun uuid(uuid: String?) = apply { this.uuid = uuid }
+        fun isThumbnail(isThumbnail: Boolean?) = apply { this.isThumbnail = isThumbnail }
+        fun hasThumbnail(hasThumbnail: Boolean?) = apply { this.hasThumbnail = hasThumbnail }
 
         fun build() = AWSFileResponse(
             name,
@@ -59,7 +65,9 @@ class AWSFileResponse private constructor(
             pageCount,
             size,
             duration,
-            uuid
+            uuid,
+            isThumbnail,
+            hasThumbnail
         )
     }
 
@@ -75,5 +83,7 @@ class AWSFileResponse private constructor(
             .size(size)
             .duration(duration)
             .uuid(uuid)
+            .isThumbnail(isThumbnail)
+            .hasThumbnail(hasThumbnail)
     }
 }

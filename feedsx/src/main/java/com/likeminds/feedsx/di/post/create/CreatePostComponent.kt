@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.di.post.create
 
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostFragment
+import com.likeminds.feedsx.post.create.view.*
 import dagger.Subcomponent
 
 @Subcomponent(modules = [CreatePostViewModelModule::class])
@@ -14,4 +13,8 @@ interface CreatePostComponent {
 
     fun inject(lmFeedCreatePostFragment: LMFeedCreatePostFragment)
     fun inject(lmFeedCreatePostActivity: LMFeedCreatePostActivity)
+    fun inject(lmFeedDiscardResourceDialog: LMFeedDiscardResourceDialog)
+    fun inject(lmFeedRemoveAttachmentDialogFragment: LMFeedRemoveAttachmentDialogFragment)
+    fun inject(lmFeedSelectAuthorActivity: LMFeedSelectAuthorActivity)
+    fun inject(lmFeedSelectAuthorFragment: LMFeedSelectAuthorFragment)
 }

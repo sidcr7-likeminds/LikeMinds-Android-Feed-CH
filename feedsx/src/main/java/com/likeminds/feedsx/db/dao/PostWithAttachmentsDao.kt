@@ -37,6 +37,10 @@ interface PostWithAttachmentsDao {
     @Delete
     suspend fun deletePost(post: PostEntity)
 
+    //delete post in local db
+    @Query("DELETE FROM ${DbConstants.POST_TABLE} WHERE temp_id = :temporaryId")
+    suspend fun deletePostWithTemporaryId(temporaryId: Long)
+
     //get the latest post in db which is not posted
     @Transaction
     @Query("SELECT * FROM ${DbConstants.POST_TABLE} WHERE is_posted = 0 ORDER BY temp_id DESC LIMIT ${DbConstants.LATEST_POST_LIMIT}")

@@ -7,8 +7,7 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
 import android.net.Uri
-import android.os.Build
-import android.os.CancellationSignal
+import android.os.*
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
@@ -16,6 +15,9 @@ import android.util.Size
 import androidx.core.content.FileProvider
 import com.likeminds.feedsx.utils.file.PathUtils.getPath
 import java.io.*
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object FileUtil {
 
@@ -254,6 +256,17 @@ object FileUtil {
             }
         }
         return bitmap
+    }
+
+    @Throws(IOException::class)
+    fun createImageFile(context: Context): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        )
     }
 }
 

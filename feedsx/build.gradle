@@ -1,3 +1,5 @@
+import com.android.build.gradle.api.BaseVariant
+
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
@@ -6,6 +8,8 @@ plugins {
     id 'androidx.navigation.safeargs'
     id 'com.google.devtools.ksp'
 }
+
+apply from: 'dependencies.gradle'
 
 android {
     namespace 'com.likeminds.feedsx'
@@ -31,23 +35,45 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "java.util.Map<String,String>", "URLS_MAP", getBuildConfigMapEntry(urls)
         }
         debug {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField "java.util.Map<String,String>", "URLS_MAP", getBuildConfigMapEntry(beta_urls)
         }
+    }
+    libraryVariants.configureEach {
+        variant ->
+            printBuildConfigKeys(variant, keys)
     }
     buildFeatures {
         dataBinding = true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17
+        jvmTarget = JavaVersion.VERSION_11
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }
 
-apply from: "dependencies.gradle"
+static void printBuildConfigKeys(BaseVariant variant, LinkedHashMap[] maps) {
+    maps.each { map ->
+        map.each { key, value ->
+            variant.buildConfigField "String", "$key", "\"$value\""
+        }
+    }
+}
+
+static String getBuildConfigMapEntry(LinkedHashMap[] maps) {
+    StringBuilder putCommandForAll = new StringBuilder()
+    maps.each { map ->
+        map.each { key, value ->
+            putCommandForAll.append("put(\"$key\",$value);")
+        }
+    }
+    return "new java.util.HashMap() {{${putCommandForAll.toString()}}}"
+}

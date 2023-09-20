@@ -2,6 +2,10 @@ package com.likeminds.feedsx.utils
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
@@ -9,8 +13,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
-import android.widget.FrameLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -125,21 +128,27 @@ object ViewUtils {
             ITEM_POST_TEXT_ONLY -> {
                 LMFeedAnalytics.Keys.POST_TYPE_TEXT
             }
+
             ITEM_POST_SINGLE_IMAGE -> {
                 LMFeedAnalytics.Keys.POST_TYPE_IMAGE
             }
+
             ITEM_POST_SINGLE_VIDEO -> {
                 LMFeedAnalytics.Keys.POST_TYPE_VIDEO
             }
+
             ITEM_POST_DOCUMENTS -> {
                 LMFeedAnalytics.Keys.POST_TYPE_DOCUMENT
             }
+
             ITEM_POST_MULTIPLE_MEDIA -> {
                 LMFeedAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
             }
+
             ITEM_POST_LINK -> {
                 LMFeedAnalytics.Keys.POST_TYPE_LINK
             }
+
             else -> {
                 LMFeedAnalytics.Keys.POST_TYPE_TEXT
             }
@@ -174,5 +183,39 @@ object ViewUtils {
 
         // If we reach here then we didn't find a CoL or a suitable content view so we'll fallback
         return fallback
+    }
+
+    // adds an asterisk in textView for mandatory field
+    fun getMandatoryAsterisk(
+        title: String,
+        tvTitle: TextView
+    ) {
+        val mandatoryAsterisk = SpannableString("$title*")
+        mandatoryAsterisk.setSpan(
+            ForegroundColorSpan(
+                Color.RED
+            ),
+            title.length,
+            title.length + 1,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        tvTitle.text = mandatoryAsterisk
+    }
+
+    // adds an asterisk for mandatory fields in the hint
+    fun getMandatoryAsterisk(
+        title: String,
+        etPostTitle: EditText
+    ) {
+        val mandatoryAsterisk = SpannableString("$title*")
+        mandatoryAsterisk.setSpan(
+            ForegroundColorSpan(
+                Color.RED
+            ),
+            title.length,
+            title.length + 1,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        etPostTitle.hint = mandatoryAsterisk
     }
 }

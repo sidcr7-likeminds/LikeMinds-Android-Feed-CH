@@ -2,16 +2,20 @@ package com.likeminds.feedsx.feed.viewmodel
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
 import com.likeminds.feedsx.LMFeedAnalytics
+import com.likeminds.feedsx.media.MediaRepository
+import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.LMFeedPostPreferences
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.IMAGE
+import com.likeminds.feedsx.posttypes.model.VIDEO
 import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
@@ -22,20 +26,12 @@ import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
-import kotlin.collections.List
-import kotlin.collections.count
-import kotlin.collections.emptyList
-import kotlin.collections.forEach
-import kotlin.collections.hashMapOf
-import kotlin.collections.isNotEmpty
-import kotlin.collections.joinToString
-import kotlin.collections.listOf
-import kotlin.collections.mapOf
 import kotlin.collections.set
 
 class FeedViewModel @Inject constructor(
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
-    private val postPreferences: LMFeedPostPreferences
+    private val postPreferences: LMFeedPostPreferences,
+    private val mediaRepository: MediaRepository
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -68,6 +64,42 @@ class FeedViewModel @Inject constructor(
         const val PAGE_SIZE = 20
     }
 
+    fun fetchUriDetails(
+        context: Context,
+        uris: List<Uri>,
+        callback: (media: List<MediaViewData>) -> Unit,
+    ) {
+        mediaRepository.getLocalUrisDetails(context, uris, callback)
+    }
+
+    fun sendMediaAttachedEvent(data: ArrayList<SingleUriData>) {
+        // counts number of images in attachments
+        val imageCount = data.count {
+            it.fileType == com.likeminds.feedsx.media.model.IMAGE
+        }
+        // counts number of videos in attachments
+        val videoCount = data.count {
+            it.fileType == com.likeminds.feedsx.media.model.VIDEO
+        }
+        // counts number of documents in attachments
+        val docsCount = data.count {
+            it.fileType == PDF
+        }
+
+        // sends image attached event if imageCount > 0
+        if (imageCount > 0) {
+            sendImageAttachedEvent(imageCount)
+        }
+        // sends image attached event if videoCount > 0
+        if (videoCount > 0) {
+            sendVideoAttachedEvent(videoCount)
+        }
+        // sends image attached event if docsCount > 0
+        if (docsCount > 0) {
+            sendDocumentAttachedEvent(docsCount)
+        }
+    }
+
     //get universal feed
     fun getUniversalFeed(page: Int) {
         viewModelScope.launchIO {
@@ -83,10 +115,11 @@ class FeedViewModel @Inject constructor(
                 val data = response.data ?: return@launchIO
                 val posts = data.posts
                 val usersMap = data.users
+                val widgets = data.widgets
 
                 //convert to view data
                 val listOfPostViewData =
-                    ViewDataConverter.convertUniversalFeedPosts(posts, usersMap)
+                    ViewDataConverter.convertUniversalFeedPosts(posts, usersMap, widgets)
 
                 //send it to ui
                 _universalFeedResponse.postValue(Pair(page, listOfPostViewData))
@@ -111,17 +144,27 @@ class FeedViewModel @Inject constructor(
                 } else {
                     postingData.text
                 }
-            val request = AddPostRequest.Builder()
-                .text(updatedText)
-                .attachments(createAttachments(postingData.attachments))
-                .build()
+            val request = if (postingData.attachments.first().attachmentType == ARTICLE) {
+                AddPostRequest.Builder()
+                    .attachments(createAttachments(postingData.attachments))
+                    .onBehalfOfUUID(postingData.onBehalfOfUUID)
+                    .build()
+            } else {
+                AddPostRequest.Builder()
+                    .text(updatedText)
+                    .heading(postingData.heading)
+                    .onBehalfOfUUID(postingData.onBehalfOfUUID)
+                    .attachments(createAttachments(postingData.attachments))
+                    .build()
+            }
 
             val response = lmFeedClient.addPost(request)
             if (response.success) {
                 val data = response.data ?: return@launchIO
-                val postViewData = convertPost(
+                val postViewData = ViewDataConverter.convertPost(
                     data.post,
-                    data.users
+                    data.users,
+                    data.widgets
                 )
 
                 // sends post creation completed event
@@ -155,8 +198,21 @@ class FeedViewModel @Inject constructor(
             } else {
                 val temporaryId = postWithAttachments.post.temporaryId
                 postPreferences.saveTemporaryId(temporaryId)
-                postDataEventChannel.send(PostDataEvent.PostDbData(convertPost(postWithAttachments)))
+                postDataEventChannel.send(
+                    PostDataEvent.PostDbData(
+                        ViewDataConverter.convertPost(
+                            postWithAttachments
+                        )
+                    )
+                )
             }
+        }
+    }
+
+    // deletes failed post from db
+    fun deletePostFromDB(temporaryId: Long) {
+        viewModelScope.launchIO {
+            postWithAttachmentsRepository.deletePostWithTemporaryId(temporaryId)
         }
     }
 
@@ -335,6 +391,45 @@ class FeedViewModel @Inject constructor(
                 return emptyList()
             }
         }
+    }
+
+    /**
+     * Triggers when the user attaches image
+     * @param imageCount - number of attached images
+     **/
+    private fun sendImageAttachedEvent(imageCount: Int) {
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.IMAGE_ATTACHED_TO_POST,
+            mapOf(
+                "image_count" to imageCount.toString()
+            )
+        )
+    }
+
+    /**
+     * Triggers when the user attaches video
+     * @param videoCount - number of attached videos
+     **/
+    private fun sendVideoAttachedEvent(videoCount: Int) {
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.VIDEO_ATTACHED_TO_POST,
+            mapOf(
+                "video_count" to videoCount.toString()
+            )
+        )
+    }
+
+    /**
+     * Triggers when the user attaches document
+     * @param documentCount - number of attached documents
+     **/
+    private fun sendDocumentAttachedEvent(documentCount: Int) {
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.DOCUMENT_ATTACHED_TO_POST,
+            mapOf(
+                "document_count" to documentCount.toString()
+            )
+        )
     }
 
     /**

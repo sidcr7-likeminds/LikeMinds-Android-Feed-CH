@@ -3,17 +3,22 @@ package com.likeminds.feedsx.utils.mediauploader.model
 import android.net.Uri
 
 class GenericFileRequest private constructor(
-    var name: String?,
-    var fileUri: Uri?,
-    var fileType: Int,
-    var awsFolderPath: String,
-    var localFilePath: String?,
-    var index: Int,
-    var width: Int?,
-    var height: Int?,
-    var pageCount: Int?,
-    var size: Long?,
-    var duration: Int?
+    val name: String?,
+    val fileUri: Uri?,
+    val fileType: Int,
+    val awsFolderPath: String,
+    val localFilePath: String?,
+    val index: Int,
+    val width: Int?,
+    val height: Int?,
+    val pageCount: Int?,
+    val size: Long?,
+    val duration: Int?,
+    val thumbnailUri: Uri?,
+    val thumbnailAWSFolderPath: String?,
+    val thumbnailLocalFilePath: String?,
+    val isThumbnail: Boolean?,
+    val hasThumbnail: Boolean?
 ) {
 
     class Builder {
@@ -29,6 +34,11 @@ class GenericFileRequest private constructor(
         private var pageCount: Int? = null
         private var size: Long? = null
         private var duration: Int? = null
+        private var thumbnailUri: Uri? = null
+        private var thumbnailAWSFolderPath: String? = null
+        private var thumbnailLocalFilePath: String? = null
+        private var isThumbnail: Boolean? = null
+        private var hasThumbnail: Boolean? = null
 
         fun name(name: String?) = apply { this.name = name }
         fun fileUri(fileUri: Uri?) = apply { this.fileUri = fileUri }
@@ -41,6 +51,15 @@ class GenericFileRequest private constructor(
         fun pageCount(pageCount: Int?) = apply { this.pageCount = pageCount }
         fun size(size: Long?) = apply { this.size = size }
         fun duration(duration: Int?) = apply { this.duration = duration }
+        fun thumbnailUri(thumbnailUri: Uri?) = apply { this.thumbnailUri = thumbnailUri }
+        fun thumbnailAWSFolderPath(thumbnailAWSFolderPath: String?) =
+            apply { this.thumbnailAWSFolderPath = thumbnailAWSFolderPath }
+
+        fun thumbnailLocalFilePath(thumbnailLocalFilePath: String?) =
+            apply { this.thumbnailLocalFilePath = thumbnailLocalFilePath }
+
+        fun isThumbnail(isThumbnail: Boolean?) = apply { this.isThumbnail = isThumbnail }
+        fun hasThumbnail(hasThumbnail: Boolean?) = apply { this.hasThumbnail = hasThumbnail }
 
         fun build() = GenericFileRequest(
             name,
@@ -53,7 +72,12 @@ class GenericFileRequest private constructor(
             height,
             pageCount,
             size,
-            duration
+            duration,
+            thumbnailUri,
+            thumbnailAWSFolderPath,
+            thumbnailLocalFilePath,
+            isThumbnail,
+            hasThumbnail
         )
     }
 
@@ -69,5 +93,10 @@ class GenericFileRequest private constructor(
             .pageCount(pageCount)
             .size(size)
             .duration(duration)
+            .thumbnailUri(thumbnailUri)
+            .thumbnailAWSFolderPath(thumbnailAWSFolderPath)
+            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+            .isThumbnail(isThumbnail)
+            .hasThumbnail(hasThumbnail)
     }
 }

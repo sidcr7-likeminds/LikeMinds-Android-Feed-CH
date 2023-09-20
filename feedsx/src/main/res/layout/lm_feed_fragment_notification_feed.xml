@@ -22,6 +22,7 @@
                 android:layout_height="0dp"
                 android:descendantFocusability="blocksDescendants"
                 android:orientation="vertical"
+                android:visibility="gone"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:itemCount="3"
                 tools:visibility="visible" />

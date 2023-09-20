@@ -11,6 +11,7 @@ import com.likeminds.feedsx.databinding.LmFeedActivityPostDetailBinding
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class PostDetailActivity : BaseAppCompatActivity() {
@@ -93,9 +94,17 @@ class PostDetailActivity : BaseAppCompatActivity() {
     }
 
     private fun initActionBar() {
-        setSupportActionBar(binding.toolbar)
-        binding.ivBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
+        binding.apply {
+            setSupportActionBar(toolbar)
+            ivBack.setOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+
+            ivPostMenu.setOnClickListener {
+                val fragment =
+                    supportFragmentManager.currentFragment(R.id.nav_host_fragment) as PostDetailFragment
+                fragment.showMenu(ivPostMenu)
+            }
         }
     }
 

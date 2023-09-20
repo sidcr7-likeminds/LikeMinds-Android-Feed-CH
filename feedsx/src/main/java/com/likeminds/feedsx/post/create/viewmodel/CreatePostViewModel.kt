@@ -16,6 +16,7 @@ import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
+import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachmentForResource
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
@@ -56,16 +57,18 @@ class CreatePostViewModel @Inject constructor(
     // calls AddPost API and posts the response in LiveData
     fun addPost(
         context: Context,
+        postTitle: String,
         postTextContent: String?,
         fileUris: List<SingleUriData>? = null,
-        ogTags: LinkOGTagsViewData? = null
+        ogTags: LinkOGTagsViewData? = null,
+        onBehalfOfUUID: String? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
-            if (fileUris != null) {
+            if (!fileUris.isNullOrEmpty()) {
                 // if the post has upload-able attachments
                 temporaryPostId = System.currentTimeMillis()
                 val postId = temporaryPostId ?: 0
@@ -79,12 +82,16 @@ class CreatePostViewModel @Inject constructor(
                 // adds post data in local db
                 storePost(
                     uploadData,
+                    postTitle,
                     updatedText,
-                    updatedFileUris
+                    updatedFileUris,
+                    onBehalfOfUUID
                 )
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
+                    .heading(postTitle)
+                    .onBehalfOfUUID(onBehalfOfUUID)
                     .text(updatedText)
                 if (ogTags != null) {
                     // if the post has ogTags
@@ -109,30 +116,56 @@ class CreatePostViewModel @Inject constructor(
     //add post:{} into local db
     private fun storePost(
         uploadData: Pair<WorkContinuation, String>,
+        heading: String,
         text: String?,
-        fileUris: List<SingleUriData>? = null
+        fileUris: List<SingleUriData>? = null,
+        onBehalfOfUUID: String?
     ) {
         viewModelScope.launchIO {
             val uuid = uploadData.second
-            if (fileUris == null) {
+            if (fileUris.isNullOrEmpty()) {
                 return@launchIO
             }
             val temporaryPostId = temporaryPostId ?: -1
             val thumbnailUri = fileUris.first().thumbnailUri
-            val postEntity = ViewDataConverter.convertPost(
-                temporaryPostId,
-                uuid,
-                thumbnailUri.toString(),
-                text
-            )
-            val attachments = fileUris.map {
-                convertAttachment(
+            // means that it is article post
+            if (fileUris.first().fileType == IMAGE) {
+                val postEntity = ViewDataConverter.convertPost(
                     temporaryPostId,
-                    it
+                    uuid,
+                    thumbnailUri.toString(),
+                    null,
+                    null,
+                    onBehalfOfUUID
                 )
+                val attachments = fileUris.map {
+                    convertAttachmentForResource(
+                        temporaryPostId,
+                        it,
+                        text ?: "",
+                        heading
+                    )
+                }
+                // add it to local db
+                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
+            } else {
+                val postEntity = ViewDataConverter.convertPost(
+                    temporaryPostId,
+                    uuid,
+                    thumbnailUri.toString(),
+                    text,
+                    heading,
+                    onBehalfOfUUID
+                )
+                val attachments = fileUris.map {
+                    convertAttachment(
+                        temporaryPostId,
+                        it
+                    )
+                }
+                // add it to local db
+                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             }
-            // add it to local db
-            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             _postAdded.postValue(false)
             uploadData.first.enqueue()
         }
@@ -155,7 +188,7 @@ class CreatePostViewModel @Inject constructor(
             // generates awsFolderPath to upload the file
             val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
                 it.mediaName,
-                userPreferences.getUserUniqueId()
+                userPreferences.getUUID()
             )
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)
@@ -167,21 +200,42 @@ class CreatePostViewModel @Inject constructor(
                         .height(dimensions.second)
                         .build()
                 }
+
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
-                        builder.thumbnailUri(thumbnailUri).build()
+                        val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                            "THUMB_${thumbnailUri.path}",
+                            userPreferences.getUUID()
+                        )
+                        val thumbnailLocalFilePath = FileUtil.getRealPath(context, thumbnailUri)
+                        builder.thumbnailUri(thumbnailUri)
+                            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+                            .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
+                            .build()
                     } else {
                         builder.build()
                     }
                 }
+
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
-                    val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
-                    builder
-                        .thumbnailUri(thumbnailUri)
-                        .format(format)
-                        .build()
+                    if (thumbnailUri != null) {
+                        val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                            "THUMB_${thumbnailUri.path}",
+                            userPreferences.getUUID()
+                        )
+                        val thumbnailLocalFilePath = FileUtil.getRealPath(context, thumbnailUri)
+                        val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
+                        builder
+                            .thumbnailUri(thumbnailUri)
+                            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+                            .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
+                            .format(format)
+                            .build()
+                    } else {
+                        builder.build()
+                    }
                 }
             }
         }

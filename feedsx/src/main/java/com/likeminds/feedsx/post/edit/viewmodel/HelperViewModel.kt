@@ -45,6 +45,11 @@ class HelperViewModel @Inject constructor(
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorEventFlow = errorEventChannel.receiveAsFlow()
 
+    // updates the user data
+    fun updateUserData(userViewData: UserViewData) {
+        _userData.postValue(userViewData)
+    }
+
     // calls DecodeUrl API
     fun decodeUrl(url: String) {
         viewModelScope.launchIO {

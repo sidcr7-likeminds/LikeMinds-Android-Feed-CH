@@ -40,7 +40,6 @@ class LMFeedItemPostDocumentsViewDataBinder constructor(
         // checks whether to bind complete data or not and execute corresponding lambda function
         PostTypeUtil.initPostTypeBindData(
             binding.authorFrame,
-            binding.tvPostContent,
             data,
             position,
             listener,

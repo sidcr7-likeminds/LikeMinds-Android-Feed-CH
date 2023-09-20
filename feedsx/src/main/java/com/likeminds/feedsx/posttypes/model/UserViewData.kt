@@ -16,7 +16,8 @@ class UserViewData private constructor(
     val isDeleted: Boolean?,
     val updatedAt: Long,
     val sdkClientInfoViewData: SDKClientInfoViewData,
-    val uuid: String
+    val uuid: String,
+    val listOfQuestionAnswerViewData: List<QuestionViewData>?
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = ITEM_USER
@@ -33,6 +34,7 @@ class UserViewData private constructor(
         private var sdkClientInfoViewData: SDKClientInfoViewData =
             SDKClientInfoViewData.Builder().build()
         private var uuid: String = ""
+        private var listOfQuestionAnswerViewData: List<QuestionViewData>? = null
 
         fun id(id: Int) = apply { this.id = id }
         fun name(name: String) = apply { this.name = name }
@@ -46,6 +48,8 @@ class UserViewData private constructor(
             apply { this.sdkClientInfoViewData = sdkClientInfoViewData }
 
         fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun listOfQuestionAnswerViewData(listOfQuestionAnswerViewData: List<QuestionViewData>?) =
+            apply { this.listOfQuestionAnswerViewData = listOfQuestionAnswerViewData }
 
         fun build() = UserViewData(
             id,
@@ -57,7 +61,8 @@ class UserViewData private constructor(
             isDeleted,
             updatedAt,
             sdkClientInfoViewData,
-            uuid
+            uuid,
+            listOfQuestionAnswerViewData
         )
     }
 
@@ -72,5 +77,6 @@ class UserViewData private constructor(
             .updatedAt(updatedAt)
             .uuid(uuid)
             .sdkClientInfoViewData(sdkClientInfoViewData)
+            .listOfQuestionAnswerViewData(listOfQuestionAnswerViewData)
     }
 }

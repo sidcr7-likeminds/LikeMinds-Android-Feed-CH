@@ -1,7 +1,10 @@
 package com.likeminds.feedsx.pushnotification
 
+import android.annotation.SuppressLint
 import android.app.*
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -24,14 +27,14 @@ class LMFeedNotificationHandler {
     companion object {
         private var notificationHandler: LMFeedNotificationHandler? = null
 
-        const val GENERAL_CHANNEL_ID = "notification_general"
+        const val RESOURCE_CHANNEL_ID = "notification_lm_feed_general"
         const val NOTIFICATION_TITLE = "title"
         const val NOTIFICATION_SUB_TITLE = "sub_title"
         const val NOTIFICATION_ROUTE = "route"
         const val NOTIFICATION_CATEGORY = "category"
         const val NOTIFICATION_SUBCATEGORY = "subcategory"
 
-        private const val NOTIFICATION_DATA = "notification_data"
+        private const val NOTIFICATION_DATA = "lm_feed_notification_data"
 
         @JvmStatic
         fun getInstance(): LMFeedNotificationHandler {
@@ -66,7 +69,7 @@ class LMFeedNotificationHandler {
             val name = mApplication.getString(R.string.general_channel_name)
             val descriptionText = mApplication.getString(R.string.general_channel_description)
             val importance = NotificationManager.IMPORTANCE_HIGH
-            val channel = NotificationChannel(GENERAL_CHANNEL_ID, name, importance).apply {
+            val channel = NotificationChannel(RESOURCE_CHANNEL_ID, name, importance).apply {
                 description = descriptionText
             }
             // Register the channel with the system
@@ -77,7 +80,7 @@ class LMFeedNotificationHandler {
     }
 
     //handle and show notification
-    fun handleNotification(data: MutableMap<String, String>) {
+    fun handleNotification(data: MutableMap<String, String>, launcherActivityIntent: Intent?) {
         val title = data[NOTIFICATION_TITLE] ?: return
         val subTitle = data[NOTIFICATION_SUB_TITLE] ?: return
         val route = data[NOTIFICATION_ROUTE] ?: return
@@ -96,6 +99,15 @@ class LMFeedNotificationHandler {
             put(NOTIFICATION_ROUTE, route)
         }
 
+        val routeUri = Uri.parse(route)
+
+        if (routeUri.host != Route.ROUTE_POST_DETAIL
+            && routeUri.host != Route.ROUTE_CREATE_POST
+            && routeUri.host != Route.ROUTE_FEED
+        ) {
+            return
+        }
+
         LMFeedAnalytics.track(
             LMFeedAnalytics.Events.NOTIFICATION_RECEIVED, hashMapOf(
                 Pair("payload", payloadJson.toString()),
@@ -110,13 +122,15 @@ class LMFeedNotificationHandler {
             subTitle,
             route,
             category,
-            subcategory
+            subcategory,
+            launcherActivityIntent
         )
     }
 
     /**
      * create pending intent and show notifications accordingly
      * */
+    @SuppressLint("MissingPermission")
     private fun sendNormalNotification(
         context: Context,
         title: String,
@@ -124,6 +138,7 @@ class LMFeedNotificationHandler {
         route: String,
         category: String?,
         subcategory: String?,
+        launcherActivityIntent: Intent?,
     ) {
         // notificationId is a unique int for each notification that you must define
         val notificationId = route.hashCode()
@@ -135,9 +150,10 @@ class LMFeedNotificationHandler {
                 title,
                 subTitle,
                 category,
-                subcategory
+                subcategory,
+                launcherActivityIntent
             )
-        val notificationBuilder = NotificationCompat.Builder(mApplication, GENERAL_CHANNEL_ID)
+        val notificationBuilder = NotificationCompat.Builder(mApplication, RESOURCE_CHANNEL_ID)
             .setContentTitle(title)
             .setContentText(subTitle)
             .setSmallIcon(notificationIcon)
@@ -161,6 +177,7 @@ class LMFeedNotificationHandler {
         notificationMessage: String,
         category: String?,
         subcategory: String?,
+        launcherActivityIntent: Intent?,
     ): PendingIntent? {
         //get intent for route
         val intent = Route.getRouteIntent(
@@ -173,7 +190,7 @@ class LMFeedNotificationHandler {
         if (intent?.getBundleExtra("bundle") != null) {
             intent.getBundleExtra("bundle")!!.putParcelable(
                 NOTIFICATION_DATA,
-                NotificationActionData.Builder()
+                LMFeedNotificationActionData.Builder()
                     .groupRoute(route)
                     .childRoute(route)
                     .notificationTitle(notificationTitle)
@@ -184,7 +201,7 @@ class LMFeedNotificationHandler {
             )
         } else {
             intent?.putExtra(
-                NOTIFICATION_DATA, NotificationActionData.Builder()
+                NOTIFICATION_DATA, LMFeedNotificationActionData.Builder()
                     .groupRoute(route)
                     .childRoute(route)
                     .notificationTitle(notificationTitle)
@@ -197,10 +214,10 @@ class LMFeedNotificationHandler {
 
         var resultPendingIntent: PendingIntent? = null
         if (intent != null) {
-            resultPendingIntent = PendingIntent.getActivity(
+            resultPendingIntent = PendingIntent.getActivities(
                 context,
                 notificationId,
-                intent,
+                arrayOf(launcherActivityIntent, intent),
                 PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             )
         }
