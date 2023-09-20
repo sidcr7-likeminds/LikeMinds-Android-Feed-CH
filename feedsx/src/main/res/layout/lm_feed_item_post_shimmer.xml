@@ -31,6 +31,7 @@
                 android:layout_width="0dp"
                 android:layout_height="16dp"
                 android:layout_marginTop="10dp"
+                android:alpha="0.5"
                 android:background="@drawable/background_shimmer_radius_4"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -43,6 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="16dp"
                 android:layout_marginTop="10dp"
+                android:alpha="0.5"
                 android:background="@drawable/background_shimmer_radius_4"
                 app:layout_constraintTop_toBottomOf="@id/v2" />
 
@@ -51,6 +53,7 @@
                 android:layout_width="80dp"
                 android:layout_height="16dp"
                 android:layout_marginTop="10dp"
+                android:alpha="0.5"
                 android:background="@drawable/background_shimmer_radius_4"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/v3" />

@@ -60,7 +60,7 @@ object LikeMindsFeedUI {
 
         val extras = LMFeedExtras.Builder()
             .apiKey(apiKey)
-            .userId(userId)
+            .uuid(userId)
             .userName(userName)
             .isGuest(isGuest)
             .build()
@@ -100,7 +100,7 @@ object LikeMindsFeedUI {
 
         val extras = LMFeedExtras.Builder()
             .apiKey(apiKey)
-            .userId(userId)
+            .uuid(userId)
             .userName(userName)
             .isGuest(isGuest)
             .build()

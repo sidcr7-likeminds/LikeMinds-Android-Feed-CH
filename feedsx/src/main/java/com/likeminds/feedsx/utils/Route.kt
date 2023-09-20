@@ -3,6 +3,7 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
@@ -62,7 +63,7 @@ object Route {
     }
 
     // route://post_detail?post_id=<post_id>&comment_id=<comment_id of new comment>
-    private fun getRouteToPostDetail(
+    fun getRouteToPostDetail(
         context: Context,
         route: Uri,
         source: String?
@@ -96,7 +97,7 @@ object Route {
     }
 
     //create route string as per uri
-    private fun getRouteFromDeepLink(data: Uri?): String? {
+    fun getRouteFromDeepLink(data: Uri?): String? {
         if (data == null) {
             return null
         }
