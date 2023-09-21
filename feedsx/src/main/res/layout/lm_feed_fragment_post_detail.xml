@@ -137,7 +137,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 tools:visibility="visible" />
 
-
             <com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
                 android:id="@+id/member_tagging_view"
                 android:layout_width="0dp"

@@ -4,7 +4,7 @@ import android.view.*
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.likeminds.feedsx.R
+import com.likeminds.feedsx.*
 import com.likeminds.feedsx.databinding.LmFeedItemPostDetailCommentBinding
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.ViewMoreReplyViewData
@@ -62,6 +62,14 @@ class ItemPostDetailCommentViewDataBinder constructor(
 
             tvCommenterName.text = data.user.name
 
+            tvCommenterName.setOnClickListener {
+                LikeMindsFeedUI.lmFeedListener.openProfile(
+                    data.user.sdkClientInfoViewData.uuid,
+                    data.id,
+                    LMFeedAnalytics.Source.FEED
+                )
+            }
+
             PostDetailUtil.initTextContent(
                 tvCommentContent,
                 data,
@@ -86,8 +94,10 @@ class ItemPostDetailCommentViewDataBinder constructor(
             }
 
             if (data.likesCount == 0) {
+                likesCount.isEnabled = false
                 likesCount.hide()
             } else {
+                likesCount.isEnabled = true
                 likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
@@ -95,13 +105,13 @@ class ItemPostDetailCommentViewDataBinder constructor(
                         data.likesCount
                     )
                 likesCount.show()
-            }
 
-            likesCount.setOnClickListener {
-                postDetailAdapterListener.showLikesScreen(
-                    data.postId,
-                    data.id
-                )
+                likesCount.setOnClickListener {
+                    postDetailAdapterListener.showLikesScreen(
+                        data.postId,
+                        data.id
+                    )
+                }
             }
 
             ivLike.setOnClickListener { view ->

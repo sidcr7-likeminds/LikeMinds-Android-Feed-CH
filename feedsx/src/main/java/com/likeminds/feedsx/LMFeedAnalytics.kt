@@ -63,6 +63,7 @@ object LMFeedAnalytics {
         const val NOTIFICATION = "notification"
         const val UNIVERSAL_FEED = "universal_feed"
         const val POST_DETAIL = "post_detail"
+        const val FEED = "feed"
     }
 
     /**

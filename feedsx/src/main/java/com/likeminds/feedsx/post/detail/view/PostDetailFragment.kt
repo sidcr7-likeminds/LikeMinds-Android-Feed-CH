@@ -6,6 +6,8 @@ import android.view.Menu
 import android.view.View
 import android.widget.PopupMenu
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -349,11 +351,45 @@ class PostDetailFragment :
                 etComment.show()
                 ivCommentSend.show()
                 tvRestricted.hide()
+                setSwipeLayoutConstraintToEtComment()
             } else {
                 etComment.hide()
                 ivCommentSend.hide()
                 tvRestricted.show()
+                setSwipeLayoutConstraintToTvRestricted()
             }
+        }
+    }
+
+    // sets the bottom constraint of swipe layout to comment edit text
+    private fun setSwipeLayoutConstraintToEtComment() {
+        binding.apply {
+            val constraintLayout: ConstraintLayout = mainLayout
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            constraintSet.connect(
+                swipeRefreshLayout.id,
+                ConstraintSet.BOTTOM,
+                etComment.id,
+                ConstraintSet.TOP
+            )
+            constraintSet.applyTo(constraintLayout)
+        }
+    }
+
+    // sets the bottom constraint of swipe layout to restricted text view
+    private fun setSwipeLayoutConstraintToTvRestricted() {
+        binding.apply {
+            val constraintLayout: ConstraintLayout = mainLayout
+            val constraintSet = ConstraintSet()
+            constraintSet.clone(constraintLayout)
+            constraintSet.connect(
+                swipeRefreshLayout.id,
+                ConstraintSet.BOTTOM,
+                tvRestricted.id,
+                ConstraintSet.TOP
+            )
+            constraintSet.applyTo(constraintLayout)
         }
     }
 

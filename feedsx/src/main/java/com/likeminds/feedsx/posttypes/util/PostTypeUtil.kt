@@ -11,7 +11,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.likeminds.feedsx.R
+import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
@@ -120,7 +120,7 @@ object PostTypeUtil {
                 showRoundImage = true
             )
 
-            val context = binding.root.context
+            val context = root.context
 
             //sets user position
             val designation = user.listOfQuestionAnswerViewData?.first {
@@ -134,6 +134,14 @@ object PostTypeUtil {
             tvMemberPosition.text = "$designation @ $communityName"
 
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
+
+            root.setOnClickListener {
+                LikeMindsFeedUI.lmFeedListener.openProfile(
+                    user.sdkClientInfoViewData.uuid,
+                    user.id.toString(),
+                    LMFeedAnalytics.Source.FEED
+                )
+            }
         }
     }
 
@@ -277,8 +285,6 @@ object PostTypeUtil {
     ) {
         binding.apply {
             val context = root.context
-            if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_filled)
-            else ivLike.setImageResource(R.drawable.ic_like_unfilled)
 
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_filled)
@@ -293,9 +299,11 @@ object PostTypeUtil {
             }
 
             if (data.likesCount == 0) {
+                likesCount.isEnabled = false
                 likesCount.text =
                     context.getString(R.string.like)
             } else {
+                likesCount.isEnabled = true
                 likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
