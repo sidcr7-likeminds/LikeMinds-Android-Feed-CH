@@ -698,19 +698,6 @@ class LMFeedFragment :
                 }
             }
 
-            PDF -> {
-                if (uri.size > PDF_SIZE_LIMIT) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.pdf_must_be_less_than_8_MB),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    false
-                } else {
-                    true
-                }
-            }
-
             else -> {
                 true
             }

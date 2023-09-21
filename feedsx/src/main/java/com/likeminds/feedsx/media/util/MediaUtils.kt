@@ -2,19 +2,14 @@ package com.likeminds.feedsx.media.util
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
+import android.graphics.*
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
 import android.util.Log
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.media.model.MediaViewData
-import com.likeminds.feedsx.media.model.SingleUriData
+import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.utils.ViewUtils
-import com.likeminds.feedsx.utils.file.FileUtil
-import com.likeminds.feedsx.utils.file.MemoryUnitFormat
-import com.likeminds.feedsx.utils.file.isLargeFile
+import com.likeminds.feedsx.utils.file.*
 
 object MediaUtils {
 
@@ -113,21 +108,42 @@ object MediaUtils {
 
         if (!medias.isNullOrEmpty()) {
             medias.forEach { mediaViewData ->
-                if (!mediaViewData.size.isLargeFile) {
-                    mediaUris.add(
-                        SingleUriData.Builder()
-                            .mediaName(mediaViewData.mediaName)
-                            .uri(mediaViewData.uri)
-                            .fileType(mediaViewData.mediaType)
-                            .size(mediaViewData.size)
-                            .duration(mediaViewData.duration)
-                            .mediaName(mediaViewData.mediaName)
-                            .duration(mediaViewData.duration)
-                            .pdfPageCount(mediaViewData.pdfPageCount)
-                            .build()
-                    )
-                } else {
-                    largeFileSelected = true
+                when (mediaViewData.mediaType) {
+                    VIDEO -> {
+                        if (!mediaViewData.size.isVideoLarge) {
+                            mediaUris.add(
+                                SingleUriData.Builder()
+                                    .mediaName(mediaViewData.mediaName)
+                                    .uri(mediaViewData.uri)
+                                    .fileType(mediaViewData.mediaType)
+                                    .size(mediaViewData.size)
+                                    .mediaName(mediaViewData.mediaName)
+                                    .duration(mediaViewData.duration)
+                                    .pdfPageCount(mediaViewData.pdfPageCount)
+                                    .build()
+                            )
+                        } else {
+                            largeFileSelected = true
+                        }
+                    }
+
+                    else -> {
+                        if (!mediaViewData.size.isLargeFile) {
+                            mediaUris.add(
+                                SingleUriData.Builder()
+                                    .mediaName(mediaViewData.mediaName)
+                                    .uri(mediaViewData.uri)
+                                    .fileType(mediaViewData.mediaType)
+                                    .size(mediaViewData.size)
+                                    .mediaName(mediaViewData.mediaName)
+                                    .duration(mediaViewData.duration)
+                                    .pdfPageCount(mediaViewData.pdfPageCount)
+                                    .build()
+                            )
+                        } else {
+                            largeFileSelected = true
+                        }
+                    }
                 }
             }
         }

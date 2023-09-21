@@ -271,6 +271,7 @@ object FileUtil {
 }
 
 private const val LARGE_FILE_SIZE = 100 //in MegaBytes
+private const val LARGE_VIDEO_FILE_SIZE = 200 //in MegaBytes
 
 val File.size get() = if (!exists()) 0.0 else length().toDouble()
 
@@ -280,3 +281,4 @@ val File.size get() = if (!exists()) 0.0 else length().toDouble()
 private val Long.sizeInKb get() = this / 1000
 private val Long.sizeInMb get() = sizeInKb / 1000
 val Long.isLargeFile get() = sizeInMb > LARGE_FILE_SIZE
+val Long.isVideoLarge get() = sizeInMb > LARGE_VIDEO_FILE_SIZE
