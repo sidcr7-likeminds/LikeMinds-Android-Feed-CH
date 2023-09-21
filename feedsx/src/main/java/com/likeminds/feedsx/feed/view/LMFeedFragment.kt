@@ -78,7 +78,6 @@ class LMFeedFragment :
 
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         private const val POST_NOTIFICATIONS = Manifest.permission.POST_NOTIFICATIONS
-        private lateinit var lmFeedListener: LMFeedListener
 
         /**
          * creates a instance of fragment
@@ -86,11 +85,9 @@ class LMFeedFragment :
         @JvmStatic
         fun getInstance(
             extras: LMFeedExtras,
-            listener: LMFeedListener
         ): LMFeedFragment {
             val fragment = LMFeedFragment()
             val bundle = Bundle()
-            lmFeedListener = listener
             bundle.putParcelable(LM_FEED_EXTRAS, extras)
             fragment.arguments = bundle
             return fragment
@@ -177,6 +174,7 @@ class LMFeedFragment :
 
         // observes userResponse LiveData
         initiateViewModel.userResponse.observe(viewLifecycleOwner) {
+            initSwipeRefreshLayout()
             observeUserResponse()
         }
 
@@ -201,7 +199,7 @@ class LMFeedFragment :
 
         // observe unread notification count
         viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { count ->
-            lmFeedListener.updateNotificationCount(count)
+            LikeMindsFeedUI.lmFeedListener.updateNotificationCount(count)
         }
 
         // observe universal feed
@@ -266,10 +264,7 @@ class LMFeedFragment :
             return
         }
 
-        attachScrollListener(
-            binding.recyclerView,
-            (binding.recyclerView.layoutManager as LinearLayoutManager)
-        )
+        binding.recyclerView.addOnScrollListener(mScrollListener)
 
         //normal adding
         if (page == 1) {
@@ -536,7 +531,6 @@ class LMFeedFragment :
         setStatusBarColor()
         initRecyclerView()
         initNewPostClick(true)
-        initSwipeRefreshLayout()
     }
 
     @Suppress("Deprecation")
@@ -809,6 +803,40 @@ class LMFeedFragment :
                 (itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
             addItemDecoration(dividerItemDecorator)
             show()
+
+            if (layoutManager is LinearLayoutManager) {
+                mScrollListener =
+                    object : EndlessRecyclerScrollListener((layoutManager as LinearLayoutManager)) {
+                        override fun onLoadMore(currentPage: Int) {
+                            if (currentPage > 0) {
+                                viewModel.getUniversalFeed(currentPage)
+                            }
+                        }
+
+                        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                            super.onScrolled(recyclerView, dx, dy)
+
+                            binding.apply {
+                                val isExtended = newPostButton.isExtended
+
+                                // Scroll down
+                                if (dy > 20 && isExtended) {
+                                    newPostButton.shrink()
+                                }
+
+                                // Scroll up
+                                if (dy < -20 && !isExtended) {
+                                    newPostButton.extend()
+                                }
+
+                                // At the top
+                                if (!recyclerView.canScrollVertically(-1)) {
+                                    newPostButton.extend()
+                                }
+                            }
+                        }
+                    }
+            }
         }
     }
 
@@ -837,45 +865,6 @@ class LMFeedFragment :
         mScrollListener.resetData()
         viewModel.getUnreadNotificationCount()
         viewModel.getUniversalFeed(1)
-    }
-
-    //attach scroll listener for pagination
-    private fun attachScrollListener(
-        recyclerView: RecyclerView,
-        layoutManager: LinearLayoutManager
-    ) {
-        mScrollListener = object : EndlessRecyclerScrollListener(layoutManager) {
-            override fun onLoadMore(currentPage: Int) {
-                if (currentPage > 0) {
-                    viewModel.getUniversalFeed(currentPage)
-                }
-            }
-
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-
-                binding.apply {
-                    val isExtended = newPostButton.isExtended
-
-                    // Scroll down
-                    if (dy > 20 && isExtended) {
-                        newPostButton.shrink()
-                    }
-
-                    // Scroll up
-                    if (dy < -20 && !isExtended) {
-                        newPostButton.extend()
-                    }
-
-                    // At the top
-                    if (!recyclerView.canScrollVertically(-1)) {
-                        newPostButton.extend()
-                    }
-                }
-            }
-        }
-
-        recyclerView.addOnScrollListener(mScrollListener)
     }
 
     // shows invalid access error and logs out invalid user

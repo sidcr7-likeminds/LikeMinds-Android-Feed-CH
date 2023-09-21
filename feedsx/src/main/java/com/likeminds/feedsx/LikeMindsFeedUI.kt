@@ -9,6 +9,8 @@ import com.likeminds.feedsx.feed.view.LMFeedFragment
 
 object LikeMindsFeedUI {
 
+    lateinit var lmFeedListener: LMFeedListener
+
     /**
      * Call this function to configure SDK in client's app
      *
@@ -65,7 +67,9 @@ object LikeMindsFeedUI {
             .isGuest(isGuest)
             .build()
 
-        return LMFeedFragment.getInstance(extras, lmFeedListener)
+        this.lmFeedListener = lmFeedListener
+
+        return LMFeedFragment.getInstance(extras)
     }
 
     /**
@@ -97,6 +101,7 @@ object LikeMindsFeedUI {
             isGuest: $isGuest
         """.trimIndent()
         )
+        this.lmFeedListener = lmFeedListener
 
         val extras = LMFeedExtras.Builder()
             .apiKey(apiKey)
@@ -105,7 +110,7 @@ object LikeMindsFeedUI {
             .isGuest(isGuest)
             .build()
 
-        val fragment = LMFeedFragment.getInstance(extras, lmFeedListener)
+        val fragment = LMFeedFragment.getInstance(extras)
 
         val transaction = activity.supportFragmentManager.beginTransaction()
         transaction.replace(containerViewId, fragment, containerViewId.toString())
@@ -122,4 +127,9 @@ object LikeMindsFeedUI {
 
 interface LMFeedListener {
     fun updateNotificationCount(count: Int)
+    fun openProfile(
+        uuid: String,
+        userId: String,
+        source: String
+    )
 }
