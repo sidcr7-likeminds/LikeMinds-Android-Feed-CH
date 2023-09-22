@@ -157,6 +157,9 @@ class PostDetailFragment :
         if (postDetailExtras.source == LMFeedAnalytics.Source.NOTIFICATION ||
             postDetailExtras.source == LMFeedAnalytics.Source.DEEP_LINK
         ) {
+            if (!postDetailExtras.commentId.isNullOrEmpty()) {
+                toFindComment = true
+            }
             initiateViewModel.initiateUser(
                 requireContext(),
                 userPreferences.getApiKey(),
@@ -1053,9 +1056,13 @@ class PostDetailFragment :
                 (it is CommentViewData) && (it.id == postDetailExtras.commentId)
             }
 
+            // todo-ch: change this logic
             //comment not present -> get it from api
             if (index == -1) {
-                viewModel.getComment(post.id, postDetailExtras.commentId ?: "", 1)
+//                viewModel.getComment(post.id, postDetailExtras.commentId ?: "", 1)
+                if (post.commentsCount > 0) {
+                    scrollToPositionWithOffset(commentsStartPosition, 75)
+                }
             } else {
                 //scroll to that comment
                 binding.rvPostDetails.scrollToPosition(index)
