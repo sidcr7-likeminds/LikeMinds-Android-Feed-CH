@@ -133,7 +133,7 @@ interface LMFeedListener {
         userId: String,
         source: String
     )
-    fun triggerAnalytics(
+    fun trackAnalytics(
         eventKey: String,
         jsonObject: JSONObject
     )
