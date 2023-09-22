@@ -163,8 +163,9 @@
     <string name="are_you_sure_you_want_to_remove_the_attached_file">Are you sure you want to remove the attached file?</string>
     <string name="select_pdf_to_share">Select PDF to share</string>
     <string name="select_video_to_share">Select Video to share</string>
-    <string name="finish_later">Finish later?</string>
-    <string name="finish_creating_later">Want to finish creating this resource later? Save it as a draft or continue editing it.</string>
+
+    <string name="discard_resource">Discard Resource?</string>
+    <string name="discard_resource_description">Your resource creation is in progress. All the resources data would be lost. Are you sure you want to discard it?</string>
     <string name="discard_this_resource">Discard this resource</string>
     <string name="continue_creating_resource">Continue creating resource</string>
     <string name="video_duration_must_be_less_than_10_min">Video duration must be less than 10 minutes</string>

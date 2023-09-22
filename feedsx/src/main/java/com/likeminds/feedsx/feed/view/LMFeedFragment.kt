@@ -481,6 +481,25 @@ class LMFeedFragment :
         postVideoAutoPlayHelper.destroy()
     }
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+
+        if (hidden) {
+            // removes the player and destroys the [postVideoAutoPlayHelper]
+            postVideoAutoPlayHelper.destroy()
+        } else {
+            // sends feed opened event
+            viewModel.sendFeedOpenedEvent()
+
+            val temporaryId = viewModel.getTemporaryId()
+            if (temporaryId != -1L && !alreadyPosting) {
+                removePostingView()
+                viewModel.fetchPendingPostFromDB()
+            }
+            initiateAutoPlayer()
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         // unsubscribes itself from the [PostPublisher]
