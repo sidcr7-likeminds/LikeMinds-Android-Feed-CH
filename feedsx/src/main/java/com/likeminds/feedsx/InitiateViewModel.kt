@@ -2,15 +2,12 @@ package com.likeminds.feedsx
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.firebase.messaging.FirebaseMessaging
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
@@ -21,7 +18,7 @@ import com.likeminds.likemindsfeed.sdk.model.User
 import javax.inject.Inject
 
 class InitiateViewModel @Inject constructor(
-    private val userPreferences: UserPreferences,
+    private val userPreferences: LMFeedUserPreferences,
     private val userWithRightsRepository: UserWithRightsRepository
 ) : ViewModel() {
 

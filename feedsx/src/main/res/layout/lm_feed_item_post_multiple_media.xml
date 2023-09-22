@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="buttonColor"
+            type="int" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white">
+
+        <include
+            android:id="@+id/author_frame"
+            layout="@layout/lm_feed_layout_author_frame"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_post_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            android:lineSpacingExtra="1sp"
+            android:textColor="@color/grey"
+            android:textSize="16sp"
+            app:fontType="regular"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/author_frame"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewpager_multiple_media"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_post_content" />
+
+        <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+            android:id="@+id/dots_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:dotsColor="@color/cloudy_blue"
+            app:dotsCornerRadius="6dp"
+            app:dotsSize="6dp"
+            app:dotsSpacing="4dp"
+            app:dotsWidthFactor="1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewpager_multiple_media"
+            app:selectedDotColor="@{buttonColor}" />
+
+        <include
+            android:id="@+id/post_actions_layout"
+            layout="@layout/lm_feed_layout_post_actions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="12dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/dots_indicator" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

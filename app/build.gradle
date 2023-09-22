@@ -5,31 +5,21 @@ plugins {
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs'
     id 'com.google.gms.google-services'
-    id 'org.sonarqube'
+    id 'com.google.devtools.ksp'
 }
-apply from: '../jacoco.gradle'
 
 android {
     namespace 'com.likeminds.feedsampleapp'
-    compileSdk versions.compile_sdk
+    compileSdkVersion feed_versions.compile_sdk
 
     defaultConfig {
         applicationId "com.likeminds.feedsampleapp"
-        minSdk versions.min_sdk
-        targetSdk versions.target_sdk
-        versionCode versions.app_version_code
-        versionName "$versions.app_version_major.$versions.app_version_minor.$versions.app_version_patch"
+        minSdk feed_versions.min_sdk
+        targetSdk feed_versions.target_sdk
+        versionCode feed_versions.app_version_code
+        versionName "$feed_versions.app_version_major.$feed_versions.app_version_minor.$feed_versions.app_version_patch"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += [
-                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
-                        "room.incremental"     : "true",
-                        "room.expandProjection": "true"]
-            }
-        }
     }
 
     buildTypes {
@@ -43,7 +33,6 @@ android {
             shrinkResources false
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
-            testCoverageEnabled = true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -51,39 +40,11 @@ android {
         dataBinding = true
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8
-    }
-
-    sonarqube {
-        properties {
-            property "sonar.projectName", "Android-Feed-UI"
-            property "sonar.projectKey", "Android-Feed-UI"
-            property "sonar.sources", "src"
-            property "sonar.sourceEncoding", "UTF-8"
-            property "sonar.binaries", "build/intermediates/classes/debug"
-            property "sonar.java.binaries", "build/intermediates/classes/debug"
-            property "sonar.tests", ["src/test/java"]
-            property "sonar.test.inclusions", "**/*Test*/**"
-            property "sonar.exclusions", '**/.gradle/**,' +
-                    "**/androidTest/**," +
-                    "**/R.class," +
-                    "**/BuildConfig.*," +
-                    "**/Manifest*.*," +
-                    "**/android/databinding/*," +
-                    "**/androidx/databinding/*," +
-                    "**/*MapperImpl*.*," +
-                    "**/BuildConfig.*," +
-                    "**/Manifest*.*," +
-                    "**/google-services.json"
-            property "sonar.java.coveragePlugin", "jacoco"
-            property "sonar.junit.reportPaths", "**/test-results/**/*.xml"
-            property "sonar.coverage.jacoco.xmlReportPaths", "**/jacocoTestReport/jacocoTestReport.xml"
-            property "sonar.coverage.exclusions", "${coverageExclusions.join(', ')}"
-        }
+        jvmTarget = JavaVersion.VERSION_17
     }
 }
 

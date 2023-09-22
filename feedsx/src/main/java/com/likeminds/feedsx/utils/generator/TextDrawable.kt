@@ -2,9 +2,7 @@ package com.likeminds.feedsx.utils.generator
 
 import android.graphics.*
 import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.OvalShape
-import android.graphics.drawable.shapes.RectShape
-import android.graphics.drawable.shapes.RoundRectShape
+import android.graphics.drawable.shapes.*
 import java.util.*
 
 class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder.shape) {
@@ -72,6 +70,7 @@ class TextDrawable private constructor(builder: Builder) : ShapeDrawable(builder
         textPaint.colorFilter = cf
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getOpacity(): Int {
         return PixelFormat.TRANSLUCENT
     }

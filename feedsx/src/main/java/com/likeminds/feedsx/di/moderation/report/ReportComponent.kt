@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.di.moderation.report
 
-import com.likeminds.feedsx.report.view.ReportActivity
-import com.likeminds.feedsx.report.view.ReportFragment
+import com.likeminds.feedsx.report.view.LMFeedReportActivity
+import com.likeminds.feedsx.report.view.LMFeedReportFragment
 import dagger.Subcomponent
 
 @Subcomponent(modules = [ReportViewModelModule::class])
@@ -12,6 +12,6 @@ interface ReportComponent {
         fun create(): ReportComponent
     }
 
-    fun inject(reportFragment: ReportFragment)
-    fun inject(reportActivity: ReportActivity)
+    fun inject(lmFeedReportFragment: LMFeedReportFragment)
+    fun inject(lmFeedReportActivity: LMFeedReportActivity)
 }

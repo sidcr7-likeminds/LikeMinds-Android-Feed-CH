@@ -1,14 +1,11 @@
 package com.likeminds.feedsx.post.detail.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.LMAnalytics
+import androidx.lifecycle.*
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.memberrights.util.MemberRightUtil
@@ -26,7 +23,7 @@ import javax.inject.Inject
 
 class PostDetailViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
-    private val userPreferences: UserPreferences
+    private val userPreferences: LMFeedUserPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -175,11 +172,11 @@ class PostDetailViewModel @Inject constructor(
      * Triggers when a comment is posted on a post
      **/
     private fun sendCommentPostedEvent(postId: String, commentId: String) {
-        LMAnalytics.track(
-            LMAnalytics.Events.COMMENT_POSTED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.COMMENT_POSTED,
             mapOf(
-                LMAnalytics.Keys.POST_ID to postId,
-                LMAnalytics.Keys.COMMENT_ID to commentId
+                LMFeedAnalytics.Keys.POST_ID to postId,
+                LMFeedAnalytics.Keys.COMMENT_ID to commentId
             )
         )
     }
@@ -272,13 +269,13 @@ class PostDetailViewModel @Inject constructor(
         parentCommentId: String,
         commentId: String,
     ) {
-        LMAnalytics.track(
-            LMAnalytics.Events.REPLY_POSTED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.REPLY_POSTED,
             mapOf(
-                LMAnalytics.Keys.UUID to parentCommentCreatorUUID,
-                LMAnalytics.Keys.POST_ID to postId,
-                LMAnalytics.Keys.COMMENT_ID to parentCommentId,
-                LMAnalytics.Keys.COMMENT_REPLY_ID to commentId
+                LMFeedAnalytics.Keys.UUID to parentCommentCreatorUUID,
+                LMFeedAnalytics.Keys.POST_ID to postId,
+                LMFeedAnalytics.Keys.COMMENT_ID to parentCommentId,
+                LMFeedAnalytics.Keys.COMMENT_REPLY_ID to commentId
             )
         )
     }
@@ -360,21 +357,21 @@ class PostDetailViewModel @Inject constructor(
     ) {
         if (parentCommentId == null) {
             // comment deleted event
-            LMAnalytics.track(
-                LMAnalytics.Events.COMMENT_DELETED,
+            LMFeedAnalytics.track(
+                LMFeedAnalytics.Events.COMMENT_DELETED,
                 mapOf(
-                    LMAnalytics.Keys.POST_ID to postId,
-                    LMAnalytics.Keys.COMMENT_ID to commentId
+                    LMFeedAnalytics.Keys.POST_ID to postId,
+                    LMFeedAnalytics.Keys.COMMENT_ID to commentId
                 )
             )
         } else {
             // reply deleted event
-            LMAnalytics.track(
-                LMAnalytics.Events.REPLY_DELETED,
+            LMFeedAnalytics.track(
+                LMFeedAnalytics.Events.REPLY_DELETED,
                 mapOf(
-                    LMAnalytics.Keys.POST_ID to postId,
-                    LMAnalytics.Keys.COMMENT_ID to parentCommentId,
-                    LMAnalytics.Keys.COMMENT_REPLY_ID to commentId,
+                    LMFeedAnalytics.Keys.POST_ID to postId,
+                    LMFeedAnalytics.Keys.COMMENT_ID to parentCommentId,
+                    LMFeedAnalytics.Keys.COMMENT_REPLY_ID to commentId,
                 )
             )
         }

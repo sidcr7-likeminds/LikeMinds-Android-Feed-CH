@@ -10,7 +10,7 @@ import android.view.WindowInsets
 import androidx.annotation.FloatRange
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
-import com.likeminds.feedsx.utils.membertagging.view.MemberTaggingView
+import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.likemindsfeed.sdk.model.User
 
 object MemberTaggingUtil {
@@ -40,7 +40,7 @@ object MemberTaggingUtil {
      * handles result and set result to [memberTagging] view as per [page]
      * */
     fun setMembersInView(
-        memberTagging: MemberTaggingView,
+        memberTagging: LMFeedMemberTaggingView,
         result: Pair<Int, ArrayList<UserTagViewData>>?
     ) {
         if (result != null) {

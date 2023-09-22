@@ -1,28 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.likeminds.feedsx">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application>
         <activity
-            android:name="com.likeminds.feedsx.media.view.MediaPickerActivity"
+            android:name="com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.report.view.ReportActivity"
+            android:name="com.likeminds.feedsx.report.view.LMFeedReportActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.post.create.view.CreatePostActivity"
+            android:name="com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
@@ -31,11 +34,11 @@
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.likes.view.LikesActivity"
+            android:name="com.likeminds.feedsx.likes.view.LMFeedLikesActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.likeminds.feedsx.notificationfeed.view.NotificationFeedActivity"
+            android:name="com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 

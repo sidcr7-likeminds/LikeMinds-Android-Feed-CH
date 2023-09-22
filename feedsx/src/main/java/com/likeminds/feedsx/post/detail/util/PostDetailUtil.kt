@@ -10,7 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.Route
@@ -78,7 +78,7 @@ object PostDetailUtil {
                 tvCommentContent,
                 textForLinkify,
                 enableClick = true,
-                LMBranding.getTextLinkColor()
+                LMFeedBranding.getTextLinkColor()
             ) {
                 onMemberTagClicked()
             }

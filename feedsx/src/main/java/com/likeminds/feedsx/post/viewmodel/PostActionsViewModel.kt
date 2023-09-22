@@ -1,25 +1,19 @@
 package com.likeminds.feedsx.post.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.LMAnalytics
+import androidx.lifecycle.*
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
-import com.likeminds.likemindsfeed.post.model.DeletePostRequest
-import com.likeminds.likemindsfeed.post.model.LikePostRequest
-import com.likeminds.likemindsfeed.post.model.PinPostRequest
-import com.likeminds.likemindsfeed.post.model.SavePostRequest
+import com.likeminds.likemindsfeed.post.model.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 class PostActionsViewModel @Inject constructor(
-    private val userPreferences: UserPreferences
+    private val userPreferences: LMFeedUserPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -138,12 +132,12 @@ class PostActionsViewModel @Inject constructor(
         val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         val map = mapOf(
             "user_state" to userStateString,
-            LMAnalytics.Keys.UUID to postCreatorUUID,
-            LMAnalytics.Keys.POST_ID to post.id,
+            LMFeedAnalytics.Keys.UUID to postCreatorUUID,
+            LMFeedAnalytics.Keys.POST_ID to post.id,
             "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
         )
-        LMAnalytics.track(
-            LMAnalytics.Events.POST_DELETED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.POST_DELETED,
             map
         )
     }
@@ -179,17 +173,17 @@ class PostActionsViewModel @Inject constructor(
         val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
         val map = mapOf(
             "created_by_uuid" to postCreatorUUID,
-            LMAnalytics.Keys.POST_ID to post.id,
+            LMFeedAnalytics.Keys.POST_ID to post.id,
             "post_type" to ViewUtils.getPostTypeFromViewType(post.viewType),
         )
         if (post.isPinned) {
-            LMAnalytics.track(
-                LMAnalytics.Events.POST_UNPINNED,
+            LMFeedAnalytics.track(
+                LMFeedAnalytics.Events.POST_UNPINNED,
                 map
             )
         } else {
-            LMAnalytics.track(
-                LMAnalytics.Events.POST_PINNED,
+            LMFeedAnalytics.track(
+                LMFeedAnalytics.Events.POST_PINNED,
                 map
             )
         }
@@ -204,11 +198,11 @@ class PostActionsViewModel @Inject constructor(
         val postType = ViewUtils.getPostTypeFromViewType(post.viewType)
 
         val postCreatorUUID = post.user.sdkClientInfoViewData.uuid
-        LMAnalytics.track(
-            LMAnalytics.Events.POST_SHARED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.POST_SHARED,
             mapOf(
                 "created_by_uuid" to postCreatorUUID,
-                LMAnalytics.Keys.POST_ID to post.id,
+                LMFeedAnalytics.Keys.POST_ID to post.id,
                 "post_type" to postType,
             )
         )

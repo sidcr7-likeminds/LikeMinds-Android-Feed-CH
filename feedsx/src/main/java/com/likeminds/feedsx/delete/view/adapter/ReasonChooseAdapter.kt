@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.delete.view.adapter
 
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
-import com.likeminds.feedsx.delete.view.adapter.databinder.ReasonChooseViewDataBinder
+import com.likeminds.feedsx.delete.view.adapter.databinder.LMFeedReasonChooseViewDataBinder
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
@@ -16,8 +16,8 @@ class ReasonChooseAdapter constructor(
 
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(1)
-        val reasonChooseViewDataBinder = ReasonChooseViewDataBinder(listener)
-        viewDataBinders.add(reasonChooseViewDataBinder)
+        val lmFeedReasonChooseViewDataBinder = LMFeedReasonChooseViewDataBinder(listener)
+        viewDataBinders.add(lmFeedReasonChooseViewDataBinder)
         return viewDataBinders
     }
 

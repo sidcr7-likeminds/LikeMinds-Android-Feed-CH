@@ -1,16 +1,13 @@
 package com.likeminds.feedsx.pushnotification
 
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import android.app.PendingIntent
+import android.app.*
 import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.utils.Route
 import org.json.JSONObject
 
@@ -52,7 +49,7 @@ class LMFeedNotificationHandler {
 
         notificationIcon = R.drawable.ic_notification
 
-        notificationTextColor = LMBranding.getButtonsColor()
+        notificationTextColor = LMFeedBranding.getButtonsColor()
 
         createNotificationChannel()
     }
@@ -99,8 +96,8 @@ class LMFeedNotificationHandler {
             put(NOTIFICATION_ROUTE, route)
         }
 
-        LMAnalytics.track(
-            LMAnalytics.Events.NOTIFICATION_RECEIVED, hashMapOf(
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.NOTIFICATION_RECEIVED, hashMapOf(
                 Pair("payload", payloadJson.toString()),
                 Pair(NOTIFICATION_CATEGORY, category),
                 Pair(NOTIFICATION_SUBCATEGORY, subcategory)
@@ -170,7 +167,7 @@ class LMFeedNotificationHandler {
             context,
             route,
             0,
-            LMAnalytics.Source.NOTIFICATION
+            LMFeedAnalytics.Source.NOTIFICATION
         )
 
         if (intent?.getBundleExtra("bundle") != null) {

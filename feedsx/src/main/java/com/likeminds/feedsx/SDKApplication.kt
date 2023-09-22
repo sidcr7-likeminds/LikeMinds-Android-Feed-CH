@@ -2,12 +2,10 @@ package com.likeminds.feedsx
 
 import android.app.Application
 import android.content.Context
-import com.amazonaws.mobile.client.AWSMobileClient
-import com.amazonaws.mobile.client.Callback
-import com.amazonaws.mobile.client.UserStateDetails
+import com.amazonaws.mobile.client.*
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
-import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.branding.model.SetBrandingRequest
+import com.likeminds.feedsx.branding.model.LMFeedBranding
+import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 import com.likeminds.feedsx.di.DaggerLikeMindsFeedComponent
 import com.likeminds.feedsx.di.LikeMindsFeedComponent
 import com.likeminds.feedsx.di.feed.FeedComponent
@@ -35,7 +33,7 @@ class SDKApplication : LMCallback {
     lateinit var postWithAttachmentsRepository: PostWithAttachmentsRepository
 
     private var likeMindsFeedComponent: LikeMindsFeedComponent? = null
-    private var feedComponent: FeedComponent? = null
+    private var lmFeedComponent: FeedComponent? = null
     private var likesComponent: LikesComponent? = null
     private var mediaComponent: MediaComponent? = null
     private var notificationFeedComponent: NotificationFeedComponent? = null
@@ -48,7 +46,7 @@ class SDKApplication : LMCallback {
     companion object {
         const val LOG_TAG = "LikeMinds"
         private var sdkApplicationInstance: SDKApplication? = null
-        private var lmUICallback: LMUICallback? = null
+        private var lmUICallback: LMFeedUICallback? = null
 
         /**
          * @return Singleton Instance of SDK Application class, which used for injecting dagger in fragments.
@@ -64,8 +62,8 @@ class SDKApplication : LMCallback {
 
     fun initSDKApplication(
         application: Application,
-        lmUICallback: LMUICallback,
-        brandingRequest: SetBrandingRequest
+        lmUICallback: LMFeedUICallback,
+        brandingRequest: SetFeedBrandingRequest
     ) {
         LMFeedClient.Builder(application)
             .lmCallback(this)
@@ -77,8 +75,8 @@ class SDKApplication : LMCallback {
     }
 
     // sets branding to the app
-    fun setupBranding(setBrandingRequest: SetBrandingRequest) {
-        LMBranding.setBranding(setBrandingRequest)
+    fun setupBranding(setFeedBrandingRequest: SetFeedBrandingRequest) {
+        LMFeedBranding.setBranding(setFeedBrandingRequest)
     }
 
     private fun initAWSMobileClient(applicationContext: Context) {
@@ -110,10 +108,10 @@ class SDKApplication : LMCallback {
      * initiate and return FeedComponent: All dependencies required for feed package
      * */
     fun feedComponent(): FeedComponent? {
-        if (feedComponent == null) {
-            feedComponent = likeMindsFeedComponent?.feedComponent()?.create()
+        if (lmFeedComponent == null) {
+            lmFeedComponent = likeMindsFeedComponent?.feedComponent()?.create()
         }
-        return feedComponent
+        return lmFeedComponent
     }
 
     /**

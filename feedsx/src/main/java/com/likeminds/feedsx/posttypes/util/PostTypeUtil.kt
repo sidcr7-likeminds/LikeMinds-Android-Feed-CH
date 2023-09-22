@@ -7,9 +7,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.view.Menu.NONE
 import android.view.View
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
@@ -18,15 +16,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
-import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.*
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
@@ -44,13 +40,13 @@ object PostTypeUtil {
 
     // initializes author data frame on the post
     private fun initAuthorFrame(
-        binding: LayoutAuthorFrameBinding,
+        binding: LmFeedLayoutAuthorFrameBinding,
         data: PostViewData,
         listener: PostAdapterListener
     ) {
         binding.apply {
             // sets button color variable in xml
-            buttonColor = LMBranding.getButtonsColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
             if (data.isPinned) {
                 ivPin.show()
             } else {
@@ -129,7 +125,7 @@ object PostTypeUtil {
 
     // initializes the recyclerview with attached documents
     fun initDocumentsRecyclerView(
-        binding: ItemPostDocumentsBinding,
+        binding: LmFeedItemPostDocumentsBinding,
         postData: PostViewData,
         postAdapterListener: PostAdapterListener,
         position: Int
@@ -174,7 +170,7 @@ object PostTypeUtil {
 
     // initializes document item of the document recyclerview
     fun initDocument(
-        binding: ItemDocumentBinding,
+        binding: LmFeedItemDocumentBinding,
         document: AttachmentViewData,
     ) {
         binding.apply {
@@ -221,7 +217,7 @@ object PostTypeUtil {
 
     // initializes various actions on the post
     fun initActionsLayout(
-        binding: LayoutPostActionsBinding,
+        binding: LmFeedLayoutPostActionsBinding,
         data: PostViewData,
         listener: PostAdapterListener,
         position: Int
@@ -293,13 +289,13 @@ object PostTypeUtil {
 
     // initializes view pager for multiple media post
     fun initViewPager(
-        binding: ItemPostMultipleMediaBinding,
+        binding: LmFeedItemPostMultipleMediaBinding,
         data: PostViewData,
         listener: PostAdapterListener
     ) {
         binding.apply {
             // sets button color variable in xml
-            buttonColor = LMBranding.getButtonsColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
             val attachments = data.attachments.map {
                 when (it.attachmentType) {
                     IMAGE -> {
@@ -391,7 +387,7 @@ object PostTypeUtil {
                 tvPostContent,
                 textForLinkify,
                 enableClick = true,
-                LMBranding.getTextLinkColor()
+                LMFeedBranding.getTextLinkColor()
             ) {
                 onMemberTagClicked()
             }
@@ -426,7 +422,9 @@ object PostTypeUtil {
                 seeMoreSpannableStringBuilder
             )
 
-            LinkifyCompat.addLinks(tvPostContent, Linkify.ALL)
+            val linkifyLinks =
+                (Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS)
+            LinkifyCompat.addLinks(tvPostContent, linkifyLinks)
             tvPostContent.movementMethod = CustomLinkMovementMethod { url ->
                 tvPostContent.setOnClickListener {
                     return@setOnClickListener
@@ -486,7 +484,7 @@ object PostTypeUtil {
 
     // handles link view in the post
     fun initLinkView(
-        binding: ItemPostLinkBinding,
+        binding: LmFeedItemPostLinkBinding,
         data: LinkOGTagsViewData
     ) {
         binding.apply {
@@ -534,7 +532,7 @@ object PostTypeUtil {
 
     // checks if binder is called from liking/saving post or not
     fun initPostTypeBindData(
-        authorFrame: LayoutAuthorFrameBinding,
+        authorFrame: LmFeedLayoutAuthorFrameBinding,
         tvPostContent: TextView,
         data: PostViewData,
         position: Int,

@@ -1,13 +1,8 @@
 package com.likeminds.feedsx.likes.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.LMAnalytics
-import com.likeminds.feedsx.likes.model.COMMENT
-import com.likeminds.feedsx.likes.model.LikeViewData
-import com.likeminds.feedsx.likes.model.POST
+import androidx.lifecycle.*
+import com.likeminds.feedsx.LMFeedAnalytics
+import com.likeminds.feedsx.likes.model.*
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -17,6 +12,9 @@ import com.likeminds.likemindsfeed.comment.model.GetCommentLikesResponse
 import com.likeminds.likemindsfeed.post.model.GetPostLikesRequest
 import com.likeminds.likemindsfeed.post.model.GetPostLikesResponse
 import javax.inject.Inject
+import kotlin.collections.List
+import kotlin.collections.hashMapOf
+import kotlin.collections.set
 
 class LikesViewModel @Inject constructor() : ViewModel() {
 
@@ -107,12 +105,12 @@ class LikesViewModel @Inject constructor() : ViewModel() {
         commentId: String?
     ) {
         val map = hashMapOf<String, String>()
-        map[LMAnalytics.Keys.POST_ID] = postId
+        map[LMFeedAnalytics.Keys.POST_ID] = postId
         if (commentId != null) {
-            map[LMAnalytics.Keys.COMMENT_ID] = commentId
+            map[LMFeedAnalytics.Keys.COMMENT_ID] = commentId
         }
-        LMAnalytics.track(
-            LMAnalytics.Events.LIKE_LIST_OPEN,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.LIKE_LIST_OPEN,
             map
         )
     }
