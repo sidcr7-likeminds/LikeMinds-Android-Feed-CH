@@ -2,6 +2,7 @@ package com.likeminds.feedsx
 
 import android.util.Log
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
+import org.json.JSONObject
 
 object LMFeedAnalytics {
     /*
@@ -77,6 +78,10 @@ object LMFeedAnalytics {
             eventName: $eventName
             eventProperties: $eventProperties
         """.trimIndent()
+        )
+        LikeMindsFeedUI.lmFeedListener.triggerAnalytics(
+            eventName,
+            JSONObject(eventProperties)
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 import com.likeminds.feedsx.feed.model.LMFeedExtras
 import com.likeminds.feedsx.feed.view.LMFeedFragment
+import org.json.JSONObject
 
 object LikeMindsFeedUI {
 
@@ -131,5 +132,9 @@ interface LMFeedListener {
         uuid: String,
         userId: String,
         source: String
+    )
+    fun triggerAnalytics(
+        eventKey: String,
+        jsonObject: JSONObject
     )
 }
