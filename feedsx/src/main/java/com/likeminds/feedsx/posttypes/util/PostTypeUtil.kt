@@ -48,14 +48,6 @@ object PostTypeUtil {
                 ivPin.hide()
             }
 
-            if (data.isEdited) {
-                viewDotEdited.show()
-                tvEdited.show()
-            } else {
-                viewDotEdited.hide()
-                tvEdited.hide()
-            }
-
             //set post title
             setTitle(tvPostTitle, data)
 
@@ -91,14 +83,6 @@ object PostTypeUtil {
                 ivPin.show()
             } else {
                 ivPin.hide()
-            }
-
-            if (data.isEdited) {
-                viewDotEdited.show()
-                tvEdited.show()
-            } else {
-                viewDotEdited.hide()
-                tvEdited.hide()
             }
 
             val postCreatorUUID = data.user.sdkClientInfoViewData.uuid

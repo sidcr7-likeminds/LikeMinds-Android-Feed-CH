@@ -77,6 +77,8 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
             val fragment = supportFragmentManager.currentFragment(R.id.nav_host_fragment)
             if (fragment is LMFeedCreatePostFragment) {
                 fragment.openBackPressedPopup()
+            } else {
+                supportFragmentManager.popBackStack()
             }
         }
 
@@ -112,6 +114,8 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
                 val fragment =
                     supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedCreatePostFragment
                 fragment.openBackPressedPopup()
+            } else {
+                supportFragmentManager.popBackStack()
             }
         }
     }

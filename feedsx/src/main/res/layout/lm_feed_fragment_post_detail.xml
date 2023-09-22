@@ -59,7 +59,7 @@
                         android:overScrollMode="never"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:itemCount="1"
-                        tools:listitem="@layout/lm_feed_item_post_single_image" />
+                        tools:listitem="@layout/lm_feed_post_detail_article" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
