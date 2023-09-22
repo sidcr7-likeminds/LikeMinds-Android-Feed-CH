@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_edit_post"
+    app:startDestination="@+id/fragment_edit_post">
+
+    <fragment
+        android:id="@+id/fragment_edit_post"
+        android:name="com.likeminds.feedsx.post.edit.view.EditPostFragment"
+        android:label="EditPostFragment"
+        tools:layout="@layout/lm_feed_fragment_edit_post">
+        <action
+            android:id="@+id/action_fragment_edit_post_to_imageCropFragment"
+            app:destination="@id/imageCropFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/imageCropFragment"
+        android:name="com.likeminds.feedsx.media.view.LMFeedImageCropFragment"
+        android:label="fragment_image_crop"
+        tools:layout="@layout/lm_feed_fragment_image_crop">
+        <argument
+            android:name="cropExtras"
+            app:argType="com.likeminds.feedsx.media.model.ImageCropExtras" />
+    </fragment>
+</navigation>

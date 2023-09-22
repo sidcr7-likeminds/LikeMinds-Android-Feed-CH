@@ -1,31 +1,25 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.likeminds.feedsx.LMAnalytics
+import androidx.lifecycle.*
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
-import com.likeminds.likemindsfeed.helper.model.DecodeUrlRequest
-import com.likeminds.likemindsfeed.helper.model.DecodeUrlResponse
-import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
-import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
+import com.likeminds.likemindsfeed.helper.model.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 class HelperViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
-    private val userPreferences: UserPreferences
+    private val userPreferences: LMFeedUserPreferences
 ) : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -50,6 +44,11 @@ class HelperViewModel @Inject constructor(
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorEventFlow = errorEventChannel.receiveAsFlow()
+
+    // updates the user data
+    fun updateUserData(userViewData: UserViewData) {
+        _userData.postValue(userViewData)
+    }
 
     // calls DecodeUrl API
     fun decodeUrl(url: String) {
@@ -131,8 +130,8 @@ class HelperViewModel @Inject constructor(
      * @param userCount count of tagged users
      */
     fun sendUserTagEvent(uuid: String, userCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.USER_TAGGED_IN_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.USER_TAGGED_IN_POST,
             mapOf(
                 "tagged_user_uuid" to uuid,
                 "tagged_user_count" to userCount.toString()
@@ -145,8 +144,8 @@ class HelperViewModel @Inject constructor(
      * @param link - url of the link
      **/
     fun sendLinkAttachedEvent(link: String) {
-        LMAnalytics.track(
-            LMAnalytics.Events.LINK_ATTACHED_IN_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.LINK_ATTACHED_IN_POST,
             mapOf(
                 "link" to link
             )

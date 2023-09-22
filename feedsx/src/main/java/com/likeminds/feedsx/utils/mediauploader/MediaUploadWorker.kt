@@ -1,23 +1,15 @@
 package com.likeminds.feedsx.utils.mediauploader
 
 import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.Data
-import androidx.work.WorkInfo
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.utils.getIntOrNull
 import com.likeminds.feedsx.utils.getLongOrNull
-import com.likeminds.feedsx.utils.mediauploader.model.GenericFileRequest
-import com.likeminds.feedsx.utils.mediauploader.model.WORKER_FAILURE
-import com.likeminds.feedsx.utils.mediauploader.model.WORKER_RETRY
-import com.likeminds.feedsx.utils.mediauploader.model.WORKER_SUCCESS
+import com.likeminds.feedsx.utils.mediauploader.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlin.coroutines.*
 
 abstract class MediaUploadWorker(
     appContext: Context,
@@ -66,12 +58,15 @@ abstract class MediaUploadWorker(
                 WORKER_SUCCESS -> {
                     Result.success()
                 }
+
                 WORKER_RETRY -> {
                     Result.retry()
                 }
+
                 WORKER_FAILURE -> {
                     getFailureResult(failedIndex.toIntArray())
                 }
+
                 else -> {
                     getFailureResult(failedIndex.toIntArray())
                 }
@@ -125,9 +120,21 @@ abstract class MediaUploadWorker(
     }
 
     protected fun createAWSRequestList(
+        thumbnailsToUpload: List<AttachmentEntity>,
         attachmentsToUpload: List<AttachmentEntity>
     ): ArrayList<GenericFileRequest> {
         val awsFileRequestList = ArrayList<GenericFileRequest>()
+        thumbnailsToUpload.mapIndexed { index, thumbnail ->
+            val request = GenericFileRequest.Builder()
+                .fileType(thumbnail.attachmentType)
+                .awsFolderPath(thumbnail.attachmentMeta.thumbnailAWSFolderPath ?: "")
+                .localFilePath(thumbnail.attachmentMeta.thumbnailLocalFilePath)
+                .index(index)
+                .isThumbnail(true)
+                .build()
+            awsFileRequestList.add(request)
+        }
+
         attachmentsToUpload.mapIndexed { index, attachment ->
             val attachmentMeta = attachment.attachmentMeta
             val request = GenericFileRequest.Builder()
@@ -139,6 +146,7 @@ abstract class MediaUploadWorker(
                 .width(attachmentMeta.width)
                 .height(attachmentMeta.height)
                 .pageCount(attachmentMeta.pageCount)
+                .hasThumbnail(attachment.attachmentMeta.thumbnailAWSFolderPath != null)
                 .duration(attachmentMeta.duration)
                 .size(attachmentMeta.size)
                 .build()

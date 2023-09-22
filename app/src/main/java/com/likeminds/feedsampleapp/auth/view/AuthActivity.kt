@@ -11,8 +11,8 @@ import com.likeminds.feedsampleapp.R
 import com.likeminds.feedsampleapp.auth.util.AuthPreferences
 import com.likeminds.feedsampleapp.databinding.ActivityAuthBinding
 import com.likeminds.feedsx.LikeMindsFeedUI
-import com.likeminds.feedsx.branding.model.LMFonts
-import com.likeminds.feedsx.branding.model.SetBrandingRequest
+import com.likeminds.feedsx.branding.model.LMFeedFonts
+import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
 import com.likeminds.feedsx.utils.Route
 import javax.inject.Singleton
 
@@ -139,12 +139,12 @@ class AuthActivity : AppCompatActivity() {
                 authPreferences.saveButtonColor(buttonColor)
                 authPreferences.saveTextLinkColor(textLinkColor)
 
-                val brandingRequest = SetBrandingRequest.Builder()
+                val brandingRequest = SetFeedBrandingRequest.Builder()
                     .headerColor(headerColor)
                     .buttonsColor(buttonColor)
                     .textLinkColor(textLinkColor)
                     .fonts(
-                        LMFonts.Builder()
+                        LMFeedFonts.Builder()
                             .bold("fonts/montserrat-bold.ttf")
                             .medium("fonts/montserrat-medium.ttf")
                             .regular("fonts/montserrat-regular.ttf")

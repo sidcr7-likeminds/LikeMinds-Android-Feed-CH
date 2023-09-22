@@ -3,11 +3,11 @@ package com.likeminds.feedsx.utils.membertagging.view.adapter
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.likeminds.feedsx.databinding.ItemMemberBinding
+import com.likeminds.feedsx.databinding.LmFeedItemMemberBinding
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 
 internal class MemberViewHolder(
-    val binding: ItemMemberBinding,
+    val binding: LmFeedItemMemberBinding,
     val darkMode: Boolean,
     private val memberAdapterClickListener: MemberAdapterClickListener
 ) : RecyclerView.ViewHolder(binding.root) {

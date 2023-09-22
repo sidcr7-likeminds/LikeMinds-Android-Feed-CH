@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="12dp">
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_commenter_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="1dp"
+            android:ellipsize="end"
+            android:includeFontPadding="false"
+            android:maxLines="1"
+            android:textColor="@color/raisin_black"
+            android:textSize="14sp"
+            app:fontType="medium"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:fontFamily="@font/roboto_medium"
+            tools:text="Ronald Richards" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_comment_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="5dp"
+            android:lineSpacingExtra="1sp"
+            android:textColor="@color/raisin_black"
+            android:textSize="14sp"
+            app:fontType="regular"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toStartOf="@id/iv_comment_menu"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_commenter_name"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
+
+        <ImageView
+            android:id="@+id/iv_comment_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:foreground="?selectableItemBackground"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toTopOf="@id/tv_comment_time"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ic_overflow_menu"
+            tools:ignore="ContentDescription,UnusedAttribute" />
+
+        <ImageView
+            android:id="@+id/iv_like"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="10dp"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tv_comment_content"
+            app:srcCompat="@drawable/ic_like_comment_filled"
+            tools:ignore="ContentDescription" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/likes_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:foreground="?selectableItemBackground"
+            android:paddingVertical="4dp"
+            android:textColor="@color/maastricht_blue_40"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="@id/iv_like"
+            app:layout_constraintStart_toEndOf="@id/iv_like"
+            app:layout_constraintTop_toTopOf="@id/iv_like"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="39 likes"
+            tools:ignore="UnusedAttribute"
+            tools:visibility="gone" />
+
+        <View
+            android:id="@+id/likes_separator"
+            android:layout_width="1dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="8dp"
+            app:layout_goneMarginStart="4dp"
+            app:layout_constraintEnd_toStartOf="@id/tv_reply"
+            android:background="@color/maastricht_blue_40"
+            app:layout_constraintBottom_toBottomOf="@id/likes_count"
+            app:layout_constraintStart_toEndOf="@id/likes_count"
+            app:layout_constraintTop_toTopOf="@id/likes_count" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_reply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:foreground="?selectableItemBackground"
+            android:padding="4dp"
+            android:text="@string/reply"
+            android:textColor="@color/maastricht_blue_40"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="@id/iv_like"
+            app:layout_constraintStart_toEndOf="@+id/likes_separator"
+            app:layout_constraintTop_toTopOf="@id/iv_like"
+            tools:fontFamily="@font/roboto_regular"
+            tools:ignore="UnusedAttribute"
+            tools:text="Reply" />
+
+        <androidx.constraintlayout.widget.Group
+            android:id="@+id/group_replies"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:constraint_referenced_ids="view_dot, tv_reply_count" />
+
+        <View
+            android:id="@+id/view_dot"
+            android:layout_width="2dp"
+            android:layout_height="2dp"
+            android:layout_marginStart="2dp"
+            android:background="@drawable/shape_dot_grey"
+            android:backgroundTint="@color/maastricht_blue_40"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_reply"
+            app:layout_constraintStart_toEndOf="@+id/tv_reply"
+            app:layout_constraintTop_toTopOf="@+id/tv_reply"
+            tools:visibility="visible" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_reply_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="2dp"
+            android:foreground="?selectableItemBackground"
+            android:padding="4dp"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="@id/view_dot"
+            app:layout_constraintStart_toEndOf="@id/view_dot"
+            app:layout_constraintTop_toTopOf="@id/view_dot"
+            app:textType="special"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="18 Replies"
+            tools:ignore="UnusedAttribute"
+            tools:visibility="visible" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_edited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="@string/edited"
+            android:textColor="@color/maastricht_blue_40"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            android:visibility="gone"
+            app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="@id/tv_reply"
+            app:layout_constraintEnd_toStartOf="@+id/view_dot_edited"
+            app:layout_constraintTop_toTopOf="@id/tv_reply"
+            tools:fontFamily="@font/roboto_regular"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/view_dot_edited"
+            android:layout_width="3dp"
+            android:layout_height="3dp"
+            android:background="@drawable/shape_dot_grey"
+            android:backgroundTint="@color/maastricht_blue_40"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_comment_time"
+            app:layout_constraintEnd_toStartOf="@id/tv_comment_time"
+            app:layout_constraintTop_toTopOf="@+id/tv_comment_time"
+            tools:visibility="visible" />
+
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+            android:id="@+id/tv_comment_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:padding="4dp"
+            android:textColor="@color/maastricht_blue_40"
+            android:textSize="12sp"
+            android:textStyle="normal"
+            android:visibility="visible"
+            app:fontType="regular"
+            app:layout_constraintBottom_toBottomOf="@id/tv_reply"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tv_reply"
+            tools:fontFamily="@font/roboto_regular"
+            tools:text="20m" />
+
+        <View
+            android:id="@+id/comment_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="20dp"
+            android:background="@color/blue_separator"
+            app:layout_constraintTop_toBottomOf="@id/tv_comment_time" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_replies"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:isScrollContainer="false"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/iv_like"
+            app:layout_constraintTop_toBottomOf="@id/iv_like"
+            tools:itemCount="3"
+            tools:listitem="@layout/lm_feed_item_post_detail_reply" />
+
+        <View
+            android:id="@+id/reply_comment_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="32dp"
+            android:background="@color/blue_separator"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/rv_replies" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

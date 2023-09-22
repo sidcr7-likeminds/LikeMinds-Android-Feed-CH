@@ -17,17 +17,18 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.widgets.model.WidgetMetaViewData
+import com.likeminds.feedsx.widgets.model.WidgetsViewData
 import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
 import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
 import com.likeminds.likemindsfeed.post.model.*
-import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
-import com.likeminds.likemindsfeed.sdk.model.User
+import com.likeminds.likemindsfeed.sdk.model.*
+import com.likeminds.likemindsfeed.widgets.model.WidgetMetaData
+import com.likeminds.likemindsfeed.widgets.model.Widgets
 
 object ViewDataConverter {
 
@@ -40,18 +41,18 @@ object ViewDataConverter {
         val attachmentType: Int?
         val viewType = when (singleUriData.fileType) {
             IMAGE -> {
-                attachmentType = com.likeminds.feedsx.posttypes.model.IMAGE
-                ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
+                attachmentType = ARTICLE
+                ITEM_POST_ARTICLE
             }
 
             VIDEO -> {
                 attachmentType = com.likeminds.feedsx.posttypes.model.VIDEO
-                ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+                ITEM_POST_SINGLE_VIDEO
             }
 
             else -> {
                 attachmentType = DOCUMENT
-                ITEM_CREATE_POST_DOCUMENTS_ITEM
+                ITEM_POST_DOCUMENTS
             }
         }
         return AttachmentViewData.Builder()
@@ -59,6 +60,7 @@ object ViewDataConverter {
             .attachmentType(attachmentType)
             .attachmentMeta(
                 AttachmentMetaViewData.Builder()
+                    .url(singleUriData.uri.toString())
                     .name(singleUriData.mediaName)
                     .duration(singleUriData.duration)
                     .format(singleUriData.format)
@@ -86,6 +88,7 @@ object ViewDataConverter {
      * View Data Model -> Network Model
     --------------------------------*/
 
+    // creates attachment list of Network Model for attachments post
     fun createAttachments(
         attachments: List<AttachmentViewData>
     ): List<Attachment> {
@@ -94,6 +97,30 @@ object ViewDataConverter {
         }
     }
 
+    // creates attachment list of Network Model for attachments post from widgets
+    fun createAttachmentsForWidget(
+        title: String,
+        updatedText: String,
+        widget: WidgetsViewData
+    ): List<Attachment> {
+        return listOf(
+            Attachment.Builder()
+                .attachmentType(ARTICLE)
+                .attachmentMeta(
+                    AttachmentMeta.Builder()
+                        .coverImageUrl(widget.widgetMetaData?.coverImageUrl)
+                        .url(widget.widgetMetaData?.url)
+                        .size(widget.widgetMetaData?.size)
+                        .name(widget.widgetMetaData?.name)
+                        .title(title)
+                        .body(updatedText)
+                        .build()
+                )
+                .build()
+        )
+    }
+
+    // creates attachment of Network Model for attachments post
     fun convertAttachment(
         attachment: AttachmentViewData
     ): Attachment {
@@ -103,6 +130,7 @@ object ViewDataConverter {
             .build()
     }
 
+    // creates attachment meta of Network Model for attachments post
     private fun convertAttachmentMeta(
         attachmentMeta: AttachmentMetaViewData
     ): AttachmentMeta {
@@ -113,6 +141,10 @@ object ViewDataConverter {
             .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .format(attachmentMeta.format)
+            .thumbnailUrl(attachmentMeta.thumbnailUrl)
+            .body(attachmentMeta.body)
+            .coverImageUrl(attachmentMeta.coverImageUrl)
+            .title(attachmentMeta.title)
             .build()
     }
 
@@ -168,15 +200,51 @@ object ViewDataConverter {
             .isDeleted(user.isDeleted)
             .uuid(user.uuid)
             .sdkClientInfoViewData(convertSDKClientInfo(user.sdkClientInfo))
+            .listOfQuestionAnswerViewData(convertQuestionAnswers(user.questionAnswers))
             .build()
     }
 
+    // converts SDKClientInfo network model to view data model
     private fun convertSDKClientInfo(sdkClientInfo: SDKClientInfo): SDKClientInfoViewData {
         return SDKClientInfoViewData.Builder()
             .user(sdkClientInfo.user)
             .uuid(sdkClientInfo.uuid)
             .userUniqueId(sdkClientInfo.userUniqueId)
             .community(sdkClientInfo.community)
+            .build()
+    }
+
+    // converts list of QuestionAnswer network model to view data model
+    private fun convertQuestionAnswers(questionAnswers: List<QuestionAnswer>?): List<QuestionViewData>? {
+        if (questionAnswers == null) {
+            return null
+        }
+        return questionAnswers.map {
+            convertQuestionAnswer(it)
+        }
+    }
+
+    // converts QuestionAnswer network model to view data model
+    private fun convertQuestionAnswer(questionAnswer: QuestionAnswer): QuestionViewData {
+        return QuestionViewData.Builder()
+            .id(questionAnswer.question.id.toString())
+            .questionTitle(questionAnswer.question.questionTitle)
+            .state(questionAnswer.question.state)
+            .value(questionAnswer.question.value)
+            .optional(questionAnswer.question.optional)
+            .helpText(questionAnswer.question.helpText)
+            .isCompulsory(questionAnswer.question.isCompulsory)
+            .isHidden(questionAnswer.question.isHidden)
+            .communityId(questionAnswer.question.communityId)
+            .memberId(questionAnswer.question.memberId)
+            .imageUrl(questionAnswer.question.imageUrl)
+            .canAddOtherOptions(questionAnswer.question.canAddOtherOptions)
+            .questionChangeState(questionAnswer.question.questionChangeState)
+            .isAnswerEditable(questionAnswer.question.isAnswerEditable)
+            .answerOfQuestion(questionAnswer.answer.answer)
+            .answerImageUrl(questionAnswer.answer.imageUrl)
+            .tag(questionAnswer.question.tag)
+            .rank(questionAnswer.question.rank)
             .build()
     }
 
@@ -203,10 +271,11 @@ object ViewDataConverter {
      * */
     fun convertUniversalFeedPosts(
         posts: List<Post>,
-        usersMap: Map<String, User>
+        usersMap: Map<String, User>,
+        widgets: Map<String, Widgets>
     ): List<PostViewData> {
         return posts.map { post ->
-            convertPost(post, usersMap)
+            convertPost(post, usersMap, widgets)
         }
     }
 
@@ -219,7 +288,8 @@ object ViewDataConverter {
      * */
     fun convertPost(
         post: Post,
-        usersMap: Map<String, User>
+        usersMap: Map<String, User>,
+        widgets: Map<String, Widgets>
     ): PostViewData {
         val postCreator = post.uuid
         val user = usersMap[postCreator]
@@ -230,6 +300,12 @@ object ViewDataConverter {
             createDeletedUser()
         } else {
             convertUser(user)
+        }
+
+        val widget = if (!post.attachments.isNullOrEmpty()) {
+            widgets[post.attachments?.first()?.attachmentMeta?.entityId]
+        } else {
+            null
         }
 
         return PostViewData.Builder()
@@ -256,6 +332,8 @@ object ViewDataConverter {
             .updatedAt(post.updatedAt)
             .user(userViewData)
             .uuid(postCreator)
+            .widget(convertWidget(widget))
+            .heading(post.heading)
             .build()
     }
 
@@ -392,6 +470,8 @@ object ViewDataConverter {
             .duration(attachmentMeta.duration)
             .pageCount(attachmentMeta.pageCount)
             .ogTags(convertLinkOGTags(attachmentMeta.ogTags))
+            .entityId(attachmentMeta.entityId)
+            .thumbnailUrl(attachmentMeta.thumbnailUrl)
             .build()
     }
 
@@ -595,6 +675,37 @@ object ViewDataConverter {
             .build()
     }
 
+    private fun convertWidget(
+        widgets: Widgets?
+    ): WidgetsViewData {
+        if (widgets == null) {
+            return WidgetsViewData.Builder().build()
+        }
+        return WidgetsViewData.Builder()
+            .id(widgets.id)
+            .createdAt(widgets.createdAt)
+            .metaData(convertWidgetMetaData(widgets.widgetMetaData))
+            .parentEntityId(widgets.parentEntityId)
+            .parentEntityType(widgets.parentEntityType)
+            .updatedAt(widgets.updatedAt)
+            .build()
+    }
+
+    private fun convertWidgetMetaData(widgetMeta: WidgetMetaData?): WidgetMetaViewData? {
+        if (widgetMeta == null) {
+            return null
+        }
+
+        return WidgetMetaViewData.Builder()
+            .body(widgetMeta.body)
+            .coverImageUrl(widgetMeta.coverImageUrl)
+            .title(widgetMeta.title)
+            .name(widgetMeta.name)
+            .size(widgetMeta.size)
+            .url(widgetMeta.url)
+            .build()
+    }
+
     /**--------------------------------
      * Network Model -> Db Model
     --------------------------------*/
@@ -699,10 +810,12 @@ object ViewDataConverter {
             .workerUUID(post.uuid)
             .isPosted(post.isPosted)
             .attachments(convertAttachmentsEntity(attachments))
+            .heading(postWithAttachments.post.heading)
+            .onBehalfOfUUID(postWithAttachments.post.onBehalfOfUUID)
             .build()
     }
 
-    private fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
+    fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
         return attachments.map { attachment ->
             convertAttachment(attachment)
         }
@@ -727,6 +840,10 @@ object ViewDataConverter {
             .uri(Uri.parse(attachmentMeta.uri))
             .width(attachmentMeta.width)
             .height(attachmentMeta.height)
+            .thumbnailUrl(attachmentMeta.thumbnailUrl)
+            .coverImageUrl(attachmentMeta.coverImageUrl)
+            .title(attachmentMeta.title)
+            .body(attachmentMeta.body)
             .build()
     }
 
@@ -738,7 +855,9 @@ object ViewDataConverter {
         temporaryId: Long,
         uuid: String,
         thumbnail: String,
-        text: String?
+        text: String?,
+        heading: String?,
+        onBehalfOfUUID: String?
     ): PostEntity {
         return PostEntity.Builder()
             .temporaryId(temporaryId)
@@ -746,6 +865,8 @@ object ViewDataConverter {
             .uuid(uuid)
             .thumbnail(thumbnail)
             .text(text)
+            .heading(heading)
+            .onBehalfOfUUID(onBehalfOfUUID)
             .build()
     }
 
@@ -754,10 +875,6 @@ object ViewDataConverter {
         singleUriData: SingleUriData
     ): AttachmentEntity {
         val attachmentType = when (singleUriData.fileType) {
-            IMAGE -> {
-                com.likeminds.feedsx.posttypes.model.IMAGE
-            }
-
             VIDEO -> {
                 com.likeminds.feedsx.posttypes.model.VIDEO
             }
@@ -784,6 +901,16 @@ object ViewDataConverter {
                 Base64.DEFAULT
             )
         ) + singleUriData.awsFolderPath
+
+        var thumbnailUrl: String? = null
+        if (!singleUriData.thumbnailAwsFolderPath.isNullOrEmpty()) {
+            thumbnailUrl = String(
+                Base64.decode(
+                    AWSKeys.getBucketBaseUrl(),
+                    Base64.DEFAULT
+                )
+            ) + singleUriData.thumbnailAwsFolderPath
+        }
         return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
             .url(url)
             .uri(singleUriData.uri.toString())
@@ -795,6 +922,70 @@ object ViewDataConverter {
             .localFilePath(singleUriData.localFilePath)
             .width(singleUriData.width)
             .height(singleUriData.height)
+            .thumbnailUrl(thumbnailUrl)
+            .thumbnailAWSFolderPath(singleUriData.thumbnailAwsFolderPath)
+            .thumbnailLocalFilePath(singleUriData.thumbnailLocalFilePath)
+            .build()
+    }
+
+    fun convertAttachmentForResource(
+        temporaryId: Long,
+        singleUriData: SingleUriData,
+        body: String,
+        title: String
+    ): AttachmentEntity {
+        return AttachmentEntity.Builder()
+            .temporaryId(temporaryId)
+            .postId(temporaryId.toString())
+            .attachmentType(ARTICLE)
+            .attachmentMeta(
+                convertAttachmentMetaForResource(
+                    singleUriData,
+                    body,
+                    title
+                )
+            )
+            .build()
+    }
+
+    private fun convertAttachmentMetaForResource(
+        singleUriData: SingleUriData,
+        body: String,
+        title: String
+    ): AttachmentMetaEntity {
+        val url = String(
+            Base64.decode(
+                AWSKeys.getBucketBaseUrl(),
+                Base64.DEFAULT
+            )
+        ) + singleUriData.awsFolderPath
+
+        var thumbnailUrl: String? = null
+        if (!singleUriData.thumbnailAwsFolderPath.isNullOrEmpty()) {
+            thumbnailUrl = String(
+                Base64.decode(
+                    AWSKeys.getBucketBaseUrl(),
+                    Base64.DEFAULT
+                )
+            ) + singleUriData.thumbnailAwsFolderPath
+        }
+        return AttachmentMetaEntity.Builder().name(singleUriData.mediaName)
+            .url(url)
+            .uri(singleUriData.uri.toString())
+            .pageCount(singleUriData.pdfPageCount)
+            .size(singleUriData.size)
+            .duration(singleUriData.duration)
+            .format(singleUriData.format)
+            .awsFolderPath(singleUriData.awsFolderPath)
+            .localFilePath(singleUriData.localFilePath)
+            .width(singleUriData.width)
+            .height(singleUriData.height)
+            .thumbnailUrl(thumbnailUrl)
+            .thumbnailAWSFolderPath(singleUriData.thumbnailAwsFolderPath)
+            .thumbnailLocalFilePath(singleUriData.thumbnailLocalFilePath)
+            .coverImageUrl(url)
+            .body(body)
+            .title(title)
             .build()
     }
 }

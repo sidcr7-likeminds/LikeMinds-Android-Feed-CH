@@ -15,7 +15,6 @@ class AfterLoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d("PUI", "onCreate: AfterLoginActivity")
         authPreferences = AuthPreferences(this)
         val binding = ActivityAfterLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -24,7 +23,6 @@ class AfterLoginActivity : AppCompatActivity() {
     }
 
     private fun initFeedFragment() {
-        Log.d("PUI", "onCreate: initFeedFragment")
         LikeMindsFeedUI.initFeed(
             this,
             R.id.frameLayout,

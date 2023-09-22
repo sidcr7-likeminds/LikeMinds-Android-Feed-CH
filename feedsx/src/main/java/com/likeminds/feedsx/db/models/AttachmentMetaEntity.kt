@@ -25,6 +25,18 @@ class AttachmentMetaEntity constructor(
     val awsFolderPath: String?,
     @ColumnInfo(name = "local_file_path")
     val localFilePath: String?,
+    @ColumnInfo(name = "thumbnail_url")
+    val thumbnailUrl: String?,
+    @ColumnInfo(name = "thumbnail_aws_folder_path")
+    val thumbnailAWSFolderPath: String?,
+    @ColumnInfo(name = "thumbnail_local_file_path")
+    val thumbnailLocalFilePath: String?,
+    @ColumnInfo(name = "cover_image_url")
+    val coverImageUrl: String?,
+    @ColumnInfo(name = "body")
+    val body: String?,
+    @ColumnInfo(name = "title")
+    val title: String?
 ) {
     class Builder {
         private var name: String? = null
@@ -38,6 +50,12 @@ class AttachmentMetaEntity constructor(
         private var height: Int? = null
         private var awsFolderPath: String? = null
         private var localFilePath: String? = null
+        private var thumbnailUrl: String? = null
+        private var thumbnailAWSFolderPath: String? = null
+        private var thumbnailLocalFilePath: String? = null
+        private var coverImageUrl: String? = null
+        private var body: String? = null
+        private var title: String? = null
 
         fun name(name: String?) = apply { this.name = name }
         fun url(url: String?) = apply { this.url = url }
@@ -50,6 +68,16 @@ class AttachmentMetaEntity constructor(
         fun height(height: Int?) = apply { this.height = height }
         fun awsFolderPath(awsFolderPath: String?) = apply { this.awsFolderPath = awsFolderPath }
         fun localFilePath(localFilePath: String?) = apply { this.localFilePath = localFilePath }
+        fun thumbnailUrl(thumbnailUrl: String?) = apply { this.thumbnailUrl = thumbnailUrl }
+        fun thumbnailAWSFolderPath(thumbnailAWSFolderPath: String?) =
+            apply { this.thumbnailAWSFolderPath = thumbnailAWSFolderPath }
+
+        fun thumbnailLocalFilePath(thumbnailLocalFilePath: String?) =
+            apply { this.thumbnailLocalFilePath = thumbnailLocalFilePath }
+
+        fun coverImageUrl(coverImageUrl: String?) = apply { this.coverImageUrl = coverImageUrl }
+        fun body(body: String?) = apply { this.body = body }
+        fun title(title: String?) = apply { this.title = title }
 
         fun build() =
             AttachmentMetaEntity(
@@ -63,7 +91,13 @@ class AttachmentMetaEntity constructor(
                 width,
                 height,
                 awsFolderPath,
-                localFilePath
+                localFilePath,
+                thumbnailUrl,
+                thumbnailAWSFolderPath,
+                thumbnailLocalFilePath,
+                coverImageUrl,
+                body,
+                title
             )
     }
 
@@ -79,5 +113,11 @@ class AttachmentMetaEntity constructor(
             .height(height)
             .awsFolderPath(awsFolderPath)
             .localFilePath(localFilePath)
+            .thumbnailUrl(thumbnailUrl)
+            .thumbnailAWSFolderPath(thumbnailAWSFolderPath)
+            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+            .coverImageUrl(coverImageUrl)
+            .body(body)
+            .title(title)
     }
 }

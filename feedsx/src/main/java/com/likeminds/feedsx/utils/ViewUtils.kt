@@ -2,6 +2,10 @@ package com.likeminds.feedsx.utils
 
 import android.content.Context
 import android.content.res.Resources
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.util.Patterns
 import android.util.TypedValue
 import android.view.View
@@ -9,17 +13,16 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.InputMethodManager
-import android.widget.FrameLayout
-import android.widget.Toast
+import android.widget.*
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.navigation.fragment.NavHostFragment
 import com.facebook.shimmer.Shimmer
 import com.facebook.shimmer.ShimmerDrawable
-import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.customview.snackbar.LikeMindsSnackbar
+import com.likeminds.feedsx.branding.customview.snackbar.LMFeedSnackbar
 import com.likeminds.feedsx.utils.model.*
 
 //view related utils class
@@ -48,11 +51,11 @@ object ViewUtils {
         val saveBounceAnim: Animation by lazy {
             AnimationUtils.loadAnimation(
                 context,
-                R.anim.bounce
+                R.anim.lm_feed_bounce
             )
         }
 
-        saveBounceAnim.interpolator = LikeMindsBounceInterpolator(0.2, 20.0)
+        saveBounceAnim.interpolator = LMFeedBounceInterpolator(0.2, 20.0)
         view.startAnimation(saveBounceAnim)
     }
 
@@ -112,7 +115,7 @@ object ViewUtils {
     // shows short length snackbar
     fun showShortSnack(view: View, text: String?, anchorView: View? = null) {
         if (text.isNullOrEmpty()) return
-        val snackBar = LikeMindsSnackbar.make(view, text)
+        val snackBar = LMFeedSnackbar.make(view, text)
         anchorView?.let {
             snackBar.setAnchorView(anchorView)
         }
@@ -123,25 +126,31 @@ object ViewUtils {
     fun getPostTypeFromViewType(postViewType: Int?): String {
         return when (postViewType) {
             ITEM_POST_TEXT_ONLY -> {
-                LMAnalytics.Keys.POST_TYPE_TEXT
+                LMFeedAnalytics.Keys.POST_TYPE_TEXT
             }
+
             ITEM_POST_SINGLE_IMAGE -> {
-                LMAnalytics.Keys.POST_TYPE_IMAGE
+                LMFeedAnalytics.Keys.POST_TYPE_IMAGE
             }
+
             ITEM_POST_SINGLE_VIDEO -> {
-                LMAnalytics.Keys.POST_TYPE_VIDEO
+                LMFeedAnalytics.Keys.POST_TYPE_VIDEO
             }
+
             ITEM_POST_DOCUMENTS -> {
-                LMAnalytics.Keys.POST_TYPE_DOCUMENT
+                LMFeedAnalytics.Keys.POST_TYPE_DOCUMENT
             }
+
             ITEM_POST_MULTIPLE_MEDIA -> {
-                LMAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
+                LMFeedAnalytics.Keys.POST_TYPE_IMAGE_VIDEO
             }
+
             ITEM_POST_LINK -> {
-                LMAnalytics.Keys.POST_TYPE_LINK
+                LMFeedAnalytics.Keys.POST_TYPE_LINK
             }
+
             else -> {
-                LMAnalytics.Keys.POST_TYPE_TEXT
+                LMFeedAnalytics.Keys.POST_TYPE_TEXT
             }
         }
     }
@@ -174,5 +183,39 @@ object ViewUtils {
 
         // If we reach here then we didn't find a CoL or a suitable content view so we'll fallback
         return fallback
+    }
+
+    // adds an asterisk in textView for mandatory field
+    fun getMandatoryAsterisk(
+        title: String,
+        tvTitle: TextView
+    ) {
+        val mandatoryAsterisk = SpannableString("$title*")
+        mandatoryAsterisk.setSpan(
+            ForegroundColorSpan(
+                Color.RED
+            ),
+            title.length,
+            title.length + 1,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        tvTitle.text = mandatoryAsterisk
+    }
+
+    // adds an asterisk for mandatory fields in the hint
+    fun getMandatoryAsterisk(
+        title: String,
+        etPostTitle: EditText
+    ) {
+        val mandatoryAsterisk = SpannableString("$title*")
+        mandatoryAsterisk.setSpan(
+            ForegroundColorSpan(
+                Color.RED
+            ),
+            title.length,
+            title.length + 1,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        etPostTitle.hint = mandatoryAsterisk
     }
 }

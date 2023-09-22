@@ -3,11 +3,14 @@ package com.likeminds.feedsx
 import android.app.Application
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.likeminds.feedsx.branding.model.SetBrandingRequest
-import com.likeminds.feedsx.feed.model.FeedExtras
-import com.likeminds.feedsx.feed.view.FeedFragment
+import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
+import com.likeminds.feedsx.feed.model.LMFeedExtras
+import com.likeminds.feedsx.feed.view.LMFeedFragment
+import org.json.JSONObject
 
 object LikeMindsFeedUI {
+
+    lateinit var lmFeedListener: LMFeedListener
 
     /**
      * Call this function to configure SDK in client's app
@@ -17,8 +20,8 @@ object LikeMindsFeedUI {
      **/
     fun initLikeMindsFeedUI(
         application: Application,
-        lmUICallback: LMUICallback,
-        brandingRequest: SetBrandingRequest
+        lmUICallback: LMFeedUICallback,
+        brandingRequest: SetFeedBrandingRequest,
     ) {
         Log.d(SDKApplication.LOG_TAG, "initiate LikeMindsFeedUI called")
 
@@ -31,6 +34,43 @@ object LikeMindsFeedUI {
             lmUICallback,
             brandingRequest
         )
+    }
+
+    /**
+     * Call this function to initiate feed in the client's app
+     * this function will show home screen of the sdk
+     *
+     * @param apiKey : API key of the community
+     * @param userName : Name of the user
+     * @param userId : user id of the user
+     * @param isGuest | nullable: is user a guest user of not
+     **/
+    fun initFeed(
+        apiKey: String,
+        userName: String,
+        userId: String,
+        isGuest: Boolean,
+        lmFeedListener: LMFeedListener
+    ): LMFeedFragment {
+        Log.d(SDKApplication.LOG_TAG, "initiate feed called")
+        Log.d(
+            SDKApplication.LOG_TAG, """
+            user_name: $userName
+            user id: $userId
+            isGuest: $isGuest
+        """.trimIndent()
+        )
+
+        val extras = LMFeedExtras.Builder()
+            .apiKey(apiKey)
+            .uuid(userId)
+            .userName(userName)
+            .isGuest(isGuest)
+            .build()
+
+        this.lmFeedListener = lmFeedListener
+
+        return LMFeedFragment.getInstance(extras)
     }
 
     /**
@@ -50,7 +90,8 @@ object LikeMindsFeedUI {
         apiKey: String,
         userName: String,
         userId: String,
-        isGuest: Boolean
+        isGuest: Boolean,
+        lmFeedListener: LMFeedListener
     ) {
         Log.d(SDKApplication.LOG_TAG, "initiate feed called")
         Log.d(
@@ -61,15 +102,16 @@ object LikeMindsFeedUI {
             isGuest: $isGuest
         """.trimIndent()
         )
+        this.lmFeedListener = lmFeedListener
 
-        val extras = FeedExtras.Builder()
+        val extras = LMFeedExtras.Builder()
             .apiKey(apiKey)
-            .userId(userId)
+            .uuid(userId)
             .userName(userName)
             .isGuest(isGuest)
             .build()
 
-        val fragment = FeedFragment.getInstance(extras)
+        val fragment = LMFeedFragment.getInstance(extras)
 
         val transaction = activity.supportFragmentManager.beginTransaction()
         transaction.replace(containerViewId, fragment, containerViewId.toString())
@@ -78,8 +120,21 @@ object LikeMindsFeedUI {
         transaction.commitNowAllowingStateLoss()
     }
 
-    fun setBranding(brandingRequest: SetBrandingRequest) {
+    fun setBranding(brandingRequest: SetFeedBrandingRequest) {
         val sdk = SDKApplication.getInstance()
         sdk.setupBranding(brandingRequest)
     }
+}
+
+interface LMFeedListener {
+    fun updateNotificationCount(count: Int)
+    fun openProfile(
+        uuid: String,
+        userId: String,
+        source: String
+    )
+    fun trackAnalytics(
+        eventKey: String,
+        jsonObject: JSONObject
+    )
 }

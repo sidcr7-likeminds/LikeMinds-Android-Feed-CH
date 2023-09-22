@@ -6,16 +6,17 @@ import android.net.Uri
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
-import com.likeminds.feedsx.LMAnalytics
+import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.media.MediaRepository
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.utils.UserPreferences
+import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
+import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachmentForResource
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
@@ -26,7 +27,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 class CreatePostViewModel @Inject constructor(
-    private val userPreferences: UserPreferences,
+    private val userPreferences: LMFeedUserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val mediaRepository: MediaRepository
 ) : ViewModel() {
@@ -56,16 +57,18 @@ class CreatePostViewModel @Inject constructor(
     // calls AddPost API and posts the response in LiveData
     fun addPost(
         context: Context,
+        postTitle: String,
         postTextContent: String?,
         fileUris: List<SingleUriData>? = null,
-        ogTags: LinkOGTagsViewData? = null
+        ogTags: LinkOGTagsViewData? = null,
+        onBehalfOfUUID: String? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
-            if (fileUris != null) {
+            if (!fileUris.isNullOrEmpty()) {
                 // if the post has upload-able attachments
                 temporaryPostId = System.currentTimeMillis()
                 val postId = temporaryPostId ?: 0
@@ -79,12 +82,16 @@ class CreatePostViewModel @Inject constructor(
                 // adds post data in local db
                 storePost(
                     uploadData,
+                    postTitle,
                     updatedText,
-                    updatedFileUris
+                    updatedFileUris,
+                    onBehalfOfUUID
                 )
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
+                    .heading(postTitle)
+                    .onBehalfOfUUID(onBehalfOfUUID)
                     .text(updatedText)
                 if (ogTags != null) {
                     // if the post has ogTags
@@ -109,30 +116,56 @@ class CreatePostViewModel @Inject constructor(
     //add post:{} into local db
     private fun storePost(
         uploadData: Pair<WorkContinuation, String>,
+        heading: String,
         text: String?,
-        fileUris: List<SingleUriData>? = null
+        fileUris: List<SingleUriData>? = null,
+        onBehalfOfUUID: String?
     ) {
         viewModelScope.launchIO {
             val uuid = uploadData.second
-            if (fileUris == null) {
+            if (fileUris.isNullOrEmpty()) {
                 return@launchIO
             }
             val temporaryPostId = temporaryPostId ?: -1
             val thumbnailUri = fileUris.first().thumbnailUri
-            val postEntity = ViewDataConverter.convertPost(
-                temporaryPostId,
-                uuid,
-                thumbnailUri.toString(),
-                text
-            )
-            val attachments = fileUris.map {
-                convertAttachment(
+            // means that it is article post
+            if (fileUris.first().fileType == IMAGE) {
+                val postEntity = ViewDataConverter.convertPost(
                     temporaryPostId,
-                    it
+                    uuid,
+                    thumbnailUri.toString(),
+                    null,
+                    null,
+                    onBehalfOfUUID
                 )
+                val attachments = fileUris.map {
+                    convertAttachmentForResource(
+                        temporaryPostId,
+                        it,
+                        text ?: "",
+                        heading
+                    )
+                }
+                // add it to local db
+                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
+            } else {
+                val postEntity = ViewDataConverter.convertPost(
+                    temporaryPostId,
+                    uuid,
+                    thumbnailUri.toString(),
+                    text,
+                    heading,
+                    onBehalfOfUUID
+                )
+                val attachments = fileUris.map {
+                    convertAttachment(
+                        temporaryPostId,
+                        it
+                    )
+                }
+                // add it to local db
+                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             }
-            // add it to local db
-            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
             _postAdded.postValue(false)
             uploadData.first.enqueue()
         }
@@ -155,7 +188,7 @@ class CreatePostViewModel @Inject constructor(
             // generates awsFolderPath to upload the file
             val awsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
                 it.mediaName,
-                userPreferences.getUserUniqueId()
+                userPreferences.getUUID()
             )
             val builder = it.toBuilder().localFilePath(localFilePath)
                 .awsFolderPath(awsFolderPath)
@@ -167,21 +200,42 @@ class CreatePostViewModel @Inject constructor(
                         .height(dimensions.second)
                         .build()
                 }
+
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
-                        builder.thumbnailUri(thumbnailUri).build()
+                        val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                            "THUMB_${thumbnailUri.path}",
+                            userPreferences.getUUID()
+                        )
+                        val thumbnailLocalFilePath = FileUtil.getRealPath(context, thumbnailUri)
+                        builder.thumbnailUri(thumbnailUri)
+                            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+                            .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
+                            .build()
                     } else {
                         builder.build()
                     }
                 }
+
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
-                    val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
-                    builder
-                        .thumbnailUri(thumbnailUri)
-                        .format(format)
-                        .build()
+                    if (thumbnailUri != null) {
+                        val thumbnailAwsFolderPath = FileUtil.generateAWSFolderPathFromFileName(
+                            "THUMB_${thumbnailUri.path}",
+                            userPreferences.getUUID()
+                        )
+                        val thumbnailLocalFilePath = FileUtil.getRealPath(context, thumbnailUri)
+                        val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
+                        builder
+                            .thumbnailUri(thumbnailUri)
+                            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+                            .thumbnailAwsFolderPath(thumbnailAwsFolderPath)
+                            .format(format)
+                            .build()
+                    } else {
+                        builder.build()
+                    }
                 }
             }
         }
@@ -204,8 +258,8 @@ class CreatePostViewModel @Inject constructor(
      * @param type - type of attachment
      */
     fun sendClickedOnAttachmentEvent(type: String) {
-        LMAnalytics.track(
-            LMAnalytics.Events.CLICKED_ON_ATTACHMENT,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.CLICKED_ON_ATTACHMENT,
             mapOf(
                 "type" to type
             )
@@ -245,8 +299,8 @@ class CreatePostViewModel @Inject constructor(
      * @param imageCount - number of attached images
      **/
     private fun sendImageAttachedEvent(imageCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.IMAGE_ATTACHED_TO_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.IMAGE_ATTACHED_TO_POST,
             mapOf(
                 "image_count" to imageCount.toString()
             )
@@ -258,8 +312,8 @@ class CreatePostViewModel @Inject constructor(
      * @param videoCount - number of attached videos
      **/
     private fun sendVideoAttachedEvent(videoCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.VIDEO_ATTACHED_TO_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.VIDEO_ATTACHED_TO_POST,
             mapOf(
                 "video_count" to videoCount.toString()
             )
@@ -271,8 +325,8 @@ class CreatePostViewModel @Inject constructor(
      * @param documentCount - number of attached documents
      **/
     private fun sendDocumentAttachedEvent(documentCount: Int) {
-        LMAnalytics.track(
-            LMAnalytics.Events.DOCUMENT_ATTACHED_TO_POST,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.DOCUMENT_ATTACHED_TO_POST,
             mapOf(
                 "document_count" to documentCount.toString()
             )
@@ -308,8 +362,8 @@ class CreatePostViewModel @Inject constructor(
         map["image_attached"] = "no"
         map["video_attached"] = "no"
         map["document_attached"] = "no"
-        LMAnalytics.track(
-            LMAnalytics.Events.POST_CREATION_COMPLETED,
+        LMFeedAnalytics.track(
+            LMFeedAnalytics.Events.POST_CREATION_COMPLETED,
             map
         )
     }

@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.posttypes.view.adapter
 
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia.ItemMultipleMediaImageViewDataBinder
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia.ItemMultipleMediaVideoViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia.LMFeedItemMultipleMediaImageViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.postmultiplemedia.LMFeedItemMultipleMediaVideoViewDataBinder
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
@@ -16,10 +16,10 @@ class MultipleMediaPostAdapter(val listener: PostAdapterListener) :
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(2)
 
-        val multipleMediaImageBinder = ItemMultipleMediaImageViewDataBinder(listener)
+        val multipleMediaImageBinder = LMFeedItemMultipleMediaImageViewDataBinder(listener)
         viewDataBinders.add(multipleMediaImageBinder)
 
-        val multipleMediaVideoBinder = ItemMultipleMediaVideoViewDataBinder(listener)
+        val multipleMediaVideoBinder = LMFeedItemMultipleMediaVideoViewDataBinder(listener)
         viewDataBinders.add(multipleMediaVideoBinder)
 
         return viewDataBinders

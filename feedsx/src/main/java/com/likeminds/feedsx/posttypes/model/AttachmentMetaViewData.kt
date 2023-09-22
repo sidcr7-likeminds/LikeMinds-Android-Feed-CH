@@ -15,7 +15,14 @@ class AttachmentMetaViewData private constructor(
     val ogTags: LinkOGTagsViewData,
     val width: Int?,
     val height: Int?,
-    val uri: Uri?
+    val uri: Uri?,
+    val entityId: String?,
+    val thumbnailUrl: String?,
+    val thumbnailAWSFolderPath: String?,
+    val thumbnailLocalFilePath: String?,
+    val coverImageUrl: String?,
+    val body: String?,
+    val title: String?,
 ) : Parcelable {
     class Builder {
         private var name: String? = null
@@ -28,6 +35,13 @@ class AttachmentMetaViewData private constructor(
         private var width: Int? = null
         private var height: Int? = null
         private var uri: Uri? = null
+        private var entityId: String? = null
+        private var thumbnailUrl: String? = null
+        private var thumbnailAWSFolderPath: String? = null
+        private var thumbnailLocalFilePath: String? = null
+        private var coverImageUrl: String? = null
+        private var body: String? = null
+        private var title: String? = null
 
         fun name(name: String?) = apply { this.name = name }
         fun url(url: String?) = apply { this.url = url }
@@ -39,6 +53,17 @@ class AttachmentMetaViewData private constructor(
         fun width(width: Int?) = apply { this.width = width }
         fun height(height: Int?) = apply { this.height = height }
         fun uri(uri: Uri?) = apply { this.uri = uri }
+        fun entityId(entityId: String?) = apply { this.entityId = entityId }
+        fun thumbnailUrl(thumbnailUrl: String?) = apply { this.thumbnailUrl = thumbnailUrl }
+        fun thumbnailAWSFolderPath(thumbnailAWSFolderPath: String?) =
+            apply { this.thumbnailAWSFolderPath = thumbnailAWSFolderPath }
+
+        fun thumbnailLocalFilePath(thumbnailLocalFilePath: String?) =
+            apply { this.thumbnailLocalFilePath = thumbnailLocalFilePath }
+
+        fun coverImageUrl(coverImageUrl: String?) = apply { this.coverImageUrl = coverImageUrl }
+        fun body(body: String?) = apply { this.body = body }
+        fun title(title: String?) = apply { this.title = title }
 
         fun build() = AttachmentMetaViewData(
             name,
@@ -50,7 +75,14 @@ class AttachmentMetaViewData private constructor(
             ogTags,
             width,
             height,
-            uri
+            uri,
+            entityId,
+            thumbnailUrl,
+            thumbnailAWSFolderPath,
+            thumbnailLocalFilePath,
+            coverImageUrl,
+            body,
+            title
         )
     }
 
@@ -66,5 +98,12 @@ class AttachmentMetaViewData private constructor(
             .width(width)
             .height(height)
             .uri(uri)
+            .entityId(entityId)
+            .thumbnailUrl(thumbnailUrl)
+            .thumbnailAWSFolderPath(thumbnailAWSFolderPath)
+            .thumbnailLocalFilePath(thumbnailLocalFilePath)
+            .coverImageUrl(coverImageUrl)
+            .body(body)
+            .title(title)
     }
 }

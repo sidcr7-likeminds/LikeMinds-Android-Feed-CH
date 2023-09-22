@@ -1,6 +1,6 @@
 package com.likeminds.feedsx.posttypes.view.adapter
 
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.postdocuments.ItemDocumentViewDataBinder
+import com.likeminds.feedsx.posttypes.view.adapter.databinder.postdocuments.LMFeedItemDocumentViewDataBinder
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.BaseViewType
@@ -16,7 +16,7 @@ class DocumentsPostAdapter constructor(
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(1)
 
-        val documentsBinder = ItemDocumentViewDataBinder()
+        val documentsBinder = LMFeedItemDocumentViewDataBinder()
         viewDataBinders.add(documentsBinder)
 
         return viewDataBinders

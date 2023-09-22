@@ -18,20 +18,24 @@ class MediaPickerAdapter constructor(
     override fun getSupportedViewDataBinder(): MutableList<ViewDataBinder<*, *>> {
         val viewDataBinders = ArrayList<ViewDataBinder<*, *>>(5)
 
-        val mediaPickerFolderItemViewDataBinder = MediaPickerFolderItemViewDataBinder(listener)
-        viewDataBinders.add(mediaPickerFolderItemViewDataBinder)
+        val lmFeedMediaPickerFolderItemViewDataBinder =
+            LMFeedMediaPickerFolderItemViewDataBinder(listener)
+        viewDataBinders.add(lmFeedMediaPickerFolderItemViewDataBinder)
 
-        val mediaPickerHeaderItemViewDataBinder = MediaPickerHeaderItemViewDataBinder()
-        viewDataBinders.add(mediaPickerHeaderItemViewDataBinder)
+        val lmFeedMediaPickerHeaderItemViewDataBinder = LMFeedMediaPickerHeaderItemViewDataBinder()
+        viewDataBinders.add(lmFeedMediaPickerHeaderItemViewDataBinder)
 
-        val mediaPickerSingleItemViewDataBinder = MediaPickerSingleItemViewDataBinder(listener)
-        viewDataBinders.add(mediaPickerSingleItemViewDataBinder)
+        val lmFeedMediaPickerSingleItemViewDataBinder =
+            LMFeedMediaPickerSingleItemViewDataBinder(listener)
+        viewDataBinders.add(lmFeedMediaPickerSingleItemViewDataBinder)
 
-        val mediaPickerBrowseItemViewDataBinder = MediaPickerBrowseItemViewDataBinder(listener)
-        viewDataBinders.add(mediaPickerBrowseItemViewDataBinder)
+        val lmFeedMediaPickerBrowseItemViewDataBinder =
+            LMFeedMediaPickerBrowseItemViewDataBinder(listener)
+        viewDataBinders.add(lmFeedMediaPickerBrowseItemViewDataBinder)
 
-        val mediaPickerDocumentItemViewDataBinder = MediaPickerDocumentItemViewDataBinder(listener)
-        viewDataBinders.add(mediaPickerDocumentItemViewDataBinder)
+        val lmFeedMediaPickerDocumentItemViewDataBinder =
+            LMFeedMediaPickerDocumentItemViewDataBinder(listener)
+        viewDataBinders.add(lmFeedMediaPickerDocumentItemViewDataBinder)
 
         return viewDataBinders
     }

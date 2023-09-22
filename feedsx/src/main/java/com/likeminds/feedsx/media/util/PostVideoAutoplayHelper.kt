@@ -6,10 +6,8 @@ import android.widget.ProgressBar
 import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.likeminds.feedsx.databinding.ItemMultipleMediaVideoBinding
-import com.likeminds.feedsx.databinding.ItemPostMultipleMediaBinding
-import com.likeminds.feedsx.databinding.ItemPostSingleVideoBinding
-import com.likeminds.feedsx.media.customviews.LikeMindsVideoPlayerView
+import com.likeminds.feedsx.databinding.*
+import com.likeminds.feedsx.media.customviews.LMFeedVideoPlayerView
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
@@ -41,7 +39,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
         }
     }
 
-    private var lastPlayerView: LikeMindsVideoPlayerView? = null
+    private var lastPlayerView: LMFeedVideoPlayerView? = null
 
     private var currentPlayingVideoItemPos = -1 // -1 indicates nothing playing
 
@@ -195,29 +193,34 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
             when (this) {
                 is PostAdapter -> {
                     val item = this[pos]
-                    handleVideoPlay(
-                        pos,
-                        (item?.viewType ?: 0),
-                        item as PostViewData
-                    )
+                    if (item is PostViewData) {
+                        handleVideoPlayAtHome(
+                            pos,
+                            (item.viewType),
+                            item
+                        )
+                    }
                 }
+
                 is PostDetailAdapter -> {
                     if (pos != 0) {
                         return
                     }
                     val item = this[pos]
-                    handleVideoPlay(
-                        pos,
-                        (item?.viewType ?: 0),
-                        item as PostViewData
-                    )
+                    if (item is PostViewData) {
+                        handleVideoPlayInPostDetail(
+                            pos,
+                            (item.viewType),
+                            item
+                        )
+                    }
                 }
             }
         }
     }
 
-    // handles main logic to play the video at specified position
-    private fun handleVideoPlay(
+    // handles main logic to play the video at specified position in home feed
+    private fun handleVideoPlayAtHome(
         pos: Int,
         viewType: Int,
         data: PostViewData
@@ -227,7 +230,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 // if the post is of type [ITEM_POST_SINGLE_VIDEO]
                 val itemPostSingleVideoBinding =
                     (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
-                        ?.binding as? ItemPostSingleVideoBinding ?: return
+                        ?.binding as? LmFeedItemPostSingleVideoBinding ?: return
 
                 if (lastPlayerView == null || lastPlayerView != itemPostSingleVideoBinding.videoPost) {
                     val meta = data.attachments.first().attachmentMeta
@@ -239,11 +242,12 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 }
                 lastPlayerView = itemPostSingleVideoBinding.videoPost
             }
+
             ITEM_POST_MULTIPLE_MEDIA -> {
                 // if the post is of type [ITEM_POST_MULTIPLE_MEDIA]
                 val itemMultipleMediaBinding =
                     (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
-                        ?.binding as? ItemPostMultipleMediaBinding ?: return
+                        ?.binding as? LmFeedItemPostMultipleMediaBinding ?: return
 
                 val viewPager = itemMultipleMediaBinding.viewpagerMultipleMedia
                 val currentItem = viewPager.currentItem
@@ -251,7 +255,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                 // gets the video binding from view pager
                 val itemMultipleMediaVideoBinding =
                     ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(currentItem) as? DataBoundViewHolder<*>)
-                        ?.binding as? ItemMultipleMediaVideoBinding
+                        ?.binding as? LmFeedItemMultipleMediaVideoBinding
 
                 if (itemMultipleMediaVideoBinding == null) {
                     // if itemMultipleMediaVideoBinding, that means it is an image
@@ -268,6 +272,68 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                     lastPlayerView = itemMultipleMediaVideoBinding.videoPost
                 }
             }
+
+            else -> {
+                // if the post is does not have any video, simply remove the player
+                removePlayer()
+            }
+        }
+    }
+
+    // handles main logic to play the video at specified position in post detail screen
+    private fun handleVideoPlayInPostDetail(
+        pos: Int,
+        viewType: Int,
+        data: PostViewData
+    ) {
+        when (viewType) {
+            ITEM_POST_SINGLE_VIDEO -> {
+                // if the post is of type [ITEM_POST_SINGLE_VIDEO]
+                val itemPostSingleVideoBinding =
+                    (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
+                        ?.binding as? LmFeedItemPostDetailSingleVideoBinding ?: return
+
+                if (lastPlayerView == null || lastPlayerView != itemPostSingleVideoBinding.videoPost) {
+                    val meta = data.attachments.first().attachmentMeta
+                    startNewPlayer(
+                        itemPostSingleVideoBinding.videoPost,
+                        itemPostSingleVideoBinding.pbVideoLoader,
+                        meta.url
+                    )
+                }
+                lastPlayerView = itemPostSingleVideoBinding.videoPost
+            }
+
+            ITEM_POST_MULTIPLE_MEDIA -> {
+                // if the post is of type [ITEM_POST_MULTIPLE_MEDIA]
+                val itemMultipleMediaBinding =
+                    (recyclerView.findViewHolderForAdapterPosition(pos) as? DataBoundViewHolder<*>)
+                        ?.binding as? LmFeedItemPostMultipleMediaBinding ?: return
+
+                val viewPager = itemMultipleMediaBinding.viewpagerMultipleMedia
+                val currentItem = viewPager.currentItem
+
+                // gets the video binding from view pager
+                val itemMultipleMediaVideoBinding =
+                    ((viewPager[0] as RecyclerView).findViewHolderForAdapterPosition(currentItem) as? DataBoundViewHolder<*>)
+                        ?.binding as? LmFeedItemMultipleMediaVideoBinding
+
+                if (itemMultipleMediaVideoBinding == null) {
+                    // if itemMultipleMediaVideoBinding, that means it is an image
+                    removePlayer()
+                } else {
+                    if (lastPlayerView == null || lastPlayerView != itemMultipleMediaVideoBinding.videoPost) {
+                        val meta = data.attachments[currentItem].attachmentMeta
+                        startNewPlayer(
+                            itemMultipleMediaVideoBinding.videoPost,
+                            itemMultipleMediaVideoBinding.pbVideoLoader,
+                            meta.url
+                        )
+                    }
+                    lastPlayerView = itemMultipleMediaVideoBinding.videoPost
+                }
+            }
+
             else -> {
                 // if the post is does not have any video, simply remove the player
                 removePlayer()
@@ -277,7 +343,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
 
     // starts player in new player view and stops last player
     private fun startNewPlayer(
-        videoPost: LikeMindsVideoPlayerView,
+        videoPost: LMFeedVideoPlayerView,
         progressBar: ProgressBar,
         url: String?
     ) {

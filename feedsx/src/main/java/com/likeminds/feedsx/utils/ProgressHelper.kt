@@ -3,11 +3,11 @@ package com.likeminds.feedsx.utils
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ProgressBarBinding
+import com.likeminds.feedsx.databinding.LmFeedProgressBarBinding
 
 object ProgressHelper {
     fun showProgress(
-        progressBarBinding: ProgressBarBinding,
+        progressBarBinding: LmFeedProgressBarBinding,
         enableBackground: Boolean = false
     ) {
         progressBarBinding.root.apply {
@@ -26,11 +26,11 @@ object ProgressHelper {
         }
     }
 
-    fun isVisible(progressBarBinding: ProgressBarBinding): Boolean {
+    fun isVisible(progressBarBinding: LmFeedProgressBarBinding): Boolean {
         return progressBarBinding.root.visibility == View.VISIBLE
     }
 
-    fun hideProgress(progressBarBinding: ProgressBarBinding) {
+    fun hideProgress(progressBarBinding: LmFeedProgressBarBinding) {
         progressBarBinding.root.visibility = View.GONE
     }
 }

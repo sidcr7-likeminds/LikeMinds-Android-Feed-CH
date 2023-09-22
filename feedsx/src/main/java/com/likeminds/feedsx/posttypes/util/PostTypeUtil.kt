@@ -1,14 +1,8 @@
 package com.likeminds.feedsx.posttypes.util
 
 import android.net.Uri
-import android.text.*
-import android.text.style.ClickableSpan
-import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
-import android.view.Menu.NONE
-import android.view.View
 import android.widget.ImageView
-import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -17,16 +11,13 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
+import com.likeminds.feedsx.*
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
-import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.posttypes.model.*
-import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.view.adapter.*
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
@@ -35,47 +26,66 @@ import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
-import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_IMAGE
-import com.likeminds.feedsx.utils.model.ITEM_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.feedsx.utils.model.*
 import java.util.Locale
 
 object PostTypeUtil {
     const val SHOW_MORE_COUNT = 2
 
-    // initializes author data frame on the post
+    // initializes author data frame on the post on home
     private fun initAuthorFrame(
-        binding: LayoutAuthorFrameBinding,
+        binding: LmFeedHomeAuthorFrameBinding,
         data: PostViewData,
         listener: PostAdapterListener
     ) {
         binding.apply {
             // sets button color variable in xml
-            buttonColor = LMBranding.getButtonsColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
+
             if (data.isPinned) {
                 ivPin.show()
             } else {
                 ivPin.hide()
             }
 
-            if (data.isEdited) {
-                viewDotEdited.show()
-                tvEdited.show()
+            //set post title
+            setTitle(tvPostTitle, data)
+
+            root.setOnClickListener {
+                listener.postDetail(data.id)
+            }
+
+            // creator data
+            val user = data.user
+            val postCreatorUUID = user.sdkClientInfoViewData.uuid
+            tvMemberName.text = user.name
+
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                postCreatorUUID,
+                memberImage,
+                showRoundImage = true
+            )
+            tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
+        }
+    }
+
+    // initializes author data frame on the post on post detail
+    private fun initAuthorFrame(
+        binding: LmFeedLayoutAuthorFrameBinding,
+        data: PostViewData
+    ) {
+        binding.apply {
+            // sets button color variable in xml
+            buttonColor = LMFeedBranding.getButtonsColor()
+            if (data.isPinned) {
+                ivPin.show()
             } else {
-                viewDotEdited.hide()
-                tvEdited.hide()
+                ivPin.hide()
             }
 
             val postCreatorUUID = data.user.sdkClientInfoViewData.uuid
-
-            ivPostMenu.setOnClickListener { view ->
-                showMenu(
-                    view,
-                    data.id,
-                    postCreatorUUID,
-                    data.menuItems,
-                    listener
-                )
-            }
 
             // creator data
             val user = data.user
@@ -89,47 +99,71 @@ object PostTypeUtil {
             MemberImageUtil.setImage(
                 user.imageUrl,
                 user.name,
-                user.userUniqueId,
+                postCreatorUUID,
                 memberImage,
                 showRoundImage = true
             )
+
+            val context = root.context
+
+            //sets user position
+            val designation = user.listOfQuestionAnswerViewData?.first {
+                it.tag == "basic" && it.state == 1
+            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+
+            val communityName = user.listOfQuestionAnswerViewData?.first {
+                it.tag == "basic" && it.state == 0
+            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+
+            tvMemberPosition.text = "$designation @ $communityName"
+
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
+
+            root.setOnClickListener {
+                LikeMindsFeedUI.lmFeedListener.openProfile(
+                    user.sdkClientInfoViewData.uuid,
+                    user.id.toString(),
+                    LMFeedAnalytics.Source.FEED
+                )
+            }
         }
     }
 
-    //to show overflow menu for post
-    private fun showMenu(
-        view: View,
-        postId: String,
-        postCreatorUUID: String,
-        menuItems: List<OverflowMenuItemViewData>,
-        listener: PostAdapterListener
-    ) {
-        val popup = PopupMenu(view.context, view)
-        menuItems.forEach { menuItem ->
-            popup.menu.add(
-                NONE,
-                menuItem.id,
-                NONE,
-                menuItem.title
-            )
-        }
-
-        popup.setOnMenuItemClickListener { menuItem ->
-            listener.onPostMenuItemClicked(
-                postId,
-                postCreatorUUID,
-                menuItem.itemId
-            )
-            true
-        }
-
-        popup.show()
-    }
-
-    // initializes the recyclerview with attached documents
+    // initializes the recyclerview with attached documents on feed
     fun initDocumentsRecyclerView(
-        binding: ItemPostDocumentsBinding,
+        binding: LmFeedItemPostDocumentsBinding,
+        postData: PostViewData,
+        postAdapterListener: PostAdapterListener,
+        position: Int
+    ) {
+        binding.apply {
+            val context = root.context ?: return
+            val mDocumentsAdapter = DocumentsPostAdapter(postAdapterListener)
+            // item decorator to add spacing between items
+            val dividerItemDecorator =
+                DividerItemDecoration(root.context, DividerItemDecoration.VERTICAL)
+            dividerItemDecorator.setDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    R.drawable.document_item_divider
+                ) ?: return
+            )
+            rvDocuments.apply {
+                adapter = mDocumentsAdapter
+                layoutManager = LinearLayoutManager(root.context)
+                // if separator is not there already, then only add
+                if (itemDecorationCount < 1) {
+                    addItemDecoration(dividerItemDecorator)
+                }
+            }
+
+            mDocumentsAdapter.replace(postData.attachments)
+        }
+    }
+
+    // initializes the recyclerview with attached documents on feed
+    fun initDocumentsRecyclerView(
+        binding: LmFeedItemPostDetailDocumentsBinding,
         postData: PostViewData,
         postAdapterListener: PostAdapterListener,
         position: Int
@@ -174,7 +208,7 @@ object PostTypeUtil {
 
     // initializes document item of the document recyclerview
     fun initDocument(
-        binding: ItemDocumentBinding,
+        binding: LmFeedItemDocumentBinding,
         document: AttachmentViewData,
     ) {
         binding.apply {
@@ -212,6 +246,13 @@ object PostTypeUtil {
                 tvMeta3.text = mediaType
                 viewMetaDot2.show()
             }
+
+            val shimmerDrawable = ViewUtils.getShimmer()
+            ImageBindingUtil.loadImage(
+                ivDocumentPreview,
+                attachmentMeta.thumbnailUrl,
+                shimmerDrawable
+            )
             root.setOnClickListener {
                 val pdfUri = Uri.parse(document.attachmentMeta.url ?: "")
                 AndroidUtils.startDocumentViewer(root.context, pdfUri)
@@ -221,15 +262,13 @@ object PostTypeUtil {
 
     // initializes various actions on the post
     fun initActionsLayout(
-        binding: LayoutPostActionsBinding,
+        binding: LmFeedLayoutPostActionsBinding,
         data: PostViewData,
         listener: PostAdapterListener,
         position: Int
     ) {
         binding.apply {
             val context = root.context
-            if (data.isLiked) ivLike.setImageResource(R.drawable.ic_like_filled)
-            else ivLike.setImageResource(R.drawable.ic_like_unfilled)
 
             if (data.isLiked) {
                 ivLike.setImageResource(R.drawable.ic_like_filled)
@@ -244,9 +283,11 @@ object PostTypeUtil {
             }
 
             if (data.likesCount == 0) {
+                likesCount.isEnabled = false
                 likesCount.text =
                     context.getString(R.string.like)
             } else {
+                likesCount.isEnabled = true
                 likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
@@ -293,13 +334,13 @@ object PostTypeUtil {
 
     // initializes view pager for multiple media post
     fun initViewPager(
-        binding: ItemPostMultipleMediaBinding,
+        binding: LmFeedItemPostMultipleMediaBinding,
         data: PostViewData,
         listener: PostAdapterListener
     ) {
         binding.apply {
             // sets button color variable in xml
-            buttonColor = LMBranding.getButtonsColor()
+            buttonColor = LMFeedBranding.getButtonsColor()
             val attachments = data.attachments.map {
                 when (it.attachmentType) {
                     IMAGE -> {
@@ -335,117 +376,79 @@ object PostTypeUtil {
         }
     }
 
-    // handles the text content of each post
+    // handles the text content of each post on post detail
     private fun initTextContent(
+        tvPostTitle: TextView,
         tvPostContent: TextView,
-        data: PostViewData,
-        itemPosition: Int,
-        adapterListener: PostAdapterListener
+        data: PostViewData
     ) {
-        val text = data.text ?: return
+        val postTitle = if (data.viewType == ITEM_POST_ARTICLE) {
+            data.widget.widgetMetaData?.title
+        } else {
+            data.heading
+        }
+
+        if (postTitle.isNullOrEmpty()) {
+            tvPostTitle.hide()
+        } else {
+            tvPostTitle.text = postTitle
+            tvPostTitle.show()
+        }
+
+        val postContentText =
+            if (data.attachments.isNotEmpty() && data.attachments.first().attachmentType == ARTICLE) {
+                data.widget.widgetMetaData?.body
+            } else {
+                data.text
+            } ?: return
+
         val context = tvPostContent.context
 
         /**
          * Text is modified as Linkify doesn't accept texts with these specific unicode characters
          * @see #Linkify.containsUnsupportedCharacters(String)
          */
-        val textForLinkify = text.getValidTextForLinkify()
-
-        var alreadySeenFullContent = data.alreadySeenFullContent == true
+        val textForLinkify = postContentText.getValidTextForLinkify()
 
         if (textForLinkify.isEmpty()) {
             tvPostContent.hide()
             return
         } else {
+            tvPostContent.text = textForLinkify
             tvPostContent.show()
         }
 
-        val seeMoreColor = ContextCompat.getColor(context, R.color.brown_grey)
-        val seeMore = SpannableStringBuilder(context.getString(R.string.see_more))
-        seeMore.setSpan(
-            ForegroundColorSpan(seeMoreColor),
-            0,
-            seeMore.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        val seeMoreClickableSpan = object : ClickableSpan() {
-            override fun onClick(view: View) {
-                tvPostContent.setOnClickListener {
-                    return@setOnClickListener
-                }
-                alreadySeenFullContent = true
-                adapterListener.updatePostSeenFullContent(itemPosition, true)
-            }
-
-            override fun updateDrawState(textPaint: TextPaint) {
-                textPaint.isUnderlineText = false
-            }
+        MemberTaggingDecoder.decode(
+            tvPostContent,
+            textForLinkify,
+            enableClick = true,
+            LMFeedBranding.getTextLinkColor()
+        ) {
+            onMemberTagClicked()
         }
 
-        // post is used here to get lines count in the text view
-        tvPostContent.post {
+        val linkifyLinks =
+            (Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS)
+        LinkifyCompat.addLinks(tvPostContent, linkifyLinks)
+        tvPostContent.movementMethod = CustomLinkMovementMethod { url ->
             tvPostContent.setOnClickListener {
-                adapterListener.postDetail(data.id)
+                return@setOnClickListener
             }
-            MemberTaggingDecoder.decode(
-                tvPostContent,
-                textForLinkify,
-                enableClick = true,
-                LMBranding.getTextLinkColor()
-            ) {
-                onMemberTagClicked()
-            }
-
-            val shortText: String? = SeeMoreUtil.getShortContent(
-                tvPostContent,
-                3,
-                500
-            )
-
-            val trimmedText =
-                if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                    tvPostContent.editableText.subSequence(0, shortText.length)
-                } else {
-                    tvPostContent.editableText
+            // creates a route and returns an intent to handle the link
+            val intent = Route.handleDeepLink(context, url)
+            if (intent != null) {
+                try {
+                    // starts activity with the intent
+                    ActivityCompat.startActivity(context, intent, null)
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
-
-            val seeMoreSpannableStringBuilder = SpannableStringBuilder()
-            if (!alreadySeenFullContent && !shortText.isNullOrEmpty()) {
-                seeMoreSpannableStringBuilder.append("...")
-                seeMoreSpannableStringBuilder.append(seeMore)
-                seeMoreSpannableStringBuilder.setSpan(
-                    seeMoreClickableSpan,
-                    3,
-                    seeMore.length + 3,
-                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                )
             }
-
-            tvPostContent.text = TextUtils.concat(
-                trimmedText,
-                seeMoreSpannableStringBuilder
-            )
-
-            LinkifyCompat.addLinks(tvPostContent, Linkify.ALL)
-            tvPostContent.movementMethod = CustomLinkMovementMethod { url ->
-                tvPostContent.setOnClickListener {
-                    return@setOnClickListener
-                }
-                // creates a route and returns an intent to handle the link
-                val intent = Route.handleDeepLink(context, url)
-                if (intent != null) {
-                    try {
-                        // starts activity with the intent
-                        ActivityCompat.startActivity(context, intent, null)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-                true
-            }
+            true
         }
     }
 
+    // initializes single image post data
     fun initPostSingleImage(
         ivPost: ImageView,
         data: PostViewData,
@@ -457,6 +460,26 @@ object PostTypeUtil {
         ImageBindingUtil.loadImage(
             ivPost,
             data.attachments.first().attachmentMeta.url,
+            placeholder = shimmerDrawable
+        )
+
+        ivPost.setOnClickListener {
+            adapterListener.postDetail(data.id)
+        }
+    }
+
+    // initializes single article post data
+    fun initPostArticle(
+        ivPost: ImageView,
+        data: PostViewData,
+        adapterListener: PostAdapterListener
+    ) {
+        // gets the shimmer drawable for placeholder
+        val shimmerDrawable = ViewUtils.getShimmer()
+
+        ImageBindingUtil.loadImage(
+            ivPost,
+            data.widget.widgetMetaData?.coverImageUrl,
             placeholder = shimmerDrawable
         )
 
@@ -484,9 +507,50 @@ object PostTypeUtil {
         )
     }
 
-    // handles link view in the post
+    // handles link view in the post on feed
     fun initLinkView(
-        binding: ItemPostLinkBinding,
+        binding: LmFeedItemPostLinkBinding,
+        data: LinkOGTagsViewData
+    ) {
+        binding.apply {
+            cvLinkPreview.setOnClickListener {
+                // creates a route and returns an intent to handle the link
+                val intent = Route.handleDeepLink(root.context, data.url)
+                if (intent != null) {
+                    try {
+                        // starts activity with the intent
+                        ActivityCompat.startActivity(root.context, intent, null)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+            }
+            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
+                data.title
+            } else {
+                root.context.getString(R.string.link)
+            }
+
+            val isImageValid = data.image.isImageValid()
+            if (isImageValid) {
+                ivLink.show()
+                ImageBindingUtil.loadImage(
+                    ivLink,
+                    data.image,
+                    placeholder = R.drawable.ic_link_primary_40dp,
+                    cornerRadius = 8
+                )
+            } else {
+                ivLink.hide()
+            }
+
+            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
+        }
+    }
+
+    // handles link view in the post detail fragment
+    fun initLinkView(
+        binding: LmFeedItemPostDetailLinkBinding,
         data: LinkOGTagsViewData
     ) {
         binding.apply {
@@ -532,10 +596,9 @@ object PostTypeUtil {
         // member tag is clicked, open profile
     }
 
-    // checks if binder is called from liking/saving post or not
+    // checks if binder is called from liking/saving post or not on home
     fun initPostTypeBindData(
-        authorFrame: LayoutAuthorFrameBinding,
-        tvPostContent: TextView,
+        authorFrame: LmFeedHomeAuthorFrameBinding,
         data: PostViewData,
         position: Int,
         listener: PostAdapterListener,
@@ -556,14 +619,59 @@ object PostTypeUtil {
                 listener
             )
 
+            executeBinder()
+        }
+    }
+
+    // checks if binder is called from liking/saving post or not on post detail fragment
+    fun initPostTypeBindData(
+        authorFrame: LmFeedLayoutAuthorFrameBinding,
+        tvPostTitle: TextView,
+        tvPostContent: TextView,
+        data: PostViewData,
+        position: Int,
+        listener: PostAdapterListener,
+        returnBinder: () -> Unit,
+        executeBinder: () -> Unit
+    ) {
+        if (data.fromPostLiked || data.fromPostSaved || data.fromVideoAction) {
+            // update fromLiked/fromSaved variables and return from binder
+            listener.updateFromLikedSaved(position)
+            returnBinder()
+        } else {
+            // call all the common functions
+
+            // sets data to the creator frame
+            initAuthorFrame(
+                authorFrame,
+                data
+            )
+
             // sets the text content of the post
             initTextContent(
+                tvPostTitle,
                 tvPostContent,
-                data,
-                itemPosition = position,
-                listener
+                data
             )
             executeBinder()
+        }
+    }
+
+    private fun setTitle(
+        tvPostTitle: TextView,
+        data: PostViewData
+    ) {
+        val title = if (data.viewType == ITEM_POST_ARTICLE) {
+            data.widget.widgetMetaData?.title
+        } else {
+            data.heading
+        }
+
+        if (title.isNullOrEmpty()) {
+            tvPostTitle.hide()
+        } else {
+            tvPostTitle.show()
+            tvPostTitle.text = title
         }
     }
 }

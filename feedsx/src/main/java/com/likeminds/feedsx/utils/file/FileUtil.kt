@@ -7,8 +7,7 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
 import android.net.Uri
-import android.os.Build
-import android.os.CancellationSignal
+import android.os.*
 import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
@@ -16,6 +15,9 @@ import android.util.Size
 import androidx.core.content.FileProvider
 import com.likeminds.feedsx.utils.file.PathUtils.getPath
 import java.io.*
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object FileUtil {
 
@@ -255,9 +257,21 @@ object FileUtil {
         }
         return bitmap
     }
+
+    @Throws(IOException::class)
+    fun createImageFile(context: Context): File {
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(
+            "JPEG_${timeStamp}_", /* prefix */
+            ".jpg", /* suffix */
+            storageDir /* directory */
+        )
+    }
 }
 
 private const val LARGE_FILE_SIZE = 100 //in MegaBytes
+private const val LARGE_VIDEO_FILE_SIZE = 200 //in MegaBytes
 
 val File.size get() = if (!exists()) 0.0 else length().toDouble()
 
@@ -267,3 +281,4 @@ val File.size get() = if (!exists()) 0.0 else length().toDouble()
 private val Long.sizeInKb get() = this / 1000
 private val Long.sizeInMb get() = sizeInKb / 1000
 val Long.isLargeFile get() = sizeInMb > LARGE_FILE_SIZE
+val Long.isVideoLarge get() = sizeInMb > LARGE_VIDEO_FILE_SIZE

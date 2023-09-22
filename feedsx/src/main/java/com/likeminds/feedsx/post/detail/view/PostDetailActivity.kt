@@ -6,15 +6,17 @@ import android.os.Bundle
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
-import com.likeminds.feedsx.branding.model.LMBranding
-import com.likeminds.feedsx.databinding.ActivityPostDetailBinding
+import com.likeminds.feedsx.branding.model.LMFeedBranding
+import com.likeminds.feedsx.databinding.LmFeedActivityPostDetailBinding
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
+import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.ViewUtils.currentFragment
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
 class PostDetailActivity : BaseAppCompatActivity() {
 
-    lateinit var binding: ActivityPostDetailBinding
+    lateinit var binding: LmFeedActivityPostDetailBinding
 
     private var postDetailExtras: PostDetailExtras? = null
 
@@ -47,14 +49,18 @@ class PostDetailActivity : BaseAppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityPostDetailBinding.inflate(layoutInflater)
-        binding.toolbarColor = LMBranding.getToolbarColor()
+        binding = LmFeedActivityPostDetailBinding.inflate(layoutInflater)
+        binding.toolbarColor = LMFeedBranding.getToolbarColor()
         setContentView(binding.root)
 
         val bundle = intent.getBundleExtra("bundle")
 
         if (bundle != null) {
-            postDetailExtras = bundle.getParcelable(POST_DETAIL_EXTRAS)
+            postDetailExtras = ExtrasUtil.getParcelable(
+                bundle,
+                POST_DETAIL_EXTRAS,
+                PostDetailExtras::class.java
+            )
             val args = Bundle().apply {
                 putParcelable(POST_DETAIL_EXTRAS, postDetailExtras)
             }
@@ -63,7 +69,7 @@ class PostDetailActivity : BaseAppCompatActivity() {
             navHostFragment =
                 supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             navController = navHostFragment.navController
-            navController.setGraph(R.navigation.nav_graph_post_detail, args)
+            navController.setGraph(R.navigation.lm_feed_nav_graph_post_detail, args)
 
             //Toolbar
             initActionBar()
@@ -83,14 +89,22 @@ class PostDetailActivity : BaseAppCompatActivity() {
     private fun redirectActivity() {
         ViewUtils.showShortToast(this, getString(R.string.request_not_processed))
         supportFragmentManager.popBackStack()
-        super.onBackPressed()
-        overridePendingTransition(R.anim.slide_from_left, R.anim.slide_to_right)
+        onBackPressedDispatcher.onBackPressed()
+        overridePendingTransition(R.anim.lm_feed_slide_from_left, R.anim.lm_feed_slide_to_right)
     }
 
     private fun initActionBar() {
-        setSupportActionBar(binding.toolbar)
-        binding.ivBack.setOnClickListener {
-            onBackPressed()
+        binding.apply {
+            setSupportActionBar(toolbar)
+            ivBack.setOnClickListener {
+                onBackPressedDispatcher.onBackPressed()
+            }
+
+            ivPostMenu.setOnClickListener {
+                val fragment =
+                    supportFragmentManager.currentFragment(R.id.nav_host_fragment) as PostDetailFragment
+                fragment.showMenu(ivPostMenu)
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.di.likes
 
-import com.likeminds.feedsx.likes.view.LikesActivity
-import com.likeminds.feedsx.likes.view.LikesFragment
+import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
+import com.likeminds.feedsx.likes.view.LMFeedLikesFragment
 import dagger.Subcomponent
 
 @Subcomponent(modules = [LikesViewModelModule::class])
@@ -12,6 +12,6 @@ interface LikesComponent {
         fun create(): LikesComponent
     }
 
-    fun inject(likesFragment: LikesFragment)
-    fun inject(likesActivity: LikesActivity)
+    fun inject(lmFeedLikesFragment: LMFeedLikesFragment)
+    fun inject(lmFeedLikesActivity: LMFeedLikesActivity)
 }

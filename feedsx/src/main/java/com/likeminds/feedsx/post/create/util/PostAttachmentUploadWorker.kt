@@ -9,10 +9,7 @@ import com.amazonaws.services.s3.model.CannedAccessControlList
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.db.models.PostWithAttachments
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
-import com.likeminds.feedsx.utils.mediauploader.model.AWSFileResponse
-import com.likeminds.feedsx.utils.mediauploader.model.GenericFileRequest
-import com.likeminds.feedsx.utils.mediauploader.model.IMAGE
-import com.likeminds.feedsx.utils.mediauploader.model.WORKER_SUCCESS
+import com.likeminds.feedsx.utils.mediauploader.model.*
 import com.likeminds.feedsx.utils.mediauploader.utils.FileHelper
 import com.likeminds.feedsx.utils.mediauploader.utils.UploadHelper
 import kotlinx.coroutines.runBlocking
@@ -49,7 +46,7 @@ class PostAttachmentUploadWorker(
                 )
                 .setBackoffCriteria(
                     BackoffPolicy.LINEAR,
-                    OneTimeWorkRequest.MIN_BACKOFF_MILLIS,
+                    WorkRequest.MIN_BACKOFF_MILLIS,
                     TimeUnit.MILLISECONDS
                 )
                 .addTag(TAG)
@@ -72,19 +69,33 @@ class PostAttachmentUploadWorker(
     // creates/resumes AWS uploads for each attachment
     override fun uploadFiles(continuation: Continuation<Int>) {
         val attachmentsToUpload = if (failedIndex.isNotEmpty()) {
-            postWithAttachments.attachments.filterIndexed { index, _ ->
-                failedIndex.contains(index)
+            postWithAttachments.attachments.filterIndexed { index, it ->
+                !(it.attachmentMeta.awsFolderPath.isNullOrEmpty())
+                        && failedIndex.contains(index)
             }
         } else {
-            postWithAttachments.attachments
+            postWithAttachments.attachments.filter {
+                !(it.attachmentMeta.awsFolderPath.isNullOrEmpty())
+            }
         }
 
-        if (attachmentsToUpload.isEmpty()) {
+        val thumbnailsToUpload = if (failedIndex.isNotEmpty()) {
+            postWithAttachments.attachments.filterIndexed { index, it ->
+                !(it.attachmentMeta.awsFolderPath.isNullOrEmpty())
+                        && failedIndex.contains(index)
+            }
+        } else {
+            postWithAttachments.attachments.filter {
+                !(it.attachmentMeta.thumbnailAWSFolderPath.isNullOrEmpty())
+            }
+        }
+
+        if (thumbnailsToUpload.isEmpty() && attachmentsToUpload.isEmpty()) {
             continuation.resume(WORKER_SUCCESS)
             return
         }
 
-        uploadList = createAWSRequestList(attachmentsToUpload)
+        uploadList = createAWSRequestList(thumbnailsToUpload, attachmentsToUpload)
         uploadList.forEach { request ->
             val resumeAWSFileResponse =
                 UploadHelper.getInstance().getAWSFileResponse(request.awsFolderPath)
@@ -150,6 +161,8 @@ class PostAttachmentUploadWorker(
             .fileType(request.fileType)
             .width(request.width)
             .height(request.height)
+            .isThumbnail(request.isThumbnail)
+            .hasThumbnail(request.hasThumbnail)
             .pageCount(request.pageCount)
             .size(request.size)
             .duration(request.duration)

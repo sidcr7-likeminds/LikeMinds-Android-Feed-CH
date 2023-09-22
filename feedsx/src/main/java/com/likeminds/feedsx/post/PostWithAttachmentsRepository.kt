@@ -41,6 +41,10 @@ class PostWithAttachmentsRepository @Inject constructor(
         postWithAttachmentsDao.deletePost(post)
     }
 
+    suspend fun deletePostWithTemporaryId(temporaryId: Long) {
+        postWithAttachmentsDao.deletePostWithTemporaryId(temporaryId)
+    }
+
     suspend fun getLatestPostWithAttachments(): PostWithAttachments? {
         return postWithAttachmentsDao.getLatestPostWithAttachments()
     }

@@ -1,12 +1,9 @@
 package com.likeminds.feedsx.post.detail.view.adapter.databinder
 
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.PopupMenu
-import com.likeminds.feedsx.R
-import com.likeminds.feedsx.databinding.ItemPostDetailReplyBinding
+import com.likeminds.feedsx.*
+import com.likeminds.feedsx.databinding.LmFeedItemPostDetailReplyBinding
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.util.PostDetailUtil
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
@@ -22,13 +19,13 @@ import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_REPLY
 class ItemPostDetailReplyViewDataBinder constructor(
     private val postDetailAdapterListener: PostDetailAdapterListener,
     private val postDetailReplyAdapterListener: PostDetailReplyAdapterListener
-) : ViewDataBinder<ItemPostDetailReplyBinding, CommentViewData>() {
+) : ViewDataBinder<LmFeedItemPostDetailReplyBinding, CommentViewData>() {
 
     override val viewType: Int
         get() = ITEM_POST_DETAIL_REPLY
 
-    override fun createBinder(parent: ViewGroup): ItemPostDetailReplyBinding {
-        return ItemPostDetailReplyBinding.inflate(
+    override fun createBinder(parent: ViewGroup): LmFeedItemPostDetailReplyBinding {
+        return LmFeedItemPostDetailReplyBinding.inflate(
             LayoutInflater.from(parent.context),
             parent,
             false
@@ -36,7 +33,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
     }
 
     override fun bindData(
-        binding: ItemPostDetailReplyBinding,
+        binding: LmFeedItemPostDetailReplyBinding,
         data: CommentViewData,
         position: Int
     ) {
@@ -48,7 +45,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
     }
 
     private fun initReplyView(
-        binding: ItemPostDetailReplyBinding,
+        binding: LmFeedItemPostDetailReplyBinding,
         data: CommentViewData,
         position: Int
     ) {
@@ -56,6 +53,14 @@ class ItemPostDetailReplyViewDataBinder constructor(
             val context = root.context
 
             tvCommenterName.text = data.user.name
+
+            tvCommenterName.setOnClickListener {
+                LikeMindsFeedUI.lmFeedListener.openProfile(
+                    data.user.sdkClientInfoViewData.uuid,
+                    data.id,
+                    LMFeedAnalytics.Source.FEED
+                )
+            }
 
             PostDetailUtil.initTextContent(
                 tvCommentContent,
@@ -90,8 +95,10 @@ class ItemPostDetailReplyViewDataBinder constructor(
             }
 
             if (data.likesCount == 0) {
+                likesCount.isEnabled = false
                 likesCount.hide()
             } else {
+                likesCount.isEnabled = true
                 likesCount.text =
                     context.resources.getQuantityString(
                         R.plurals.likes,
@@ -99,13 +106,13 @@ class ItemPostDetailReplyViewDataBinder constructor(
                         data.likesCount
                     )
                 likesCount.show()
-            }
 
-            likesCount.setOnClickListener {
-                postDetailAdapterListener.showLikesScreen(
-                    data.postId,
-                    data.id
-                )
+                likesCount.setOnClickListener {
+                    postDetailAdapterListener.showLikesScreen(
+                        data.postId,
+                        data.id
+                    )
+                }
             }
 
             ivLike.setOnClickListener { view ->

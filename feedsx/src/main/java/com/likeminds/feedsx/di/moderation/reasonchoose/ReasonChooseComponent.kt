@@ -1,6 +1,6 @@
 package com.likeminds.feedsx.di.moderation.reasonchoose
 
-import com.likeminds.feedsx.delete.view.ReasonChooseDialog
+import com.likeminds.feedsx.delete.view.LMFeedReasonChooseDialog
 import dagger.Subcomponent
 
 @Subcomponent(modules = [ReasonChooseViewModelModule::class])
@@ -11,5 +11,5 @@ interface ReasonChooseComponent {
         fun create(): ReasonChooseComponent
     }
 
-    fun inject(reasonChooseDialog: ReasonChooseDialog)
+    fun inject(LMFeedReasonChooseDialog: LMFeedReasonChooseDialog)
 }
