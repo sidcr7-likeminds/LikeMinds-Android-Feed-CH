@@ -472,12 +472,17 @@ class LMFeedFragment :
             removePostingView()
             viewModel.fetchPendingPostFromDB()
         }
+        if (this.isVisible) {
+            initiateAutoPlayer()
+        }
     }
 
     override fun onPause() {
         super.onPause()
         // removes the player and destroys the [postVideoAutoPlayHelper]
-        postVideoAutoPlayHelper.destroy()
+        if (::postVideoAutoPlayHelper.isInitialized) {
+            postVideoAutoPlayHelper.destroy()
+        }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
