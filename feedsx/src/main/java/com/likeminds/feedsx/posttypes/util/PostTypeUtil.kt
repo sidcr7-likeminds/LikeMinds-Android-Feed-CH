@@ -107,11 +107,11 @@ object PostTypeUtil {
             val context = root.context
 
             //sets user position
-            val designation = user.listOfQuestionAnswerViewData?.first {
+            val designation = user.listOfQuestionAnswerViewData?.firstOrNull {
                 it.tag == "basic" && it.state == 1
             }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
 
-            val communityName = user.listOfQuestionAnswerViewData?.first {
+            val communityName = user.listOfQuestionAnswerViewData?.firstOrNull {
                 it.tag == "basic" && it.state == 0
             }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
 

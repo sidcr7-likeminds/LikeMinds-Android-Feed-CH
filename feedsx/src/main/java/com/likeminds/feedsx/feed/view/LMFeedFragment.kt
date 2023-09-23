@@ -472,7 +472,6 @@ class LMFeedFragment :
             removePostingView()
             viewModel.fetchPendingPostFromDB()
         }
-        initiateAutoPlayer()
     }
 
     override fun onPause() {
