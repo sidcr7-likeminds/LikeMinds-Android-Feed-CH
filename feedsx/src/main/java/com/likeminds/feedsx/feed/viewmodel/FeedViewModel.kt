@@ -18,19 +18,11 @@ import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.*
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.*
+import com.likeminds.likemindsfeed.topic.model.GetTopicRequest
 import com.likeminds.likemindsfeed.universalfeed.model.GetFeedRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
-import kotlin.collections.List
-import kotlin.collections.count
-import kotlin.collections.emptyList
-import kotlin.collections.forEach
-import kotlin.collections.hashMapOf
-import kotlin.collections.isNotEmpty
-import kotlin.collections.joinToString
-import kotlin.collections.listOf
-import kotlin.collections.mapOf
 import kotlin.collections.set
 
 class FeedViewModel @Inject constructor(
@@ -46,6 +38,9 @@ class FeedViewModel @Inject constructor(
     private val _unreadNotificationCount = MutableLiveData<Int>()
     val unreadNotificationCount: LiveData<Int> = _unreadNotificationCount
 
+    private val _showTopicFilter = MutableLiveData<Boolean>()
+    val showTopicFilter: LiveData<Boolean> = _showTopicFilter
+
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
 
@@ -53,6 +48,7 @@ class FeedViewModel @Inject constructor(
         data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
         data class GetUnreadNotificationCount(val errorMessage: String?) : ErrorMessageEvent()
+        data class GetTopic(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     sealed class PostDataEvent {
@@ -203,6 +199,29 @@ class FeedViewModel @Inject constructor(
             } else {
                 //for error
                 errorMessageChannel.send(ErrorMessageEvent.GetUnreadNotificationCount(response.errorMessage))
+            }
+        }
+    }
+
+    fun getAllTopics() {
+        viewModelScope.launchIO {
+            val request = GetTopicRequest.Builder()
+                .page(1)
+                .pageSize(10)
+                .build()
+
+            val response = lmFeedClient.getTopics(request)
+
+            if (response.success) {
+                val topics = response.data?.topics
+                if (topics.isNullOrEmpty()) {
+                    _showTopicFilter.postValue(false)
+                } else {
+                    _showTopicFilter.postValue(true)
+                }
+            } else {
+                _showTopicFilter.postValue(false)
+                errorMessageChannel.send(ErrorMessageEvent.GetTopic(response.errorMessage))
             }
         }
     }

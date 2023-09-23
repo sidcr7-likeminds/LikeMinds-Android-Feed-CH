@@ -33,6 +33,11 @@ const val ITEM_REASON_CHOOSE = 27
 const val ITEM_NOTIFICATION_FEED = 28
 const val ITEM_NO_COMMENTS_FOUND = 29
 const val ITEM_EDIT_POST_DOCUMENTS_ITEM = 30
+//31 is article
+//32 is shimmer
+const val ITEM_TOPIC = 33
+const val ITEM_TOPIC_HEADING = 34
+const val ITEM_ALL_TOPIC = 35
 
 @IntDef(
     ITEM_NONE,
@@ -65,7 +70,10 @@ const val ITEM_EDIT_POST_DOCUMENTS_ITEM = 30
     ITEM_REASON_CHOOSE,
     ITEM_NOTIFICATION_FEED,
     ITEM_NO_COMMENTS_FOUND,
-    ITEM_EDIT_POST_DOCUMENTS_ITEM
+    ITEM_EDIT_POST_DOCUMENTS_ITEM,
+    ITEM_TOPIC,
+    ITEM_TOPIC_HEADING,
+    ITEM_ALL_TOPIC
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class ViewType

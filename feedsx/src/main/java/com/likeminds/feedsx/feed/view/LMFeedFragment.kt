@@ -53,6 +53,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicHeadingViewData
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -204,6 +205,13 @@ class LMFeedFragment :
             observeFeedUniversal(pair)
         }
 
+        viewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopicFilter ->
+            if (showTopicFilter) {
+                val allTopicHeading = LMFeedTopicHeadingViewData.Builder().build()
+                mPostAdapter.add(0, allTopicHeading)
+            }
+        }
+
         // observes deletePostResponse LiveData
         postActionsViewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId)?.first ?: return@observe
@@ -242,6 +250,7 @@ class LMFeedFragment :
         initToolbar()
         setUserImage(user)
         viewModel.getUnreadNotificationCount()
+        viewModel.getAllTopics()
         viewModel.getUniversalFeed(1)
     }
 
@@ -453,6 +462,10 @@ class LMFeedFragment :
 
             is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
                 binding.tvNotificationCount.hide()
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+            }
+
+            is FeedViewModel.ErrorMessageEvent.GetTopic -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
         }
