@@ -53,7 +53,6 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.*
-import com.likeminds.feedsx.topic.model.LMFeedTopicHeadingViewData
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -206,10 +205,7 @@ class LMFeedFragment :
         }
 
         viewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopicFilter ->
-            if (showTopicFilter) {
-                val allTopicHeading = LMFeedTopicHeadingViewData.Builder().build()
-                mPostAdapter.add(0, allTopicHeading)
-            }
+            binding.layoutAllTopics.root.isVisible = showTopicFilter
         }
 
         // observes deletePostResponse LiveData
@@ -600,7 +596,14 @@ class LMFeedFragment :
         setStatusBarColor()
         initRecyclerView()
         initNewPostClick(true)
+        initTopicFilterClick()
         initSwipeRefreshLayout()
+    }
+
+    private fun initTopicFilterClick() {
+       binding.layoutAllTopics.root.setOnClickListener {
+           //show topics selecting screen with All topic filter
+       }
     }
 
     @Suppress("Deprecation")

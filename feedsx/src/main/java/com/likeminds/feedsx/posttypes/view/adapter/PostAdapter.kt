@@ -1,7 +1,6 @@
 package com.likeminds.feedsx.posttypes.view.adapter
 
 import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.view.adapter.databinder.LMFeedItemAllTopicsViewDataBinder
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.LMFeedItemPostDocumentsViewDataBinder
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.LMFeedItemPostLinkViewDataBinder
 import com.likeminds.feedsx.posttypes.view.adapter.databinder.LMFeedItemPostMultipleMediaViewDataBinder
@@ -42,9 +41,6 @@ class PostAdapter constructor(
         val itemPostMultipleMediaViewDataBinder =
             LMFeedItemPostMultipleMediaViewDataBinder(listener)
         viewDataBinders.add(itemPostMultipleMediaViewDataBinder)
-
-        val lmFeedItemAllTopicsViewDataBinder = LMFeedItemAllTopicsViewDataBinder(listener)
-        viewDataBinders.add(lmFeedItemAllTopicsViewDataBinder)
 
         return viewDataBinders
     }

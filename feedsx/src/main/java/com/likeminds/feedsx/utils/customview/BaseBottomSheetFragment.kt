@@ -55,7 +55,7 @@ abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStyle(DialogFragment.STYLE_NORMAL, R.style.BottomSheetStyle)
+        setStyle(DialogFragment.STYLE_NORMAL, R.style.LMFeedBottomSheetStyle)
         init()
         receiveExtras()
     }

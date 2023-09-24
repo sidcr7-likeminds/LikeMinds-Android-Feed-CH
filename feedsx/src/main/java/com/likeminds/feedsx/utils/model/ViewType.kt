@@ -36,8 +36,7 @@ const val ITEM_EDIT_POST_DOCUMENTS_ITEM = 30
 //31 is article
 //32 is shimmer
 const val ITEM_TOPIC = 33
-const val ITEM_TOPIC_HEADING = 34
-const val ITEM_ALL_TOPIC = 35
+const val ITEM_ALL_TOPIC = 34
 
 @IntDef(
     ITEM_NONE,
@@ -72,7 +71,6 @@ const val ITEM_ALL_TOPIC = 35
     ITEM_NO_COMMENTS_FOUND,
     ITEM_EDIT_POST_DOCUMENTS_ITEM,
     ITEM_TOPIC,
-    ITEM_TOPIC_HEADING,
     ITEM_ALL_TOPIC
 )
 @Retention(AnnotationRetention.SOURCE)
