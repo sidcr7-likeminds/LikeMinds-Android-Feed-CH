@@ -14,6 +14,12 @@ class LMFeedAllTopicsViewData private constructor(
 
         private var isSelected: Boolean = true
 
+        fun isSelected(isSelected: Boolean) = apply { this.isSelected = isSelected }
+
         fun build() = LMFeedAllTopicsViewData(isSelected)
+    }
+
+    fun toBuilder(): Builder {
+        return Builder().isSelected(isSelected)
     }
 }

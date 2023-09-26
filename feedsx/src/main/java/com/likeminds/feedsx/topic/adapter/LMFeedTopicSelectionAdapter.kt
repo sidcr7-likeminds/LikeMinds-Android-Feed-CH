@@ -2,6 +2,7 @@ package com.likeminds.feedsx.topic.adapter
 
 import com.likeminds.feedsx.topic.adapter.databinders.LMFeedAllTopicsViewDataBinder
 import com.likeminds.feedsx.topic.adapter.databinders.LMFeedTopicViewDataBinder
+import com.likeminds.feedsx.topic.model.LMFeedAllTopicsViewData
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.customview.BaseRecyclerAdapter
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
@@ -28,6 +29,6 @@ class LMFeedTopicSelectionAdapter(private val listener: LMFeedTopicSelectionAdap
 }
 
 interface LMFeedTopicSelectionAdapterListener {
-    fun allTopicSelected()
-    fun topicSelected(topic: LMFeedTopicViewData)
+    fun allTopicSelected(lmFeedAllTopic: LMFeedAllTopicsViewData, position: Int)
+    fun topicSelected(topic: LMFeedTopicViewData, position: Int)
 }

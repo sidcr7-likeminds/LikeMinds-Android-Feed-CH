@@ -31,12 +31,21 @@ class LMFeedAllTopicsViewDataBinder(private val listener: LMFeedTopicSelectionAd
         data: LMFeedAllTopicsViewData,
         position: Int
     ) {
-        binding.ivSelected.isVisible = data.isSelected
+        binding.apply {
+            //set values in binding
+            lmFeedAllTopic = data
+            this.position = position
+
+            //set selected click
+            ivSelected.isVisible = data.isSelected
+        }
     }
 
     private fun setListeners(binding: LmFeedItemAllTopicBinding) {
         binding.root.setOnClickListener {
-            listener.allTopicSelected()
+            val lmFeedAllTopic = binding.lmFeedAllTopic ?: return@setOnClickListener
+            val position = binding.position
+            listener.allTopicSelected(lmFeedAllTopic, position)
         }
     }
 }

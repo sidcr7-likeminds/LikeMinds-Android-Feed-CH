@@ -6,6 +6,10 @@
     <data>
 
         <variable
+            name="position"
+            type="int" />
+
+        <variable
             name="lm_feed_topic"
             type="com.likeminds.feedsx.topic.model.LMFeedTopicViewData" />
     </data>

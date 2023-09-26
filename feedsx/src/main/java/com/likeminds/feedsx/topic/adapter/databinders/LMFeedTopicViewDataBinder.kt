@@ -32,6 +32,7 @@ class LMFeedTopicViewDataBinder(private val listener: LMFeedTopicSelectionAdapte
         binding.apply {
             //set data to binding
             lmFeedTopic = data
+            this.position = position
 
             //set topic name
             tvTopicName.text = data.name
@@ -42,11 +43,12 @@ class LMFeedTopicViewDataBinder(private val listener: LMFeedTopicSelectionAdapte
     }
 
     private fun setListener(binding: LmFeedItemTopicBinding) {
-       binding.apply {
-          root.setOnClickListener {
-              val topic = lmFeedTopic ?: return@setOnClickListener
-              listener.topicSelected(topic)
-          }
-       }
+        binding.apply {
+            root.setOnClickListener {
+                val topic = lmFeedTopic ?: return@setOnClickListener
+                val position = position
+                listener.topicSelected(topic, position)
+            }
+        }
     }
 }
