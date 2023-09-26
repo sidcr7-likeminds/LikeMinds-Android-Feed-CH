@@ -134,7 +134,7 @@ object PostTypeUtil {
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
             root.setOnClickListener {
-                LikeMindsFeedUI.lmFeedListener.openProfile(
+                SDKApplication.getLMFeedUICallback()?.openProfile(
                     user.sdkClientInfoViewData.uuid,
                     user.id.toString(),
                     LMFeedAnalytics.Source.FEED

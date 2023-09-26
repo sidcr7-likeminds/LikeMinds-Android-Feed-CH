@@ -58,6 +58,14 @@ class SDKApplication : LMCallback {
             }
             return sdkApplicationInstance!!
         }
+
+        /**
+         * @return Singleton Instance of Call backs required
+         * */
+        @JvmStatic
+        fun getLMFeedUICallback(): LMFeedUICallback? {
+            return lmUICallback
+        }
     }
 
     fun initSDKApplication(

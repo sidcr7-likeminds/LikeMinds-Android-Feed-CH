@@ -196,7 +196,6 @@ class EditPostFragment :
     private fun initiateMediaPicker(list: List<String>) {
         val extras = MediaPickerExtras.Builder()
             .mediaTypes(list)
-            .allowMultipleSelect(true)
             .build()
         val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
         galleryLauncher.launch(intent)
