@@ -2,8 +2,7 @@ package com.likeminds.feedsx.likes.adapter.databinder
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.likeminds.feedsx.LMFeedAnalytics
-import com.likeminds.feedsx.LikeMindsFeedUI
+import com.likeminds.feedsx.*
 import com.likeminds.feedsx.databinding.LmFeedItemLikesScreenBinding
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.utils.MemberImageUtil
@@ -50,7 +49,7 @@ class LMFeedItemLikesScreenViewDataBinder :
         binding.apply {
             // calls a callback to navigate to profile screen
             root.setOnClickListener {
-                LikeMindsFeedUI.lmFeedListener.openProfile(
+                SDKApplication.getLMFeedUICallback()?.openProfile(
                     user.sdkClientInfoViewData.uuid,
                     user.id.toString(),
                     LMFeedAnalytics.Source.FEED

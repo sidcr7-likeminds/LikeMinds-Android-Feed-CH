@@ -79,7 +79,7 @@ object LMFeedAnalytics {
             eventProperties: $eventProperties
         """.trimIndent()
         )
-        LikeMindsFeedUI.lmFeedListener.trackAnalytics(
+        SDKApplication.getLMFeedUICallback()?.trackAnalytics(
             eventName,
             JSONObject(eventProperties)
         )

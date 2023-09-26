@@ -198,7 +198,7 @@ class LMFeedFragment :
 
         // observe unread notification count
         viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { count ->
-            LikeMindsFeedUI.lmFeedListener.updateNotificationCount(count)
+            SDKApplication.getLMFeedUICallback()?.updateNotificationCount(count)
         }
 
         // observe universal feed
@@ -1270,7 +1270,6 @@ class LMFeedFragment :
     private fun initiateMediaPicker(list: List<String>) {
         val extras = MediaPickerExtras.Builder()
             .mediaTypes(list)
-            .allowMultipleSelect(true)
             .build()
         val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
         galleryLauncher.launch(intent)

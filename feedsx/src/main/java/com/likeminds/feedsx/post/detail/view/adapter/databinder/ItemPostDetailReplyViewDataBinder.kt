@@ -55,7 +55,7 @@ class ItemPostDetailReplyViewDataBinder constructor(
             tvCommenterName.text = data.user.name
 
             tvCommenterName.setOnClickListener {
-                LikeMindsFeedUI.lmFeedListener.openProfile(
+                SDKApplication.getLMFeedUICallback()?.openProfile(
                     data.user.sdkClientInfoViewData.uuid,
                     data.id,
                     LMFeedAnalytics.Source.FEED
