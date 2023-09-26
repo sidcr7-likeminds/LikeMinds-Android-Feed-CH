@@ -229,14 +229,14 @@ class EditPostFragment :
 
         if (data.isNotEmpty()) {
             if (data.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
-                val imageCropExtras = ImageCropExtras.Builder()
+                val imageCropExtras = LMFeedImageCropExtras.Builder()
                     .singleUriData(data.first())
                     .cropWidth(16)
                     .cropHeight(9)
                     .build()
 
                 findNavController().navigate(
-                    EditPostFragmentDirections.actionFragmentEditPostToImageCropFragment(
+                    EditPostFragmentDirections.actionFragmentCreatePostToLmFeedImageCropFragment(
                         imageCropExtras
                     )
                 )
@@ -252,14 +252,14 @@ class EditPostFragment :
             )
             if (mediaUris.isNotEmpty()) {
                 if (mediaUris.first().fileType == com.likeminds.feedsx.media.model.IMAGE) {
-                    val imageCropExtras = ImageCropExtras.Builder()
+                    val imageCropExtras = LMFeedImageCropExtras.Builder()
                         .singleUriData(mediaUris.first())
                         .cropWidth(16)
                         .cropHeight(9)
                         .build()
 
                     findNavController().navigate(
-                        LMFeedCreatePostFragmentDirections.actionFragmentCreatePostToImageCropFragment(
+                        LMFeedCreatePostFragmentDirections.actionFragmentCreatePostToLmFeedImageCropFragment(
                             imageCropExtras
                         )
                     )

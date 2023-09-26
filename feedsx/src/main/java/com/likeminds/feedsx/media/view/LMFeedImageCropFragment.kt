@@ -11,7 +11,7 @@ import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.likeminds.feedsx.databinding.LmFeedFragmentImageCropBinding
-import com.likeminds.feedsx.media.model.ImageCropExtras
+import com.likeminds.feedsx.media.model.LMFeedImageCropExtras
 import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.utils.ValueUtils.getMediaType
 import com.likeminds.feedsx.utils.file.FileUtil
@@ -26,7 +26,7 @@ class LMFeedImageCropFragment : Fragment() {
         private const val BUNDLE_IMAGE_CROP = "bundle of image crop"
 
         @JvmStatic
-        fun getInstance(extras: ImageCropExtras): LMFeedImageCropFragment {
+        fun getInstance(extras: LMFeedImageCropExtras): LMFeedImageCropFragment {
             val fragment = LMFeedImageCropFragment()
             val bundle = Bundle()
             bundle.putParcelable(BUNDLE_IMAGE_CROP, extras)
@@ -35,14 +35,14 @@ class LMFeedImageCropFragment : Fragment() {
         }
     }
 
-    private lateinit var extras: ImageCropExtras
+    private lateinit var extras: LMFeedImageCropExtras
 
     private lateinit var binding: LmFeedFragmentImageCropBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments == null) return
-        extras = LMFeedImageCropFragmentArgs.fromBundle(requireArguments()).cropExtras
+        extras = LMFeedImageCropFragmentArgs.fromBundle(requireArguments()).lmFeedCropExtras
     }
 
     override fun onCreateView(

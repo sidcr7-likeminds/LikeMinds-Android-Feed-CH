@@ -1,10 +1,12 @@
 package com.likeminds.feedsx.media.model
 
 import android.os.Parcelable
+import androidx.annotation.Keep
 import kotlinx.parcelize.Parcelize
 
+@Keep
 @Parcelize
-class ImageCropExtras private constructor(
+class LMFeedImageCropExtras private constructor(
     val singleUriData: SingleUriData?,
     val cropWidth: Int,
     val cropHeight: Int
@@ -20,7 +22,7 @@ class ImageCropExtras private constructor(
         fun cropWidth(cropWidth: Int) = apply { this.cropWidth = cropWidth }
         fun cropHeight(cropHeight: Int) = apply { this.cropHeight = cropHeight }
 
-        fun build() = ImageCropExtras(
+        fun build() = LMFeedImageCropExtras(
             singleUriData,
             cropWidth,
             cropHeight

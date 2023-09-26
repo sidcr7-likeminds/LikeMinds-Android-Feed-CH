@@ -104,18 +104,32 @@ object PostTypeUtil {
                 showRoundImage = true
             )
 
-            val context = root.context
-
             //sets user position
             val designation = user.listOfQuestionAnswerViewData?.firstOrNull {
                 it.tag == "basic" && it.state == 1
-            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+            }?.answerOfQuestion ?: ""
 
             val communityName = user.listOfQuestionAnswerViewData?.firstOrNull {
                 it.tag == "basic" && it.state == 0
-            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+            }?.answerOfQuestion ?: ""
 
-            tvMemberPosition.text = "$designation @ $communityName"
+            if (communityName.isEmpty()) {
+                // communityName & designation, both are empty then hide the view
+                if (designation.isEmpty()) {
+                    tvMemberPosition.hide()
+                } else {
+                    // communityName is empty but designation is not empty then show designation only
+                    tvMemberPosition.text = "$designation"
+                }
+            } else {
+                if (designation.isEmpty()) {
+                    // communityName is not empty but designation is empty then show @ communityName
+                    tvMemberPosition.text = "@ $communityName"
+                } else {
+                    // show designation @ $communityName when both are non-empty
+                    tvMemberPosition.text = "$designation @ $communityName"
+                }
+            }
 
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
