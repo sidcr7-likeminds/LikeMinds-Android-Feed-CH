@@ -104,18 +104,28 @@ object PostTypeUtil {
                 showRoundImage = true
             )
 
-            val context = root.context
-
             //sets user position
             val designation = user.listOfQuestionAnswerViewData?.firstOrNull {
                 it.tag == "basic" && it.state == 1
-            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+            }?.answerOfQuestion ?: ""
 
             val communityName = user.listOfQuestionAnswerViewData?.firstOrNull {
                 it.tag == "basic" && it.state == 0
-            }?.answerOfQuestion ?: context.getString(R.string.not_mentioned)
+            }?.answerOfQuestion ?: ""
 
-            tvMemberPosition.text = "$designation @ $communityName"
+            if (communityName.isEmpty()) {
+                if (designation.isEmpty()) {
+                    tvMemberPosition.hide()
+                } else {
+                    tvMemberPosition.text = "$designation"
+                }
+            } else {
+                if (designation.isEmpty()) {
+                    tvMemberPosition.text = "@ $communityName"
+                } else {
+                    tvMemberPosition.text = "$designation @ $communityName"
+                }
+            }
 
             tvTime.text = TimeUtil.getRelativeTimeInString(data.createdAt)
 
