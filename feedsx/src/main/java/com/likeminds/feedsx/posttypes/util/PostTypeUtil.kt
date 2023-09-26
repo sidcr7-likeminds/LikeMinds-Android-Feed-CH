@@ -114,15 +114,19 @@ object PostTypeUtil {
             }?.answerOfQuestion ?: ""
 
             if (communityName.isEmpty()) {
+                // communityName & designation, both are empty then hide the view
                 if (designation.isEmpty()) {
                     tvMemberPosition.hide()
                 } else {
+                    // communityName is empty but designation is not empty then show designation only
                     tvMemberPosition.text = "$designation"
                 }
             } else {
                 if (designation.isEmpty()) {
+                    // communityName is not empty but designation is empty then show @ communityName
                     tvMemberPosition.text = "@ $communityName"
                 } else {
+                    // show designation @ $communityName when both are non-empty
                     tvMemberPosition.text = "$designation @ $communityName"
                 }
             }
