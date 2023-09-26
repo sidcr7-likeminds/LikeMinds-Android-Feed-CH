@@ -490,7 +490,9 @@ class LMFeedFragment :
 
         if (hidden) {
             // removes the player and destroys the [postVideoAutoPlayHelper]
-            postVideoAutoPlayHelper.destroy()
+            if (::postVideoAutoPlayHelper.isInitialized) {
+                postVideoAutoPlayHelper.destroy()
+            }
         } else {
             // sends feed opened event
             viewModel.sendFeedOpenedEvent()

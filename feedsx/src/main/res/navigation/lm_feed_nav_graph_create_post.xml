@@ -11,17 +11,17 @@
         android:label="CreatePostFragment"
         tools:layout="@layout/lm_feed_fragment_create_post">
         <action
-            android:id="@+id/action_fragment_create_post_to_imageCropFragment"
-            app:destination="@id/imageCropFragment" />
+            android:id="@+id/action_fragment_create_post_to_lmFeedImageCropFragment"
+            app:destination="@id/lmFeedImageCropFragment" />
     </fragment>
 
     <fragment
-        android:id="@+id/imageCropFragment"
+        android:id="@+id/lmFeedImageCropFragment"
         android:name="com.likeminds.feedsx.media.view.LMFeedImageCropFragment"
-        android:label="fragment_image_crop"
+        android:label="lm_feed_fragment_image_crop"
         tools:layout="@layout/lm_feed_fragment_image_crop">
         <argument
-            android:name="cropExtras"
-            app:argType="com.likeminds.feedsx.media.model.ImageCropExtras" />
+            android:name="lmFeedCropExtras"
+            app:argType="com.likeminds.feedsx.media.model.LMFeedImageCropExtras" />
     </fragment>
 </navigation>
