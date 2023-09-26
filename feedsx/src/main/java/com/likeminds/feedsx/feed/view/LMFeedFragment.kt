@@ -174,7 +174,6 @@ class LMFeedFragment :
 
         // observes userResponse LiveData
         initiateViewModel.userResponse.observe(viewLifecycleOwner) {
-            initSwipeRefreshLayout()
             observeUserResponse()
         }
 
@@ -549,12 +548,13 @@ class LMFeedFragment :
      * UI Block
      **/
 
-// initializes various UI components
+    // initializes various UI components
     private fun initUI() {
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
 
         setStatusBarColor()
         initRecyclerView()
+        initSwipeRefreshLayout()
         initNewPostClick(true)
     }
 
