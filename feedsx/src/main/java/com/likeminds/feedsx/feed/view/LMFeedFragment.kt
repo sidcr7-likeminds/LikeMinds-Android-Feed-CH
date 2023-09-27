@@ -53,6 +53,8 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -601,9 +603,15 @@ class LMFeedFragment :
     }
 
     private fun initTopicFilterClick() {
-       binding.layoutAllTopics.root.setOnClickListener {
-           //show topics selecting screen with All topic filter
-       }
+        binding.layoutAllTopics.root.setOnClickListener {
+            //show topics selecting screen with All topic filter
+            LMFeedTopicSelectionActivity.start(
+                requireContext(),
+                LMFeedTopicSelectionExtras.Builder()
+                    .showAllTopicFilter(true)
+                    .build()
+            )
+        }
     }
 
     @Suppress("Deprecation")

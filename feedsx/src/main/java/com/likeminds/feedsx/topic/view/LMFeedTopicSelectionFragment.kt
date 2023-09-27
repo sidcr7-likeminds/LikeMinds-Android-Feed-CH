@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.topic.view
 
+import android.util.Log
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.SDKApplication
@@ -88,15 +89,31 @@ class LMFeedTopicSelectionFragment :
 
         //update other topics
         mAdapter.items().forEachIndexed { index, topic ->
-            if (topic !is LMFeedTopicViewData) return
+            if (topic is LMFeedTopicViewData) {
+                val updatedTopic = topic.toBuilder().isSelected(false).build()
 
-            val updatedTopic = topic.toBuilder().isSelected(false).build()
+                mAdapter.update(index, updatedTopic)
+            }
 
-            mAdapter.update(index, updatedTopic)
         }
     }
 
     override fun topicSelected(topic: LMFeedTopicViewData, position: Int) {
+
+        val allTopicViewData = mAdapter.items()?.find {
+            it is LMFeedAllTopicsViewData
+        } as? LMFeedAllTopicsViewData
+
+        //check all topic filter exists and it is selected
+        if (allTopicViewData != null && allTopicViewData.isSelected) {
+            //update view data to not selected
+            val updatedAllTopicViewData = allTopicViewData.toBuilder()
+                .isSelected(false)
+                .build()
+
+            mAdapter.update(0, updatedAllTopicViewData)
+        }
+
         //update topic
         val updatedTopic = if (topic.isSelected) {
             topic.toBuilder()

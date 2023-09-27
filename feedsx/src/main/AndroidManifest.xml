@@ -46,5 +46,10 @@
             android:name="com.likeminds.feedsx.post.detail.view.PostDetailActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".topic.view.LMFeedTopicSelectionActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>

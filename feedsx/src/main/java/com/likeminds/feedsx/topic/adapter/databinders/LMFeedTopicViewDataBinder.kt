@@ -1,7 +1,9 @@
 package com.likeminds.feedsx.topic.adapter.databinders
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import com.likeminds.feedsx.databinding.LmFeedItemTopicBinding
 import com.likeminds.feedsx.topic.adapter.LMFeedTopicSelectionAdapterListener
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
@@ -29,6 +31,14 @@ class LMFeedTopicViewDataBinder(private val listener: LMFeedTopicSelectionAdapte
         data: LMFeedTopicViewData,
         position: Int
     ) {
+        Log.d(
+            "PUI", """
+            data:
+            id: ${data.id}
+            name: ${data.name}
+            isSelected:${data.isSelected}
+        """.trimIndent()
+        )
         binding.apply {
             //set data to binding
             lmFeedTopic = data
@@ -38,7 +48,7 @@ class LMFeedTopicViewDataBinder(private val listener: LMFeedTopicSelectionAdapte
             tvTopicName.text = data.name
 
             //set isSelected
-            ivSelected.isSelected = data.isSelected
+            ivSelected.isVisible = data.isSelected
         }
     }
 
