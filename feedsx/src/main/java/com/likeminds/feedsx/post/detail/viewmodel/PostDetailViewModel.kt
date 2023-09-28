@@ -102,10 +102,11 @@ class PostDetailViewModel @Inject constructor(
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
+                val topics = data.topics
                 _postResponse.postValue(
                     Pair(
                         page,
-                        ViewDataConverter.convertPost(post, users)
+                        ViewDataConverter.convertPost(post, users, topics)
                     )
                 )
             } else {

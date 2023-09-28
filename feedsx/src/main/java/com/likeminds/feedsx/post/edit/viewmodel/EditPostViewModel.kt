@@ -3,7 +3,9 @@ package com.likeminds.feedsx.post.edit.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMFeedAnalytics
-import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.model.AttachmentViewData
+import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -51,11 +53,13 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
+                val topics = data.topics
                 postDataEventChannel.send(
                     PostDataEvent.GetPost(
                         ViewDataConverter.convertPost(
                             post,
-                            users
+                            users,
+                            topics
                         )
                     )
                 )
@@ -103,7 +107,8 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
-                val postViewData = ViewDataConverter.convertPost(post, users)
+                val topics = data.topics
+                val postViewData = ViewDataConverter.convertPost(post, users, topics)
                 postDataEventChannel.send(PostDataEvent.EditPost(postViewData))
 
                 // sends post edited event

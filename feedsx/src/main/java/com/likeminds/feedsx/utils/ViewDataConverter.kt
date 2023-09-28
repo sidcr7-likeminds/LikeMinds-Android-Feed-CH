@@ -224,10 +224,11 @@ object ViewDataConverter {
      * */
     fun convertUniversalFeedPosts(
         posts: List<Post>,
-        usersMap: Map<String, User>
+        usersMap: Map<String, User>,
+        topicsMap: Map<String, Topic>
     ): List<PostViewData> {
         return posts.map { post ->
-            convertPost(post, usersMap)
+            convertPost(post, usersMap, topicsMap)
         }
     }
 
@@ -240,17 +241,25 @@ object ViewDataConverter {
      * */
     fun convertPost(
         post: Post,
-        usersMap: Map<String, User>
+        usersMap: Map<String, User>,
+        topicsMap: Map<String, Topic>
     ): PostViewData {
         val postCreator = post.uuid
         val user = usersMap[postCreator]
         val postId = post.id
         val replies = post.replies?.toMutableList()
+        val topicsId = post.topicIds ?: emptyList()
 
         val userViewData = if (user == null) {
             createDeletedUser()
         } else {
             convertUser(user)
+        }
+
+        val topicsViewData = topicsId.mapNotNull { topicId ->
+            topicsMap[topicId]
+        }.map { topic ->
+            convertTopic(topic)
         }
 
         return PostViewData.Builder()
@@ -277,6 +286,8 @@ object ViewDataConverter {
             .updatedAt(post.updatedAt)
             .user(userViewData)
             .uuid(postCreator)
+            .temporaryId(post.tempId)
+            .topics(topicsViewData)
             .build()
     }
 
