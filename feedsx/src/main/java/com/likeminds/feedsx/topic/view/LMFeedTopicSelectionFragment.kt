@@ -2,7 +2,6 @@ package com.likeminds.feedsx.topic.view
 
 import android.app.Activity
 import android.content.Intent
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -125,6 +124,7 @@ class LMFeedTopicSelectionFragment :
         //update sub title
         selectedTopics = 0
         updateSelectedTopicsCount()
+        viewModel.clearSelectedTopic()
     }
 
     override fun topicSelected(topic: LMFeedTopicViewData, position: Int) {
@@ -146,11 +146,13 @@ class LMFeedTopicSelectionFragment :
         //update topic
         val updatedTopic = if (topic.isSelected) {
             selectedTopics--
+            viewModel.removeSelectedTopic(topic)
             topic.toBuilder()
                 .isSelected(false)
                 .build()
         } else {
             selectedTopics++
+            viewModel.addSelectedTopic(topic)
             topic.toBuilder()
                 .isSelected(true)
                 .build()

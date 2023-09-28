@@ -1,11 +1,11 @@
 package com.likeminds.feedsx.topic.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.topic.model.LMFeedAllTopicsViewData
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.model.BaseViewType
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
     companion object {
         const val SEARCH_TYPE = "name"
-        const val PAGE_SIZE = 20
+        const val PAGE_SIZE = 10
     }
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -28,6 +28,10 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
 
     private val _errorMessage = MutableLiveData<String?>()
     val errorMessage: LiveData<String?> = _errorMessage
+
+    private val selectedTopics by lazy {
+        HashMap<String, LMFeedTopicViewData>()
+    }
 
     fun getTopics(showAllTopicFilter: Boolean, page: Int, searchString: String? = null) {
         viewModelScope.launchIO {
@@ -48,12 +52,21 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
             if (response.success) {
                 val topics = response.data?.topics ?: emptyList()
                 val topicsViewData = topics.map { topic ->
-                    ViewDataConverter.convertTopic(topic)
+                    val topicViewData = ViewDataConverter.convertTopic(topic)
+
+                    if (selectedTopics.containsKey(topicViewData.id)) {
+                        topicViewData.toBuilder().isSelected(true).build()
+                    } else {
+                        topicViewData.toBuilder().isSelected(false).build()
+                    }
                 }
 
                 val viewTypes = ArrayList<BaseViewType>()
                 if (page == 1 && showAllTopicFilter) {
-                    val allTopicsFilter = LMFeedAllTopicsViewData.Builder().build()
+                    val allTopicsFilter =
+                        LMFeedAllTopicsViewData.Builder()
+                            .isSelected(selectedTopics.isEmpty())
+                            .build()
                     viewTypes.add(allTopicsFilter)
                 }
 
@@ -65,5 +78,19 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
                 _errorMessage.postValue(errorMessage)
             }
         }
+    }
+
+    //add selected topic into map
+    fun addSelectedTopic(topicViewData: LMFeedTopicViewData) {
+        selectedTopics[topicViewData.id] = topicViewData
+    }
+
+    //remove topic from map
+    fun removeSelectedTopic(topicViewData: LMFeedTopicViewData) {
+        selectedTopics.remove(topicViewData.id)
+    }
+
+    fun clearSelectedTopic() {
+        selectedTopics.clear()
     }
 }
