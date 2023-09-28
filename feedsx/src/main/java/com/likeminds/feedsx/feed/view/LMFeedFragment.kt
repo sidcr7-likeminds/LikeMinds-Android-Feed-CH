@@ -255,7 +255,10 @@ class LMFeedFragment :
         setUserImage(user)
         viewModel.getUnreadNotificationCount()
         viewModel.getAllTopics()
-        viewModel.getUniversalFeed(1)
+        viewModel.getUniversalFeed(
+            1,
+            viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+        )
     }
 
     // observe unread notification count
@@ -761,14 +764,32 @@ class LMFeedFragment :
 
     private fun handleTopicSelectionResult(resultExtras: LMFeedTopicSelectionResultExtras) {
         binding.apply {
+            mScrollListener.resetData()
+            mPostAdapter.clearAndNotify()
+
             if (resultExtras.isAllTopicSelected) {
+                //show layouts accordingly
                 layoutAllTopics.root.show()
                 layoutSelectedTopics.root.hide()
+
+                //call api
+                ProgressHelper.showProgress(binding.progressBar,true)
+                viewModel.getUniversalFeed(1, null)
             } else {
+                //show layouts accordingly
                 layoutAllTopics.root.hide()
                 layoutSelectedTopics.root.show()
+
+                //set selected topics to filter
                 val selectedTopics = resultExtras.selectedTopics
                 mSelectedTopicAdapter.replace(selectedTopics)
+
+                //call api
+                ProgressHelper.showProgress(binding.progressBar,true)
+                viewModel.getUniversalFeed(
+                    1,
+                    viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+                )
             }
         }
     }
@@ -787,17 +808,40 @@ class LMFeedFragment :
 
             //set clear listener
             tvClear.setOnClickListener {
-                mSelectedTopicAdapter.clearAndNotify()
-
-                //show layout
-                this.root.hide()
-                binding.layoutAllTopics.root.show()
+                clearTopics()
             }
         }
     }
 
     override fun topicCleared(position: Int) {
-        //handle clear logic
+        if (mSelectedTopicAdapter.itemCount == 1) {
+            clearTopics()
+        } else {
+            //remove from adapter
+            mSelectedTopicAdapter.removeIndex(position)
+
+            //call apis
+            mScrollListener.resetData()
+            mPostAdapter.clearAndNotify()
+            ProgressHelper.showProgress(binding.progressBar,true)
+            viewModel.getUniversalFeed(
+                1,
+                viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+            )
+        }
+    }
+
+    //clear all selected topics and reset data
+    private fun clearTopics() {
+        //call api
+        mSelectedTopicAdapter.clearAndNotify()
+        mScrollListener.resetData()
+        ProgressHelper.showProgress(binding.progressBar,true)
+        viewModel.getUniversalFeed(1, null)
+
+        //show layout accordingly
+        binding.layoutSelectedTopics.root.hide()
+        binding.layoutAllTopics.root.show()
     }
 
     //set posts through diff utils and scroll to top of the feed
@@ -812,7 +856,10 @@ class LMFeedFragment :
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
         viewModel.getUnreadNotificationCount()
-        viewModel.getUniversalFeed(1)
+        viewModel.getUniversalFeed(
+            1,
+            viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+        )
     }
 
     //attach scroll listener for pagination
@@ -823,7 +870,10 @@ class LMFeedFragment :
         mScrollListener = object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 if (currentPage > 0) {
-                    viewModel.getUniversalFeed(currentPage)
+                    viewModel.getUniversalFeed(
+                        currentPage,
+                        viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+                    )
                 }
             }
 

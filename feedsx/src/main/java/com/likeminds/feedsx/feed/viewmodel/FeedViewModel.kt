@@ -10,6 +10,7 @@ import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.LMFeedPostPreferences
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertPost
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
@@ -65,11 +66,12 @@ class FeedViewModel @Inject constructor(
     }
 
     //get universal feed
-    fun getUniversalFeed(page: Int) {
+    fun getUniversalFeed(page: Int, topicsId: List<String>? = null) {
         viewModelScope.launchIO {
             val request = GetFeedRequest.Builder()
                 .page(page)
                 .pageSize(PAGE_SIZE)
+                .topicIds(topicsId)
                 .build()
 
             //call universal feed api
@@ -225,6 +227,12 @@ class FeedViewModel @Inject constructor(
                 _showTopicFilter.postValue(false)
                 errorMessageChannel.send(ErrorMessageEvent.GetTopic(response.errorMessage))
             }
+        }
+    }
+
+    fun getTopicIdsFromAdapterList(items: List<BaseViewType>): List<String> {
+        return items.map {
+            (it as LMFeedTopicViewData).id
         }
     }
 
