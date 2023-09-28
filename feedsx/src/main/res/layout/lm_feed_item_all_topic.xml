@@ -40,7 +40,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
-            android:src="@drawable/ic_arrow_back_black_24dp"
+            android:src="@drawable/lm_feed_ic_topic_selected"
             app:layout_constraintBottom_toBottomOf="@id/tv_topic_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@id/tv_topic_name"

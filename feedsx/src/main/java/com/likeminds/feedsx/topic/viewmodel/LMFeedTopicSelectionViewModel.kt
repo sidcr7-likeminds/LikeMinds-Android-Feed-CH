@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.topic.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -15,7 +16,7 @@ import javax.inject.Inject
 class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
     companion object {
         const val SEARCH_TYPE = "name"
-        const val PAGE_SIZE = 10
+        const val PAGE_SIZE = 20
     }
 
     private val lmFeedClient = LMFeedClient.getInstance()
@@ -30,6 +31,7 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
 
     fun getTopics(showAllTopicFilter: Boolean, page: Int, searchString: String? = null) {
         viewModelScope.launchIO {
+
             val requestBuilder = GetTopicRequest.Builder()
                 .page(page)
                 .pageSize(PAGE_SIZE)

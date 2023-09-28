@@ -4,7 +4,9 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.content.Context
 import android.content.res.Configuration
-import android.text.*
+import android.text.Editable
+import android.text.TextUtils
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -25,9 +27,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 
-class CustomSearchBar @JvmOverloads constructor(
+class LMFeedCustomSearchBar @JvmOverloads constructor(
     mContext: Context,
     attributeSet: AttributeSet? = null
 ) : ConstraintLayout(mContext, attributeSet) {
@@ -110,13 +118,18 @@ class CustomSearchBar @JvmOverloads constructor(
     fun EditText.textChanges(): Flow<CharSequence?> {
         return callbackFlow<CharSequence?> {
             val listener = object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) = Unit
+                override fun afterTextChanged(s: Editable?) {
+
+                }
+
                 override fun beforeTextChanged(
                     s: CharSequence?,
                     start: Int,
                     count: Int,
                     after: Int
-                ) = Unit
+                ) {
+
+                }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                     if (isOpen) {
@@ -231,10 +244,12 @@ class CustomSearchBar @JvmOverloads constructor(
                 .debounce(500)
                 .distinctUntilChanged()
                 .onEach { keyword ->
-                    if (!keyword.isNullOrEmpty()) {
-                        mSearchViewListener?.keywordEntered(keyword.toString())
-                    } else {
-                        mSearchViewListener?.emptyKeywordEntered()
+                    if (keyword != null) {
+                        if (keyword.isNotEmpty()) {
+                            mSearchViewListener?.keywordEntered(keyword.toString())
+                        } else {
+                            mSearchViewListener?.emptyKeywordEntered()
+                        }
                     }
                 }
                 .launchIn(lifecycleScope)
@@ -244,8 +259,6 @@ class CustomSearchBar @JvmOverloads constructor(
                 .onEach { keyword ->
                     if (!keyword.isNullOrEmpty()) {
                         mSearchViewListener?.keywordEntered(keyword.toString())
-                    } else {
-                        mSearchViewListener?.emptyKeywordEntered()
                     }
                 }
                 .launchIn(lifecycleScope)

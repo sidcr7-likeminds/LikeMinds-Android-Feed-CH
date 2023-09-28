@@ -31,14 +31,6 @@ class LMFeedTopicViewDataBinder(private val listener: LMFeedTopicSelectionAdapte
         data: LMFeedTopicViewData,
         position: Int
     ) {
-        Log.d(
-            "PUI", """
-            data:
-            id: ${data.id}
-            name: ${data.name}
-            isSelected:${data.isSelected}
-        """.trimIndent()
-        )
         binding.apply {
             //set data to binding
             lmFeedTopic = data

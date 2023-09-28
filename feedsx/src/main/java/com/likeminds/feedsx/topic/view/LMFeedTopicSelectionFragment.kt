@@ -2,10 +2,16 @@ package com.likeminds.feedsx.topic.view
 
 import android.app.Activity
 import android.content.Intent
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentTopicSelectionBinding
+import com.likeminds.feedsx.search.util.LMFeedCustomSearchBar
 import com.likeminds.feedsx.topic.adapter.LMFeedTopicSelectionAdapter
 import com.likeminds.feedsx.topic.adapter.LMFeedTopicSelectionAdapterListener
 import com.likeminds.feedsx.topic.model.LMFeedAllTopicsViewData
@@ -17,6 +23,7 @@ import com.likeminds.feedsx.topic.viewmodel.LMFeedTopicSelectionViewModel
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
@@ -34,6 +41,9 @@ class LMFeedTopicSelectionFragment :
 
     private lateinit var extras: LMFeedTopicSelectionExtras
     private lateinit var mAdapter: LMFeedTopicSelectionAdapter
+    private lateinit var scrollListener: EndlessRecyclerScrollListener
+    private var selectedTopics = 0
+    private var searchKeyword: String? = null
 
     companion object {
         const val TAG = "LMFeedTopicSelectionFragment"
@@ -55,7 +65,8 @@ class LMFeedTopicSelectionFragment :
 
     override fun setUpViews() {
         super.setUpViews()
-
+        initToolbar()
+        initSearchView()
         initRecyclerView()
         initListeners()
         fetchTopics()
@@ -68,9 +79,20 @@ class LMFeedTopicSelectionFragment :
             val page = response.first
             val topics = response.second
 
-            if (page == 1) {
-                mAdapter.replace(topics)
+
+            if (mAdapter.items().isEmpty() && topics.isEmpty()) {
+                binding.apply {
+                    rvTopics.hide()
+                    layoutNoTopic.root.show()
+                    fabSelected.hide()
+                }
+                mAdapter.clearAndNotify()
             } else {
+                binding.apply {
+                    rvTopics.show()
+                    layoutNoTopic.root.hide()
+                    fabSelected.show()
+                }
                 mAdapter.addAll(topics)
             }
         }
@@ -98,8 +120,11 @@ class LMFeedTopicSelectionFragment :
 
                 mAdapter.update(index, updatedTopic)
             }
-
         }
+
+        //update sub title
+        selectedTopics = 0
+        updateSelectedTopicsCount()
     }
 
     override fun topicSelected(topic: LMFeedTopicViewData, position: Int) {
@@ -120,10 +145,12 @@ class LMFeedTopicSelectionFragment :
 
         //update topic
         val updatedTopic = if (topic.isSelected) {
+            selectedTopics--
             topic.toBuilder()
                 .isSelected(false)
                 .build()
         } else {
+            selectedTopics++
             topic.toBuilder()
                 .isSelected(true)
                 .build()
@@ -131,6 +158,23 @@ class LMFeedTopicSelectionFragment :
 
         //update recycle
         mAdapter.update(position, updatedTopic)
+
+        //update sub title
+        updateSelectedTopicsCount()
+    }
+
+    private fun updateSelectedTopicsCount() {
+        binding.tvToolbarSubTitle.apply {
+            if (selectedTopics > 0) {
+                show()
+                text = getString(
+                    R.string.topics_selected,
+                    selectedTopics
+                )
+            } else {
+                hide()
+            }
+        }
     }
 
     //calls api
@@ -168,6 +212,26 @@ class LMFeedTopicSelectionFragment :
         }
     }
 
+    private fun initToolbar() {
+        (activity as AppCompatActivity).setSupportActionBar(binding.toolbar)
+        binding.ivBack.setOnClickListener {
+            requireActivity().onBackPressedDispatcher.onBackPressed()
+        }
+
+        binding.ivSearch.setOnClickListener {
+            showSearchToolbar()
+        }
+
+        binding.toolbarColor = LMFeedBranding.getToolbarColor()
+    }
+
+    private fun showSearchToolbar() {
+        binding.searchBar.show()
+        binding.searchBar.post {
+            binding.searchBar.openSearch()
+        }
+    }
+
     //init recycler view
     private fun initRecyclerView() {
         val linearLayoutManager = LinearLayoutManager(requireContext())
@@ -187,13 +251,53 @@ class LMFeedTopicSelectionFragment :
         recyclerView: RecyclerView,
         layoutManager: LinearLayoutManager
     ) {
-        recyclerView.addOnScrollListener(object : EndlessRecyclerScrollListener(layoutManager) {
+        scrollListener = object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 if (currentPage > 0) {
                     // calls api for paginated data
-                    viewModel.getTopics(extras.showAllTopicFilter, currentPage, null)
+                    viewModel.getTopics(extras.showAllTopicFilter, currentPage, searchKeyword)
                 }
             }
-        })
+        }
+        recyclerView.addOnScrollListener(scrollListener)
+    }
+
+    private fun initSearchView() {
+        binding.searchBar.apply {
+            initialize(lifecycleScope)
+            setSearchViewListener(object : LMFeedCustomSearchBar.SearchViewListener {
+                override fun onSearchViewClosed() {
+                    hide()
+                    clearSearchedTopics()
+                }
+
+                override fun crossClicked() {
+                    clearSearchedTopics()
+                }
+
+                override fun keywordEntered(keyword: String) {
+                    super.keywordEntered(keyword)
+                    scrollListener.resetData()
+                    mAdapter.clearAndNotify()
+                    searchKeyword = keyword
+                    viewModel.getTopics(false, 1, keyword)
+                }
+
+                override fun emptyKeywordEntered() {
+                    super.emptyKeywordEntered()
+                    if (!searchKeyword.isNullOrEmpty()) {
+                        clearSearchedTopics()
+                    }
+                }
+            })
+            observeSearchView(true)
+        }
+    }
+
+    private fun clearSearchedTopics() {
+        scrollListener.resetData()
+        mAdapter.clearAndNotify()
+        searchKeyword = null
+        viewModel.getTopics(extras.showAllTopicFilter, 1, null)
     }
 }

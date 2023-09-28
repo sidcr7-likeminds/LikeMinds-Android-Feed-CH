@@ -57,7 +57,6 @@ class LMFeedTopicSelectionActivity : BaseAppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         binding = LmFeedActivityTopicSelectionBinding.inflate(layoutInflater)
-        binding.toolbarColor = LMFeedBranding.getToolbarColor()
         setContentView(binding.root)
 
         val bundle = intent.getBundleExtra("bundle")
@@ -78,24 +77,6 @@ class LMFeedTopicSelectionActivity : BaseAppCompatActivity() {
                 supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             navController = navHostFragment.navController
             navController.setGraph(R.navigation.lm_feed_nav_graph_topic_selection, args)
-
-            //Toolbar
-            initActionBar()
-
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                when (destination.label) {
-                    LMFeedTopicSelectionFragment::class.simpleName -> {
-                        binding.tvToolbarTitle.text = getString(R.string.select_topic)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun initActionBar() {
-        setSupportActionBar(binding.toolbar)
-        binding.ivBack.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
         }
     }
 }
