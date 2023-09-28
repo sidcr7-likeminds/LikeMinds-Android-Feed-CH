@@ -30,6 +30,8 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.LMFeedAdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.LMFeedSelfDeleteDialogFragment
+import com.likeminds.feedsx.feed.adapter.LMFeedSelectedTopicAdapter
+import com.likeminds.feedsx.feed.adapter.LMFeedSelectedTopicAdapterListener
 import com.likeminds.feedsx.feed.model.LMFeedExtras
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.feed.util.PostEvent.PostObserver
@@ -54,7 +56,9 @@ import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity.Companion.TOPIC_SELECTION_RESULT_EXTRAS
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -71,7 +75,8 @@ class LMFeedFragment :
     PostAdapterListener,
     LMFeedAdminDeleteDialogFragment.DeleteDialogListener,
     LMFeedSelfDeleteDialogFragment.DeleteAlertDialogListener,
-    PostObserver {
+    PostObserver,
+    LMFeedSelectedTopicAdapterListener {
 
     companion object {
         const val TAG = "LMFeedFragment"
@@ -108,6 +113,7 @@ class LMFeedFragment :
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
     private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
+    private lateinit var mSelectedTopicAdapter: LMFeedSelectedTopicAdapter
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -596,22 +602,11 @@ class LMFeedFragment :
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
 
         setStatusBarColor()
-        initRecyclerView()
+        initFeedRecyclerView()
+        initSelectedTopicRecyclerView()
         initNewPostClick(true)
         initTopicFilterClick()
         initSwipeRefreshLayout()
-    }
-
-    private fun initTopicFilterClick() {
-        binding.layoutAllTopics.root.setOnClickListener {
-            //show topics selecting screen with All topic filter
-            LMFeedTopicSelectionActivity.start(
-                requireContext(),
-                LMFeedTopicSelectionExtras.Builder()
-                    .showAllTopicFilter(true)
-                    .build()
-            )
-        }
     }
 
     @Suppress("Deprecation")
@@ -696,7 +691,7 @@ class LMFeedFragment :
         }
 
     // initializes universal feed recyclerview
-    private fun initRecyclerView() {
+    private fun initFeedRecyclerView() {
         // item decorator to add spacing between items
         val dividerItemDecorator =
             DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
@@ -733,6 +728,76 @@ class LMFeedFragment :
         mSwipeRefreshLayout.setOnRefreshListener {
             refreshFeed()
         }
+    }
+
+    private fun initTopicFilterClick() {
+        binding.layoutAllTopics.root.setOnClickListener {
+            //show topics selecting screen with All topic filter
+            val intent = LMFeedTopicSelectionActivity.getIntent(
+                requireContext(),
+                LMFeedTopicSelectionExtras.Builder()
+                    .showAllTopicFilter(true)
+                    .build()
+            )
+
+            topicSelectionLauncher.launch(intent)
+        }
+    }
+
+
+    private val topicSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val bundle = result.data?.extras
+                val resultExtras = ExtrasUtil.getParcelable(
+                    bundle,
+                    TOPIC_SELECTION_RESULT_EXTRAS,
+                    LMFeedTopicSelectionResultExtras::class.java
+                ) ?: return@registerForActivityResult
+
+                handleTopicSelectionResult(resultExtras)
+            }
+        }
+
+    private fun handleTopicSelectionResult(resultExtras: LMFeedTopicSelectionResultExtras) {
+        binding.apply {
+            if (resultExtras.isAllTopicSelected) {
+                layoutAllTopics.root.show()
+                layoutSelectedTopics.root.hide()
+            } else {
+                layoutAllTopics.root.hide()
+                layoutSelectedTopics.root.show()
+                val selectedTopics = resultExtras.selectedTopics
+                mSelectedTopicAdapter.replace(selectedTopics)
+            }
+        }
+    }
+
+    //init selected topic recycler view
+    private fun initSelectedTopicRecyclerView() {
+        mSelectedTopicAdapter = LMFeedSelectedTopicAdapter(this)
+        binding.layoutSelectedTopics.apply {
+            //set adapter
+            rvSelectedTopics.adapter = mSelectedTopicAdapter
+            rvSelectedTopics.layoutManager = LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+
+            //set clear listener
+            tvClear.setOnClickListener {
+                mSelectedTopicAdapter.clearAndNotify()
+
+                //show layout
+                this.root.hide()
+                binding.layoutAllTopics.root.show()
+            }
+        }
+    }
+
+    override fun topicCleared(position: Int) {
+        //handle clear logic
     }
 
     //set posts through diff utils and scroll to top of the feed

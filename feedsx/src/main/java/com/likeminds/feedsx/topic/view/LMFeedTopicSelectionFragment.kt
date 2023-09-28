@@ -1,6 +1,7 @@
 package com.likeminds.feedsx.topic.view
 
-import android.util.Log
+import android.app.Activity
+import android.content.Intent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.SDKApplication
@@ -9,7 +10,9 @@ import com.likeminds.feedsx.topic.adapter.LMFeedTopicSelectionAdapter
 import com.likeminds.feedsx.topic.adapter.LMFeedTopicSelectionAdapterListener
 import com.likeminds.feedsx.topic.model.LMFeedAllTopicsViewData
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity.Companion.TOPIC_SELECTION_RESULT_EXTRAS
 import com.likeminds.feedsx.topic.viewmodel.LMFeedTopicSelectionViewModel
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ExtrasUtil
@@ -54,6 +57,7 @@ class LMFeedTopicSelectionFragment :
         super.setUpViews()
 
         initRecyclerView()
+        initListeners()
         fetchTopics()
     }
 
@@ -132,6 +136,36 @@ class LMFeedTopicSelectionFragment :
     //calls api
     private fun fetchTopics() {
         viewModel.getTopics(extras.showAllTopicFilter, 1, null)
+    }
+
+    //init listeners for done
+    private fun initListeners() {
+        binding.fabSelected.setOnClickListener {
+            //check for all topic is selected
+            val allTopicViewData = mAdapter.items()?.find {
+                it is LMFeedAllTopicsViewData
+            } as? LMFeedAllTopicsViewData
+
+            val resultExtras = if (allTopicViewData != null && allTopicViewData.isSelected) {
+                LMFeedTopicSelectionResultExtras.Builder()
+                    .isAllTopicSelected(true)
+                    .build()
+            } else {
+                val selectedTopics = mAdapter.items().filter {
+                    it is LMFeedTopicViewData && it.isSelected
+                }.map {
+                    it as LMFeedTopicViewData
+                }
+                LMFeedTopicSelectionResultExtras.Builder()
+                    .selectedTopics(selectedTopics)
+                    .build()
+            }
+            val resultIntent = Intent().apply {
+                putExtra(TOPIC_SELECTION_RESULT_EXTRAS, resultExtras)
+            }
+            requireActivity().setResult(Activity.RESULT_OK, resultIntent)
+            requireActivity().finish()
+        }
     }
 
     //init recycler view

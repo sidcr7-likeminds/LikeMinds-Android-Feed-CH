@@ -27,6 +27,7 @@ class LMFeedTopicSelectionActivity : BaseAppCompatActivity() {
     companion object {
         const val TAG = "LMFeedTopicSelectionActivity"
         const val TOPIC_SELECTION_EXTRAS = "TOPIC_SELECTION_EXTRAS"
+        const val TOPIC_SELECTION_RESULT_EXTRAS = "TOPIC_SELECTION_RESULT_EXTRAS"
 
         @JvmStatic
         fun start(context: Context, extras: LMFeedTopicSelectionExtras) {

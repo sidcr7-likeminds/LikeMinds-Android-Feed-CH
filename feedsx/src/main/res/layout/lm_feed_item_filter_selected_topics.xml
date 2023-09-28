@@ -8,45 +8,42 @@
         <variable
             name="position"
             type="int" />
-
-        <variable
-            name="lm_feed_topic"
-            type="com.likeminds.feedsx.topic.model.LMFeedTopicViewData" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        style="@style/LMFeedClickableView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/white">
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/lm_feed_background_selected_filter_topic">
 
-        <com.likeminds.feedsx.branding.customview.LMFeedTextView
+
+        <TextView
             android:id="@+id/tv_topic_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="16dp"
-            android:layout_marginStart="16dp"
-            android:lineHeight="20sp"
-            android:textColor="@color/dark_grey"
+            android:layout_marginVertical="4dp"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/majorelle_blue"
             android:textSize="16sp"
-            android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Books" />
 
         <ImageView
-            android:id="@+id/iv_selected"
+            android:id="@+id/iv_cross"
+            style="@style/LMFeedClickableView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:src="@drawable/lm_feed_ic_topic_selected"
-            android:visibility="gone"
+            android:layout_marginStart="2dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/lm_feed_ic_cross_topics"
             app:layout_constraintBottom_toBottomOf="@id/tv_topic_name"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tv_topic_name"
             app:layout_constraintTop_toTopOf="@id/tv_topic_name"
-            tools:ignore="ContentDescription"
-            tools:visibility="visible" />
+            tools:ignore="ContentDescription" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
