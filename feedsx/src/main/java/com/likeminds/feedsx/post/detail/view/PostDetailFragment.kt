@@ -68,7 +68,9 @@ class PostDetailFragment :
     private var parentCommentIdToReply: String? = null
     private var toFindComment: Boolean = false
 
+    // variables to handle comment/reply edit action
     private var editCommentId: String? = null
+    private var parentId: String? = null
 
     private lateinit var memberTagging: LMFeedMemberTaggingView
 
@@ -251,14 +253,7 @@ class PostDetailFragment :
                     }
 
                     editCommentId != null -> {
-                        // when an existing comment is edited
-                        val commentId = editCommentId ?: return@setOnClickListener
-                        viewModel.editComment(
-                            postId,
-                            commentId,
-                            updatedText
-                        )
-                        editCommentId = null
+                        editCommentLocally(updatedText)
                     }
 
                     else -> {
@@ -768,6 +763,7 @@ class PostDetailFragment :
         // updates the edittext with the comment to be edited
         binding.apply {
             editCommentId = commentId
+            parentId = parentCommentId
             // decodes the comment text and sets to the edit text
             MemberTaggingDecoder.decode(
                 etComment,
@@ -916,6 +912,68 @@ class PostDetailFragment :
 
         // adds reply to the adapter
         addReplyToAdapter(parentCommentId, replyViewData)
+    }
+
+    // edits the comment locally and calls api
+    private fun editCommentLocally(updatedText: String) {
+        // when an existing comment is edited
+        val commentId = editCommentId ?: return
+
+        // calls api
+        viewModel.editComment(
+            postDetailExtras.postId,
+            commentId,
+            updatedText
+        )
+
+        if (parentId == null) {
+            // edited comment is of level-0
+
+            val pair = getIndexAndCommentFromAdapter(commentId) ?: return
+            val commentPosition = pair.first
+            val comment = pair.second
+
+            //update comment view data
+            val updatedComment = comment.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(true)
+                .isEdited(true)
+                .text(updatedText)
+                .build()
+
+            mPostDetailAdapter.update(commentPosition, updatedComment)
+        } else {
+            // edited comment is of level-1 (reply)
+
+            val pair = getIndexAndCommentFromAdapter(parentId ?: "") ?: return
+            val parentIndex = pair.first
+            val parentCommentInAdapter = pair.second
+
+            // finds index of the reply inside the comment
+            val replyPair =
+                getIndexAndReplyFromComment(parentCommentInAdapter, commentId) ?: return
+
+            val index = replyPair.first
+            val reply = replyPair.second.toBuilder()
+                .isEdited(true)
+                .text(updatedText)
+                .fromCommentEdited(true)
+                .build()
+
+            if (index == -1) return
+
+            parentCommentInAdapter.replies[index] = reply
+
+            val newViewData = parentCommentInAdapter.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(false)
+                .build()
+
+            // updates the parentComment with edited reply
+            mPostDetailAdapter.update(parentIndex, newViewData)
+        }
+        editCommentId = null
+        parentId = null
     }
 
     /*
