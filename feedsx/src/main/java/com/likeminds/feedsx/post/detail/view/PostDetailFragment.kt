@@ -68,7 +68,9 @@ class PostDetailFragment :
     private var parentCommentIdToReply: String? = null
     private var toFindComment: Boolean = false
 
+    // variables to handle comment/reply edit action
     private var editCommentId: String? = null
+    private var parentId: String? = null
 
     private lateinit var memberTagging: LMFeedMemberTaggingView
 
@@ -247,34 +249,16 @@ class PostDetailFragment :
                 val postId = postDetailExtras.postId
                 when {
                     parentCommentIdToReply != null -> {
-                        // input text is reply to a comment
-                        val parentCommentId = parentCommentIdToReply ?: return@setOnClickListener
-                        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
-                            ?: return@setOnClickListener
-                        val parentCommentCreatorUUID = parentComment.user.sdkClientInfoViewData.uuid
-                        viewModel.replyComment(
-                            parentCommentCreatorUUID,
-                            postDetailExtras.postId,
-                            parentCommentId,
-                            updatedText
-                        )
-                        hideReplyingToView()
+                        addReply(updatedText)
                     }
 
                     editCommentId != null -> {
-                        // when an existing comment is edited
-                        val commentId = editCommentId ?: return@setOnClickListener
-                        viewModel.editComment(
-                            postId,
-                            commentId,
-                            updatedText
-                        )
-                        editCommentId = null
+                        editCommentLocally(updatedText)
                     }
 
                     else -> {
                         // input text is a comment
-                        viewModel.addComment(postId, updatedText)
+                        addComment(postId, updatedText)
                     }
                 }
                 ViewUtils.hideKeyboard(this.root)
@@ -418,50 +402,12 @@ class PostDetailFragment :
     private fun observeCommentData() {
         // observes addCommentResponse LiveData
         viewModel.addCommentResponse.observe(viewLifecycleOwner) { comment ->
-            // remove NoCommentsViewData if visible
-            if (mPostDetailAdapter[commentsCountPosition] is NoCommentsViewData) {
-                mPostDetailAdapter.removeIndex(commentsCountPosition)
+            val index =
+                getIndexAndCommentFromAdapterUsingTempId(comment.tempId)?.first ?: return@observe
+
+            if (mPostDetailAdapter[index] is CommentViewData) {
+                mPostDetailAdapter.update(index, comment)
             }
-            // gets old [CommentsCountViewData] from adapter
-            if (mPostDetailAdapter[commentsCountPosition] != null) {
-                val oldCommentsCountViewData =
-                    (mPostDetailAdapter[commentsCountPosition] as CommentsCountViewData)
-
-                // updates old [CommentsCountViewData] by adding to [commentsCount]
-                val updatedCommentsCountViewData = oldCommentsCountViewData.toBuilder()
-                    .commentsCount(oldCommentsCountViewData.commentsCount + 1)
-                    .build()
-
-                // updates [CommentsCountViewData]
-                mPostDetailAdapter.update(commentsCountPosition, updatedCommentsCountViewData)
-            } else {
-                // creates new [CommentsCountViewData] when the added comment is first
-                val newCommentsCountViewData = CommentsCountViewData.Builder()
-                    .commentsCount(1)
-                    .build()
-                mPostDetailAdapter.add(commentsCountPosition, newCommentsCountViewData)
-            }
-
-            // gets post from adapter
-            var post = mPostDetailAdapter[postDataPosition] as PostViewData
-            post = post.toBuilder()
-                .commentsCount(post.commentsCount + 1)
-                .build()
-
-            // notifies the subscribers about the change in post data
-            postEvent.notify(Pair(post.id, post))
-
-            // updates comments count on header
-            updateCommentsCount(post.commentsCount)
-
-            // adds new comment to adapter
-            mPostDetailAdapter.add(commentsStartPosition, comment)
-
-            // scroll to comment's position
-            scrollToPositionWithOffset(commentsStartPosition, 75)
-
-            // updates comment data in post
-            mPostDetailAdapter.update(postDataPosition, post)
         }
 
         // observes editCommentResponse LiveData
@@ -477,8 +423,23 @@ class PostDetailFragment :
             // view data of comment with level-1
             val replyViewData = pair.second
 
-            // adds reply to the adapter
-            addReplyToAdapter(parentCommentId, replyViewData)
+            // gets the parentComment from adapter
+            val parentComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return@observe
+            val parentIndex = parentComment.first
+            val parentCommentViewData = parentComment.second
+
+            val replyIndex = parentCommentViewData.replies.indexOfFirst {
+                it.tempId == replyViewData.tempId
+            }
+
+            if (replyIndex != -1) {
+                parentCommentViewData.replies[replyIndex] = replyViewData
+                val newCommentViewData = parentCommentViewData.toBuilder()
+                    .fromCommentLiked(false)
+                    .fromCommentEdited(false)
+                    .build()
+                mPostDetailAdapter.update(parentIndex, newCommentViewData)
+            }
         }
 
         // observes deleteCommentResponse LiveData
@@ -488,10 +449,10 @@ class PostDetailFragment :
 
             // level-0 comment
             if (parentCommentId == null) {
-                removeDeletedComment(commentId)
+                removeCommentFromAdapter(commentId)
             } else {
                 // level-1 comment
-                removeDeletedReply(parentCommentId, commentId)
+                removeReplyFromAdapter(parentCommentId, commentId)
             }
         }
 
@@ -548,7 +509,7 @@ class PostDetailFragment :
         }
     }
 
-    private fun removeDeletedComment(commentId: String) {
+    private fun removeCommentFromAdapter(commentId: String, isLocal: Boolean = false) {
         // gets old [CommentsCountViewData] from adapter
         val oldCommentsCountViewData =
             (mPostDetailAdapter[commentsCountPosition] as CommentsCountViewData)
@@ -564,12 +525,16 @@ class PostDetailFragment :
         // get the deleted comment from the adapter
         val indexToRemove =
             getIndexAndCommentFromAdapter(commentId)?.first ?: return
+
         // removes the deleted comment from the adapter
         mPostDetailAdapter.removeIndex(indexToRemove)
-        ViewUtils.showShortToast(
-            requireContext(),
-            getString(R.string.comment_deleted)
-        )
+
+        if (!isLocal) {
+            ViewUtils.showShortToast(
+                requireContext(),
+                getString(R.string.comment_deleted)
+            )
+        }
 
         if (newCommentsCountViewData.commentsCount == 0) {
             mPostDetailAdapter.removeIndex(commentsCountPosition)
@@ -628,6 +593,12 @@ class PostDetailFragment :
                 }
 
                 is PostDetailViewModel.ErrorMessageEvent.AddComment -> {
+                    removeCommentFromAdapter(response.tempId, isLocal = true)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+
+                is PostDetailViewModel.ErrorMessageEvent.ReplyComment -> {
+                    removeReplyFromAdapter(response.parentCommentId, response.tempId)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
@@ -792,6 +763,7 @@ class PostDetailFragment :
         // updates the edittext with the comment to be edited
         binding.apply {
             editCommentId = commentId
+            parentId = parentCommentId
             // decodes the comment text and sets to the edit text
             MemberTaggingDecoder.decode(
                 etComment,
@@ -843,6 +815,165 @@ class PostDetailFragment :
             tvReplyingTo.hide()
             ivRemoveReplyingTo.hide()
         }
+    }
+
+    // adds the comment locally and calls api
+    private fun addComment(postId: String, updatedText: String) {
+        val createdAt = System.currentTimeMillis()
+        val tempId = "-${createdAt}"
+
+        // calls api
+        viewModel.addComment(postId, tempId, updatedText)
+
+        // adds comment locally
+        val commentViewData = viewModel.getCommentViewDataForLocalHandling(
+            postId,
+            createdAt,
+            tempId,
+            updatedText,
+            null
+        )
+
+        // remove NoCommentsViewData if visible
+        if (mPostDetailAdapter[commentsCountPosition] is NoCommentsViewData) {
+            mPostDetailAdapter.removeIndex(commentsCountPosition)
+        }
+        // gets old [CommentsCountViewData] from adapter
+        if (mPostDetailAdapter[commentsCountPosition] != null) {
+            val oldCommentsCountViewData =
+                (mPostDetailAdapter[commentsCountPosition] as CommentsCountViewData)
+
+            // updates old [CommentsCountViewData] by adding to [commentsCount]
+            val updatedCommentsCountViewData = oldCommentsCountViewData.toBuilder()
+                .commentsCount(oldCommentsCountViewData.commentsCount + 1)
+                .build()
+
+            // updates [CommentsCountViewData]
+            mPostDetailAdapter.update(commentsCountPosition, updatedCommentsCountViewData)
+        } else {
+            // creates new [CommentsCountViewData] when the added comment is first
+            val newCommentsCountViewData = CommentsCountViewData.Builder()
+                .commentsCount(1)
+                .build()
+            mPostDetailAdapter.add(commentsCountPosition, newCommentsCountViewData)
+        }
+
+        // gets post from adapter
+        var post = mPostDetailAdapter[postDataPosition] as PostViewData
+        post = post.toBuilder()
+            .commentsCount(post.commentsCount + 1)
+            .build()
+
+        // notifies the subscribers about the change in post data
+        postEvent.notify(Pair(post.id, post))
+
+        // updates comments count on header
+        updateCommentsCount(post.commentsCount)
+
+        // adds new comment to adapter
+        mPostDetailAdapter.add(commentsStartPosition, commentViewData)
+
+        // scroll to comment's position
+        scrollToPositionWithOffset(commentsStartPosition, 75)
+
+        // updates comment data in post
+        mPostDetailAdapter.update(postDataPosition, post)
+    }
+
+    // adds the reply locally and calls api
+    private fun addReply(updatedText: String) {
+        val createdAt = System.currentTimeMillis()
+        val tempId = "-${createdAt}"
+        val postId = postDetailExtras.postId
+
+        // input text is reply to a comment
+        val parentCommentId = parentCommentIdToReply ?: return
+        val parentComment = getIndexAndCommentFromAdapter(parentCommentId)?.second
+            ?: return
+        val parentCommentCreatorUUID = parentComment.user.sdkClientInfoViewData.uuid
+        viewModel.replyComment(
+            parentCommentCreatorUUID,
+            postId,
+            parentCommentId,
+            updatedText,
+            tempId
+        )
+        hideReplyingToView()
+
+        // view data of comment with level-1
+        val replyViewData = viewModel.getCommentViewDataForLocalHandling(
+            postId,
+            createdAt,
+            tempId,
+            updatedText,
+            parentCommentId,
+            level = 1
+        )
+
+        // adds reply to the adapter
+        addReplyToAdapter(parentCommentId, replyViewData)
+    }
+
+    // edits the comment locally and calls api
+    private fun editCommentLocally(updatedText: String) {
+        // when an existing comment is edited
+        val commentId = editCommentId ?: return
+
+        // calls api
+        viewModel.editComment(
+            postDetailExtras.postId,
+            commentId,
+            updatedText
+        )
+
+        if (parentId == null) {
+            // edited comment is of level-0
+
+            val pair = getIndexAndCommentFromAdapter(commentId) ?: return
+            val commentPosition = pair.first
+            val comment = pair.second
+
+            //update comment view data
+            val updatedComment = comment.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(true)
+                .isEdited(true)
+                .text(updatedText)
+                .build()
+
+            mPostDetailAdapter.update(commentPosition, updatedComment)
+        } else {
+            // edited comment is of level-1 (reply)
+
+            val pair = getIndexAndCommentFromAdapter(parentId ?: "") ?: return
+            val parentIndex = pair.first
+            val parentCommentInAdapter = pair.second
+
+            // finds index of the reply inside the comment
+            val replyPair =
+                getIndexAndReplyFromComment(parentCommentInAdapter, commentId) ?: return
+
+            val index = replyPair.first
+            val reply = replyPair.second.toBuilder()
+                .isEdited(true)
+                .text(updatedText)
+                .fromCommentEdited(true)
+                .build()
+
+            if (index == -1) return
+
+            parentCommentInAdapter.replies[index] = reply
+
+            val newViewData = parentCommentInAdapter.toBuilder()
+                .fromCommentLiked(false)
+                .fromCommentEdited(false)
+                .build()
+
+            // updates the parentComment with edited reply
+            mPostDetailAdapter.update(parentIndex, newViewData)
+        }
+        editCommentId = null
+        parentId = null
     }
 
     /*
@@ -1081,7 +1212,7 @@ class PostDetailFragment :
     }
 
     // removes the reply from its parentComment
-    private fun removeDeletedReply(parentCommentId: String, replyId: String) {
+    private fun removeReplyFromAdapter(parentCommentId: String, replyId: String) {
         // gets the parentComment from adapter
         val parentComment = getIndexAndCommentFromAdapter(parentCommentId) ?: return
         val parentIndex = parentComment.first
@@ -1526,7 +1657,22 @@ class PostDetailFragment :
         postActionsViewModel.sendPostShared(post)
     }
 
-    //get index and post from the adapter using postId
+    //get index and post from the adapter using tempId
+    private fun getIndexAndCommentFromAdapterUsingTempId(tempId: String?): Pair<Int, CommentViewData>? {
+        val index = mPostDetailAdapter.items().indexOfFirst {
+            (it is CommentViewData) && (it.tempId == tempId)
+        }
+
+        if (index == -1) {
+            return null
+        }
+
+        val comment = getCommentFromAdapter(index)
+
+        return Pair(index, comment)
+    }
+
+    //get index and post from the adapter using commentId
     private fun getIndexAndCommentFromAdapter(commentId: String): Pair<Int, CommentViewData>? {
         val index = mPostDetailAdapter.items().indexOfFirst {
             (it is CommentViewData) && (it.id == commentId)
