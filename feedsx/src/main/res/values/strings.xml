@@ -181,4 +181,6 @@
     <string name="edit_pdf_resource">Edit PDF Resource</string>
     <string name="select_author">Select author</string>
     <string name="select_new_author_for_this_resource">Select the new author for this resource.</string>
+    <string name="max_100mb">( Max. 100MB )</string>
+    <string name="max_200mb">( Max. 200MB )</string>
 </resources>
