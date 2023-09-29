@@ -65,7 +65,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
             tvCommenterName.setOnClickListener {
                 SDKApplication.getLMFeedUICallback()?.openProfile(
                     data.user.sdkClientInfoViewData.uuid,
-                    data.id,
+                    data.user.id.toString(),
                     LMFeedAnalytics.Source.FEED
                 )
             }
