@@ -334,6 +334,7 @@ object ViewDataConverter {
                 }
             )
             .uuid(commentCreator)
+            .tempId(comment.tempId)
             .build()
     }
 
