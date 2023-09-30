@@ -286,7 +286,6 @@ object ViewDataConverter {
             .updatedAt(post.updatedAt)
             .user(userViewData)
             .uuid(postCreator)
-            .temporaryId(post.tempId)
             .topics(topicsViewData)
             .build()
     }

@@ -6,6 +6,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -19,10 +21,13 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.*
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedFragmentCreatePostBinding
 import com.likeminds.feedsx.databinding.LmFeedItemCreatePostSingleVideoBinding
+import com.likeminds.feedsx.databinding.LmFeedSelectTopicChipBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
@@ -36,6 +41,9 @@ import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
@@ -131,6 +139,7 @@ class LMFeedCreatePostFragment :
         super.setUpViews()
 
         fetchUserFromDB()
+        checkForEnabledTopics()
         initMemberTaggingView()
         initAddAttachmentsView()
         initPostContentTextListener()
@@ -140,6 +149,10 @@ class LMFeedCreatePostFragment :
     // fetches user data from local db
     private fun fetchUserFromDB() {
         helperViewModel.fetchUserFromDB()
+    }
+
+    private fun checkForEnabledTopics() {
+        viewModel.getEnabledTopics()
     }
 
     // observes data
@@ -170,6 +183,15 @@ class LMFeedCreatePostFragment :
                 finish()
             }
         }
+
+        viewModel.showTopicsFilter.observe(viewLifecycleOwner) { showTopicSelection ->
+            if (showTopicSelection) {
+                initTopicSelectionView()
+                handleTopicSelectionView(true)
+            } else {
+                handleTopicSelectionView(false)
+            }
+        }
     }
 
     /**
@@ -189,6 +211,11 @@ class LMFeedCreatePostFragment :
             when (response) {
                 is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
                     handlePostButton(clickable = true, showProgress = false)
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+
+                is CreatePostViewModel.ErrorMessageEvent.ShowTopics -> {
+                    handleTopicSelectionView(showView = false)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
             }
@@ -361,6 +388,57 @@ class LMFeedCreatePostFragment :
             )
         }
     }
+
+    private fun initTopicSelectionView() {
+        binding.cgTopics.apply {
+            removeAllViews()
+            addView(createSelectTopicsChip(this))
+        }
+    }
+
+    private fun createSelectTopicsChip(chipGroup: ChipGroup): Chip {
+        //create binding
+        val binding = LmFeedSelectTopicChipBinding.inflate(
+            LayoutInflater.from(chipGroup.context),
+            chipGroup,
+            false
+        )
+        val chip = binding.chipTopic
+
+        //add click listener
+        chip.setOnClickListener {
+            val extras = LMFeedTopicSelectionExtras.Builder()
+                .showAllTopicFilter(false)
+                .build()
+            val intent = LMFeedTopicSelectionActivity.getIntent(requireContext(), extras)
+            topicSelectionLauncher.launch(intent)
+        }
+
+        //return chip
+        return chip
+    }
+
+    private val topicSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val bundle = result.data?.extras
+                val resultExtras = ExtrasUtil.getParcelable(
+                    bundle,
+                    LMFeedTopicSelectionActivity.TOPIC_SELECTION_RESULT_EXTRAS,
+                    LMFeedTopicSelectionResultExtras::class.java
+                ) ?: return@registerForActivityResult
+
+                Log.d(
+                    "PUI", """
+                    resultExtras = ${
+                        resultExtras.selectedTopics.map {
+                            it.name
+                        }
+                    }
+                """.trimIndent()
+                )
+            }
+        }
 
     /**
      * Adds TextWatcher to edit text with Flow operators
@@ -776,6 +854,13 @@ class LMFeedCreatePostFragment :
                     tvPostDone.setTextColor(Color.parseColor("#666666"))
                 }
             }
+        }
+    }
+
+    private fun handleTopicSelectionView(showView: Boolean) {
+        binding.apply {
+            cgTopics.isVisible = showView
+            topicSeparator.isVisible = showView
         }
     }
 

@@ -192,6 +192,7 @@ class LMFeedTopicSelectionFragment :
                 it is LMFeedAllTopicsViewData
             } as? LMFeedAllTopicsViewData
 
+            //create result extras
             val resultExtras = if (allTopicViewData != null && allTopicViewData.isSelected) {
                 LMFeedTopicSelectionResultExtras.Builder()
                     .isAllTopicSelected(true)
@@ -206,6 +207,8 @@ class LMFeedTopicSelectionFragment :
                     .selectedTopics(selectedTopics)
                     .build()
             }
+
+            //send result
             val resultIntent = Intent().apply {
                 putExtra(TOPIC_SELECTION_RESULT_EXTRAS, resultExtras)
             }

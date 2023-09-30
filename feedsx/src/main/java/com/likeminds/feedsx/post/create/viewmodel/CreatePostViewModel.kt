@@ -21,6 +21,7 @@ import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
+import com.likeminds.likemindsfeed.topic.model.GetTopicRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
@@ -36,10 +37,14 @@ class CreatePostViewModel @Inject constructor(
     private val _postAdded = MutableLiveData<Boolean>()
     val postAdded: LiveData<Boolean> = _postAdded
 
+    private val _showTopicsFilter = MutableLiveData<Boolean>()
+    val showTopicsFilter: LiveData<Boolean> = _showTopicsFilter
+
     private var temporaryPostId: Long? = null
 
     sealed class ErrorMessageEvent {
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
+        data class ShowTopics(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
@@ -167,6 +172,7 @@ class CreatePostViewModel @Inject constructor(
                         .height(dimensions.second)
                         .build()
                 }
+
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
@@ -175,6 +181,7 @@ class CreatePostViewModel @Inject constructor(
                         builder.build()
                     }
                 }
+
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
                     val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
@@ -197,6 +204,23 @@ class CreatePostViewModel @Inject constructor(
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
         val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
+    }
+
+    fun getEnabledTopics() {
+        viewModelScope.launchIO {
+            val request = GetTopicRequest.Builder()
+                .isEnabled(true)
+                .page(1)
+                .pageSize(10)
+                .build()
+            val response = lmFeedClient.getTopics(request)
+            if (response.success) {
+                val topics = response.data?.topics ?: emptyList()
+                _showTopicsFilter.postValue(topics.isNotEmpty())
+            } else {
+                errorEventChannel.send(ErrorMessageEvent.ShowTopics(response.errorMessage))
+            }
+        }
     }
 
     /**
