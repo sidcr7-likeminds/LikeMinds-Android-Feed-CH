@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -25,9 +24,11 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
+import com.likeminds.feedsx.databinding.LmFeedEditTopicChipBinding
 import com.likeminds.feedsx.databinding.LmFeedFragmentCreatePostBinding
 import com.likeminds.feedsx.databinding.LmFeedItemCreatePostSingleVideoBinding
 import com.likeminds.feedsx.databinding.LmFeedSelectTopicChipBinding
+import com.likeminds.feedsx.databinding.LmFeedTopicChipBinding
 import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
@@ -43,6 +44,7 @@ import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
@@ -89,6 +91,10 @@ class LMFeedCreatePostFragment :
     private val videoPreviewAutoPlayHelper by lazy {
         VideoPreviewAutoPlayHelper.getInstance()
     }
+    private val selectedTopic by lazy {
+        ArrayList<LMFeedTopicViewData>()
+    }
+
     override val useSharedViewModel: Boolean
         get() = true
 
@@ -428,17 +434,54 @@ class LMFeedCreatePostFragment :
                     LMFeedTopicSelectionResultExtras::class.java
                 ) ?: return@registerForActivityResult
 
-                Log.d(
-                    "PUI", """
-                    resultExtras = ${
-                        resultExtras.selectedTopics.map {
-                            it.name
-                        }
-                    }
-                """.trimIndent()
-                )
+                val selectedTopics = resultExtras.selectedTopics
+                if (selectedTopics.isNotEmpty()) {
+                    addTopicsToGroup(selectedTopics)
+                }
             }
         }
+
+    private fun addTopicsToGroup(newSelectedTopics: List<LMFeedTopicViewData>) {
+        this.selectedTopic.apply {
+            clear()
+            addAll(newSelectedTopics)
+        }
+        binding.cgTopics.apply {
+            removeAllViews()
+            newSelectedTopics.forEach { topic ->
+                addView(createTopicChip(this, topic.name))
+            }
+            addView(createEditChip(this))
+        }
+    }
+
+    private fun createTopicChip(chipGroup: ChipGroup, topicName: String): Chip {
+        val binding = LmFeedTopicChipBinding.inflate(
+            LayoutInflater.from(chipGroup.context),
+            chipGroup,
+            false
+        )
+        binding.chipTopic.text = topicName
+        return binding.chipTopic
+    }
+
+    private fun createEditChip(chipGroup: ChipGroup): Chip {
+        val binding = LmFeedEditTopicChipBinding.inflate(
+            LayoutInflater.from(chipGroup.context),
+            chipGroup,
+            false
+        )
+        val chip = binding.editChip
+        chip.setOnClickListener {
+            val extras = LMFeedTopicSelectionExtras.Builder()
+                .showAllTopicFilter(false)
+                .selectedTopics(selectedTopic)
+                .build()
+            val intent = LMFeedTopicSelectionActivity.getIntent(requireContext(), extras)
+            topicSelectionLauncher.launch(intent)
+        }
+        return chip
+    }
 
     /**
      * Adds TextWatcher to edit text with Flow operators

@@ -64,6 +64,7 @@ class LMFeedTopicSelectionFragment :
 
     override fun setUpViews() {
         super.setUpViews()
+        checkForSelectedTopics()
         initToolbar()
         initSearchView()
         initRecyclerView()
@@ -215,6 +216,13 @@ class LMFeedTopicSelectionFragment :
             requireActivity().setResult(Activity.RESULT_OK, resultIntent)
             requireActivity().finish()
         }
+    }
+
+    private fun checkForSelectedTopics() {
+        val previousSelectedTopics = extras.selectedTopics
+        viewModel.setPreviousSelectedTopics(previousSelectedTopics)
+        selectedTopics = previousSelectedTopics?.size ?: 0
+        updateSelectedTopicsCount()
     }
 
     private fun initToolbar() {

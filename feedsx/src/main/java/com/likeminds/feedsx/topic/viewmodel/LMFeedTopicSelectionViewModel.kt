@@ -33,6 +33,13 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
         HashMap<String, LMFeedTopicViewData>()
     }
 
+    fun setPreviousSelectedTopics(selectedTopics: List<LMFeedTopicViewData>?) {
+        if (selectedTopics.isNullOrEmpty()) return
+        selectedTopics.forEach { topic ->
+            this.selectedTopics[topic.id] = topic
+        }
+    }
+
     fun getTopics(showAllTopicFilter: Boolean, page: Int, searchString: String? = null) {
         viewModelScope.launchIO {
 
