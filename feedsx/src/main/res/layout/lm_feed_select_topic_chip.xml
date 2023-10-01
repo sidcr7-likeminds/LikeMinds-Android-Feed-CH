@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chip_topic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="false"
+        android:text="@string/select_topics"
+        android:textColor="@color/majorelle_blue"
+        app:chipStartPadding="8dp"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        app:chipBackgroundColor="@color/majorelle_blue_10"
+        app:chipCornerRadius="4dp"
+        app:chipIcon="@drawable/lm_feed_ic_add_topics"
+        app:chipIconSize="12dp" />
+</layout>

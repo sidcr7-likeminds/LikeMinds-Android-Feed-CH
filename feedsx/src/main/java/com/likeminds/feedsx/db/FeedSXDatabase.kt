@@ -7,6 +7,7 @@ import com.likeminds.feedsx.db.dao.UserWithRightsDao
 import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.db.models.MemberRightsEntity
 import com.likeminds.feedsx.db.models.PostEntity
+import com.likeminds.feedsx.db.models.TopicEntity
 import com.likeminds.feedsx.db.models.UserEntity
 
 @Database(
@@ -14,8 +15,9 @@ import com.likeminds.feedsx.db.models.UserEntity
         UserEntity::class,
         PostEntity::class,
         AttachmentEntity::class,
-        MemberRightsEntity::class
-    ], version = 3, exportSchema = false
+        MemberRightsEntity::class,
+        TopicEntity::class
+    ], version = 4, exportSchema = false
 )
 abstract class FeedSXDatabase : RoomDatabase() {
     //User related queries

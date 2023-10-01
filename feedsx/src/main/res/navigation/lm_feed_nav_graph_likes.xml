@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph_likes.xml"
     app:startDestination="@id/fragment_likes">
 
     <fragment
         android:id="@+id/fragment_likes"
         android:name="com.likeminds.feedsx.likes.view.LMFeedLikesFragment"
-        android:label="LikesFragment" />
+        android:label="LikesFragment"
+        tools:layout="@layout/lm_feed_fragment_likes" />
 </navigation>

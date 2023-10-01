@@ -23,8 +23,8 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
-import com.likeminds.feedsx.post.edit.model.EditPostExtras
-import com.likeminds.feedsx.post.edit.view.EditPostActivity
+import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
+import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
@@ -1372,10 +1372,10 @@ class PostDetailFragment :
     ) {
         when (menuId) {
             EDIT_POST_MENU_ITEM_ID -> {
-                val editPostExtras = EditPostExtras.Builder()
+                val editPostExtras = LMFeedEditPostExtras.Builder()
                     .postId(postId)
                     .build()
-                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                val intent = LMFeedEditPostActivity.getIntent(requireContext(), editPostExtras)
                 editPostLauncher.launch(intent)
             }
 

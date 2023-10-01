@@ -13,6 +13,7 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.convertAttachment
@@ -25,7 +26,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-class CreatePostViewModel @Inject constructor(
+class LMFeedCreatePostViewModel @Inject constructor(
     private val userPreferences: LMFeedUserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val mediaRepository: MediaRepository
@@ -58,13 +59,19 @@ class CreatePostViewModel @Inject constructor(
         context: Context,
         postTextContent: String?,
         fileUris: List<SingleUriData>? = null,
-        ogTags: LinkOGTagsViewData? = null
+        ogTags: LinkOGTagsViewData? = null,
+        selectedTopics: ArrayList<LMFeedTopicViewData>? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
+
+            val topicIds = selectedTopics?.map {
+                it.id
+            }
+
             if (fileUris != null) {
                 // if the post has upload-able attachments
                 temporaryPostId = System.currentTimeMillis()
@@ -80,23 +87,33 @@ class CreatePostViewModel @Inject constructor(
                 storePost(
                     uploadData,
                     updatedText,
-                    updatedFileUris
+                    updatedFileUris,
+                    selectedTopics
                 )
             } else {
                 // if the post does not have any upload-able attachments
                 val requestBuilder = AddPostRequest.Builder()
                     .text(updatedText)
+
                 if (ogTags != null) {
                     // if the post has ogTags
                     requestBuilder.attachments(ViewDataConverter.convertAttachments(ogTags))
                 }
+
+                if (!topicIds.isNullOrEmpty()) {
+                    //if user has selected any topics
+                    requestBuilder.topicIds(topicIds)
+                }
+
                 val request = requestBuilder.build()
+
                 val response = lmFeedClient.addPost(request)
                 if (response.success) {
                     // sends post creation completed event
                     sendPostCreationCompletedEvent(
                         updatedText,
-                        ogTags
+                        ogTags,
+                        selectedTopics
                     )
                     _postAdded.postValue(true)
                 } else {
@@ -110,7 +127,8 @@ class CreatePostViewModel @Inject constructor(
     private fun storePost(
         uploadData: Pair<WorkContinuation, String>,
         text: String?,
-        fileUris: List<SingleUriData>? = null
+        fileUris: List<SingleUriData>? = null,
+        selectedTopics: ArrayList<LMFeedTopicViewData>?
     ) {
         viewModelScope.launchIO {
             val uuid = uploadData.second
@@ -119,20 +137,30 @@ class CreatePostViewModel @Inject constructor(
             }
             val temporaryPostId = temporaryPostId ?: -1
             val thumbnailUri = fileUris.first().thumbnailUri
+
             val postEntity = ViewDataConverter.convertPost(
                 temporaryPostId,
                 uuid,
                 thumbnailUri.toString(),
                 text
             )
+
             val attachments = fileUris.map {
                 convertAttachment(
                     temporaryPostId,
                     it
                 )
             }
+
+            val topics = selectedTopics?.map {
+                ViewDataConverter.convertTopic(
+                    temporaryPostId,
+                    it
+                )
+            } ?: emptyList()
+
             // add it to local db
-            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
+            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments, topics)
             _postAdded.postValue(false)
             uploadData.first.enqueue()
         }
@@ -167,6 +195,7 @@ class CreatePostViewModel @Inject constructor(
                         .height(dimensions.second)
                         .build()
                 }
+
                 VIDEO -> {
                     val thumbnailUri = FileUtil.getVideoThumbnailUri(context, it.uri)
                     if (thumbnailUri != null) {
@@ -175,6 +204,7 @@ class CreatePostViewModel @Inject constructor(
                         builder.build()
                     }
                 }
+
                 else -> {
                     val thumbnailUri = MediaUtils.getDocumentPreview(context, it.uri)
                     val format = FileUtil.getFileExtensionFromFileName(it.mediaName)
@@ -284,10 +314,12 @@ class CreatePostViewModel @Inject constructor(
      **/
     private fun sendPostCreationCompletedEvent(
         postText: String?,
-        ogTags: LinkOGTagsViewData?
+        ogTags: LinkOGTagsViewData?,
+        topics: List<LMFeedTopicViewData>?
     ) {
         val map = hashMapOf<String, String>()
         val taggedUsers = MemberTaggingDecoder.decodeAndReturnAllTaggedMembers(postText)
+
         if (taggedUsers.isNotEmpty()) {
             map["user_tagged"] = "yes"
             map["tagged_users_count"] = taggedUsers.size.toString()
@@ -299,15 +331,26 @@ class CreatePostViewModel @Inject constructor(
         } else {
             map["user_tagged"] = "no"
         }
+
         if (ogTags != null) {
             map["link_attached"] = "yes"
             map["link"] = ogTags.url ?: ""
         } else {
             map["link_attached"] = "no"
         }
+
+        if (!topics.isNullOrEmpty()) {
+            val topicsNameString = topics.joinToString(", ") { it.name }
+            map["topics_added"] = "yes"
+            map["topics"] = topicsNameString
+        } else {
+            map["topics_added"] = "no"
+        }
+
         map["image_attached"] = "no"
         map["video_attached"] = "no"
         map["document_attached"] = "no"
+
         LMFeedAnalytics.track(
             LMFeedAnalytics.Events.POST_CREATION_COMPLETED,
             map

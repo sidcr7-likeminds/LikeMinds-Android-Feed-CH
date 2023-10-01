@@ -39,6 +39,7 @@ class LMFeedItemPostLinkViewDataBinder constructor(
             binding.tvPostContent,
             data,
             position,
+            binding.cgTopics,
             listener,
             returnBinder = {
                 return@initPostTypeBindData

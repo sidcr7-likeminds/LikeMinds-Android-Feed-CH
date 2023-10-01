@@ -18,7 +18,7 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapter
 import com.likeminds.feedsx.media.view.adapter.MediaPickerAdapterListener
 import com.likeminds.feedsx.media.viewmodel.MediaViewModel
-import com.likeminds.feedsx.search.util.CustomSearchBar
+import com.likeminds.feedsx.search.util.LMFeedCustomSearchBar
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.customview.BaseFragment
 
@@ -271,7 +271,7 @@ class LMFeedMediaPickerDocumentFragment :
         searchBar.initialize(lifecycleScope)
 
         searchBar.setSearchViewListener(
-            object : CustomSearchBar.SearchViewListener {
+            object : LMFeedCustomSearchBar.SearchViewListener {
                 override fun onSearchViewClosed() {
                     searchBar.hide()
                     viewModel.clearDocumentFilter()

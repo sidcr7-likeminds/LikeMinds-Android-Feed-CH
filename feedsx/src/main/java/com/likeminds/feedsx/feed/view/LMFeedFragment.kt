@@ -30,10 +30,12 @@ import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
 import com.likeminds.feedsx.delete.view.LMFeedAdminDeleteDialogFragment
 import com.likeminds.feedsx.delete.view.LMFeedSelfDeleteDialogFragment
+import com.likeminds.feedsx.feed.adapter.LMFeedSelectedTopicAdapter
+import com.likeminds.feedsx.feed.adapter.LMFeedSelectedTopicAdapterListener
 import com.likeminds.feedsx.feed.model.LMFeedExtras
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.feed.util.PostEvent.PostObserver
-import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.feed.viewmodel.LMFeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
@@ -43,8 +45,9 @@ import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
-import com.likeminds.feedsx.post.edit.model.EditPostExtras
-import com.likeminds.feedsx.post.edit.view.EditPostActivity
+import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
+import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -53,6 +56,10 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
 import com.likeminds.feedsx.report.model.ReportExtras
 import com.likeminds.feedsx.report.view.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity.Companion.TOPIC_SELECTION_RESULT_EXTRAS
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -65,11 +72,12 @@ import java.util.*
 import javax.inject.Inject
 
 class LMFeedFragment :
-    BaseFragment<LmFeedFragmentFeedBinding, FeedViewModel>(),
+    BaseFragment<LmFeedFragmentFeedBinding, LMFeedViewModel>(),
     PostAdapterListener,
     LMFeedAdminDeleteDialogFragment.DeleteDialogListener,
     LMFeedSelfDeleteDialogFragment.DeleteAlertDialogListener,
-    PostObserver {
+    PostObserver,
+    LMFeedSelectedTopicAdapterListener {
 
     companion object {
         const val TAG = "LMFeedFragment"
@@ -102,10 +110,14 @@ class LMFeedFragment :
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
 
+    @Inject
+    lateinit var lmFeedHelperViewModel: LMFeedHelperViewModel
+
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
     private lateinit var postVideoAutoPlayHelper: PostVideoAutoPlayHelper
+    private lateinit var mSelectedTopicAdapter: LMFeedSelectedTopicAdapter
 
     // variable to check if there is a post already uploading
     private var alreadyPosting: Boolean = false
@@ -118,8 +130,8 @@ class LMFeedFragment :
     override val useSharedViewModel: Boolean
         get() = true
 
-    override fun getViewModelClass(): Class<FeedViewModel> {
-        return FeedViewModel::class.java
+    override fun getViewModelClass(): Class<LMFeedViewModel> {
+        return LMFeedViewModel::class.java
     }
 
     override fun attachDagger() {
@@ -204,6 +216,10 @@ class LMFeedFragment :
             observeFeedUniversal(pair)
         }
 
+        lmFeedHelperViewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopicFilter ->
+            binding.layoutAllTopics.root.isVisible = showTopicFilter
+        }
+
         // observes deletePostResponse LiveData
         postActionsViewModel.deletePostResponse.observe(viewLifecycleOwner) { postId ->
             val indexToRemove = getIndexAndPostFromAdapter(postId)?.first ?: return@observe
@@ -242,7 +258,11 @@ class LMFeedFragment :
         initToolbar()
         setUserImage(user)
         viewModel.getUnreadNotificationCount()
-        viewModel.getUniversalFeed(1)
+        lmFeedHelperViewModel.getAllTopics(false)
+        viewModel.getUniversalFeed(
+            1,
+            viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+        )
     }
 
     // observe unread notification count
@@ -314,7 +334,7 @@ class LMFeedFragment :
         viewModel.postDataEventFlow.onEach { response ->
             when (response) {
                 // when the post data comes from local db
-                is FeedViewModel.PostDataEvent.PostDbData -> {
+                is LMFeedViewModel.PostDataEvent.PostDbData -> {
                     alreadyPosting = true
                     val post = response.post
                     binding.layoutPosting.apply {
@@ -338,7 +358,7 @@ class LMFeedFragment :
                     }
                 }
                 // when the post data comes from api response
-                is FeedViewModel.PostDataEvent.PostResponseData -> {
+                is LMFeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
                         ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
                         refreshFeed()
@@ -437,22 +457,26 @@ class LMFeedFragment :
     }
 
     //observe error handling
-    private fun observeErrorMessage(response: FeedViewModel.ErrorMessageEvent) {
+    private fun observeErrorMessage(response: LMFeedViewModel.ErrorMessageEvent) {
         when (response) {
-            is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
+            is LMFeedViewModel.ErrorMessageEvent.UniversalFeed -> {
                 val errorMessage = response.errorMessage
                 mSwipeRefreshLayout.isRefreshing = false
                 ProgressHelper.hideProgress(binding.progressBar)
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
 
-            is FeedViewModel.ErrorMessageEvent.AddPost -> {
+            is LMFeedViewModel.ErrorMessageEvent.AddPost -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 removePostingView()
             }
 
-            is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
+            is LMFeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
                 binding.tvNotificationCount.hide()
+                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+            }
+
+            is LMFeedViewModel.ErrorMessageEvent.GetTopic -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
         }
@@ -585,8 +609,10 @@ class LMFeedFragment :
         binding.toolbarColor = LMFeedBranding.getToolbarColor()
 
         setStatusBarColor()
-        initRecyclerView()
+        initFeedRecyclerView()
+        initSelectedTopicRecyclerView()
         initNewPostClick(true)
+        initTopicFilterClick()
         initSwipeRefreshLayout()
     }
 
@@ -672,7 +698,7 @@ class LMFeedFragment :
         }
 
     // initializes universal feed recyclerview
-    private fun initRecyclerView() {
+    private fun initFeedRecyclerView() {
         // item decorator to add spacing between items
         val dividerItemDecorator =
             DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
@@ -711,6 +737,120 @@ class LMFeedFragment :
         }
     }
 
+    //init topic filter view which shows all topics
+    private fun initTopicFilterClick() {
+        binding.layoutAllTopics.root.setOnClickListener {
+            //show topics selecting screen with All topic filter
+            val intent = LMFeedTopicSelectionActivity.getIntent(
+                requireContext(),
+                LMFeedTopicSelectionExtras.Builder()
+                    .showAllTopicFilter(true)
+                    .showEnabledTopicOnly(false)
+                    .build()
+            )
+
+            topicSelectionLauncher.launch(intent)
+        }
+    }
+
+
+    private val topicSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val bundle = result.data?.extras
+                val resultExtras = ExtrasUtil.getParcelable(
+                    bundle,
+                    TOPIC_SELECTION_RESULT_EXTRAS,
+                    LMFeedTopicSelectionResultExtras::class.java
+                ) ?: return@registerForActivityResult
+
+                handleTopicSelectionResult(resultExtras)
+            }
+        }
+
+    //handles result after selecting filters and show recyclers views
+    private fun handleTopicSelectionResult(resultExtras: LMFeedTopicSelectionResultExtras) {
+        binding.apply {
+            mScrollListener.resetData()
+            mPostAdapter.clearAndNotify()
+
+            if (resultExtras.isAllTopicSelected) {
+                //show layouts accordingly
+                layoutAllTopics.root.show()
+                layoutSelectedTopics.root.hide()
+
+                //call api
+                ProgressHelper.showProgress(binding.progressBar,true)
+                viewModel.getUniversalFeed(1, null)
+            } else {
+                //show layouts accordingly
+                layoutAllTopics.root.hide()
+                layoutSelectedTopics.root.show()
+
+                //set selected topics to filter
+                val selectedTopics = resultExtras.selectedTopics
+                mSelectedTopicAdapter.replace(selectedTopics)
+
+                //call api
+                ProgressHelper.showProgress(binding.progressBar,true)
+                viewModel.getUniversalFeed(
+                    1,
+                    viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+                )
+            }
+        }
+    }
+
+    //init selected topic recycler view
+    private fun initSelectedTopicRecyclerView() {
+        mSelectedTopicAdapter = LMFeedSelectedTopicAdapter(this)
+        binding.layoutSelectedTopics.apply {
+            //set adapter
+            rvSelectedTopics.adapter = mSelectedTopicAdapter
+            rvSelectedTopics.layoutManager = LinearLayoutManager(
+                requireContext(),
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
+
+            //set clear listener
+            tvClear.setOnClickListener {
+                clearTopics()
+            }
+        }
+    }
+
+    override fun topicCleared(position: Int) {
+        if (mSelectedTopicAdapter.itemCount == 1) {
+            clearTopics()
+        } else {
+            //remove from adapter
+            mSelectedTopicAdapter.removeIndex(position)
+
+            //call apis
+            mScrollListener.resetData()
+            mPostAdapter.clearAndNotify()
+            ProgressHelper.showProgress(binding.progressBar,true)
+            viewModel.getUniversalFeed(
+                1,
+                viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+            )
+        }
+    }
+
+    //clear all selected topics and reset data
+    private fun clearTopics() {
+        //call api
+        mSelectedTopicAdapter.clearAndNotify()
+        mScrollListener.resetData()
+        ProgressHelper.showProgress(binding.progressBar,true)
+        viewModel.getUniversalFeed(1, null)
+
+        //show layout accordingly
+        binding.layoutSelectedTopics.root.hide()
+        binding.layoutAllTopics.root.show()
+    }
+
     //set posts through diff utils and scroll to top of the feed
     private fun setFeedAndScrollToTop(feed: List<PostViewData>) {
         mPostAdapter.replace(feed)
@@ -723,7 +863,10 @@ class LMFeedFragment :
         mSwipeRefreshLayout.isRefreshing = true
         mScrollListener.resetData()
         viewModel.getUnreadNotificationCount()
-        viewModel.getUniversalFeed(1)
+        viewModel.getUniversalFeed(
+            1,
+            viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+        )
     }
 
     //attach scroll listener for pagination
@@ -734,7 +877,10 @@ class LMFeedFragment :
         mScrollListener = object : EndlessRecyclerScrollListener(layoutManager) {
             override fun onLoadMore(currentPage: Int) {
                 if (currentPage > 0) {
-                    viewModel.getUniversalFeed(currentPage)
+                    viewModel.getUniversalFeed(
+                        currentPage,
+                        viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+                    )
                 }
             }
 
@@ -894,10 +1040,10 @@ class LMFeedFragment :
     ) {
         when (menuId) {
             EDIT_POST_MENU_ITEM_ID -> {
-                val editPostExtras = EditPostExtras.Builder()
+                val editPostExtras = LMFeedEditPostExtras.Builder()
                     .postId(postId)
                     .build()
-                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                val intent = LMFeedEditPostActivity.getIntent(requireContext(), editPostExtras)
                 startActivity(intent)
             }
 

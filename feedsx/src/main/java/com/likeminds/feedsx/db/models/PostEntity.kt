@@ -32,7 +32,9 @@ class PostEntity constructor(
         fun thumbnail(thumbnail: String?) = apply { this.thumbnail = thumbnail }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
-        fun postId(postId: String) = apply { this.postId = postId }
+        fun postId(postId: String) = apply {
+            this.postId = postId
+        }
 
         fun build() =
             PostEntity(

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -14,7 +15,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-class EditPostViewModel @Inject constructor() : ViewModel() {
+class LMFeedEditPostViewModel @Inject constructor() : ViewModel() {
 
     private val lmFeedClient = LMFeedClient.getInstance()
 
@@ -51,11 +52,13 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
+                val topics = data.topics
                 postDataEventChannel.send(
                     PostDataEvent.GetPost(
                         ViewDataConverter.convertPost(
                             post,
-                            users
+                            users,
+                            topics
                         )
                     )
                 )
@@ -70,13 +73,19 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
         postId: String,
         postTextContent: String?,
         attachments: List<AttachmentViewData>? = null,
-        ogTags: LinkOGTagsViewData? = null
+        ogTags: LinkOGTagsViewData? = null,
+        selectedTopics: List<LMFeedTopicViewData>? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
+
+            val topicIds = selectedTopics?.map {
+                it.id
+            }
+
             val request =
                 if (attachments != null) {
                     // if the post has any file attachments
@@ -84,12 +93,14 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                         .postId(postId)
                         .text(updatedText)
                         .attachments(ViewDataConverter.createAttachments(attachments))
+                        .topicIds(topicIds)
                         .build()
                 } else {
                     // if the post does not have any file attachments
                     val requestBuilder = EditPostRequest.Builder()
                         .postId(postId)
                         .text(updatedText)
+                        .topicIds(topicIds)
                     if (ogTags != null) {
                         // if the post has ogTags
                         requestBuilder.attachments(ViewDataConverter.convertAttachments(ogTags))
@@ -103,7 +114,8 @@ class EditPostViewModel @Inject constructor() : ViewModel() {
                 val data = response.data ?: return@launchIO
                 val post = data.post
                 val users = data.users
-                val postViewData = ViewDataConverter.convertPost(post, users)
+                val topics = data.topics
+                val postViewData = ViewDataConverter.convertPost(post, users, topics)
                 postDataEventChannel.send(PostDataEvent.EditPost(postViewData))
 
                 // sends post edited event

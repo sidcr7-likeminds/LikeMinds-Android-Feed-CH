@@ -30,12 +30,37 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cg_topics"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:chipSpacingHorizontal="4dp"
+                    app:chipSpacingVertical="4dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/author_frame" />
+
+                <View
+                    android:id="@+id/topic_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/blue_separator"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cg_topics" />
+
                 <com.likeminds.feedsx.branding.customview.LMFeedEditText
                     android:id="@+id/et_post_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginVertical="16dp"
                     android:background="@null"
                     android:ellipsize="end"
                     android:hint="@string/write_something_here"
@@ -50,7 +75,7 @@
                     android:textSize="16sp"
                     app:font_style="regular"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/author_frame" />
+                    app:layout_constraintTop_toBottomOf="@id/topic_separator" />
 
 
                 <com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView

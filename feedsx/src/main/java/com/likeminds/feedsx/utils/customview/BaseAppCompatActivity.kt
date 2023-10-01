@@ -26,18 +26,18 @@ open class BaseAppCompatActivity : AppCompatActivity() {
     @Inject
     lateinit var snackBar: LMFeedCustomSnackBar
 
-    private lateinit var LMFeedSessionPermission: LMFeedSessionPermission
-    private val LMFeedPermissionCallbackSparseArray = SparseArray<LMFeedPermissionCallback>()
+    private lateinit var lmFeedSessionPermission: LMFeedSessionPermission
+    private val lmFeedPermissionCallbackSparseArray = SparseArray<LMFeedPermissionCallback>()
 
     private var wasNetworkGone = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        LMFeedSessionPermission = LMFeedSessionPermission(application)
+    protected open fun attachDagger() {
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        attachDagger()
+        lmFeedSessionPermission = LMFeedSessionPermission(application)
     }
 
     override fun onStart() {
@@ -45,9 +45,6 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         setStatusBarColor(LMFeedBranding.getHeaderColor())
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
 
     // todo: find alternative for this code
     @Suppress("Deprecation")
@@ -59,11 +56,11 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
     }
 
-    fun hasPermission(LMFeedPermission: LMFeedPermission): Boolean {
+    fun hasPermission(lmFeedPermission: LMFeedPermission): Boolean {
         return if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             true
         } else {
-            checkSelfPermission(LMFeedPermission.permissionName) == PackageManager.PERMISSION_GRANTED
+            checkSelfPermission(lmFeedPermission.permissionName) == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -82,35 +79,35 @@ open class BaseAppCompatActivity : AppCompatActivity() {
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     fun requestPermission(
-        LMFeedPermission: LMFeedPermission,
-        LMFeedPermissionCallback: LMFeedPermissionCallback
+        lmFeedPermission: LMFeedPermission,
+        lmFeedPermissionCallback: LMFeedPermissionCallback
     ) {
-        LMFeedPermissionCallbackSparseArray.put(
-            LMFeedPermission.requestCode,
-            LMFeedPermissionCallback
+        lmFeedPermissionCallbackSparseArray.put(
+            lmFeedPermission.requestCode,
+            lmFeedPermissionCallback
         )
-        LMFeedSessionPermission.setPermissionRequest(LMFeedPermission.permissionName)
-        requestPermissions(arrayOf(LMFeedPermission.permissionName), LMFeedPermission.requestCode)
+        lmFeedSessionPermission.setPermissionRequest(lmFeedPermission.permissionName)
+        requestPermissions(arrayOf(lmFeedPermission.permissionName), lmFeedPermission.requestCode)
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     fun requestMultiplePermissions(
         permissionExtras: PermissionExtras,
-        LMFeedPermissionCallback: LMFeedPermissionCallback
+        lmFeedPermissionCallback: LMFeedPermissionCallback
     ) {
         permissionExtras.apply {
             permissions.forEach { permissionName ->
-                LMFeedPermissionCallbackSparseArray.put(requestCode, LMFeedPermissionCallback)
-                LMFeedSessionPermission.setPermissionRequest(permissionName)
+                lmFeedPermissionCallbackSparseArray.put(requestCode, lmFeedPermissionCallback)
+                lmFeedSessionPermission.setPermissionRequest(permissionName)
             }
             requestPermissions(permissions, requestCode)
         }
     }
 
     @TargetApi(Build.VERSION_CODES.M)
-    fun canRequestPermission(LMFeedPermission: LMFeedPermission): Boolean {
-        return !wasRequestedBefore(LMFeedPermission.permissionName) ||
-                shouldShowRequestPermissionRationale(LMFeedPermission.permissionName)
+    fun canRequestPermission(lmFeedPermission: LMFeedPermission): Boolean {
+        return !wasRequestedBefore(lmFeedPermission.permissionName) ||
+                shouldShowRequestPermissionRationale(lmFeedPermission.permissionName)
     }
 
     @TargetApi(Build.VERSION_CODES.M)
@@ -124,7 +121,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
     }
 
     private fun wasRequestedBefore(permissionName: String): Boolean {
-        return LMFeedSessionPermission.wasPermissionRequestedBefore(permissionName)
+        return lmFeedSessionPermission.wasPermissionRequestedBefore(permissionName)
     }
 
     override fun onRequestPermissionsResult(
@@ -133,7 +130,7 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        val callback = LMFeedPermissionCallbackSparseArray.get(requestCode, null) ?: return
+        val callback = lmFeedPermissionCallbackSparseArray.get(requestCode, null) ?: return
         if (grantResults.isNotEmpty()) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 callback.onGrant()
