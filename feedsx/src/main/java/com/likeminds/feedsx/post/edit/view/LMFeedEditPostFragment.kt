@@ -38,7 +38,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
-import com.likeminds.feedsx.topic.util.TopicChipUtil
+import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
@@ -797,7 +797,7 @@ class LMFeedEditPostFragment :
     private fun initTopicSelectionView() {
         binding.cgTopics.apply {
             removeAllViews()
-            addView(TopicChipUtil.createSelectTopicsChip(requireContext(), this) { intent ->
+            addView(LMFeedTopicChipUtil.createSelectTopicsChip(requireContext(), this) { intent ->
                 topicSelectionLauncher.launch(intent)
             })
         }
@@ -843,10 +843,10 @@ class LMFeedEditPostFragment :
         binding.cgTopics.apply {
             removeAllViews()
             selectedTopics.forEach { topic ->
-                addView(TopicChipUtil.createTopicChip(this, topic.name))
+                addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
             }
             addView(
-                TopicChipUtil.createEditChip(
+                LMFeedTopicChipUtil.createEditChip(
                     requireContext(),
                     selectedTopics,
                     this,

@@ -32,13 +32,13 @@ import com.likeminds.feedsx.post.create.util.CreatePostListener
 import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity.Companion.POST_ATTACHMENTS_LIMIT
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
 import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
-import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
+import com.likeminds.feedsx.post.create.viewmodel.LMFeedCreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
-import com.likeminds.feedsx.topic.util.TopicChipUtil
+import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
@@ -63,7 +63,7 @@ import java.util.*
 import javax.inject.Inject
 
 class LMFeedCreatePostFragment :
-    BaseFragment<LmFeedFragmentCreatePostBinding, CreatePostViewModel>(),
+    BaseFragment<LmFeedFragmentCreatePostBinding, LMFeedCreatePostViewModel>(),
     CreatePostListener {
 
     @Inject
@@ -92,8 +92,8 @@ class LMFeedCreatePostFragment :
     override val useSharedViewModel: Boolean
         get() = true
 
-    override fun getViewModelClass(): Class<CreatePostViewModel> {
-        return CreatePostViewModel::class.java
+    override fun getViewModelClass(): Class<LMFeedCreatePostViewModel> {
+        return LMFeedCreatePostViewModel::class.java
     }
 
     override fun attachDagger() {
@@ -209,7 +209,7 @@ class LMFeedCreatePostFragment :
     private fun observeErrors() {
         viewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
+                is LMFeedCreatePostViewModel.ErrorMessageEvent.AddPost -> {
                     handlePostButton(clickable = true, showProgress = false)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
@@ -395,7 +395,7 @@ class LMFeedCreatePostFragment :
     private fun initTopicSelectionView() {
         binding.cgTopics.apply {
             removeAllViews()
-            addView(TopicChipUtil.createSelectTopicsChip(requireContext(), this) { intent ->
+            addView(LMFeedTopicChipUtil.createSelectTopicsChip(requireContext(), this) { intent ->
                 topicSelectionLauncher.launch(intent)
             })
         }
@@ -428,10 +428,10 @@ class LMFeedCreatePostFragment :
         binding.cgTopics.apply {
             removeAllViews()
             newSelectedTopics.forEach { topic ->
-                addView(TopicChipUtil.createTopicChip(this, topic.name))
+                addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
             }
             addView(
-                TopicChipUtil.createEditChip(requireContext(), selectedTopic, this) { intent ->
+                LMFeedTopicChipUtil.createEditChip(requireContext(), selectedTopic, this) { intent ->
                     topicSelectionLauncher.launch(intent)
                 })
         }

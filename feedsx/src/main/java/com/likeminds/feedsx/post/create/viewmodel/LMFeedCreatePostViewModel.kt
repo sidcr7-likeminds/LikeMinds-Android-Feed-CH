@@ -23,12 +23,11 @@ import com.likeminds.feedsx.utils.file.FileUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.AddPostRequest
-import com.likeminds.likemindsfeed.topic.model.GetTopicRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-class CreatePostViewModel @Inject constructor(
+class LMFeedCreatePostViewModel @Inject constructor(
     private val userPreferences: LMFeedUserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val mediaRepository: MediaRepository

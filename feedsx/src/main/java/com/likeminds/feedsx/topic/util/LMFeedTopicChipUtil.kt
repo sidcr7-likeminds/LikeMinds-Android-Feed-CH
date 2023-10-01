@@ -12,7 +12,7 @@ import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 
-object TopicChipUtil {
+object LMFeedTopicChipUtil {
 
     //create select topic chip and add click listener and launch topic selection screen
     fun createSelectTopicsChip(
