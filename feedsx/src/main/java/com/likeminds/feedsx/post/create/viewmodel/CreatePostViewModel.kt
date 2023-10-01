@@ -39,14 +39,10 @@ class CreatePostViewModel @Inject constructor(
     private val _postAdded = MutableLiveData<Boolean>()
     val postAdded: LiveData<Boolean> = _postAdded
 
-    private val _showTopicsFilter = MutableLiveData<Boolean>()
-    val showTopicsFilter: LiveData<Boolean> = _showTopicsFilter
-
     private var temporaryPostId: Long? = null
 
     sealed class ErrorMessageEvent {
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
-        data class ShowTopics(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
@@ -73,13 +69,6 @@ class CreatePostViewModel @Inject constructor(
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
-            Log.d(
-                "PUI", """
-                selectedTopics: 
-                ${selectedTopics?.map { it.name }}
-                 ${selectedTopics?.map { it.id }}
-            """.trimIndent()
-            )
 
             val topicIds = selectedTopics?.map {
                 it.id
@@ -247,23 +236,6 @@ class CreatePostViewModel @Inject constructor(
         val oneTimeWorkRequest = PostAttachmentUploadWorker.getInstance(postId, filesCount)
         val workContinuation = WorkManager.getInstance(context).beginWith(oneTimeWorkRequest)
         return Pair(workContinuation, oneTimeWorkRequest.id.toString())
-    }
-
-    fun getEnabledTopics() {
-        viewModelScope.launchIO {
-            val request = GetTopicRequest.Builder()
-                .isEnabled(true)
-                .page(1)
-                .pageSize(10)
-                .build()
-            val response = lmFeedClient.getTopics(request)
-            if (response.success) {
-                val topics = response.data?.topics ?: emptyList()
-                _showTopicsFilter.postValue(topics.isNotEmpty())
-            } else {
-                errorEventChannel.send(ErrorMessageEvent.ShowTopics(response.errorMessage))
-            }
-        }
     }
 
     /**

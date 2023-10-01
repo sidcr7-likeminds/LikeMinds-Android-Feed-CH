@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import kotlin.collections.set
 
-class FeedViewModel @Inject constructor(
+class LMFeedViewModel @Inject constructor(
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val postPreferences: LMFeedPostPreferences
 ) : ViewModel() {
@@ -38,9 +38,6 @@ class FeedViewModel @Inject constructor(
 
     private val _unreadNotificationCount = MutableLiveData<Int>()
     val unreadNotificationCount: LiveData<Int> = _unreadNotificationCount
-
-    private val _showTopicFilter = MutableLiveData<Boolean>()
-    val showTopicFilter: LiveData<Boolean> = _showTopicFilter
 
     private val errorMessageChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorMessageEventFlow = errorMessageChannel.receiveAsFlow()
@@ -209,29 +206,6 @@ class FeedViewModel @Inject constructor(
             } else {
                 //for error
                 errorMessageChannel.send(ErrorMessageEvent.GetUnreadNotificationCount(response.errorMessage))
-            }
-        }
-    }
-
-    fun getAllTopics() {
-        viewModelScope.launchIO {
-            val request = GetTopicRequest.Builder()
-                .page(1)
-                .pageSize(10)
-                .build()
-
-            val response = lmFeedClient.getTopics(request)
-
-            if (response.success) {
-                val topics = response.data?.topics
-                if (topics.isNullOrEmpty()) {
-                    _showTopicFilter.postValue(false)
-                } else {
-                    _showTopicFilter.postValue(true)
-                }
-            } else {
-                _showTopicFilter.postValue(false)
-                errorMessageChannel.send(ErrorMessageEvent.GetTopic(response.errorMessage))
             }
         }
     }

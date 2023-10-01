@@ -225,7 +225,11 @@ class LMFeedTopicSelectionFragment :
 
     private fun checkForSelectedTopics() {
         val previousSelectedTopics = extras.selectedTopics
+        val disabledTopics = extras.disabledTopics
+
         viewModel.setPreviousSelectedTopics(previousSelectedTopics)
+        viewModel.setPreviousDisabledTopics(disabledTopics)
+
         selectedTopics = previousSelectedTopics?.size ?: 0
         updateSelectedTopicsCount()
     }

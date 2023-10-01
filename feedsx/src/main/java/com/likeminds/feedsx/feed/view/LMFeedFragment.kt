@@ -35,7 +35,7 @@ import com.likeminds.feedsx.feed.adapter.LMFeedSelectedTopicAdapterListener
 import com.likeminds.feedsx.feed.model.LMFeedExtras
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.feed.util.PostEvent.PostObserver
-import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.feed.viewmodel.LMFeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
@@ -47,6 +47,7 @@ import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
 import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -71,7 +72,7 @@ import java.util.*
 import javax.inject.Inject
 
 class LMFeedFragment :
-    BaseFragment<LmFeedFragmentFeedBinding, FeedViewModel>(),
+    BaseFragment<LmFeedFragmentFeedBinding, LMFeedViewModel>(),
     PostAdapterListener,
     LMFeedAdminDeleteDialogFragment.DeleteDialogListener,
     LMFeedSelfDeleteDialogFragment.DeleteAlertDialogListener,
@@ -109,6 +110,9 @@ class LMFeedFragment :
     @Inject
     lateinit var initiateViewModel: InitiateViewModel
 
+    @Inject
+    lateinit var lmFeedHelperViewModel: LMFeedHelperViewModel
+
     private lateinit var mSwipeRefreshLayout: SwipeRefreshLayout
     private lateinit var mPostAdapter: PostAdapter
     private lateinit var mScrollListener: EndlessRecyclerScrollListener
@@ -126,8 +130,8 @@ class LMFeedFragment :
     override val useSharedViewModel: Boolean
         get() = true
 
-    override fun getViewModelClass(): Class<FeedViewModel> {
-        return FeedViewModel::class.java
+    override fun getViewModelClass(): Class<LMFeedViewModel> {
+        return LMFeedViewModel::class.java
     }
 
     override fun attachDagger() {
@@ -212,7 +216,7 @@ class LMFeedFragment :
             observeFeedUniversal(pair)
         }
 
-        viewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopicFilter ->
+        lmFeedHelperViewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopicFilter ->
             binding.layoutAllTopics.root.isVisible = showTopicFilter
         }
 
@@ -254,7 +258,7 @@ class LMFeedFragment :
         initToolbar()
         setUserImage(user)
         viewModel.getUnreadNotificationCount()
-        viewModel.getAllTopics()
+        lmFeedHelperViewModel.getAllTopics(false)
         viewModel.getUniversalFeed(
             1,
             viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
@@ -330,7 +334,7 @@ class LMFeedFragment :
         viewModel.postDataEventFlow.onEach { response ->
             when (response) {
                 // when the post data comes from local db
-                is FeedViewModel.PostDataEvent.PostDbData -> {
+                is LMFeedViewModel.PostDataEvent.PostDbData -> {
                     alreadyPosting = true
                     val post = response.post
                     binding.layoutPosting.apply {
@@ -354,7 +358,7 @@ class LMFeedFragment :
                     }
                 }
                 // when the post data comes from api response
-                is FeedViewModel.PostDataEvent.PostResponseData -> {
+                is LMFeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
                         ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
                         refreshFeed()
@@ -453,26 +457,26 @@ class LMFeedFragment :
     }
 
     //observe error handling
-    private fun observeErrorMessage(response: FeedViewModel.ErrorMessageEvent) {
+    private fun observeErrorMessage(response: LMFeedViewModel.ErrorMessageEvent) {
         when (response) {
-            is FeedViewModel.ErrorMessageEvent.UniversalFeed -> {
+            is LMFeedViewModel.ErrorMessageEvent.UniversalFeed -> {
                 val errorMessage = response.errorMessage
                 mSwipeRefreshLayout.isRefreshing = false
                 ProgressHelper.hideProgress(binding.progressBar)
                 ViewUtils.showErrorMessageToast(requireContext(), errorMessage)
             }
 
-            is FeedViewModel.ErrorMessageEvent.AddPost -> {
+            is LMFeedViewModel.ErrorMessageEvent.AddPost -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 removePostingView()
             }
 
-            is FeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
+            is LMFeedViewModel.ErrorMessageEvent.GetUnreadNotificationCount -> {
                 binding.tvNotificationCount.hide()
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
 
-            is FeedViewModel.ErrorMessageEvent.GetTopic -> {
+            is LMFeedViewModel.ErrorMessageEvent.GetTopic -> {
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
         }

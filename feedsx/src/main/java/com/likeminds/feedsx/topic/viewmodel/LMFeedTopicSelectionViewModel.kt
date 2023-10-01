@@ -33,11 +33,23 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
         HashMap<String, LMFeedTopicViewData>()
     }
 
+    private val disabledTopics by lazy {
+        ArrayList<LMFeedTopicViewData>()
+    }
+
     fun setPreviousSelectedTopics(selectedTopics: List<LMFeedTopicViewData>?) {
         if (selectedTopics.isNullOrEmpty()) return
         selectedTopics.forEach { topic ->
             this.selectedTopics[topic.id] = topic
         }
+    }
+
+    fun setPreviousDisabledTopics(disabledTopics: List<LMFeedTopicViewData>?) {
+        if (disabledTopics.isNullOrEmpty()) return
+        val updatedDisabledTopics = disabledTopics.map {
+            it.toBuilder().isSelected(true).build()
+        }
+        this.disabledTopics.addAll(updatedDisabledTopics)
     }
 
     fun getTopics(
@@ -78,6 +90,11 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
                 }
 
                 val viewTypes = ArrayList<BaseViewType>()
+
+                if (page == 1 && disabledTopics.isNotEmpty()) {
+                    viewTypes.addAll(disabledTopics)
+                }
+
                 if (page == 1 && showAllTopicFilter) {
                     val allTopicsFilter =
                         LMFeedAllTopicsViewData.Builder()

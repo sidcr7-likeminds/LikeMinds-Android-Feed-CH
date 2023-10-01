@@ -1,6 +1,9 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
@@ -12,12 +15,16 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
-import com.likeminds.likemindsfeed.helper.model.*
+import com.likeminds.likemindsfeed.helper.model.DecodeUrlRequest
+import com.likeminds.likemindsfeed.helper.model.DecodeUrlResponse
+import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
+import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
+import com.likeminds.likemindsfeed.topic.model.GetTopicRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-class HelperViewModel @Inject constructor(
+class LMFeedHelperViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
     private val userPreferences: LMFeedUserPreferences
 ) : ViewModel() {
@@ -30,6 +37,9 @@ class HelperViewModel @Inject constructor(
     private val _userData = MutableLiveData<UserViewData>()
     val userData: LiveData<UserViewData> = _userData
 
+    private val _showTopicFilter = MutableLiveData<Boolean>()
+    val showTopicFilter: LiveData<Boolean> = _showTopicFilter
+
     /**
      * [taggingData] contains first -> page called
      * second -> Community Members and Groups
@@ -40,6 +50,7 @@ class HelperViewModel @Inject constructor(
     sealed class ErrorMessageEvent {
         data class DecodeUrl(val errorMessage: String?) : ErrorMessageEvent()
         data class GetTaggingList(val errorMessage: String?) : ErrorMessageEvent()
+        data class GetTopic(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
@@ -118,6 +129,35 @@ class HelperViewModel @Inject constructor(
             }
         }
     }
+
+    fun getAllTopics(showEnabledTopicsOnly: Boolean) {
+        viewModelScope.launchIO {
+            val requestBuilder = GetTopicRequest.Builder()
+                .page(1)
+                .pageSize(10)
+
+            if (showEnabledTopicsOnly) {
+                requestBuilder.isEnabled(true)
+            }
+
+            val request = requestBuilder.build()
+
+            val response = lmFeedClient.getTopics(request)
+
+            if (response.success) {
+                val topics = response.data?.topics
+                if (topics.isNullOrEmpty()) {
+                    _showTopicFilter.postValue(false)
+                } else {
+                    _showTopicFilter.postValue(true)
+                }
+            } else {
+                _showTopicFilter.postValue(false)
+                errorEventChannel.send(ErrorMessageEvent.GetTopic(response.errorMessage))
+            }
+        }
+    }
+
 
     /**
      * Triggers event when the user tags someone

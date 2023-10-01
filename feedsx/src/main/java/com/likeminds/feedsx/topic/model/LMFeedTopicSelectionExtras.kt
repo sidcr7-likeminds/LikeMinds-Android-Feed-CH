@@ -8,12 +8,14 @@ class LMFeedTopicSelectionExtras private constructor(
     val showAllTopicFilter: Boolean,
     val selectedTopics: List<LMFeedTopicViewData>?,
     val showEnabledTopicOnly: Boolean,
+    val disabledTopics: List<LMFeedTopicViewData>?
 ) : Parcelable {
 
     class Builder {
         private var showAllTopicFilter: Boolean = false
         private var selectedTopics: List<LMFeedTopicViewData>? = null
         private var showEnabledTopicOnly: Boolean = false
+        private var disabledTopics: List<LMFeedTopicViewData>? = null
 
         fun showAllTopicFilter(showAllTopicFilter: Boolean) =
             apply { this.showAllTopicFilter = showAllTopicFilter }
@@ -24,11 +26,15 @@ class LMFeedTopicSelectionExtras private constructor(
         fun showEnabledTopicOnly(showEnabledTopicOnly: Boolean) =
             apply { this.showEnabledTopicOnly = showEnabledTopicOnly }
 
+        fun disabledTopics(disabledTopics: List<LMFeedTopicViewData>?) =
+            apply { this.disabledTopics = disabledTopics }
+
         fun build() =
             LMFeedTopicSelectionExtras(
                 showAllTopicFilter,
                 selectedTopics,
-                showEnabledTopicOnly
+                showEnabledTopicOnly,
+                disabledTopics
             )
     }
 
@@ -36,5 +42,6 @@ class LMFeedTopicSelectionExtras private constructor(
         return Builder().showAllTopicFilter(showAllTopicFilter)
             .selectedTopics(selectedTopics)
             .showEnabledTopicOnly(showEnabledTopicOnly)
+            .disabledTopics(disabledTopics)
     }
 }
