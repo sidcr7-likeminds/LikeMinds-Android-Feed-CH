@@ -131,7 +131,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto_regular"
                 android:paddingVertical="26dp"
-                android:text="@string/max_200mb"
+                android:text="@string/max_100mb"
                 android:textColor="@color/grey"
                 android:textSize="12sp" />
         </LinearLayout>
