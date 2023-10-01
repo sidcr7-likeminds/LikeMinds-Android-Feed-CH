@@ -1,9 +1,6 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
@@ -15,10 +12,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
-import com.likeminds.likemindsfeed.helper.model.DecodeUrlRequest
-import com.likeminds.likemindsfeed.helper.model.DecodeUrlResponse
-import com.likeminds.likemindsfeed.helper.model.GetTaggingListRequest
-import com.likeminds.likemindsfeed.helper.model.GetTaggingListResponse
+import com.likeminds.likemindsfeed.helper.model.*
 import com.likeminds.likemindsfeed.topic.model.GetTopicRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -130,6 +124,7 @@ class LMFeedHelperViewModel @Inject constructor(
         }
     }
 
+    //calls to topics api and check whether to show topics view or not
     fun getAllTopics(showEnabledTopicsOnly: Boolean) {
         viewModelScope.launchIO {
             val requestBuilder = GetTopicRequest.Builder()

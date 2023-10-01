@@ -228,6 +228,7 @@ class LMFeedEditPostFragment :
         }
     }
 
+    //check all the necessary conditions before saving a post
     private fun savePost() {
         val text = binding.etPostContent.text
         val updatedText = memberTagging.replaceSelectedMembers(text).trim()
@@ -249,7 +250,7 @@ class LMFeedEditPostFragment :
                 showDisabledTopicsAlert(disabledTopics.values.toList())
             }
         } else {
-            //call api as all topics are enabled
+            //call api as no topics are enabled
             handleSaveButton(clickable = true, showProgress = true)
             viewModel.editPost(
                 editPostExtras.postId,
@@ -261,6 +262,7 @@ class LMFeedEditPostFragment :
         }
     }
 
+    //show alert for disabled topics
     private fun showDisabledTopicsAlert(disabledTopics: List<LMFeedTopicViewData>) {
         val noOfDisabledTopics = disabledTopics.size
 

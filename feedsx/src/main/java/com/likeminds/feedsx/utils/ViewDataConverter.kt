@@ -2,14 +2,7 @@ package com.likeminds.feedsx.utils
 
 import android.net.Uri
 import android.util.Base64
-import com.likeminds.feedsx.db.models.AttachmentEntity
-import com.likeminds.feedsx.db.models.AttachmentMetaEntity
-import com.likeminds.feedsx.db.models.MemberRightsEntity
-import com.likeminds.feedsx.db.models.PostEntity
-import com.likeminds.feedsx.db.models.PostWithAttachments
-import com.likeminds.feedsx.db.models.SDKClientInfoEntity
-import com.likeminds.feedsx.db.models.TopicEntity
-import com.likeminds.feedsx.db.models.UserEntity
+import com.likeminds.feedsx.db.models.*
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.likes.model.LikeViewData
 import com.likeminds.feedsx.media.model.IMAGE
@@ -33,20 +26,13 @@ import com.likeminds.feedsx.report.model.ReportTagViewData
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_DOCUMENTS_ITEM
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_IMAGE
-import com.likeminds.feedsx.utils.model.ITEM_CREATE_POST_MULTIPLE_MEDIA_VIDEO
+import com.likeminds.feedsx.utils.model.*
 import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
 import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
-import com.likeminds.likemindsfeed.post.model.Attachment
-import com.likeminds.likemindsfeed.post.model.AttachmentMeta
-import com.likeminds.likemindsfeed.post.model.Like
-import com.likeminds.likemindsfeed.post.model.LinkOGTags
-import com.likeminds.likemindsfeed.post.model.MenuItem
-import com.likeminds.likemindsfeed.post.model.Post
+import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
 import com.likeminds.likemindsfeed.sdk.model.User
 import com.likeminds.likemindsfeed.topic.model.Topic
@@ -627,6 +613,9 @@ object ViewDataConverter {
             .build()
     }
 
+    /**
+     * convert [Topic] to [LMFeedTopicViewData]
+     * */
     fun convertTopic(topic: Topic): LMFeedTopicViewData {
         return LMFeedTopicViewData.Builder()
             .id(topic.id)
@@ -780,6 +769,9 @@ object ViewDataConverter {
             .build()
     }
 
+    /**
+     * convert [TopicEntity] to [LMFeedTopicViewData]
+     */
     private fun convertTopic(topicEntity: TopicEntity): LMFeedTopicViewData {
         return LMFeedTopicViewData.Builder()
             .id(topicEntity.id)
@@ -856,6 +848,10 @@ object ViewDataConverter {
             .build()
     }
 
+    /***
+     * convert [LMFeedTopicViewData] to [TopicEntity]
+     * @param temporaryId: Temporary id of the post
+     */
     fun convertTopic(temporaryId: Long, topic: LMFeedTopicViewData): TopicEntity {
         return TopicEntity.Builder()
             .id(topic.id)

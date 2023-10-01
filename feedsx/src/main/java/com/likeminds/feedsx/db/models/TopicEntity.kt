@@ -15,7 +15,7 @@ class TopicEntity constructor(
     @ColumnInfo(name = "is_topic_enabled")
     var isEnabled: Boolean,
     @ColumnInfo(name = "post_id")
-    val postId: String,
+    var postId: String,
 ) {
 
     class Builder {

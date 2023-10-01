@@ -737,6 +737,7 @@ class LMFeedFragment :
         }
     }
 
+    //init topic filter view which shows all topics
     private fun initTopicFilterClick() {
         binding.layoutAllTopics.root.setOnClickListener {
             //show topics selecting screen with All topic filter
@@ -767,6 +768,7 @@ class LMFeedFragment :
             }
         }
 
+    //handles result after selecting filters and show recyclers views
     private fun handleTopicSelectionResult(resultExtras: LMFeedTopicSelectionResultExtras) {
         binding.apply {
             mScrollListener.resetData()

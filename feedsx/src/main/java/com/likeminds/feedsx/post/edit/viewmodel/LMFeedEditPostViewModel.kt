@@ -3,9 +3,7 @@ package com.likeminds.feedsx.post.edit.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.likeminds.feedsx.LMFeedAnalytics
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewUtils

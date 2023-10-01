@@ -37,6 +37,7 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
         ArrayList<LMFeedTopicViewData>()
     }
 
+    //set previous selected topics to map
     fun setPreviousSelectedTopics(selectedTopics: List<LMFeedTopicViewData>?) {
         if (selectedTopics.isNullOrEmpty()) return
         selectedTopics.forEach { topic ->
@@ -44,6 +45,7 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
         }
     }
 
+    //set previous disabled topics to map
     fun setPreviousDisabledTopics(disabledTopics: List<LMFeedTopicViewData>?) {
         if (disabledTopics.isNullOrEmpty()) return
         val updatedDisabledTopics = disabledTopics.map {
@@ -52,6 +54,7 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
         this.disabledTopics.addAll(updatedDisabledTopics)
     }
 
+    //get topics as per requirement
     fun getTopics(
         showAllTopicFilter: Boolean,
         showEnabledTopicOnly: Boolean,

@@ -1,20 +1,14 @@
 package com.likeminds.feedsx.posttypes.util
 
 import android.net.Uri
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.TextPaint
-import android.text.TextUtils
+import android.text.*
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.Menu.NONE
 import android.view.View
-import android.widget.ImageView
-import android.widget.PopupMenu
-import android.widget.TextView
+import android.widget.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.text.util.LinkifyCompat
@@ -26,33 +20,16 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMFeedBranding
-import com.likeminds.feedsx.databinding.LmFeedItemDocumentBinding
-import com.likeminds.feedsx.databinding.LmFeedItemPostDocumentsBinding
-import com.likeminds.feedsx.databinding.LmFeedItemPostLinkBinding
-import com.likeminds.feedsx.databinding.LmFeedItemPostMultipleMediaBinding
-import com.likeminds.feedsx.databinding.LmFeedLayoutAuthorFrameBinding
-import com.likeminds.feedsx.databinding.LmFeedLayoutPostActionsBinding
-import com.likeminds.feedsx.databinding.LmFeedTopicChipBinding
+import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.posttypes.model.AttachmentViewData
-import com.likeminds.feedsx.posttypes.model.IMAGE
-import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.posttypes.model.PostViewData
-import com.likeminds.feedsx.posttypes.model.VIDEO
-import com.likeminds.feedsx.posttypes.view.adapter.DocumentsPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
-import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
+import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.view.adapter.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
-import com.likeminds.feedsx.utils.AndroidUtils
-import com.likeminds.feedsx.utils.MemberImageUtil
-import com.likeminds.feedsx.utils.Route
-import com.likeminds.feedsx.utils.SeeMoreUtil
-import com.likeminds.feedsx.utils.TimeUtil
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
@@ -596,6 +573,7 @@ object PostTypeUtil {
         }
     }
 
+    //handle topic chip group if topics are present and add individual chip for topics
     private fun initTopicsView(chipGroup: ChipGroup, topics: List<LMFeedTopicViewData>) {
         if (topics.isEmpty()) {
             chipGroup.hide()
@@ -610,6 +588,7 @@ object PostTypeUtil {
         }
     }
 
+    //create chip view for topic
     private fun createTopicChip(chipGroup: ChipGroup, topicName: String): Chip {
         val binding = LmFeedTopicChipBinding.inflate(
             LayoutInflater.from(chipGroup.context),

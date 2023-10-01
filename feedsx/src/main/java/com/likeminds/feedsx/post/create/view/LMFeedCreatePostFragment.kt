@@ -151,6 +151,7 @@ class LMFeedCreatePostFragment :
         lmFeedHelperViewModel.fetchUserFromDB()
     }
 
+    // fetched enabled comments from api
     private fun checkForEnabledTopics() {
         lmFeedHelperViewModel.getAllTopics(true)
     }
@@ -854,6 +855,7 @@ class LMFeedCreatePostFragment :
         }
     }
 
+    //hide/show topics related views
     private fun handleTopicSelectionView(showView: Boolean) {
         binding.apply {
             cgTopics.isVisible = showView

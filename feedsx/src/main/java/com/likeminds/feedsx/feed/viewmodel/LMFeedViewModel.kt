@@ -210,6 +210,7 @@ class LMFeedViewModel @Inject constructor(
         }
     }
 
+    //get ids from topic selected adapter
     fun getTopicIdsFromAdapterList(items: List<BaseViewType>): List<String> {
         return items.map {
             (it as LMFeedTopicViewData).id

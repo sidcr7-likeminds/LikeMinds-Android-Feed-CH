@@ -3,7 +3,6 @@ package com.likeminds.feedsx.post.create.viewmodel
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.*
 import androidx.work.WorkContinuation
 import androidx.work.WorkManager
@@ -107,13 +106,6 @@ class LMFeedCreatePostViewModel @Inject constructor(
                 }
 
                 val request = requestBuilder.build()
-
-                Log.d(
-                    "PUI", """
-                    requestCreated: 
-                    text = ${request.text}
-                """.trimIndent()
-                )
 
                 val response = lmFeedClient.addPost(request)
                 if (response.success) {

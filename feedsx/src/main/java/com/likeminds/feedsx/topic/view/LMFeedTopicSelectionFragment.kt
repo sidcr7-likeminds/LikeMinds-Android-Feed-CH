@@ -13,19 +13,13 @@ import com.likeminds.feedsx.databinding.LmFeedFragmentTopicSelectionBinding
 import com.likeminds.feedsx.search.util.LMFeedCustomSearchBar
 import com.likeminds.feedsx.topic.adapter.LMFeedTopicSelectionAdapter
 import com.likeminds.feedsx.topic.adapter.LMFeedTopicSelectionAdapterListener
-import com.likeminds.feedsx.topic.model.LMFeedAllTopicsViewData
-import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
-import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
-import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
+import com.likeminds.feedsx.topic.model.*
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity.Companion.TOPIC_SELECTION_RESULT_EXTRAS
 import com.likeminds.feedsx.topic.viewmodel.LMFeedTopicSelectionViewModel
-import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
-import com.likeminds.feedsx.utils.ExtrasUtil
-import com.likeminds.feedsx.utils.ViewUtils
+import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
-import com.likeminds.feedsx.utils.emptyExtrasException
 
 class LMFeedTopicSelectionFragment :
     BaseFragment<LmFeedFragmentTopicSelectionBinding, LMFeedTopicSelectionViewModel>(),
@@ -166,6 +160,7 @@ class LMFeedTopicSelectionFragment :
         updateSelectedTopicsCount()
     }
 
+    //update selected count in subtitle
     private fun updateSelectedTopicsCount() {
         binding.tvToolbarSubTitle.apply {
             if (selectedTopics > 0) {
@@ -223,6 +218,7 @@ class LMFeedTopicSelectionFragment :
         }
     }
 
+    //check whether extras contains selected and disabled topics and set it to view model
     private fun checkForSelectedTopics() {
         val previousSelectedTopics = extras.selectedTopics
         val disabledTopics = extras.disabledTopics
@@ -289,6 +285,7 @@ class LMFeedTopicSelectionFragment :
         recyclerView.addOnScrollListener(scrollListener)
     }
 
+    //init search view and handle listeners
     private fun initSearchView() {
         binding.searchBar.apply {
             initialize(lifecycleScope)
@@ -326,6 +323,7 @@ class LMFeedTopicSelectionFragment :
         }
     }
 
+    //reset search view and show default view
     private fun clearSearchedTopics() {
         scrollListener.resetData()
         mAdapter.clearAndNotify()
