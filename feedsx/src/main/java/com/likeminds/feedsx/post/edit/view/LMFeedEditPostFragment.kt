@@ -25,8 +25,8 @@ import com.likeminds.feedsx.databinding.LmFeedFragmentEditPostBinding
 import com.likeminds.feedsx.databinding.LmFeedItemMultipleMediaVideoBinding
 import com.likeminds.feedsx.feed.util.PostEvent
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
-import com.likeminds.feedsx.post.edit.model.EditPostExtras
-import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
+import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
+import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity.Companion.EDIT_POST_EXTRAS
 import com.likeminds.feedsx.post.edit.view.adapter.EditPostDocumentsAdapter
 import com.likeminds.feedsx.post.edit.viewmodel.EditPostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
@@ -55,14 +55,14 @@ import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
 
-class EditPostFragment :
+class LMFeedEditPostFragment :
     BaseFragment<LmFeedFragmentEditPostBinding, EditPostViewModel>(),
     PostAdapterListener {
 
     @Inject
     lateinit var helperViewModel: HelperViewModel
 
-    private lateinit var editPostExtras: EditPostExtras
+    private lateinit var editPostExtras: LMFeedEditPostExtras
 
     private var fileAttachments: List<AttachmentViewData>? = null
     private var ogTags: LinkOGTagsViewData? = null
@@ -109,7 +109,7 @@ class EditPostFragment :
         editPostExtras = ExtrasUtil.getParcelable(
             arguments,
             EDIT_POST_EXTRAS,
-            EditPostExtras::class.java
+            LMFeedEditPostExtras::class.java
         ) ?: throw emptyExtrasException(TAG)
     }
 
@@ -446,6 +446,7 @@ class EditPostFragment :
     private fun setPostData(post: PostViewData) {
         binding.apply {
             val attachments = post.attachments
+            val topics = post.topics
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
 
@@ -486,6 +487,8 @@ class EditPostFragment :
 
                 }
             }
+
+
             initPostContentTextListener()
         }
     }
@@ -570,7 +573,7 @@ class EditPostFragment :
         binding.apply {
             multipleMediaAttachment.root.show()
             multipleMediaAttachment.buttonColor = LMFeedBranding.getButtonsColor()
-            val multiMediaAdapter = MultipleMediaPostAdapter(this@EditPostFragment)
+            val multiMediaAdapter = MultipleMediaPostAdapter(this@LMFeedEditPostFragment)
             val viewPager = multipleMediaAttachment.viewpagerMultipleMedia
             viewPager.adapter = multiMediaAdapter
             multipleMediaAttachment.dotsIndicator.setViewPager2(multipleMediaAttachment.viewpagerMultipleMedia)

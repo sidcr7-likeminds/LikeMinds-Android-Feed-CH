@@ -417,6 +417,7 @@ class LMFeedCreatePostFragment :
         chip.setOnClickListener {
             val extras = LMFeedTopicSelectionExtras.Builder()
                 .showAllTopicFilter(false)
+                .showEnabledTopicOnly(true)
                 .build()
             val intent = LMFeedTopicSelectionActivity.getIntent(requireContext(), extras)
             topicSelectionLauncher.launch(intent)
@@ -482,6 +483,7 @@ class LMFeedCreatePostFragment :
             val extras = LMFeedTopicSelectionExtras.Builder()
                 .showAllTopicFilter(false)
                 .selectedTopics(selectedTopic)
+                .showEnabledTopicOnly(true)
                 .build()
             val intent = LMFeedTopicSelectionActivity.getIntent(requireContext(), extras)
             topicSelectionLauncher.launch(intent)

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class EditPostExtras private constructor(
+class LMFeedEditPostExtras private constructor(
     val postId: String
 ) : Parcelable {
     class Builder {
@@ -12,7 +12,7 @@ class EditPostExtras private constructor(
 
         fun postId(postId: String) = apply { this.postId = postId }
 
-        fun build() = EditPostExtras(postId)
+        fun build() = LMFeedEditPostExtras(postId)
     }
 
     fun toBuilder(): Builder {

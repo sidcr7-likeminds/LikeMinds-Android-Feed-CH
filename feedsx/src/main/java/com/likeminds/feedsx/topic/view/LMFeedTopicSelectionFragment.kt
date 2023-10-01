@@ -182,7 +182,12 @@ class LMFeedTopicSelectionFragment :
 
     //calls api
     private fun fetchTopics() {
-        viewModel.getTopics(extras.showAllTopicFilter, 1, null)
+        viewModel.getTopics(
+            extras.showAllTopicFilter,
+            extras.showEnabledTopicOnly,
+            1,
+            null
+        )
     }
 
     //init listeners for done
@@ -268,7 +273,12 @@ class LMFeedTopicSelectionFragment :
             override fun onLoadMore(currentPage: Int) {
                 if (currentPage > 0) {
                     // calls api for paginated data
-                    viewModel.getTopics(extras.showAllTopicFilter, currentPage, searchKeyword)
+                    viewModel.getTopics(
+                        extras.showAllTopicFilter,
+                        extras.showEnabledTopicOnly,
+                        currentPage,
+                        searchKeyword
+                    )
                 }
             }
         }
@@ -293,7 +303,12 @@ class LMFeedTopicSelectionFragment :
                     scrollListener.resetData()
                     mAdapter.clearAndNotify()
                     searchKeyword = keyword
-                    viewModel.getTopics(false, 1, keyword)
+                    viewModel.getTopics(
+                        false,
+                        extras.showEnabledTopicOnly,
+                        1,
+                        keyword
+                    )
                 }
 
                 override fun emptyKeywordEntered() {
@@ -311,6 +326,11 @@ class LMFeedTopicSelectionFragment :
         scrollListener.resetData()
         mAdapter.clearAndNotify()
         searchKeyword = null
-        viewModel.getTopics(extras.showAllTopicFilter, 1, null)
+        viewModel.getTopics(
+            extras.showAllTopicFilter,
+            extras.showEnabledTopicOnly,
+            1,
+            null
+        )
     }
 }

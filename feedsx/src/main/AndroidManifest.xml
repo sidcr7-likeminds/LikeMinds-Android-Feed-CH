@@ -30,7 +30,7 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <activity
-            android:name="com.likeminds.feedsx.post.edit.view.EditPostActivity"
+            android:name="com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity

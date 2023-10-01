@@ -40,7 +40,12 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun getTopics(showAllTopicFilter: Boolean, page: Int, searchString: String? = null) {
+    fun getTopics(
+        showAllTopicFilter: Boolean,
+        showEnabledTopicOnly: Boolean,
+        page: Int,
+        searchString: String? = null
+    ) {
         viewModelScope.launchIO {
 
             val requestBuilder = GetTopicRequest.Builder()
@@ -50,6 +55,10 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
             if (!searchString.isNullOrEmpty()) {
                 requestBuilder.search(searchString)
                     .searchType(SEARCH_TYPE)
+            }
+
+            if (showEnabledTopicOnly) {
+                requestBuilder.isEnabled(true)
             }
 
             val request = requestBuilder.build()

@@ -111,8 +111,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
-            app:layout_constraintBottom_toBottomOf="parent">
+            tools:visibility="visible">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -128,12 +129,38 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/cg_topics"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="gone"
+                    app:chipSpacingHorizontal="4dp"
+                    app:chipSpacingVertical="4dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/author_frame"
+                    tools:visibility="visible" />
+
+                <View
+                    android:id="@+id/topic_separator"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/blue_separator"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/cg_topics"
+                    tools:visibility="visible" />
+
                 <com.likeminds.feedsx.branding.customview.LMFeedEditText
                     android:id="@+id/et_post_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginVertical="16dp"
                     android:background="@null"
                     android:ellipsize="end"
                     android:hint="@string/write_something_here"
@@ -148,7 +175,7 @@
                     android:textSize="16sp"
                     app:font_style="regular"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/author_frame" />
+                    app:layout_constraintTop_toBottomOf="@id/topic_separator" />
 
                 <com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
                     android:id="@+id/member_tagging_view"
