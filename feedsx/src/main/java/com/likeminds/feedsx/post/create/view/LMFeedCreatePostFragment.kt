@@ -335,17 +335,19 @@ class LMFeedCreatePostFragment :
                 if (selectedMediaUris.isNotEmpty()) {
                     handlePostButton(clickable = true, showProgress = true)
                     viewModel.addPost(
-                        requireContext(),
-                        updatedText,
-                        selectedMediaUris,
-                        ogTags
+                        context = requireContext(),
+                        postTextContent = updatedText,
+                        fileUris = selectedMediaUris,
+                        ogTags = ogTags,
+                        selectedTopics = selectedTopic
                     )
                 } else if (updatedText.isNotEmpty()) {
                     handlePostButton(clickable = true, showProgress = true)
                     viewModel.addPost(
-                        requireContext(),
-                        updatedText,
-                        ogTags = ogTags
+                        context = requireContext(),
+                        postTextContent = updatedText,
+                        ogTags = ogTags,
+                        selectedTopics = selectedTopic
                     )
                 }
             }

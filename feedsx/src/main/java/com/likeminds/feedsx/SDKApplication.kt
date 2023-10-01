@@ -48,7 +48,7 @@ class SDKApplication : LMCallback {
     private var lmFeedTopicComponent: LMFeedTopicComponent? = null
 
     companion object {
-        const val LOG_TAG = "LikeMinds"
+        const val LOG_TAG = "LikeMindsFeed"
         private var sdkApplicationInstance: SDKApplication? = null
         private var lmUICallback: LMFeedUICallback? = null
 
@@ -199,8 +199,8 @@ class SDKApplication : LMCallback {
         return reasonChooseComponent
     }
 
-    fun lmFeedTopicComponent():LMFeedTopicComponent?{
-        if (lmFeedTopicComponent == null){
+    fun lmFeedTopicComponent(): LMFeedTopicComponent? {
+        if (lmFeedTopicComponent == null) {
             lmFeedTopicComponent = likeMindsFeedComponent?.topicComponent()?.create()
         }
 

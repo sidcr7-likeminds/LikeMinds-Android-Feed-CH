@@ -4,13 +4,18 @@ import com.likeminds.feedsx.db.dao.PostWithAttachmentsDao
 import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.db.models.PostWithAttachments
+import com.likeminds.feedsx.db.models.TopicEntity
 import javax.inject.Inject
 
 class PostWithAttachmentsRepository @Inject constructor(
     private val postWithAttachmentsDao: PostWithAttachmentsDao
 ) {
-    suspend fun insertPostWithAttachments(post: PostEntity, attachments: List<AttachmentEntity>) {
-        postWithAttachmentsDao.insertPostWithAttachments(post, attachments)
+    suspend fun insertPostWithAttachments(
+        post: PostEntity,
+        attachments: List<AttachmentEntity>,
+        topics: List<TopicEntity>
+    ) {
+        postWithAttachmentsDao.insertPostWithAttachments(post, attachments, topics)
     }
 
     suspend fun updatePost(post: PostEntity) {

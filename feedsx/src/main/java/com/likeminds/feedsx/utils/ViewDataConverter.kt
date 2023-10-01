@@ -8,6 +8,7 @@ import com.likeminds.feedsx.db.models.MemberRightsEntity
 import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.db.models.PostWithAttachments
 import com.likeminds.feedsx.db.models.SDKClientInfoEntity
+import com.likeminds.feedsx.db.models.TopicEntity
 import com.likeminds.feedsx.db.models.UserEntity
 import com.likeminds.feedsx.delete.model.ReasonChooseViewData
 import com.likeminds.feedsx.likes.model.LikeViewData
@@ -733,6 +734,7 @@ object ViewDataConverter {
     fun convertPost(postWithAttachments: PostWithAttachments): PostViewData {
         val post = postWithAttachments.post
         val attachments = postWithAttachments.attachments
+        val topics = postWithAttachments.topics
         return PostViewData.Builder()
             .text(post.text)
             .temporaryId(post.temporaryId)
@@ -740,7 +742,14 @@ object ViewDataConverter {
             .workerUUID(post.uuid)
             .isPosted(post.isPosted)
             .attachments(convertAttachmentsEntity(attachments))
+            .topics(convertTopicsEntity(topics))
             .build()
+    }
+
+    private fun convertTopicsEntity(topics: List<TopicEntity>): List<LMFeedTopicViewData> {
+        return topics.map { topic ->
+            convertTopic(topic)
+        }
     }
 
     private fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
@@ -768,6 +777,14 @@ object ViewDataConverter {
             .uri(Uri.parse(attachmentMeta.uri))
             .width(attachmentMeta.width)
             .height(attachmentMeta.height)
+            .build()
+    }
+
+    private fun convertTopic(topicEntity: TopicEntity): LMFeedTopicViewData {
+        return LMFeedTopicViewData.Builder()
+            .id(topicEntity.id)
+            .name(topicEntity.name)
+            .isEnabled(topicEntity.isEnabled)
             .build()
     }
 
@@ -836,6 +853,15 @@ object ViewDataConverter {
             .localFilePath(singleUriData.localFilePath)
             .width(singleUriData.width)
             .height(singleUriData.height)
+            .build()
+    }
+
+    fun convertTopic(temporaryId: Long, topic: LMFeedTopicViewData): TopicEntity {
+        return TopicEntity.Builder()
+            .id(topic.id)
+            .isEnabled(topic.isEnabled)
+            .name(topic.name)
+            .postId(temporaryId.toString())
             .build()
     }
 }

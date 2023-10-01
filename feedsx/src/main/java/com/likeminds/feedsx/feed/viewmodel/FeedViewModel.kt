@@ -110,9 +110,15 @@ class FeedViewModel @Inject constructor(
                 } else {
                     postingData.text
                 }
+
+            val topicIds = postingData.topics.map {
+                it.id
+            }
+
             val request = AddPostRequest.Builder()
                 .text(updatedText)
                 .attachments(createAttachments(postingData.attachments))
+                .topicIds(topicIds)
                 .build()
 
             val response = lmFeedClient.addPost(request)
@@ -271,6 +277,7 @@ class FeedViewModel @Inject constructor(
         val map = hashMapOf<String, String>()
         // fetches list of tagged users
         val taggedUsers = MemberTaggingDecoder.decodeAndReturnAllTaggedMembers(post.text)
+        val topics = post.topics
 
         // adds tagged user count and their ids in the map
         if (taggedUsers.isNotEmpty()) {
@@ -283,6 +290,14 @@ class FeedViewModel @Inject constructor(
             map["tagged_users_id"] = taggedUserIds
         } else {
             map["user_tagged"] = "no"
+        }
+
+        if (topics.isNotEmpty()) {
+            val topicsNameString = topics.joinToString(", ") { it.name }
+            map["topics_added"] = "yes"
+            map["topics"] = topicsNameString
+        } else {
+            map["topics_added"] = "no"
         }
 
         // gets event property key and corresponding value for post attachments

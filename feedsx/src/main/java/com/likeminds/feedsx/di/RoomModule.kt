@@ -19,6 +19,7 @@ class RoomModule {
     fun provideFeedSXDatabase(context: Context): FeedSXDatabase {
         return Room.databaseBuilder(context, FeedSXDatabase::class.java, DbConstants.FEED_SX_DB)
             .addMigrations(DbMigration.MIGRATION_1_2, DbMigration.MIGRATION_2_3)
+            .fallbackToDestructiveMigration()
             .build()
     }
 
