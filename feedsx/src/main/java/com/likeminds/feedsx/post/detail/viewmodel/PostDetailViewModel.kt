@@ -3,8 +3,7 @@ package com.likeminds.feedsx.post.detail.viewmodel
 import androidx.lifecycle.*
 import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.feed.UserWithRightsRepository
-import com.likeminds.feedsx.posttypes.model.CommentViewData
-import com.likeminds.feedsx.posttypes.model.PostViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.LMFeedUserPreferences
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -72,7 +71,17 @@ class PostDetailViewModel @Inject constructor(
             val errorMessage: String?
         ) : ErrorMessageEvent()
 
-        data class AddComment(val errorMessage: String?) : ErrorMessageEvent()
+        data class AddComment(
+            val tempId: String,
+            val errorMessage: String?
+        ) : ErrorMessageEvent()
+
+        data class ReplyComment(
+            val parentCommentId: String,
+            val tempId: String,
+            val errorMessage: String?
+        ) : ErrorMessageEvent()
+
         data class EditComment(val errorMessage: String?) : ErrorMessageEvent()
         data class DeleteComment(val errorMessage: String?) : ErrorMessageEvent()
         data class GetComment(val errorMessage: String?) : ErrorMessageEvent()
@@ -140,12 +149,19 @@ class PostDetailViewModel @Inject constructor(
     }
 
     // for adding comment on post
-    fun addComment(postId: String, text: String) {
+    fun addComment(
+        postId: String,
+        tempId: String,
+        text: String
+    ) {
         viewModelScope.launchIO {
+            // initializes temp id for local handling of comment
+
             // builds api request
             val request = AddCommentRequest.Builder()
                 .postId(postId)
                 .text(text)
+                .tempId(tempId)
                 .build()
 
             // calls api
@@ -164,7 +180,12 @@ class PostDetailViewModel @Inject constructor(
                     )
                 )
             } else {
-                errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
+                errorMessageChannel.send(
+                    ErrorMessageEvent.AddComment(
+                        tempId,
+                        response.errorMessage
+                    )
+                )
             }
         }
     }
@@ -221,7 +242,8 @@ class PostDetailViewModel @Inject constructor(
         parentCommentCreatorUUID: String,
         postId: String,
         parentCommentId: String,
-        text: String
+        text: String,
+        tempId: String
     ) {
         viewModelScope.launchIO {
             // builds api request
@@ -229,6 +251,7 @@ class PostDetailViewModel @Inject constructor(
                 .postId(postId)
                 .commentId(parentCommentId)
                 .text(text)
+                .tempId(tempId)
                 .build()
 
             // calls api
@@ -256,7 +279,13 @@ class PostDetailViewModel @Inject constructor(
                     )
                 )
             } else {
-                errorMessageChannel.send(ErrorMessageEvent.AddComment(response.errorMessage))
+                errorMessageChannel.send(
+                    ErrorMessageEvent.ReplyComment(
+                        parentCommentId,
+                        tempId,
+                        response.errorMessage
+                    )
+                )
             }
         }
     }
@@ -433,5 +462,31 @@ class PostDetailViewModel @Inject constructor(
                 )
             )
         }
+    }
+
+    // returns [CommentViewData] for local handling of comment
+    fun getCommentViewDataForLocalHandling(
+        postId: String,
+        createdAt: Long,
+        tempId: String,
+        text: String,
+        parentCommentId: String?,
+        level: Int = 0
+    ): CommentViewData {
+        // adds comment locally
+        return CommentViewData.Builder()
+            .postId(postId)
+            .user(
+                UserViewData.Builder()
+                    .name(userPreferences.getUserName() ?: "")
+                    .build()
+            )
+            .createdAt(createdAt)
+            .id(tempId)
+            .tempId(tempId)
+            .text(text)
+            .parentId(parentCommentId)
+            .level(level)
+            .build()
     }
 }
