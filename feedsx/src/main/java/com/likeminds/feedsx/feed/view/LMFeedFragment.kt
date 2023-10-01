@@ -825,7 +825,7 @@ class LMFeedFragment :
             clearTopics()
         } else {
             //remove from adapter
-            mSelectedTopicAdapter.removeIndex(position)
+            mSelectedTopicAdapter.removeIndexWithNotifyDataSetChanged(position)
 
             //call apis
             mScrollListener.resetData()
