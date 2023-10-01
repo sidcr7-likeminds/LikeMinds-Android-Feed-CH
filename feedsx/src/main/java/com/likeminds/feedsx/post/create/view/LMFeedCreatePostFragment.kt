@@ -463,7 +463,10 @@ class LMFeedCreatePostFragment :
             chipGroup,
             false
         )
-        binding.chipTopic.text = topicName
+        binding.chipTopic.apply {
+            text = topicName
+            setEnsureMinTouchTargetSize(false)
+        }
         return binding.chipTopic
     }
 
@@ -474,6 +477,7 @@ class LMFeedCreatePostFragment :
             false
         )
         val chip = binding.editChip
+        chip.setEnsureMinTouchTargetSize(false)
         chip.setOnClickListener {
             val extras = LMFeedTopicSelectionExtras.Builder()
                 .showAllTopicFilter(false)

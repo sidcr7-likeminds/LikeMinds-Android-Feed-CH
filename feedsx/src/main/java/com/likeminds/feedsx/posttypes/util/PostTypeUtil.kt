@@ -616,7 +616,11 @@ object PostTypeUtil {
             chipGroup,
             false
         )
-        binding.chipTopic.text = topicName
+        binding.chipTopic.apply {
+            text = topicName
+            setEnsureMinTouchTargetSize(false)
+        }
+
         return binding.chipTopic
     }
 }
