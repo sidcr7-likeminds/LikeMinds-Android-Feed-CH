@@ -5,6 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
+import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedEditTopicChipBinding
 import com.likeminds.feedsx.databinding.LmFeedSelectTopicChipBinding
 import com.likeminds.feedsx.databinding.LmFeedTopicChipBinding
@@ -26,6 +27,7 @@ object LMFeedTopicChipUtil {
             chipGroup,
             false
         )
+        binding.buttonColor = LMFeedBranding.getButtonsColor()
         val chip = binding.chipTopic
 
         //add click listener
@@ -49,6 +51,7 @@ object LMFeedTopicChipUtil {
             chipGroup,
             false
         )
+        binding.buttonColor = LMFeedBranding.getButtonsColor()
         binding.chipTopic.apply {
             text = topicName
             setEnsureMinTouchTargetSize(false)

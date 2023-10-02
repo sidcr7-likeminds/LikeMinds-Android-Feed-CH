@@ -595,6 +595,7 @@ object PostTypeUtil {
             chipGroup,
             false
         )
+        binding.buttonColor = LMFeedBranding.getButtonsColor()
         binding.chipTopic.apply {
             text = topicName
             setEnsureMinTouchTargetSize(false)
