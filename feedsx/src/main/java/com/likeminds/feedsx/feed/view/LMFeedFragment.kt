@@ -475,10 +475,6 @@ class LMFeedFragment :
                 binding.tvNotificationCount.hide()
                 ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
             }
-
-            is LMFeedViewModel.ErrorMessageEvent.GetTopic -> {
-                ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
-            }
         }
     }
 

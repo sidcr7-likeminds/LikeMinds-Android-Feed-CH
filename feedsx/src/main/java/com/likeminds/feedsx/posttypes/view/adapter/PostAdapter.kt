@@ -89,8 +89,4 @@ interface PostAdapterListener {
     fun updateFromLikedSaved(position: Int) {
         //triggered to update the data with re-inflation of the item
     }
-
-    fun selectTopicsSelected() {
-        //triggered when selecting topics
-    }
 }
