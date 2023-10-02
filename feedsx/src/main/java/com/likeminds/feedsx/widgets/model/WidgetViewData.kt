@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class WidgetsViewData private constructor(
+class WidgetViewData private constructor(
     val id: String,
     val createdAt: Long,
     val widgetMetaData: WidgetMetaViewData?,
@@ -31,7 +31,7 @@ class WidgetsViewData private constructor(
 
         fun updatedAt(updatedAt: Long) = apply { this.updatedAt = updatedAt }
 
-        fun build() = WidgetsViewData(
+        fun build() = WidgetViewData(
             id,
             createdAt,
             widgetMetaData,

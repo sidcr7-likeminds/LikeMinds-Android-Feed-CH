@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.edit.view
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.util.Log
 import android.view.MotionEvent
@@ -27,12 +28,16 @@ import com.likeminds.feedsx.media.view.LMFeedImageCropFragment
 import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
 import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
 import com.likeminds.feedsx.post.create.view.*
-import com.likeminds.feedsx.post.edit.model.EditPostExtras
-import com.likeminds.feedsx.post.edit.view.EditPostActivity.Companion.EDIT_POST_EXTRAS
-import com.likeminds.feedsx.post.edit.viewmodel.EditPostViewModel
-import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
+import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
+import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity.Companion.EDIT_POST_EXTRAS
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedEditPostViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
+import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -43,24 +48,24 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.*
-import com.likeminds.feedsx.widgets.model.WidgetsViewData
+import com.likeminds.feedsx.widgets.model.WidgetViewData
 import kotlinx.coroutines.flow.*
 import java.util.*
 import javax.inject.Inject
 
-class EditPostFragment :
-    BaseFragment<LmFeedFragmentEditPostBinding, EditPostViewModel>(),
+class LMFeedEditPostFragment :
+    BaseFragment<LmFeedFragmentEditPostBinding, LMFeedEditPostViewModel>(),
     LMFeedDiscardResourceDialog.DiscardResourceDialogListener,
     PostAdapterListener,
     LMFeedRemoveAttachmentDialogFragment.RemoveAttachmentDialogListener {
 
     @Inject
-    lateinit var helperViewModel: HelperViewModel
+    lateinit var lmFeedHelperViewModel: LMFeedHelperViewModel
 
-    private lateinit var editPostExtras: EditPostExtras
+    private lateinit var editPostExtras: LMFeedEditPostExtras
 
     private var fileAttachments: List<AttachmentViewData>? = null
-    private var widget: WidgetsViewData? = null
+    private var widget: WidgetViewData? = null
     private var ogTags: LinkOGTagsViewData? = null
 
     private var articleSingleUriData: SingleUriData? = null
@@ -79,7 +84,16 @@ class EditPostFragment :
 
     private var isEditingArticle: Boolean = false
 
+    private val selectedTopic by lazy {
+        HashMap<String, LMFeedTopicViewData>()
+    }
+
+    private val disabledTopics by lazy {
+        HashMap<String, LMFeedTopicViewData>()
+    }
+
     companion object {
+
         const val TAG = "EditPostFragment"
     }
 
@@ -106,8 +120,8 @@ class EditPostFragment :
             }
         }
 
-    override fun getViewModelClass(): Class<EditPostViewModel> {
-        return EditPostViewModel::class.java
+    override fun getViewModelClass(): Class<LMFeedEditPostViewModel> {
+        return LMFeedEditPostViewModel::class.java
     }
 
     override fun attachDagger() {
@@ -128,7 +142,7 @@ class EditPostFragment :
         editPostExtras = ExtrasUtil.getParcelable(
             arguments,
             EDIT_POST_EXTRAS,
-            EditPostExtras::class.java
+            LMFeedEditPostExtras::class.java
         ) ?: throw emptyExtrasException(TAG)
     }
 
@@ -277,7 +291,7 @@ class EditPostFragment :
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        helperViewModel.fetchUserFromDB()
+        lmFeedHelperViewModel.fetchUserFromDB()
     }
 
     /**
@@ -298,14 +312,14 @@ class EditPostFragment :
         memberTagging.addListener(object : MemberTaggingViewListener {
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
-                helperViewModel.sendUserTagEvent(
+                lmFeedHelperViewModel.sendUserTagEvent(
                     user.userUniqueId,
                     memberTagging.getTaggedMemberCount()
                 )
             }
 
             override fun callApi(page: Int, searchName: String) {
-                helperViewModel.getMembersForTagging(page, searchName)
+                lmFeedHelperViewModel.getMembersForTagging(page, searchName)
             }
         })
     }
@@ -381,6 +395,76 @@ class EditPostFragment :
         }
     }
 
+    //todo check with new code
+    private fun savePost() {
+        val text = binding.etPostContent.text
+        val updatedText = memberTagging.replaceSelectedMembers(text).trim()
+        val topics = selectedTopic.values
+
+        if (selectedTopic.isNotEmpty()) {
+            if (disabledTopics.isEmpty()) {
+                //call api as all topics are enabled
+                handleSaveButton(clickable = true, showProgress = true)
+                viewModel.editPost(
+                    editPostExtras.postId,
+                    updatedText,
+                    attachments = fileAttachments,
+                    ogTags = ogTags,
+                    selectedTopics = topics.toList()
+                )
+            } else {
+                //show dialog for disabled topics
+                showDisabledTopicsAlert(disabledTopics.values.toList())
+            }
+        } else {
+            //call api as no topics are enabled
+            handleSaveButton(clickable = true, showProgress = true)
+            viewModel.editPost(
+                editPostExtras.postId,
+                updatedText,
+                attachments = fileAttachments,
+                ogTags = ogTags,
+                selectedTopics = topics.toList()
+            )
+        }
+    }
+
+    //show alert for disabled topics
+    private fun showDisabledTopicsAlert(disabledTopics: List<LMFeedTopicViewData>) {
+        val noOfDisabledTopics = disabledTopics.size
+
+        //create message string
+        val topicNameString = disabledTopics.joinToString(", ") { it.name }
+        val firstLineMessage = resources.getQuantityString(
+            R.plurals.topic_disabled_message,
+            noOfDisabledTopics,
+            noOfDisabledTopics
+        )
+        val finalMessage = "$firstLineMessage \n $topicNameString"
+
+        //create dialog
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle(
+                resources.getQuantityString(
+                    R.plurals.topic_disabled,
+                    noOfDisabledTopics,
+                    noOfDisabledTopics
+                )
+            )
+            .setMessage(finalMessage)
+            .setPositiveButton(R.string.ok) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
+
+        //set positive button color
+        val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton?.apply {
+            isAllCaps = true
+            setTextColor(LMFeedBranding.getButtonsColor())
+        }
+    }
+
     // adds text watcher on post content edit text
     @SuppressLint("ClickableViewAccessibility")
     private fun initPostContentTextListener() {
@@ -405,6 +489,14 @@ class EditPostFragment :
         }
     }
 
+    //handles topics chip group and separator line
+    private fun handleTopicSelectionView(showView: Boolean) {
+        binding.apply {
+            cgTopics.isVisible = showView
+            topicSeparator.isVisible = showView
+        }
+    }
+
     // handles Save Done button click-ability
     private fun handleSaveButton(
         visible: Boolean
@@ -426,7 +518,7 @@ class EditPostFragment :
         observeMembersTaggingList()
 
         // observes userData and initializes the user view
-        helperViewModel.userData.observe(viewLifecycleOwner) {
+        lmFeedHelperViewModel.userData.observe(viewLifecycleOwner) {
             initAuthorFrame(it)
         }
 
@@ -434,10 +526,19 @@ class EditPostFragment :
             observeUploading(it)
         }
 
+        lmFeedHelperViewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopics ->
+            if (showTopics) {
+                handleTopicSelectionView(true)
+                initTopicSelectionView()
+            } else {
+                handleTopicSelectionView(false)
+            }
+        }
+
         // observes postResponse live data
         viewModel.postDataEventFlow.onEach { response ->
             when (response) {
-                is EditPostViewModel.PostDataEvent.EditPost -> {
+                is LMFeedEditPostViewModel.PostDataEvent.EditPost -> {
                     // updated post from editPost response
 
                     val post = response.post
@@ -451,7 +552,7 @@ class EditPostFragment :
                     }
                 }
 
-                is EditPostViewModel.PostDataEvent.GetPost -> {
+                is LMFeedEditPostViewModel.PostDataEvent.GetPost -> {
                     // post from getPost response
                     post = response.post
                     initEditTextListener()
@@ -459,6 +560,12 @@ class EditPostFragment :
                 }
             }
         }.observeInLifecycle(viewLifecycleOwner)
+
+        // observes decodeUrlResponse and returns link ogTags
+        lmFeedHelperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
+            this.ogTags = ogTags
+            initLinkView()
+        }
     }
 
     // initializes a listener to edit text
@@ -486,13 +593,13 @@ class EditPostFragment :
     private fun observeErrors() {
         viewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is EditPostViewModel.ErrorMessageEvent.EditPost -> {
+                is LMFeedEditPostViewModel.ErrorMessageEvent.EditPost -> {
                     handleSaveButton(visible = true)
                     binding.progressBar.root.show()
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
-                is EditPostViewModel.ErrorMessageEvent.GetPost -> {
+                is LMFeedEditPostViewModel.ErrorMessageEvent.GetPost -> {
                     requireActivity().apply {
                         ViewUtils.showErrorMessageToast(this, response.errorMessage)
                         setResult(Activity.RESULT_CANCELED)
@@ -502,13 +609,23 @@ class EditPostFragment :
             }
         }.observeInLifecycle(viewLifecycleOwner)
 
-        helperViewModel.errorEventFlow.onEach { response ->
+        lmFeedHelperViewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
+                is LMFeedHelperViewModel.ErrorMessageEvent.DecodeUrl -> {
+                    val postText = binding.etPostContent.text.toString()
+                    val link = postText.getUrlIfExist()
+                    if (link != ogTags?.url) {
+                        clearPreviewLink()
+                    }
+                }
+
+                is LMFeedHelperViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
-                else -> {}
+                is LMFeedHelperViewModel.ErrorMessageEvent.GetTopic -> {
+
+                }
             }
         }.observeInLifecycle(viewLifecycleOwner)
     }
@@ -519,7 +636,7 @@ class EditPostFragment :
      * second -> Community Members and Groups
      */
     private fun observeMembersTaggingList() {
-        helperViewModel.taggingData.observe(viewLifecycleOwner) { result ->
+        lmFeedHelperViewModel.taggingData.observe(viewLifecycleOwner) { result ->
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
@@ -527,6 +644,8 @@ class EditPostFragment :
     // sets the post data in view
     private fun setPostData(post: PostViewData) {
         binding.apply {
+            val attachments = post.attachments
+            val topics = post.topics
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
 
@@ -589,6 +708,24 @@ class EditPostFragment :
 
             else -> {
                 Log.e(SDKApplication.LOG_TAG, "invalid view type")
+            }
+
+            if (topics.isNotEmpty()) {
+                handleTopicSelectionView(true)
+
+                selectedTopic.clear()
+                disabledTopics.clear()
+
+                //filter disabled topics
+                topics.forEach { topic ->
+                    if (!topic.isEnabled) {
+                        disabledTopics[topic.id] = topic
+                    }
+                }
+
+                addTopicsToGroup(false, topics)
+            } else {
+                lmFeedHelperViewModel.getAllTopics(true)
             }
         }
     }
@@ -783,5 +920,69 @@ class EditPostFragment :
     // when user removes attachment
     override fun onCancelled() {
         removeAttachmentDialogFragment?.dismiss()
+    }
+
+    //init initial topic selection view with "Select Topic Chip"
+    private fun initTopicSelectionView() {
+        binding.cgTopics.apply {
+            removeAllViews()
+            addView(LMFeedTopicChipUtil.createSelectTopicsChip(requireContext(), this) { intent ->
+                topicSelectionLauncher.launch(intent)
+            })
+        }
+    }
+
+    //start activity -> Topic Selection and check for result with selected topics
+    private val topicSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val bundle = result.data?.extras
+                val resultExtras = ExtrasUtil.getParcelable(
+                    bundle,
+                    LMFeedTopicSelectionActivity.TOPIC_SELECTION_RESULT_EXTRAS,
+                    LMFeedTopicSelectionResultExtras::class.java
+                ) ?: return@registerForActivityResult
+
+                val selectedTopics = resultExtras.selectedTopics
+                if (selectedTopics.isNotEmpty()) {
+                    addTopicsToGroup(true, selectedTopics)
+                }
+            }
+        }
+
+    //add selected topics to group and add edit chip as well in the end
+    private fun addTopicsToGroup(
+        isAfterSelection: Boolean,
+        newSelectedTopics: List<LMFeedTopicViewData>
+    ) {
+        if (isAfterSelection) {
+            disabledTopics.clear()
+            selectedTopic.clear()
+        }
+
+        newSelectedTopics.forEach { topic ->
+            if (!topic.isEnabled) {
+                disabledTopics[topic.id] = topic
+            }
+            selectedTopic[topic.id] = topic
+        }
+
+        val selectedTopics = selectedTopic.values.toList()
+
+        binding.cgTopics.apply {
+            removeAllViews()
+            selectedTopics.forEach { topic ->
+                addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
+            }
+            addView(
+                LMFeedTopicChipUtil.createEditChip(
+                    requireContext(),
+                    selectedTopics,
+                    this,
+                    disabledTopics.values.toList()
+                ) { intent ->
+                    topicSelectionLauncher.launch(intent)
+                })
+        }
     }
 }

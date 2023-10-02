@@ -32,6 +32,19 @@ import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
 import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
+import com.likeminds.feedsx.post.create.util.CreatePostListener
+import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity.Companion.POST_ATTACHMENTS_LIMIT
+import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
+import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
+import com.likeminds.feedsx.post.create.viewmodel.LMFeedCreatePostViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
+import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
+import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
+import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -51,7 +64,7 @@ import java.util.*
 import javax.inject.Inject
 
 class LMFeedCreatePostFragment :
-    BaseFragment<LmFeedFragmentCreatePostBinding, CreatePostViewModel>(),
+    BaseFragment<LmFeedFragmentCreatePostBinding, LMFeedCreatePostViewModel>(),
     LMFeedDiscardResourceDialog.DiscardResourceDialogListener,
     LMFeedRemoveAttachmentDialogFragment.RemoveAttachmentDialogListener {
 
@@ -59,7 +72,7 @@ class LMFeedCreatePostFragment :
     lateinit var initiateViewModel: InitiateViewModel
 
     @Inject
-    lateinit var helperViewModel: HelperViewModel
+    lateinit var lmFeedHelperViewModel: LMFeedHelperViewModel
 
     @Inject
     lateinit var userPreferences: LMFeedUserPreferences
@@ -81,6 +94,10 @@ class LMFeedCreatePostFragment :
     }
     private var discardResourceDialog: LMFeedDiscardResourceDialog? = null
     private var removeAttachmentDialogFragment: LMFeedRemoveAttachmentDialogFragment? = null
+
+    private val selectedTopic by lazy {
+        ArrayList<LMFeedTopicViewData>()
+    }
 
     override val useSharedViewModel: Boolean
         get() = true
@@ -124,8 +141,8 @@ class LMFeedCreatePostFragment :
             }
         }
 
-    override fun getViewModelClass(): Class<CreatePostViewModel> {
-        return CreatePostViewModel::class.java
+    override fun getViewModelClass(): Class<LMFeedCreatePostViewModel> {
+        return LMFeedCreatePostViewModel::class.java
     }
 
     override fun attachDagger() {
@@ -192,6 +209,7 @@ class LMFeedCreatePostFragment :
         initView()
         initEditTextListener()
         fetchUserFromDB()
+        checkForEnabledTopics()
         initMemberTaggingView()
         initPostDoneListener()
     }
@@ -484,7 +502,12 @@ class LMFeedCreatePostFragment :
 
     // fetches user data from local db
     private fun fetchUserFromDB() {
-        helperViewModel.fetchUserFromDB()
+        lmFeedHelperViewModel.fetchUserFromDB()
+    }
+
+    // fetched enabled comments from api
+    private fun checkForEnabledTopics() {
+        lmFeedHelperViewModel.getAllTopics(true)
     }
 
     // observes data
@@ -494,7 +517,7 @@ class LMFeedCreatePostFragment :
         observeErrors()
         observeMembersTaggingList()
         // observes userData and initializes the user view
-        helperViewModel.userData.observe(viewLifecycleOwner) {
+        lmFeedHelperViewModel.userData.observe(viewLifecycleOwner) {
             loggedInUserUUID = it.sdkClientInfoViewData.uuid
             if (user == null) {
                 user = it
@@ -502,7 +525,7 @@ class LMFeedCreatePostFragment :
             }
         }
         // observes decodeUrlResponse and returns link ogTags
-        helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
+        lmFeedHelperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
             this.ogTags = ogTags
             showPostMedia()
         }
@@ -520,6 +543,15 @@ class LMFeedCreatePostFragment :
                 finish()
             }
         }
+
+        lmFeedHelperViewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopicSelection ->
+            if (showTopicSelection) {
+                initTopicSelectionView()
+                handleTopicSelectionView(true)
+            } else {
+                handleTopicSelectionView(false)
+            }
+        }
     }
 
     /**
@@ -528,7 +560,7 @@ class LMFeedCreatePostFragment :
      * second -> Community Members and Groups
      */
     private fun observeMembersTaggingList() {
-        helperViewModel.taggingData.observe(viewLifecycleOwner) { result ->
+        lmFeedHelperViewModel.taggingData.observe(viewLifecycleOwner) { result ->
             MemberTaggingUtil.setMembersInView(memberTagging, result)
         }
     }
@@ -537,7 +569,7 @@ class LMFeedCreatePostFragment :
     private fun observeErrors() {
         viewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is CreatePostViewModel.ErrorMessageEvent.AddPost -> {
+                is LMFeedCreatePostViewModel.ErrorMessageEvent.AddPost -> {
                     handleProgressBar(false)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
@@ -545,13 +577,18 @@ class LMFeedCreatePostFragment :
             }
         }.observeInLifecycle(viewLifecycleOwner)
 
-        helperViewModel.errorEventFlow.onEach { response ->
+        lmFeedHelperViewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is HelperViewModel.ErrorMessageEvent.DecodeUrl -> {
+                is LMFeedHelperViewModel.ErrorMessageEvent.DecodeUrl -> {
                     clearPreviewLink()
                 }
 
-                is HelperViewModel.ErrorMessageEvent.GetTaggingList -> {
+                is LMFeedHelperViewModel.ErrorMessageEvent.GetTaggingList -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+
+                is LMFeedHelperViewModel.ErrorMessageEvent.GetTopic -> {
+                    handleTopicSelectionView(showView = false)
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
@@ -577,14 +614,14 @@ class LMFeedCreatePostFragment :
         memberTagging.addListener(object : MemberTaggingViewListener {
             override fun onMemberTagged(user: UserTagViewData) {
                 // sends user tagged event
-                helperViewModel.sendUserTagEvent(
+                lmFeedHelperViewModel.sendUserTagEvent(
                     user.uuid,
                     memberTagging.getTaggedMemberCount()
                 )
             }
 
             override fun callApi(page: Int, searchName: String) {
-                helperViewModel.getMembersForTagging(page, searchName)
+                lmFeedHelperViewModel.getMembersForTagging(page, searchName)
             }
         })
     }
@@ -606,6 +643,7 @@ class LMFeedCreatePostFragment :
                     ogTags,
                     onBehalfOfUUID
                 )
+                //todo add selectedTopics
             }
         }
     }
@@ -627,6 +665,134 @@ class LMFeedCreatePostFragment :
                 creatorImage,
                 showRoundImage = true,
                 objectKey = user?.updatedAt
+            )
+        }
+    }
+
+    //init initial topic selection view with "Select Topic Chip"
+    private fun initTopicSelectionView() {
+        binding.cgTopics.apply {
+            removeAllViews()
+            addView(LMFeedTopicChipUtil.createSelectTopicsChip(requireContext(), this) { intent ->
+                topicSelectionLauncher.launch(intent)
+            })
+        }
+    }
+
+    //start activity -> Topic Selection and check for result with selected topics
+    private val topicSelectionLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val bundle = result.data?.extras
+                val resultExtras = ExtrasUtil.getParcelable(
+                    bundle,
+                    LMFeedTopicSelectionActivity.TOPIC_SELECTION_RESULT_EXTRAS,
+                    LMFeedTopicSelectionResultExtras::class.java
+                ) ?: return@registerForActivityResult
+
+                val selectedTopics = resultExtras.selectedTopics
+                if (selectedTopics.isNotEmpty()) {
+                    addTopicsToGroup(selectedTopics)
+                }
+            }
+        }
+
+    //add selected topics to group and add edit chip as well in the end
+    private fun addTopicsToGroup(newSelectedTopics: List<LMFeedTopicViewData>) {
+        this.selectedTopic.apply {
+            clear()
+            addAll(newSelectedTopics)
+        }
+        binding.cgTopics.apply {
+            removeAllViews()
+            newSelectedTopics.forEach { topic ->
+                addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
+            }
+            addView(
+                LMFeedTopicChipUtil.createEditChip(requireContext(), selectedTopic, this) { intent ->
+                    topicSelectionLauncher.launch(intent)
+                })
+        }
+    }
+
+    /**
+     * Adds TextWatcher to edit text with Flow operators
+     * **/
+    @ExperimentalCoroutinesApi
+    @CheckResult
+    fun EditText.textChanges(): Flow<CharSequence?> {
+        return callbackFlow<CharSequence?> {
+            etPostTextChangeListener = object : TextWatcher {
+                override fun afterTextChanged(s: Editable?) = Unit
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) = Unit
+
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                    (this@callbackFlow).trySend(s.toString())
+                }
+            }
+            addTextChangedListener(etPostTextChangeListener)
+            awaitClose { removeTextChangedListener(etPostTextChangeListener) }
+        }.onStart { emit(text) }
+    }
+
+    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
+    private fun initiateMediaPicker(list: List<String>) {
+        val extras = MediaPickerExtras.Builder()
+            .mediaTypes(list)
+            .allowMultipleSelect(true)
+            .build()
+        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
+        galleryLauncher.launch(intent)
+    }
+
+    // process the result obtained from media picker
+    private fun checkMediaPickedResult(result: MediaPickerResult?) {
+        if (result != null) {
+            when (result.mediaPickerResultType) {
+                MEDIA_RESULT_BROWSE -> {
+                    if (MediaType.isPDF(result.mediaTypes)) {
+                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
+                            allowMultipleSelect = result.allowMultipleSelect
+                        )
+                        documentBrowseLauncher.launch(intent)
+                    } else {
+                        val intent = AndroidUtils.getExternalPickerIntent(
+                            result.mediaTypes,
+                            result.allowMultipleSelect,
+                            result.browseClassName
+                        )
+                        if (intent != null)
+                            mediaBrowseLauncher.launch(intent)
+                    }
+                }
+
+                MEDIA_RESULT_PICKED -> {
+                    onMediaPicked(result)
+                }
+            }
+        }
+    }
+
+    // converts the picked media to SingleUriData and adds to the selected media
+    private fun onMediaPicked(result: MediaPickerResult) {
+        val data =
+            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
+        // sends media attached event with media type and count
+        viewModel.sendMediaAttachedEvent(data)
+        selectedMediaUris.addAll(data)
+        showPostMedia()
+    }
+
+    private fun onMediaPickedFromGallery(data: Intent?) {
+        val uris = MediaUtils.getExternalIntentPickerUris(data)
+        viewModel.fetchUriDetails(requireContext(), uris) {
+            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
+                requireContext(), it
             )
         }
     }
@@ -775,7 +941,7 @@ class LMFeedCreatePostFragment :
                 handlePostButton(visible = true)
             }
             // sends link attached event with the link
-            helperViewModel.sendLinkAttachedEvent(ogTags?.url ?: "")
+            lmFeedHelperViewModel.sendLinkAttachedEvent(ogTags?.url ?: "")
             ImageBindingUtil.loadImage(
                 ivLink,
                 ogTags?.image,
@@ -840,6 +1006,14 @@ class LMFeedCreatePostFragment :
             )
             etPostLink.show()
             etPostLink.addTextChangedListener(etLinkTextChangeListener)
+        }
+    }
+
+    //hide/show topics related views
+    private fun handleTopicSelectionView(showView: Boolean) {
+        binding.apply {
+            cgTopics.isVisible = showView
+            topicSeparator.isVisible = showView
         }
     }
 

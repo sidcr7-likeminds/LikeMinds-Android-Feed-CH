@@ -2,9 +2,7 @@ package com.likeminds.feedsx.posttypes.model
 
 import android.os.Parcelable
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.utils.model.BaseViewType
-import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_COMMENT
-import com.likeminds.feedsx.utils.model.ITEM_POST_DETAIL_REPLY
+import com.likeminds.feedsx.utils.model.*
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -28,7 +26,8 @@ class CommentViewData private constructor(
     val alreadySeenFullContent: Boolean?,
     val fromCommentLiked: Boolean,
     val fromCommentEdited: Boolean,
-    val uuid: String
+    val uuid: String,
+    val tempId: String?,
 ) : Parcelable, BaseViewType {
     override val viewType: Int
         get() = when (level) {
@@ -57,6 +56,7 @@ class CommentViewData private constructor(
         private var fromCommentLiked: Boolean = false
         private var fromCommentEdited: Boolean = false
         private var uuid: String = ""
+        private var tempId: String? = null
 
         fun id(id: String) = apply { this.id = id }
         fun postId(postId: String) = apply { this.postId = postId }
@@ -90,6 +90,7 @@ class CommentViewData private constructor(
             apply { this.fromCommentEdited = fromCommentEdited }
 
         fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun tempId(tempId: String?) = apply { this.tempId = tempId }
 
         fun build() = CommentViewData(
             id,
@@ -111,7 +112,8 @@ class CommentViewData private constructor(
             alreadySeenFullContent,
             fromCommentLiked,
             fromCommentEdited,
-            uuid
+            uuid,
+            tempId
         )
     }
 
@@ -136,5 +138,6 @@ class CommentViewData private constructor(
             .fromCommentLiked(fromCommentLiked)
             .fromCommentEdited(fromCommentEdited)
             .uuid(uuid)
+            .tempId(tempId)
     }
 }

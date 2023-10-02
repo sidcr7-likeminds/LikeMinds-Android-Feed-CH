@@ -139,6 +139,7 @@
     <string name="no_activities_to_showno_activities_to_show">No activities to show</string>
     <string name="nine_nine_plus">99+</string>
     <string name="no_notifications_yet">Oops! You don\'t have any notifications yet!</string>
+    <string name="no_topics_yet">Oops! No topic found</string>
     <string name="just_now">Just now</string>
     <string name="ellipsize">…</string>
     <string name="empty_api_key">Empty API Key</string>
@@ -183,4 +184,17 @@
     <string name="select_new_author_for_this_resource">Select the new author for this resource.</string>
     <string name="max_100mb">( Max. 100MB )</string>
     <string name="max_200mb">( Max. 200MB )</string>
+    <string name="all_topics">All Topics</string>
+    <string name="select_topic">Select Topic</string>
+    <string name="clear">Clear</string>
+    <string name="topics_selected">%d selected</string>
+    <string name="select_topics">Select Topics</string>
+    <plurals name="topic_disabled">
+        <item quantity="one">Topic is Disabled</item>
+        <item quantity="other">Topics are Disabled</item>
+    </plurals>
+    <plurals name="topic_disabled_message">
+        <item quantity="one">The following topic is disabled. Please remove it to save the post.</item>
+        <item quantity="other">The following topics are disabled. Please remove them to save the post.</item>
+    </plurals>
 </resources>

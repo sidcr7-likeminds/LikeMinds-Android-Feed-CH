@@ -1,7 +1,7 @@
 package com.likeminds.feedsx.di.post.edit
 
-import com.likeminds.feedsx.post.edit.view.EditPostActivity
-import com.likeminds.feedsx.post.edit.view.EditPostFragment
+import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity
+import com.likeminds.feedsx.post.edit.view.LMFeedEditPostFragment
 import dagger.Subcomponent
 
 @Subcomponent(modules = [EditPostViewModelModule::class])
@@ -12,6 +12,6 @@ interface EditPostComponent {
         fun create(): EditPostComponent
     }
 
-    fun inject(editPostFragment: EditPostFragment)
-    fun inject(editPostActivity: EditPostActivity)
+    fun inject(LMFeedEditPostFragment: LMFeedEditPostFragment)
+    fun inject(LMFeedEditPostActivity: LMFeedEditPostActivity)
 }

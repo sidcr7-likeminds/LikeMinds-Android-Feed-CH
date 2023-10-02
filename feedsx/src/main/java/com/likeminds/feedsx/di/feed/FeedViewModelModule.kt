@@ -2,7 +2,7 @@ package com.likeminds.feedsx.di.feed
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.likeminds.feedsx.feed.viewmodel.FeedViewModel
+import com.likeminds.feedsx.feed.viewmodel.LMFeedViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
@@ -14,6 +14,6 @@ abstract class FeedViewModelModule {
 
     @Binds
     @IntoMap
-    @FeedViewModelKey(FeedViewModel::class)
-    abstract fun bindFeedViewModel(feedViewModel: FeedViewModel): ViewModel
+    @FeedViewModelKey(LMFeedViewModel::class)
+    abstract fun bindFeedViewModel(LMFeedViewModel: LMFeedViewModel): ViewModel
 }

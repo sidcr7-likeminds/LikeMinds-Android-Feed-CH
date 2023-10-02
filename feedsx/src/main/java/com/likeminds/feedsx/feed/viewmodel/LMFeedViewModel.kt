@@ -15,6 +15,7 @@ import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.model.IMAGE
 import com.likeminds.feedsx.posttypes.model.VIDEO
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.ViewDataConverter.createAttachments
 import com.likeminds.feedsx.utils.coroutine.launchIO
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import kotlin.collections.set
 
-class FeedViewModel @Inject constructor(
+class LMFeedViewModel @Inject constructor(
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val postPreferences: LMFeedPostPreferences,
     private val mediaRepository: MediaRepository
@@ -61,6 +62,7 @@ class FeedViewModel @Inject constructor(
     val postDataEventFlow = postDataEventChannel.receiveAsFlow()
 
     companion object {
+
         const val PAGE_SIZE = 20
     }
 
@@ -101,11 +103,12 @@ class FeedViewModel @Inject constructor(
     }
 
     //get universal feed
-    fun getUniversalFeed(page: Int) {
+    fun getUniversalFeed(page: Int, topicsId: List<String>? = null) {
         viewModelScope.launchIO {
             val request = GetFeedRequest.Builder()
                 .page(page)
                 .pageSize(PAGE_SIZE)
+                .topicIds(topicsId)
                 .build()
 
             //call universal feed api
@@ -116,10 +119,11 @@ class FeedViewModel @Inject constructor(
                 val posts = data.posts
                 val usersMap = data.users
                 val widgets = data.widgets
+                val topicsMap = data.topics
 
                 //convert to view data
                 val listOfPostViewData =
-                    ViewDataConverter.convertUniversalFeedPosts(posts, usersMap, widgets)
+                    ViewDataConverter.convertUniversalFeedPosts(posts, usersMap, widgets, topicsMap)
 
                 //send it to ui
                 _universalFeedResponse.postValue(Pair(page, listOfPostViewData))
@@ -144,6 +148,11 @@ class FeedViewModel @Inject constructor(
                 } else {
                     postingData.text
                 }
+
+            val topicIds = postingData.topics.map {
+                it.id
+            }
+
             val request = if (postingData.attachments.first().attachmentType == ARTICLE) {
                 AddPostRequest.Builder()
                     .attachments(createAttachments(postingData.attachments))
@@ -155,6 +164,7 @@ class FeedViewModel @Inject constructor(
                     .heading(postingData.heading)
                     .onBehalfOfUUID(postingData.onBehalfOfUUID)
                     .attachments(createAttachments(postingData.attachments))
+                    .topicIds(topicIds)
                     .build()
             }
 
@@ -164,7 +174,8 @@ class FeedViewModel @Inject constructor(
                 val postViewData = ViewDataConverter.convertPost(
                     data.post,
                     data.users,
-                    data.widgets
+                    data.widgets,
+                    data.topics
                 )
 
                 // sends post creation completed event
@@ -263,6 +274,13 @@ class FeedViewModel @Inject constructor(
         }
     }
 
+    //get ids from topic selected adapter
+    fun getTopicIdsFromAdapterList(items: List<BaseViewType>): List<String> {
+        return items.map {
+            (it as LMFeedTopicViewData).id
+        }
+    }
+
     /**
      * Triggers when the user opens feed fragment
      **/
@@ -298,6 +316,7 @@ class FeedViewModel @Inject constructor(
         val map = hashMapOf<String, String>()
         // fetches list of tagged users
         val taggedUsers = MemberTaggingDecoder.decodeAndReturnAllTaggedMembers(post.text)
+        val topics = post.topics
 
         // adds tagged user count and their ids in the map
         if (taggedUsers.isNotEmpty()) {
@@ -310,6 +329,14 @@ class FeedViewModel @Inject constructor(
             map["tagged_users_id"] = taggedUserIds
         } else {
             map["user_tagged"] = "no"
+        }
+
+        if (topics.isNotEmpty()) {
+            val topicsNameString = topics.joinToString(", ") { it.name }
+            map["topics_added"] = "yes"
+            map["topics"] = topicsNameString
+        } else {
+            map["topics_added"] = "no"
         }
 
         // gets event property key and corresponding value for post attachments

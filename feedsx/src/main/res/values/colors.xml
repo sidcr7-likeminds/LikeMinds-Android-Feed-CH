@@ -64,6 +64,7 @@
     <color name="medium_grey">#888888</color>
     <color name="dark_red">#d50000</color>
     <color name="majorelle_blue">#5046E5</color>
+    <color name="majorelle_blue_10">#1A5046E5</color>
     <color name="raisin_black">#222020</color>
 
     <!--Global profile image color-->

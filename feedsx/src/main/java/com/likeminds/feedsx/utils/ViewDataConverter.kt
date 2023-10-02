@@ -15,11 +15,12 @@ import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
 import com.likeminds.feedsx.post.detail.model.CommentsCountViewData
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.report.model.ReportTagViewData
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.model.*
 import com.likeminds.feedsx.widgets.model.WidgetMetaViewData
-import com.likeminds.feedsx.widgets.model.WidgetsViewData
+import com.likeminds.feedsx.widgets.model.WidgetViewData
 import com.likeminds.likemindsfeed.comment.model.Comment
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
@@ -27,8 +28,9 @@ import com.likeminds.likemindsfeed.notificationfeed.model.Activity
 import com.likeminds.likemindsfeed.notificationfeed.model.ActivityEntityData
 import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.*
+import com.likeminds.likemindsfeed.topic.model.Topic
+import com.likeminds.likemindsfeed.widgets.model.Widget
 import com.likeminds.likemindsfeed.widgets.model.WidgetMetaData
-import com.likeminds.likemindsfeed.widgets.model.Widgets
 
 object ViewDataConverter {
 
@@ -101,7 +103,7 @@ object ViewDataConverter {
     fun createAttachmentsForWidget(
         title: String,
         updatedText: String,
-        widget: WidgetsViewData
+        widget: WidgetViewData
     ): List<Attachment> {
         return listOf(
             Attachment.Builder()
@@ -272,10 +274,11 @@ object ViewDataConverter {
     fun convertUniversalFeedPosts(
         posts: List<Post>,
         usersMap: Map<String, User>,
-        widgets: Map<String, Widgets>
+        widgets: Map<String, Widget>,
+        topicsMap: Map<String, Topic>
     ): List<PostViewData> {
         return posts.map { post ->
-            convertPost(post, usersMap, widgets)
+            convertPost(post, usersMap, widgets, topicsMap)
         }
     }
 
@@ -289,12 +292,14 @@ object ViewDataConverter {
     fun convertPost(
         post: Post,
         usersMap: Map<String, User>,
-        widgets: Map<String, Widgets>
+        widgets: Map<String, Widget>,
+        topicsMap: Map<String, Topic>
     ): PostViewData {
         val postCreator = post.uuid
         val user = usersMap[postCreator]
         val postId = post.id
         val replies = post.replies?.toMutableList()
+        val topicsId = post.topicIds ?: emptyList()
 
         val userViewData = if (user == null) {
             createDeletedUser()
@@ -306,6 +311,12 @@ object ViewDataConverter {
             widgets[post.attachments?.first()?.attachmentMeta?.entityId]
         } else {
             null
+        }
+
+        val topicsViewData = topicsId.mapNotNull { topicId ->
+            topicsMap[topicId]
+        }.map { topic ->
+            convertTopic(topic)
         }
 
         return PostViewData.Builder()
@@ -334,6 +345,7 @@ object ViewDataConverter {
             .uuid(postCreator)
             .widget(convertWidget(widget))
             .heading(post.heading)
+            .topics(topicsViewData)
             .build()
     }
 
@@ -412,6 +424,7 @@ object ViewDataConverter {
                 }
             )
             .uuid(commentCreator)
+            .tempId(comment.tempId)
             .build()
     }
 
@@ -676,18 +689,18 @@ object ViewDataConverter {
     }
 
     private fun convertWidget(
-        widgets: Widgets?
-    ): WidgetsViewData {
-        if (widgets == null) {
-            return WidgetsViewData.Builder().build()
+        widget: Widget?
+    ): WidgetViewData {
+        if (widget == null) {
+            return WidgetViewData.Builder().build()
         }
-        return WidgetsViewData.Builder()
-            .id(widgets.id)
-            .createdAt(widgets.createdAt)
-            .metaData(convertWidgetMetaData(widgets.widgetMetaData))
-            .parentEntityId(widgets.parentEntityId)
-            .parentEntityType(widgets.parentEntityType)
-            .updatedAt(widgets.updatedAt)
+        return WidgetViewData.Builder()
+            .id(widget.id)
+            .createdAt(widget.createdAt)
+            .metaData(convertWidgetMetaData(widget.widgetMetaData))
+            .parentEntityId(widget.parentEntityId)
+            .parentEntityType(widget.parentEntityType)
+            .updatedAt(widget.updatedAt)
             .build()
     }
 
@@ -703,6 +716,18 @@ object ViewDataConverter {
             .name(widgetMeta.name)
             .size(widgetMeta.size)
             .url(widgetMeta.url)
+            .build()
+    }
+
+    /**
+     * convert [Topic] to [LMFeedTopicViewData]
+     * */
+    fun convertTopic(topic: Topic): LMFeedTopicViewData {
+        return LMFeedTopicViewData.Builder()
+            .id(topic.id)
+            .name(topic.name)
+            .isEnabled(topic.isEnabled)
+            .isSelected(false)
             .build()
     }
 
@@ -803,6 +828,7 @@ object ViewDataConverter {
     fun convertPost(postWithAttachments: PostWithAttachments): PostViewData {
         val post = postWithAttachments.post
         val attachments = postWithAttachments.attachments
+        val topics = postWithAttachments.topics
         return PostViewData.Builder()
             .text(post.text)
             .temporaryId(post.temporaryId)
@@ -812,10 +838,17 @@ object ViewDataConverter {
             .attachments(convertAttachmentsEntity(attachments))
             .heading(postWithAttachments.post.heading)
             .onBehalfOfUUID(postWithAttachments.post.onBehalfOfUUID)
+            .topics(convertTopicsEntity(topics))
             .build()
     }
 
-    fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
+    private fun convertTopicsEntity(topics: List<TopicEntity>): List<LMFeedTopicViewData> {
+        return topics.map { topic ->
+            convertTopic(topic)
+        }
+    }
+
+    private fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
         return attachments.map { attachment ->
             convertAttachment(attachment)
         }
@@ -844,6 +877,17 @@ object ViewDataConverter {
             .coverImageUrl(attachmentMeta.coverImageUrl)
             .title(attachmentMeta.title)
             .body(attachmentMeta.body)
+            .build()
+    }
+
+    /**
+     * convert [TopicEntity] to [LMFeedTopicViewData]
+     */
+    private fun convertTopic(topicEntity: TopicEntity): LMFeedTopicViewData {
+        return LMFeedTopicViewData.Builder()
+            .id(topicEntity.id)
+            .name(topicEntity.name)
+            .isEnabled(topicEntity.isEnabled)
             .build()
     }
 
@@ -986,6 +1030,19 @@ object ViewDataConverter {
             .coverImageUrl(url)
             .body(body)
             .title(title)
+            .build()
+    }
+
+    /***
+     * convert [LMFeedTopicViewData] to [TopicEntity]
+     * @param temporaryId: Temporary id of the post
+     */
+    fun convertTopic(temporaryId: Long, topic: LMFeedTopicViewData): TopicEntity {
+        return TopicEntity.Builder()
+            .id(topic.id)
+            .isEnabled(topic.isEnabled)
+            .name(topic.name)
+            .postId(temporaryId.toString())
             .build()
     }
 }

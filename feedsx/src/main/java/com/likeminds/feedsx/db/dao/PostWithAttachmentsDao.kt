@@ -4,6 +4,7 @@ import androidx.room.*
 import com.likeminds.feedsx.db.models.AttachmentEntity
 import com.likeminds.feedsx.db.models.PostEntity
 import com.likeminds.feedsx.db.models.PostWithAttachments
+import com.likeminds.feedsx.db.models.TopicEntity
 import com.likeminds.feedsx.db.utils.DbConstants
 
 @Dao
@@ -11,7 +12,11 @@ interface PostWithAttachmentsDao {
 
     //add post in local db
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertPostWithAttachments(post: PostEntity, attachments: List<AttachmentEntity>)
+    suspend fun insertPostWithAttachments(
+        post: PostEntity,
+        attachments: List<AttachmentEntity>,
+        topics: List<TopicEntity>
+    )
 
     //update post in local db
     @Update

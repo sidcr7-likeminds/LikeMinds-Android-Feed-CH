@@ -13,10 +13,13 @@ import com.likeminds.feedsx.media.model.SingleUriData
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
+import com.likeminds.feedsx.utils.ViewDataConverter
+import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
-import com.likeminds.feedsx.widgets.model.WidgetsViewData
+import com.likeminds.feedsx.widgets.model.WidgetViewData
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.post.model.EditPostRequest
 import com.likeminds.likemindsfeed.post.model.GetPostRequest
@@ -24,7 +27,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
-class EditPostViewModel @Inject constructor(
+class LMFeedEditPostViewModel @Inject constructor(
     private val userPreferences: LMFeedUserPreferences,
     private val postWithAttachmentsRepository: PostWithAttachmentsRepository,
     private val mediaRepository: MediaRepository
@@ -78,12 +81,14 @@ class EditPostViewModel @Inject constructor(
                 val post = data.post
                 val users = data.users
                 val widgets = data.widgets
+                val topics = data.topics
                 postDataEventChannel.send(
                     PostDataEvent.GetPost(
                         ViewDataConverter.convertPost(
                             post,
                             users,
-                            widgets
+                            widgets,
+                            topics
                         )
                     )
                 )
@@ -153,6 +158,7 @@ class EditPostViewModel @Inject constructor(
             .build()
     }
 
+    //todo add topics
     //add post:{} into local db
     private fun storePost(
         uploadData: Pair<WorkContinuation, String>,
@@ -208,13 +214,19 @@ class EditPostViewModel @Inject constructor(
         postTextContent: String?,
         attachments: List<AttachmentViewData>? = null,
         ogTags: LinkOGTagsViewData? = null,
-        widget: WidgetsViewData? = null
+        widget: WidgetViewData? = null,
+        selectedTopics: List<LMFeedTopicViewData>? = nul
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
             if (updatedText.isNullOrEmpty()) {
                 updatedText = null
             }
+
+            val topicIds = selectedTopics?.map {
+                it.id
+            }
+
             val request = when {
                 widget != null -> {
                     // if the post has any file attachments
@@ -238,6 +250,7 @@ class EditPostViewModel @Inject constructor(
                         .text(updatedText)
                         .heading(postTitle)
                         .attachments(ViewDataConverter.createAttachments(attachments))
+                        .topicIds(topicIds)
                         .build()
                 }
 
@@ -247,6 +260,7 @@ class EditPostViewModel @Inject constructor(
                         .postId(postId)
                         .heading(postTitle)
                         .text(updatedText)
+                        .topicIds(topicIds)
                     if (ogTags != null) {
                         // if the post has ogTags
                         requestBuilder.attachments(ViewDataConverter.convertAttachments(ogTags))
@@ -262,7 +276,8 @@ class EditPostViewModel @Inject constructor(
                 val post = data.post
                 val users = data.users
                 val widgets = data.widgets
-                val postViewData = ViewDataConverter.convertPost(post, users, widgets)
+                val topics = data.topics
+                val postViewData = ViewDataConverter.convertPost(post, users, widgets,topics)
                 postDataEventChannel.send(PostDataEvent.EditPost(postViewData))
 
                 // sends post edited event
