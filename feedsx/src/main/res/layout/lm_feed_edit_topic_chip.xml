@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.google.android.material.chip.Chip
+        android:id="@+id/edit_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:chipBackgroundColor="@color/colorPrimary_10"
+        app:chipCornerRadius="4dp"
+        app:chipEndPadding="12dp"
+        app:chipIcon="@drawable/lm_feed_ic_edit_topic"
+        app:chipIconSize="12dp"
+        app:chipStartPadding="12dp"
+        app:textEndPadding="0dp"
+        app:textStartPadding="0dp" />
+</layout>

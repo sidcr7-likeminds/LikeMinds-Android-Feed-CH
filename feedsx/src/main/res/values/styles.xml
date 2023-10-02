@@ -19,9 +19,15 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="BottomSheetStyle" parent="Theme.Design.Light.BottomSheetDialog">
+    <style name="LMFeedBottomSheetStyle" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="android:windowIsFloating">false</item>
         <item name="android:windowSoftInputMode">adjustResize</item>
+    </style>
+
+    <style name="LMFeedClickableView">
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:focusable">true</item>
+        <item name="android:clickable">true</item>
     </style>
 
     <style name="LMFeedClickableImageView">

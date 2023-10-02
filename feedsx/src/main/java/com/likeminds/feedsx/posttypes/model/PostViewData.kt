@@ -2,8 +2,9 @@ package com.likeminds.feedsx.posttypes.model
 
 import android.os.Parcelable
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.model.*
-import com.likeminds.feedsx.widgets.model.WidgetsViewData
+import com.likeminds.feedsx.widgets.model.WidgetViewData
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -34,9 +35,10 @@ class PostViewData private constructor(
     val isPosted: Boolean,
     val temporaryId: Long?,
     val uuid: String,
-    val widget: WidgetsViewData,
+    val widget: WidgetViewData,
     val heading: String?,
-    val onBehalfOfUUID: String?
+    val onBehalfOfUUID: String?,
+    val topics: List<LMFeedTopicViewData>
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -97,9 +99,10 @@ class PostViewData private constructor(
         private var temporaryId: Long? = null
         private var fromVideoAction: Boolean = false
         private var uuid: String = ""
-        private var widget: WidgetsViewData = WidgetsViewData.Builder().build()
+        private var widget: WidgetViewData = WidgetViewData.Builder().build()
         private var heading: String? = null
         private var onBehalfOfUUID: String? = null
+        private var topics: List<LMFeedTopicViewData> = emptyList()
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String?) = apply { this.text = text }
@@ -138,9 +141,10 @@ class PostViewData private constructor(
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
         fun temporaryId(temporaryId: Long?) = apply { this.temporaryId = temporaryId }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
-        fun widget(widget: WidgetsViewData) = apply { this.widget = widget }
+        fun widget(widget: WidgetViewData) = apply { this.widget = widget }
         fun heading(heading: String?) = apply { this.heading = heading }
         fun onBehalfOfUUID(onBehalfOfUUID: String?) = apply { this.onBehalfOfUUID = onBehalfOfUUID }
+        fun topics(topics: List<LMFeedTopicViewData>) = apply { this.topics = topics }
 
         fun build() = PostViewData(
             id,
@@ -171,7 +175,8 @@ class PostViewData private constructor(
             uuid,
             widget,
             heading,
-            onBehalfOfUUID
+            onBehalfOfUUID,
+            topics
         )
     }
 
@@ -205,5 +210,6 @@ class PostViewData private constructor(
             .widget(widget)
             .heading(heading)
             .onBehalfOfUUID(onBehalfOfUUID)
+            .topics(topics)
     }
 }

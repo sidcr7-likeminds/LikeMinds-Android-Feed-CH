@@ -21,3 +21,5 @@
 #-renamesourcefileattribute SourceFile
 
 -keep class androidx.databinding.DataBindingComponent {*;}
+-dontwarn com.amazonaws.mobileconnectors.cognitoauth.**
+-dontwarn com.amazonaws.mobile.auth.**

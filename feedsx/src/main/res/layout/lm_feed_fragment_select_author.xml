@@ -81,7 +81,7 @@
 
         </com.likeminds.feedsx.branding.customview.LMFeedToolbar>
 
-        <com.likeminds.feedsx.search.util.CustomSearchBar
+        <com.likeminds.feedsx.search.util.LMFeedCustomSearchBar
             android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"

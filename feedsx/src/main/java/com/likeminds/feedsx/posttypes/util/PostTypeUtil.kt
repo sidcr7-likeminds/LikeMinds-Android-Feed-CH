@@ -2,6 +2,7 @@ package com.likeminds.feedsx.posttypes.util
 
 import android.net.Uri
 import android.text.util.Linkify
+import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
@@ -11,6 +12,8 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.likeminds.feedsx.*
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.*
@@ -18,6 +21,7 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
@@ -615,6 +619,7 @@ object PostTypeUtil {
         authorFrame: LmFeedHomeAuthorFrameBinding,
         data: PostViewData,
         position: Int,
+        chipGroup: ChipGroup,
         listener: PostAdapterListener,
         returnBinder: () -> Unit,
         executeBinder: () -> Unit
@@ -644,6 +649,7 @@ object PostTypeUtil {
         tvPostContent: TextView,
         data: PostViewData,
         position: Int,
+        chipGroup: ChipGroup,
         listener: PostAdapterListener,
         returnBinder: () -> Unit,
         executeBinder: () -> Unit
@@ -667,6 +673,9 @@ object PostTypeUtil {
                 tvPostContent,
                 data
             )
+
+            //sets topics
+            initTopicsView(chipGroup, data.topics)
             executeBinder()
         }
     }
@@ -687,5 +696,35 @@ object PostTypeUtil {
             tvPostTitle.show()
             tvPostTitle.text = title
         }
+    }
+
+    //handle topic chip group if topics are present and add individual chip for topics
+    private fun initTopicsView(chipGroup: ChipGroup, topics: List<LMFeedTopicViewData>) {
+        if (topics.isEmpty()) {
+            chipGroup.hide()
+        } else {
+            chipGroup.apply {
+                show()
+                removeAllViews()
+                topics.forEach { topic ->
+                    addView(createTopicChip(this, topic.name))
+                }
+            }
+        }
+    }
+
+    //create chip view for topic
+    private fun createTopicChip(chipGroup: ChipGroup, topicName: String): Chip {
+        val binding = LmFeedTopicChipBinding.inflate(
+            LayoutInflater.from(chipGroup.context),
+            chipGroup,
+            false
+        )
+        binding.chipTopic.apply {
+            text = topicName
+            setEnsureMinTouchTargetSize(false)
+        }
+
+        return binding.chipTopic
     }
 }

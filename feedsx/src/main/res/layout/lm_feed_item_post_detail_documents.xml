@@ -48,6 +48,19 @@
             app:layout_constraintTop_toBottomOf="@+id/rv_documents"
             tools:text="+1 more" />
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cg_topics"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            app:chipSpacingHorizontal="4dp"
+            app:chipSpacingVertical="4dp"
+            app:layout_constraintEnd_toEndOf="@id/rv_documents"
+            app:layout_constraintStart_toStartOf="@id/rv_documents"
+            app:layout_constraintTop_toBottomOf="@id/rv_documents"
+            tools:visibility="visible" />
+
         <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/tv_post_title"
             android:layout_width="match_parent"
@@ -59,7 +72,7 @@
             app:fontType="medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_show_more"
+            app:layout_constraintTop_toBottomOf="@id/cg_topics"
             tools:fontFamily="@font/roboto_regular"
             tools:text="5 tips to position your community beyond just an online group" />
 

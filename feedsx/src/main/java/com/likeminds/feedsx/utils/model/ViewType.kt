@@ -35,6 +35,8 @@ const val ITEM_NO_COMMENTS_FOUND = 29
 const val ITEM_EDIT_POST_DOCUMENTS_ITEM = 30
 const val ITEM_POST_ARTICLE = 31
 const val ITEM_POST_SHIMMER = 32
+const val ITEM_TOPIC = 33
+const val ITEM_ALL_TOPIC = 34
 
 @IntDef(
     ITEM_NONE,
@@ -69,7 +71,9 @@ const val ITEM_POST_SHIMMER = 32
     ITEM_NO_COMMENTS_FOUND,
     ITEM_EDIT_POST_DOCUMENTS_ITEM,
     ITEM_POST_ARTICLE,
-    ITEM_POST_SHIMMER
+    ITEM_POST_SHIMMER,
+    ITEM_TOPIC,
+    ITEM_ALL_TOPIC
 )
 @Retention(AnnotationRetention.SOURCE)
 annotation class ViewType
