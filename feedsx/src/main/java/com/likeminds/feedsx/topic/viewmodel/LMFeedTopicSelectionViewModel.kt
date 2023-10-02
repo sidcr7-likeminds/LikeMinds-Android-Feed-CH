@@ -1,9 +1,6 @@
 package com.likeminds.feedsx.topic.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.likeminds.feedsx.topic.model.LMFeedAllTopicsViewData
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.ViewDataConverter
@@ -12,9 +9,11 @@ import com.likeminds.feedsx.utils.model.BaseViewType
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.topic.model.GetTopicRequest
 import javax.inject.Inject
+import kotlin.collections.set
 
 class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
     companion object {
+
         const val SEARCH_TYPE = "name"
         const val PAGE_SIZE = 10
     }
@@ -126,7 +125,13 @@ class LMFeedTopicSelectionViewModel @Inject constructor() : ViewModel() {
         selectedTopics.remove(topicViewData.id)
     }
 
+    //clear the topic hashmap
     fun clearSelectedTopic() {
         selectedTopics.clear()
     }
+
+    fun getSelectedTopics(): List<LMFeedTopicViewData> {
+        return selectedTopics.values.toList()
+    }
+
 }

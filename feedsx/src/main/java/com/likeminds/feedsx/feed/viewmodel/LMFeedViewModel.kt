@@ -157,6 +157,7 @@ class LMFeedViewModel @Inject constructor(
                 AddPostRequest.Builder()
                     .attachments(createAttachments(postingData.attachments))
                     .onBehalfOfUUID(postingData.onBehalfOfUUID)
+                    .topicIds(topicIds)
                     .build()
             } else {
                 AddPostRequest.Builder()

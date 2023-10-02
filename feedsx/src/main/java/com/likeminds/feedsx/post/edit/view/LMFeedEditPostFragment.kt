@@ -363,7 +363,12 @@ class LMFeedEditPostFragment :
     // fetches the post data
     private fun fetchPost() {
         ProgressHelper.showProgress(binding.progressBar)
-        viewModel.getPost(editPostExtras.postId)
+        if (post == null) {
+            viewModel.getPost(editPostExtras.postId)
+        } else {
+            val postViewData = post ?: return
+            setPostData(postViewData)
+        }
     }
 
     // initializes post done button click listener
@@ -515,7 +520,9 @@ class LMFeedEditPostFragment :
         lmFeedHelperViewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopics ->
             if (showTopics) {
                 handleTopicSelectionView(true)
-                initTopicSelectionView()
+                if (selectedTopic.isEmpty()) {
+                    initTopicSelectionView()
+                }
             } else {
                 handleTopicSelectionView(false)
             }
@@ -620,7 +627,15 @@ class LMFeedEditPostFragment :
     // sets the post data in view
     private fun setPostData(post: PostViewData) {
         binding.apply {
-            val topics = post.topics
+            val topics = post.topics.ifEmpty {
+                selectedTopic.values.toList()
+            }
+            Log.d(
+                "PUI", """
+            setPostData
+            topics: ${topics.size}
+        """.trimIndent()
+            )
 
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
@@ -657,6 +672,12 @@ class LMFeedEditPostFragment :
     }
 
     private fun showSelectedTopic(topics: List<LMFeedTopicViewData>) {
+        Log.d(
+            "PUI", """
+            showSelectedTopic
+            topics: ${topics.size}
+        """.trimIndent()
+        )
         if (topics.isNotEmpty()) {
             handleTopicSelectionView(true)
 
@@ -672,7 +693,9 @@ class LMFeedEditPostFragment :
 
             addTopicsToGroup(false, topics)
         } else {
-            lmFeedHelperViewModel.getAllTopics(true)
+            if (lmFeedHelperViewModel.showTopicFilter.value == null) {
+                lmFeedHelperViewModel.getAllTopics(true)
+            }
         }
     }
 

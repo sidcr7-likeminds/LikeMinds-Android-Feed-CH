@@ -934,7 +934,8 @@ class LMFeedFragment :
                 layoutSelectedTopics.root.hide()
 
                 //call api
-                ProgressHelper.showProgress(binding.progressBar, true)
+                mPostAdapter.clearAndNotify()
+                addShimmer()
                 viewModel.getUniversalFeed(1, null)
             } else {
                 //show layouts accordingly
@@ -946,7 +947,8 @@ class LMFeedFragment :
                 mSelectedTopicAdapter.replace(selectedTopics)
 
                 //call api
-                ProgressHelper.showProgress(binding.progressBar, true)
+                mPostAdapter.clearAndNotify()
+                addShimmer()
                 viewModel.getUniversalFeed(
                     1,
                     viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
@@ -984,7 +986,7 @@ class LMFeedFragment :
             //call apis
             mScrollListener.resetData()
             mPostAdapter.clearAndNotify()
-            ProgressHelper.showProgress(binding.progressBar, true)
+            addShimmer()
             viewModel.getUniversalFeed(
                 1,
                 viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
@@ -997,7 +999,8 @@ class LMFeedFragment :
         //call api
         mSelectedTopicAdapter.clearAndNotify()
         mScrollListener.resetData()
-        ProgressHelper.showProgress(binding.progressBar, true)
+        mPostAdapter.clearAndNotify()
+        addShimmer()
         viewModel.getUniversalFeed(1, null)
 
         //show layout accordingly

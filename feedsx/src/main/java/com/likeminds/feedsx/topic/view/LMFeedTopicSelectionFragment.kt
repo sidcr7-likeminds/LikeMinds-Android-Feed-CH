@@ -199,11 +199,7 @@ class LMFeedTopicSelectionFragment :
                     .isAllTopicSelected(true)
                     .build()
             } else {
-                val selectedTopics = mAdapter.items().filter {
-                    it is LMFeedTopicViewData && it.isSelected
-                }.map {
-                    it as LMFeedTopicViewData
-                }
+                val selectedTopics = viewModel.getSelectedTopics()
                 LMFeedTopicSelectionResultExtras.Builder()
                     .selectedTopics(selectedTopics)
                     .build()

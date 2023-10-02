@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
@@ -191,6 +192,17 @@ class LMFeedCreatePostFragment :
                     LMFeedImageCropFragment.BUNDLE_ARG_URI,
                     SingleUriData::class.java
                 ) ?: return@setFragmentResultListener
+
+            Log.d(
+                "PUI", """
+                    setFragmentResultListener
+                selectedTopic: ${
+                    selectedTopic.map {
+                        it.name
+                    }
+                }
+            """.trimIndent()
+            )
 
             selectedMediaUris.add(singleUriData)
             showPostMedia()
@@ -500,7 +512,9 @@ class LMFeedCreatePostFragment :
 
     // fetched enabled comments from api
     private fun checkForEnabledTopics() {
-        lmFeedHelperViewModel.getAllTopics(true)
+        if (lmFeedHelperViewModel.showTopicFilter.value == null) {
+            lmFeedHelperViewModel.getAllTopics(true)
+        }
     }
 
     // observes data
@@ -626,12 +640,13 @@ class LMFeedCreatePostFragment :
                 val text = etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 val postTitle = etPostTitle.text?.trim().toString()
-                handleProgressBar(true)
 
                 if (selectedTopic.isEmpty()) {
                     LMFeedTopicSelectionAlert.showDialog(childFragmentManager)
                     return@setOnClickListener
                 }
+
+                handleProgressBar(true)
 
                 viewModel.addPost(
                     requireContext(),
@@ -690,17 +705,27 @@ class LMFeedCreatePostFragment :
 
                 val selectedTopics = resultExtras.selectedTopics
                 if (selectedTopics.isNotEmpty()) {
-                    addTopicsToGroup(selectedTopics)
+                    this.selectedTopic.apply {
+                        clear()
+                        addAll(selectedTopics)
+                    }
+                    showPostMedia()
                 }
             }
         }
 
     //add selected topics to group and add edit chip as well in the end
     private fun addTopicsToGroup(newSelectedTopics: List<LMFeedTopicViewData>) {
-        this.selectedTopic.apply {
-            clear()
-            addAll(newSelectedTopics)
-        }
+        Log.d(
+            "PUI", """
+                addTopicsToGroup
+                selectedTopic: ${
+                newSelectedTopics.map {
+                    it.name
+                }
+            }
+            """.trimIndent()
+        )
         binding.cgTopics.apply {
             removeAllViews()
             newSelectedTopics.forEach { topic ->
@@ -719,6 +744,7 @@ class LMFeedCreatePostFragment :
 
     // handles the logic to show the type of post
     private fun showPostMedia() {
+        addTopicsToGroup(selectedTopic)
         when (createPostExtras.attachmentType) {
             com.likeminds.feedsx.posttypes.model.VIDEO -> {
                 showAttachedMedia()
