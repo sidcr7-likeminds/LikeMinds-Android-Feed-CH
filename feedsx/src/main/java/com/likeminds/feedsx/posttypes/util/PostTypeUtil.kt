@@ -638,9 +638,6 @@ object PostTypeUtil {
                 listener
             )
 
-//            //sets topics
-//            initTopicsView(chipGroup, data.topics)
-
             executeBinder()
         }
     }

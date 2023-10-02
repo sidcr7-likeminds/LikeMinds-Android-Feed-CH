@@ -395,6 +395,7 @@ class LMFeedEditPostFragment :
         }
     }
 
+    // processes save post request and calls api
     private fun savePost(title: String, updatedText: String, topics: List<LMFeedTopicViewData>) {
         binding.apply {
             progressBar.root.show()
@@ -630,12 +631,6 @@ class LMFeedEditPostFragment :
             val topics = post.topics.ifEmpty {
                 selectedTopic.values.toList()
             }
-            Log.d(
-                "PUI", """
-            setPostData
-            topics: ${topics.size}
-        """.trimIndent()
-            )
 
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
@@ -672,12 +667,6 @@ class LMFeedEditPostFragment :
     }
 
     private fun showSelectedTopic(topics: List<LMFeedTopicViewData>) {
-        Log.d(
-            "PUI", """
-            showSelectedTopic
-            topics: ${topics.size}
-        """.trimIndent()
-        )
         if (topics.isNotEmpty()) {
             handleTopicSelectionView(true)
 

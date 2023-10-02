@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.widget.EditText
@@ -192,17 +191,6 @@ class LMFeedCreatePostFragment :
                     LMFeedImageCropFragment.BUNDLE_ARG_URI,
                     SingleUriData::class.java
                 ) ?: return@setFragmentResultListener
-
-            Log.d(
-                "PUI", """
-                    setFragmentResultListener
-                selectedTopic: ${
-                    selectedTopic.map {
-                        it.name
-                    }
-                }
-            """.trimIndent()
-            )
 
             selectedMediaUris.add(singleUriData)
             showPostMedia()
@@ -716,16 +704,6 @@ class LMFeedCreatePostFragment :
 
     //add selected topics to group and add edit chip as well in the end
     private fun addTopicsToGroup(newSelectedTopics: List<LMFeedTopicViewData>) {
-        Log.d(
-            "PUI", """
-                addTopicsToGroup
-                selectedTopic: ${
-                newSelectedTopics.map {
-                    it.name
-                }
-            }
-            """.trimIndent()
-        )
         binding.cgTopics.apply {
             removeAllViews()
             newSelectedTopics.forEach { topic ->
