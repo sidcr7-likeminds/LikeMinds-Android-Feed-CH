@@ -706,17 +706,21 @@ class LMFeedCreatePostFragment :
     private fun addTopicsToGroup(newSelectedTopics: List<LMFeedTopicViewData>) {
         binding.cgTopics.apply {
             removeAllViews()
-            newSelectedTopics.forEach { topic ->
-                addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
+            if (newSelectedTopics.isEmpty()) {
+                initTopicSelectionView()
+            } else {
+                newSelectedTopics.forEach { topic ->
+                    addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
+                }
+                addView(
+                    LMFeedTopicChipUtil.createEditChip(
+                        requireContext(),
+                        selectedTopic,
+                        this
+                    ) { intent ->
+                        topicSelectionLauncher.launch(intent)
+                    })
             }
-            addView(
-                LMFeedTopicChipUtil.createEditChip(
-                    requireContext(),
-                    selectedTopic,
-                    this
-                ) { intent ->
-                    topicSelectionLauncher.launch(intent)
-                })
         }
     }
 

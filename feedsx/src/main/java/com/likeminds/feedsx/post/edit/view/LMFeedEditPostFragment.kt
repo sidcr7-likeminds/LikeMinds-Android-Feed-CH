@@ -399,6 +399,7 @@ class LMFeedEditPostFragment :
     private fun savePost(title: String, updatedText: String, topics: List<LMFeedTopicViewData>) {
         binding.apply {
             progressBar.root.show()
+            handleSaveButton(false)
             if (articleSingleUriData != null) {
                 viewModel.uploadArticleImage(
                     requireContext(),
@@ -583,7 +584,7 @@ class LMFeedEditPostFragment :
             when (response) {
                 is LMFeedEditPostViewModel.ErrorMessageEvent.EditPost -> {
                     handleSaveButton(visible = true)
-                    binding.progressBar.root.show()
+                    binding.progressBar.root.hide()
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
@@ -880,6 +881,7 @@ class LMFeedEditPostFragment :
             }
 
             WorkInfo.State.FAILED -> {
+                handleSaveButton(visible = true)
                 binding.progressBar.root.hide()
                 ViewUtils.showShortToast(requireContext(), getString(R.string.something_went_wrong))
             }
