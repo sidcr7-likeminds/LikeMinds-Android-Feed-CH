@@ -10,10 +10,10 @@ import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.databinding.LmFeedFragmentSelectAuthorBinding
 import com.likeminds.feedsx.post.create.view.adapter.SelectAuthorAdapter
 import com.likeminds.feedsx.post.create.view.adapter.SelectAuthorAdapterListener
-import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.SDKClientInfoViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.search.util.CustomSearchBar
+import com.likeminds.feedsx.search.util.LMFeedCustomSearchBar
 import com.likeminds.feedsx.utils.EndlessRecyclerScrollListener
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -25,7 +25,7 @@ class LMFeedSelectAuthorFragment :
     SelectAuthorAdapterListener {
 
     @Inject
-    lateinit var helperViewModel: HelperViewModel
+    lateinit var lmFeedHelperViewModel: LMFeedHelperViewModel
 
     private lateinit var mAdapter: SelectAuthorAdapter
     private lateinit var scrollListener: EndlessRecyclerScrollListener
@@ -60,7 +60,7 @@ class LMFeedSelectAuthorFragment :
     override fun observeData() {
         super.observeData()
 
-        helperViewModel.taggingData.observe(viewLifecycleOwner) {
+        lmFeedHelperViewModel.taggingData.observe(viewLifecycleOwner) {
             val userTagViewData = it?.second
             val userViewData = userTagViewData?.map { user ->
                 UserViewData.Builder()
@@ -77,7 +77,7 @@ class LMFeedSelectAuthorFragment :
     }
 
     private fun getInitialData() {
-        helperViewModel.getMembersForTagging(
+        lmFeedHelperViewModel.getMembersForTagging(
             1,
             ""
         )
@@ -95,7 +95,7 @@ class LMFeedSelectAuthorFragment :
             scrollListener = object : EndlessRecyclerScrollListener(linearLayoutManager) {
                 override fun onLoadMore(currentPage: Int) {
                     if (currentPage > 0) {
-                        helperViewModel.getMembersForTagging(
+                        lmFeedHelperViewModel.getMembersForTagging(
                             currentPage,
                             searchKeyword ?: ""
                         )
@@ -110,7 +110,7 @@ class LMFeedSelectAuthorFragment :
             this.initialize(lifecycleScope)
 
             setSearchViewListener(object :
-                CustomSearchBar.SearchViewListener {
+                LMFeedCustomSearchBar.SearchViewListener {
                 override fun onSearchViewClosed() {
                     hide()
                     clearParticipants()
@@ -148,7 +148,7 @@ class LMFeedSelectAuthorFragment :
         scrollListener.resetData()
         mAdapter.clearAndNotify()
         searchKeyword = keyword
-        helperViewModel.getMembersForTagging(
+        lmFeedHelperViewModel.getMembersForTagging(
             1,
             searchKeyword ?: ""
         )

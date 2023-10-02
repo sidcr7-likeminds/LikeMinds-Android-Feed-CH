@@ -845,7 +845,10 @@ class LMFeedFragment :
                     object : EndlessRecyclerScrollListener((layoutManager as LinearLayoutManager)) {
                         override fun onLoadMore(currentPage: Int) {
                             if (currentPage > 0) {
-                                viewModel.getUniversalFeed(currentPage)
+                                viewModel.getUniversalFeed(
+                                    currentPage,
+                                    viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
+                                )
                             }
                         }
 

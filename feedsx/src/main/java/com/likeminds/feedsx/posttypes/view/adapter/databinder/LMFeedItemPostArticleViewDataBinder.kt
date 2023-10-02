@@ -45,6 +45,7 @@ class LMFeedItemPostArticleViewDataBinder constructor(
                 authorFrame,
                 data,
                 position,
+                cgTopics,
                 listener,
                 returnBinder = {
                     return@initPostTypeBindData

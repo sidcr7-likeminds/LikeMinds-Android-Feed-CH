@@ -619,6 +619,7 @@ object PostTypeUtil {
         authorFrame: LmFeedHomeAuthorFrameBinding,
         data: PostViewData,
         position: Int,
+        chipGroup: ChipGroup,
         listener: PostAdapterListener,
         returnBinder: () -> Unit,
         executeBinder: () -> Unit
@@ -636,6 +637,9 @@ object PostTypeUtil {
                 data,
                 listener
             )
+
+            //sets topics
+            initTopicsView(chipGroup, data.topics)
 
             executeBinder()
         }

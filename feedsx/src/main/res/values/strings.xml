@@ -164,7 +164,6 @@
     <string name="are_you_sure_you_want_to_remove_the_attached_file">Are you sure you want to remove the attached file?</string>
     <string name="select_pdf_to_share">Select PDF to share</string>
     <string name="select_video_to_share">Select Video to share</string>
-
     <string name="discard_resource">Discard Resource?</string>
     <string name="discard_resource_description">Your resource creation is in progress. All the resources data would be lost. Are you sure you want to discard it?</string>
     <string name="discard_this_resource">Discard this resource</string>
@@ -188,7 +187,9 @@
     <string name="select_topic">Select Topic</string>
     <string name="clear">Clear</string>
     <string name="topics_selected">%d selected</string>
-    <string name="select_topics">Select Topics</string>
+    <string name="select_topics">Select Topics*</string>
+    <string name="topic_not_selected">Topic Not Selected!</string>
+    <string name="please_select_at_least_one_topic">Please select at least one topic</string>
     <plurals name="topic_disabled">
         <item quantity="one">Topic is Disabled</item>
         <item quantity="other">Topics are Disabled</item>

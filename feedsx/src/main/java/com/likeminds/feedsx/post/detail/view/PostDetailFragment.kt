@@ -25,8 +25,8 @@ import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.detail.model.*
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity.Companion.POST_DETAIL_EXTRAS
 import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
-import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.PostDetailAdapterListener
-import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.PostDetailReplyAdapterListener
+import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter.*
+import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.*
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
 import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
 import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity
@@ -784,11 +784,11 @@ class PostDetailFragment :
     ) {
         when (menuId) {
             EDIT_POST_MENU_ITEM_ID -> {
-                val editPostExtras = EditPostExtras.Builder()
+                val editPostExtras = LMFeedEditPostExtras.Builder()
                     .postId(postId)
                     .viewType(viewType)
                     .build()
-                val intent = EditPostActivity.getIntent(requireContext(), editPostExtras)
+                val intent = LMFeedEditPostActivity.getIntent(requireContext(), editPostExtras)
                 editPostLauncher.launch(intent)
             }
 

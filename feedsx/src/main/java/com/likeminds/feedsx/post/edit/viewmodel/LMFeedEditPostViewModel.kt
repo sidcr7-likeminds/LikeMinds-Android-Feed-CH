@@ -14,8 +14,6 @@ import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.feedsx.post.create.util.PostAttachmentUploadWorker
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
-import com.likeminds.feedsx.utils.ViewDataConverter
-import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.file.FileUtil
@@ -45,8 +43,10 @@ class LMFeedEditPostViewModel @Inject constructor(
     val postDataEventFlow = postDataEventChannel.receiveAsFlow()
 
     // Pair -> [uploadWorkerUUID, attachment]
-    private val _uploadingData = MutableLiveData<Pair<String, AttachmentViewData>>()
-    val uploadingData: LiveData<Pair<String, AttachmentViewData>> = _uploadingData
+    private val _uploadingData =
+        MutableLiveData<Triple<String, AttachmentViewData, List<LMFeedTopicViewData>>>()
+    val uploadingData: LiveData<Triple<String, AttachmentViewData, List<LMFeedTopicViewData>>> =
+        _uploadingData
 
     sealed class ErrorMessageEvent {
         data class GetPost(val errorMessage: String?) : ErrorMessageEvent()
@@ -103,7 +103,8 @@ class LMFeedEditPostViewModel @Inject constructor(
         context: Context,
         postTitle: String,
         updatedText: String,
-        fileUri: SingleUriData?
+        fileUri: SingleUriData?,
+        topics: List<LMFeedTopicViewData>
     ) {
         if (fileUri == null) {
             return
@@ -126,7 +127,8 @@ class LMFeedEditPostViewModel @Inject constructor(
             temporaryId,
             postTitle,
             updatedText,
-            updatedFileUri
+            updatedFileUri,
+            topics
         )
     }
 
@@ -158,14 +160,14 @@ class LMFeedEditPostViewModel @Inject constructor(
             .build()
     }
 
-    //todo add topics
     //add post:{} into local db
     private fun storePost(
         uploadData: Pair<WorkContinuation, String>,
         temporaryId: Long,
         heading: String,
         text: String?,
-        fileUri: SingleUriData
+        fileUri: SingleUriData,
+        topics: List<LMFeedTopicViewData>
     ) {
         viewModelScope.launchIO {
             val uuid = uploadData.second
@@ -187,11 +189,19 @@ class LMFeedEditPostViewModel @Inject constructor(
                 )
             )
 
+            val topicEntities = topics.map {
+                ViewDataConverter.convertTopic(temporaryId, it)
+            }
+
             val attachmentsViewData = ViewDataConverter.convertAttachmentsEntity(attachments)
 
             // add it to local db
-            postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments)
-            _uploadingData.postValue(Pair(uuid, attachmentsViewData.first()))
+            postWithAttachmentsRepository.insertPostWithAttachments(
+                postEntity,
+                attachments,
+                topicEntities
+            )
+            _uploadingData.postValue(Triple(uuid, attachmentsViewData.first(), topics))
             uploadData.first.enqueue()
         }
     }
@@ -215,7 +225,7 @@ class LMFeedEditPostViewModel @Inject constructor(
         attachments: List<AttachmentViewData>? = null,
         ogTags: LinkOGTagsViewData? = null,
         widget: WidgetViewData? = null,
-        selectedTopics: List<LMFeedTopicViewData>? = nul
+        selectedTopics: List<LMFeedTopicViewData>? = null
     ) {
         viewModelScope.launchIO {
             var updatedText = postTextContent?.trim()
@@ -233,6 +243,7 @@ class LMFeedEditPostViewModel @Inject constructor(
                     EditPostRequest.Builder()
                         .postId(postId)
                         .entityId(widget.id)
+                        .topicIds(topicIds)
                         .attachments(
                             ViewDataConverter.createAttachmentsForWidget(
                                 postTitle ?: "",
@@ -277,7 +288,7 @@ class LMFeedEditPostViewModel @Inject constructor(
                 val users = data.users
                 val widgets = data.widgets
                 val topics = data.topics
-                val postViewData = ViewDataConverter.convertPost(post, users, widgets,topics)
+                val postViewData = ViewDataConverter.convertPost(post, users, widgets, topics)
                 postDataEventChannel.send(PostDataEvent.EditPost(postViewData))
 
                 // sends post edited event

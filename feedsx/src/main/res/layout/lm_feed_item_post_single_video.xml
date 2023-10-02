@@ -15,46 +15,6 @@
         android:layout_height="wrap_content"
         android:background="@color/white">
 
-        <include
-            android:id="@+id/author_frame"
-            layout="@layout/lm_feed_layout_author_frame"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/cg_topics"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:visibility="gone"
-            app:chipSpacingHorizontal="4dp"
-            app:chipSpacingVertical="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/author_frame"
-            tools:visibility="visible" />
-
-        <com.likeminds.feedsx.branding.customview.LMFeedTextView
-            android:id="@+id/tv_post_content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp"
-            android:lineSpacingExtra="1sp"
-            android:textColor="@color/grey"
-            android:textSize="16sp"
-            app:fontType="regular"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cg_topics"
-            tools:fontFamily="@font/roboto_regular"
-            tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
-
         <com.likeminds.feedsx.media.customviews.LMFeedVideoPlayerView
             android:id="@+id/video_post"
             android:layout_width="0dp"
@@ -91,6 +51,20 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/video_post" />
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cg_topics"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="60dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:chipSpacingHorizontal="4dp"
+            app:chipSpacingVertical="4dp"
+            app:layout_constraintEnd_toEndOf="@id/author_frame"
+            app:layout_constraintStart_toStartOf="@id/author_frame"
+            app:layout_constraintTop_toBottomOf="@id/author_frame"
+            tools:visibility="visible" />
+
         <include
             android:id="@+id/post_actions_layout"
             layout="@layout/lm_feed_layout_post_actions"
@@ -101,7 +75,7 @@
             android:layout_marginEnd="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/author_frame" />
+            app:layout_constraintTop_toBottomOf="@id/cg_topics" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

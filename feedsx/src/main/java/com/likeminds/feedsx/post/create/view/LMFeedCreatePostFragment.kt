@@ -29,22 +29,14 @@ import com.likeminds.feedsx.media.view.LMFeedImageCropFragment
 import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
 import com.likeminds.feedsx.post.create.model.CreatePostExtras
 import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
-import com.likeminds.feedsx.post.create.viewmodel.CreatePostViewModel
-import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
-import com.likeminds.feedsx.posttypes.model.*
-import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity.Companion.ARG_MEDIA_PICKER_RESULT
-import com.likeminds.feedsx.post.create.util.CreatePostListener
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity.Companion.POST_ATTACHMENTS_LIMIT
-import com.likeminds.feedsx.post.create.view.adapter.CreatePostDocumentsAdapter
-import com.likeminds.feedsx.post.create.view.adapter.CreatePostMultipleMediaAdapter
 import com.likeminds.feedsx.post.create.viewmodel.LMFeedCreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
-import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
-import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionAlert
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ViewUtils.hide
@@ -155,6 +147,7 @@ class LMFeedCreatePostFragment :
     }
 
     companion object {
+
         const val TAG = "CreatePostFragment"
         const val MIN_ARTICLE_CONTENT = 200
     }
@@ -278,7 +271,7 @@ class LMFeedCreatePostFragment :
                 val link = text.getUrlIfExist()
 
                 if (!link.isNullOrEmpty()) {
-                    helperViewModel.decodeUrl(link)
+                    lmFeedHelperViewModel.decodeUrl(link)
                 }
             }
             .launchIn(lifecycleScope)
@@ -635,15 +628,20 @@ class LMFeedCreatePostFragment :
                 val postTitle = etPostTitle.text?.trim().toString()
                 handleProgressBar(true)
 
+                if (selectedTopic.isEmpty()) {
+                    LMFeedTopicSelectionAlert.showDialog(childFragmentManager)
+                    return@setOnClickListener
+                }
+
                 viewModel.addPost(
                     requireContext(),
                     postTitle,
                     updatedText,
                     selectedMediaUris,
                     ogTags,
-                    onBehalfOfUUID
+                    onBehalfOfUUID,
+                    selectedTopic
                 )
-                //todo add selectedTopics
             }
         }
     }
@@ -709,91 +707,13 @@ class LMFeedCreatePostFragment :
                 addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
             }
             addView(
-                LMFeedTopicChipUtil.createEditChip(requireContext(), selectedTopic, this) { intent ->
+                LMFeedTopicChipUtil.createEditChip(
+                    requireContext(),
+                    selectedTopic,
+                    this
+                ) { intent ->
                     topicSelectionLauncher.launch(intent)
                 })
-        }
-    }
-
-    /**
-     * Adds TextWatcher to edit text with Flow operators
-     * **/
-    @ExperimentalCoroutinesApi
-    @CheckResult
-    fun EditText.textChanges(): Flow<CharSequence?> {
-        return callbackFlow<CharSequence?> {
-            etPostTextChangeListener = object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) = Unit
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) = Unit
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    (this@callbackFlow).trySend(s.toString())
-                }
-            }
-            addTextChangedListener(etPostTextChangeListener)
-            awaitClose { removeTextChangedListener(etPostTextChangeListener) }
-        }.onStart { emit(text) }
-    }
-
-    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
-    private fun initiateMediaPicker(list: List<String>) {
-        val extras = MediaPickerExtras.Builder()
-            .mediaTypes(list)
-            .allowMultipleSelect(true)
-            .build()
-        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
-        galleryLauncher.launch(intent)
-    }
-
-    // process the result obtained from media picker
-    private fun checkMediaPickedResult(result: MediaPickerResult?) {
-        if (result != null) {
-            when (result.mediaPickerResultType) {
-                MEDIA_RESULT_BROWSE -> {
-                    if (MediaType.isPDF(result.mediaTypes)) {
-                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
-                            allowMultipleSelect = result.allowMultipleSelect
-                        )
-                        documentBrowseLauncher.launch(intent)
-                    } else {
-                        val intent = AndroidUtils.getExternalPickerIntent(
-                            result.mediaTypes,
-                            result.allowMultipleSelect,
-                            result.browseClassName
-                        )
-                        if (intent != null)
-                            mediaBrowseLauncher.launch(intent)
-                    }
-                }
-
-                MEDIA_RESULT_PICKED -> {
-                    onMediaPicked(result)
-                }
-            }
-        }
-    }
-
-    // converts the picked media to SingleUriData and adds to the selected media
-    private fun onMediaPicked(result: MediaPickerResult) {
-        val data =
-            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
-        // sends media attached event with media type and count
-        viewModel.sendMediaAttachedEvent(data)
-        selectedMediaUris.addAll(data)
-        showPostMedia()
-    }
-
-    private fun onMediaPickedFromGallery(data: Intent?) {
-        val uris = MediaUtils.getExternalIntentPickerUris(data)
-        viewModel.fetchUriDetails(requireContext(), uris) {
-            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
-                requireContext(), it
-            )
         }
     }
 

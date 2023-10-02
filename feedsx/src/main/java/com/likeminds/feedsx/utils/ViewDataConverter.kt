@@ -848,7 +848,7 @@ object ViewDataConverter {
         }
     }
 
-    private fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
+    fun convertAttachmentsEntity(attachments: List<AttachmentEntity>): List<AttachmentViewData> {
         return attachments.map { attachment ->
             convertAttachment(attachment)
         }

@@ -6,7 +6,7 @@
         android:id="@+id/edit_chip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:chipBackgroundColor="@color/majorelle_blue_10"
+        app:chipBackgroundColor="@color/colorPrimary_10"
         app:chipCornerRadius="4dp"
         app:chipEndPadding="12dp"
         app:chipIcon="@drawable/lm_feed_ic_edit_topic"

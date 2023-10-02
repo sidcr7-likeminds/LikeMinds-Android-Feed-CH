@@ -8,10 +8,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
-        android:textColor="@color/majorelle_blue"
+        android:textColor="@color/colorPrimary"
         android:textSize="14sp"
         android:textStyle="normal"
-        app:chipBackgroundColor="@color/majorelle_blue_10"
+        app:chipBackgroundColor="@color/colorPrimary_10"
         app:chipCornerRadius="4dp"
         tools:text="Alternative Rock" />
 </layout>

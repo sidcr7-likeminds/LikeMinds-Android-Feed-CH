@@ -173,7 +173,11 @@ class LMFeedCreatePostViewModel @Inject constructor(
                     )
                 }
                 // add it to local db
-                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments,topics)
+                postWithAttachmentsRepository.insertPostWithAttachments(
+                    postEntity,
+                    attachments,
+                    topics
+                )
             } else {
                 val postEntity = ViewDataConverter.convertPost(
                     temporaryPostId,
@@ -190,7 +194,11 @@ class LMFeedCreatePostViewModel @Inject constructor(
                     )
                 }
                 // add it to local db
-                postWithAttachmentsRepository.insertPostWithAttachments(postEntity, attachments,topics)
+                postWithAttachmentsRepository.insertPostWithAttachments(
+                    postEntity,
+                    attachments,
+                    topics
+                )
             }
             _postAdded.postValue(false)
             uploadData.first.enqueue()

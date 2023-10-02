@@ -38,6 +38,7 @@ import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
+import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionAlert
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -249,7 +250,7 @@ class LMFeedEditPostFragment :
                     .build()
 
                 findNavController().navigate(
-                    EditPostFragmentDirections.actionFragmentCreatePostToLmFeedImageCropFragment(
+                    LMFeedEditPostFragmentDirections.actionFragmentCreatePostToLmFeedImageCropFragment(
                         imageCropExtras
                     )
                 )
@@ -372,60 +373,45 @@ class LMFeedEditPostFragment :
                 val text = etPostContent.text
                 val updatedText = memberTagging.replaceSelectedMembers(text).trim()
                 val title = etPostTitle.text?.trim().toString()
+                val topics = selectedTopic.values
 
-                progressBar.root.show()
-                if (articleSingleUriData != null) {
-                    viewModel.uploadArticleImage(
-                        requireContext(),
-                        etPostTitle.text?.trim().toString(),
-                        etPostContent.text?.trim().toString(),
-                        articleSingleUriData
-                    )
+                if (selectedTopic.isNotEmpty()) {
+                    if (disabledTopics.isEmpty()) {
+                        savePost(title, updatedText, topics.toList())
+                    } else {
+                        //show dialog for disabled topics
+                        showDisabledTopicsAlert(disabledTopics.values.toList())
+                    }
                 } else {
-                    viewModel.editPost(
-                        editPostExtras.postId,
-                        title,
-                        updatedText,
-                        attachments = fileAttachments,
-                        ogTags = ogTags,
-                        widget = widget
-                    )
+                    //call api as no topics are enabled
+                    LMFeedTopicSelectionAlert.showDialog(childFragmentManager)
                 }
             }
         }
     }
 
-    //todo check with new code
-    private fun savePost() {
-        val text = binding.etPostContent.text
-        val updatedText = memberTagging.replaceSelectedMembers(text).trim()
-        val topics = selectedTopic.values
-
-        if (selectedTopic.isNotEmpty()) {
-            if (disabledTopics.isEmpty()) {
-                //call api as all topics are enabled
-                handleSaveButton(clickable = true, showProgress = true)
+    private fun savePost(title: String, updatedText: String, topics: List<LMFeedTopicViewData>) {
+        binding.apply {
+            progressBar.root.show()
+            if (articleSingleUriData != null) {
+                viewModel.uploadArticleImage(
+                    requireContext(),
+                    etPostTitle.text?.trim().toString(),
+                    etPostContent.text?.trim().toString(),
+                    articleSingleUriData,
+                    topics
+                )
+            } else {
                 viewModel.editPost(
                     editPostExtras.postId,
+                    title,
                     updatedText,
                     attachments = fileAttachments,
                     ogTags = ogTags,
-                    selectedTopics = topics.toList()
+                    widget = widget,
+                    selectedTopics = topics
                 )
-            } else {
-                //show dialog for disabled topics
-                showDisabledTopicsAlert(disabledTopics.values.toList())
             }
-        } else {
-            //call api as no topics are enabled
-            handleSaveButton(clickable = true, showProgress = true)
-            viewModel.editPost(
-                editPostExtras.postId,
-                updatedText,
-                attachments = fileAttachments,
-                ogTags = ogTags,
-                selectedTopics = topics.toList()
-            )
         }
     }
 
@@ -522,8 +508,8 @@ class LMFeedEditPostFragment :
             initAuthorFrame(it)
         }
 
-        viewModel.uploadingData.observe(viewLifecycleOwner) {
-            observeUploading(it)
+        viewModel.uploadingData.observe(viewLifecycleOwner) { response ->
+            observeUploading(response)
         }
 
         lmFeedHelperViewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopics ->
@@ -560,12 +546,6 @@ class LMFeedEditPostFragment :
                 }
             }
         }.observeInLifecycle(viewLifecycleOwner)
-
-        // observes decodeUrlResponse and returns link ogTags
-        lmFeedHelperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) { ogTags ->
-            this.ogTags = ogTags
-            initLinkView()
-        }
     }
 
     // initializes a listener to edit text
@@ -611,19 +591,15 @@ class LMFeedEditPostFragment :
 
         lmFeedHelperViewModel.errorEventFlow.onEach { response ->
             when (response) {
-                is LMFeedHelperViewModel.ErrorMessageEvent.DecodeUrl -> {
-                    val postText = binding.etPostContent.text.toString()
-                    val link = postText.getUrlIfExist()
-                    if (link != ogTags?.url) {
-                        clearPreviewLink()
-                    }
-                }
-
                 is LMFeedHelperViewModel.ErrorMessageEvent.GetTaggingList -> {
                     ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
                 }
 
                 is LMFeedHelperViewModel.ErrorMessageEvent.GetTopic -> {
+                    ViewUtils.showErrorMessageToast(requireContext(), response.errorMessage)
+                }
+
+                else -> {
 
                 }
             }
@@ -644,8 +620,8 @@ class LMFeedEditPostFragment :
     // sets the post data in view
     private fun setPostData(post: PostViewData) {
         binding.apply {
-            val attachments = post.attachments
             val topics = post.topics
+
             ProgressHelper.hideProgress(progressBar)
             nestedScroll.show()
 
@@ -668,11 +644,35 @@ class LMFeedEditPostFragment :
                 content,
                 LMFeedBranding.getTextLinkColor()
             )
+
             showPostMedia(title, content)
+            showSelectedTopic(topics)
+
             // sets the cursor to the end and opens keyboard
             etPostContent.setSelection(etPostContent.length())
             etPostContent.focusAndShowKeyboard()
+
             initPostContentTextListener()
+        }
+    }
+
+    private fun showSelectedTopic(topics: List<LMFeedTopicViewData>) {
+        if (topics.isNotEmpty()) {
+            handleTopicSelectionView(true)
+
+            selectedTopic.clear()
+            disabledTopics.clear()
+
+            //filter disabled topics
+            topics.forEach { topic ->
+                if (!topic.isEnabled) {
+                    disabledTopics[topic.id] = topic
+                }
+            }
+
+            addTopicsToGroup(false, topics)
+        } else {
+            lmFeedHelperViewModel.getAllTopics(true)
         }
     }
 
@@ -708,24 +708,6 @@ class LMFeedEditPostFragment :
 
             else -> {
                 Log.e(SDKApplication.LOG_TAG, "invalid view type")
-            }
-
-            if (topics.isNotEmpty()) {
-                handleTopicSelectionView(true)
-
-                selectedTopic.clear()
-                disabledTopics.clear()
-
-                //filter disabled topics
-                topics.forEach { topic ->
-                    if (!topic.isEnabled) {
-                        disabledTopics[topic.id] = topic
-                    }
-                }
-
-                addTopicsToGroup(false, topics)
-            } else {
-                lmFeedHelperViewModel.getAllTopics(true)
             }
         }
     }
@@ -846,13 +828,13 @@ class LMFeedEditPostFragment :
     }
 
     // observes post uploading
-    private fun observeUploading(uploadingData: Pair<String, AttachmentViewData>) {
+    private fun observeUploading(uploadingData: Triple<String, AttachmentViewData, List<LMFeedTopicViewData>>) {
         val uuid = UUID.fromString(uploadingData.first)
         if (!workersMap.contains(uuid)) {
             workersMap.add(uuid)
             WorkManager.getInstance(requireContext()).getWorkInfoByIdLiveData(uuid)
                 .observe(viewLifecycleOwner) { workInfo ->
-                    observeMediaWorker(workInfo, uploadingData.second)
+                    observeMediaWorker(workInfo, uploadingData.second, uploadingData.third)
                 }
         }
     }
@@ -860,7 +842,8 @@ class LMFeedEditPostFragment :
     // observes the media worker through various worker lifecycle
     private fun observeMediaWorker(
         workInfo: WorkInfo,
-        attachmentViewData: AttachmentViewData
+        attachmentViewData: AttachmentViewData,
+        topics: List<LMFeedTopicViewData>
     ) {
         when (workInfo.state) {
             WorkInfo.State.SUCCEEDED -> {
@@ -879,7 +862,8 @@ class LMFeedEditPostFragment :
                     editPostExtras.postId,
                     attachmentViewData.attachmentMeta.title ?: "",
                     attachmentViewData.attachmentMeta.body ?: "",
-                    widget = updatedWidget
+                    widget = updatedWidget,
+                    selectedTopics = topics
                 )
             }
 

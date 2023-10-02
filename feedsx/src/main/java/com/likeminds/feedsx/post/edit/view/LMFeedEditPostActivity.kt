@@ -8,7 +8,6 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.LmFeedActivityEditPostBinding
-import com.likeminds.feedsx.post.create.view.LMFeedCreatePostFragment
 import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
@@ -90,9 +89,9 @@ class LMFeedEditPostActivity : BaseAppCompatActivity() {
     // setups up on back pressed callback
     private fun setupOnBackPressedCallback() {
         onBackPressedDispatcher.addCallback(this) {
-            if (supportFragmentManager.currentFragment(R.id.nav_host_fragment) is EditPostFragment) {
+            if (supportFragmentManager.currentFragment(R.id.nav_host_fragment) is LMFeedEditPostFragment) {
                 val fragment =
-                    supportFragmentManager.currentFragment(R.id.nav_host_fragment) as EditPostFragment
+                    supportFragmentManager.currentFragment(R.id.nav_host_fragment) as LMFeedEditPostFragment
                 fragment.openBackPressedPopup()
             }
         }
