@@ -18,6 +18,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/cg_topics"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            app:chipSpacingHorizontal="4dp"
+            app:chipSpacingVertical="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/author_frame"
+            tools:visibility="visible" />
+
         <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/tv_post_content"
             android:layout_width="match_parent"
@@ -29,7 +42,7 @@
             app:fontType="regular"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/author_frame"
+            app:layout_constraintTop_toBottomOf="@id/cg_topics"
             tools:fontFamily="@font/roboto_regular"
             tools:text="Congrats to @talasha.sawant &amp; @kate92kt for being Community Hood CMs Of the Week! They both are founders of @_towardsabetteryou_  that is for mental &amp; emotional wellbeing ... See more" />
 

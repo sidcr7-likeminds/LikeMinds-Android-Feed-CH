@@ -12,12 +12,13 @@ import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
+import com.likeminds.feedsx.utils.emptyExtrasException
 
 class LMFeedLikesActivity : BaseAppCompatActivity() {
 
     lateinit var binding: LmFeedActivityLikesBinding
 
-    private var likesScreenExtras: LikesScreenExtras? = null
+    private lateinit var likesScreenExtras: LikesScreenExtras
 
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
@@ -25,6 +26,7 @@ class LMFeedLikesActivity : BaseAppCompatActivity() {
 
     companion object {
         const val LIKES_SCREEN_EXTRAS = "LIKES_SCREEN_EXTRAS"
+        const val TAG = "LMFeedLikesActivity"
 
         @JvmStatic
         fun start(context: Context, extras: LikesScreenExtras) {
@@ -59,7 +61,7 @@ class LMFeedLikesActivity : BaseAppCompatActivity() {
                 bundle,
                 LIKES_SCREEN_EXTRAS,
                 LikesScreenExtras::class.java
-            )
+            ) ?: throw emptyExtrasException(TAG)
 
             val args = Bundle().apply {
                 putParcelable(LIKES_SCREEN_EXTRAS, likesScreenExtras)

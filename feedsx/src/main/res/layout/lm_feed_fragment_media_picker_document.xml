@@ -86,7 +86,7 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.appcompat.widget.Toolbar>
 
-        <com.likeminds.feedsx.search.util.CustomSearchBar
+        <com.likeminds.feedsx.search.util.LMFeedCustomSearchBar
             android:id="@+id/search_bar"
             android:layout_width="0dp"
             android:layout_height="?attr/actionBarSize"

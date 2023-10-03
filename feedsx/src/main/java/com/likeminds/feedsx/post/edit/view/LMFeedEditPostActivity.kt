@@ -7,16 +7,16 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.LmFeedActivityEditPostBinding
-import com.likeminds.feedsx.post.edit.model.EditPostExtras
+import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 
-class EditPostActivity : BaseAppCompatActivity() {
+class LMFeedEditPostActivity : BaseAppCompatActivity() {
 
     lateinit var binding: LmFeedActivityEditPostBinding
 
-    private var editPostExtras: EditPostExtras? = null
+    private var editPostExtras: LMFeedEditPostExtras? = null
 
     //Navigation
     private lateinit var navHostFragment: NavHostFragment
@@ -26,8 +26,8 @@ class EditPostActivity : BaseAppCompatActivity() {
         const val EDIT_POST_EXTRAS = "EDIT_POST_EXTRAS"
 
         @JvmStatic
-        fun start(context: Context, extras: EditPostExtras) {
-            val intent = Intent(context, EditPostActivity::class.java)
+        fun start(context: Context, extras: LMFeedEditPostExtras) {
+            val intent = Intent(context, LMFeedEditPostActivity::class.java)
             val bundle = Bundle()
             bundle.putParcelable(EDIT_POST_EXTRAS, extras)
             intent.putExtra("bundle", bundle)
@@ -35,8 +35,8 @@ class EditPostActivity : BaseAppCompatActivity() {
         }
 
         @JvmStatic
-        fun getIntent(context: Context, extras: EditPostExtras): Intent {
-            val intent = Intent(context, EditPostActivity::class.java)
+        fun getIntent(context: Context, extras: LMFeedEditPostExtras): Intent {
+            val intent = Intent(context, LMFeedEditPostActivity::class.java)
             val bundle = Bundle()
             bundle.putParcelable(EDIT_POST_EXTRAS, extras)
             intent.putExtra("bundle", bundle)
@@ -56,7 +56,7 @@ class EditPostActivity : BaseAppCompatActivity() {
             editPostExtras = ExtrasUtil.getParcelable(
                 bundle,
                 EDIT_POST_EXTRAS,
-                EditPostExtras::class.java
+                LMFeedEditPostExtras::class.java
             )
 
             val args = Bundle().apply {

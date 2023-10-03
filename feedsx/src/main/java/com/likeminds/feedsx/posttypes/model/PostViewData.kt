@@ -2,7 +2,14 @@ package com.likeminds.feedsx.posttypes.model
 
 import android.os.Parcelable
 import com.likeminds.feedsx.overflowmenu.model.OverflowMenuItemViewData
-import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
+import com.likeminds.feedsx.utils.model.BaseViewType
+import com.likeminds.feedsx.utils.model.ITEM_POST_DOCUMENTS
+import com.likeminds.feedsx.utils.model.ITEM_POST_LINK
+import com.likeminds.feedsx.utils.model.ITEM_POST_MULTIPLE_MEDIA
+import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_IMAGE
+import com.likeminds.feedsx.utils.model.ITEM_POST_SINGLE_VIDEO
+import com.likeminds.feedsx.utils.model.ITEM_POST_TEXT_ONLY
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -32,7 +39,8 @@ class PostViewData private constructor(
     val workerUUID: String,
     val isPosted: Boolean,
     val temporaryId: Long?,
-    val uuid: String
+    val uuid: String,
+    val topics: List<LMFeedTopicViewData>
 ) : Parcelable, BaseViewType {
 
     override val viewType: Int
@@ -89,6 +97,7 @@ class PostViewData private constructor(
         private var temporaryId: Long? = null
         private var fromVideoAction: Boolean = false
         private var uuid: String = ""
+        private var topics: List<LMFeedTopicViewData> = emptyList()
 
         fun id(id: String) = apply { this.id = id }
         fun text(text: String?) = apply { this.text = text }
@@ -127,6 +136,7 @@ class PostViewData private constructor(
         fun isPosted(isPosted: Boolean) = apply { this.isPosted = isPosted }
         fun temporaryId(temporaryId: Long?) = apply { this.temporaryId = temporaryId }
         fun uuid(uuid: String) = apply { this.uuid = uuid }
+        fun topics(topics: List<LMFeedTopicViewData>) = apply { this.topics = topics }
 
         fun build() = PostViewData(
             id,
@@ -154,7 +164,8 @@ class PostViewData private constructor(
             workerUUID,
             isPosted,
             temporaryId,
-            uuid
+            uuid,
+            topics
         )
     }
 
@@ -185,5 +196,6 @@ class PostViewData private constructor(
             .isPosted(isPosted)
             .temporaryId(temporaryId)
             .uuid(uuid)
+            .topics(topics)
     }
 }
