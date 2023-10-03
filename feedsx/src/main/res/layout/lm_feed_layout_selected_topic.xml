@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/lm_feed_item_filter_selected_topics" />
 
-        <TextView
+        <com.likeminds.feedsx.branding.customview.LMFeedTextView
             android:id="@+id/tv_clear"
             style="@style/LMFeedClickableView"
             android:layout_width="wrap_content"
@@ -36,7 +36,8 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:textType="special" />
 
         <View
             android:id="@+id/view_separator"

@@ -46,7 +46,6 @@ class LMFeedViewModel @Inject constructor(
         data class UniversalFeed(val errorMessage: String?) : ErrorMessageEvent()
         data class AddPost(val errorMessage: String?) : ErrorMessageEvent()
         data class GetUnreadNotificationCount(val errorMessage: String?) : ErrorMessageEvent()
-        data class GetTopic(val errorMessage: String?) : ErrorMessageEvent()
     }
 
     sealed class PostDataEvent {

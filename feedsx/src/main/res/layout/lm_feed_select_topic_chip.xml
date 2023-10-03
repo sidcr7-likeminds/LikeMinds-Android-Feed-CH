@@ -2,13 +2,20 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <data>
+
+        <variable
+            name="buttonColor"
+            type="int" />
+    </data>
+
     <com.google.android.material.chip.Chip
         android:id="@+id/chip_topic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="false"
         android:text="@string/select_topics"
-        android:textColor="@color/majorelle_blue"
+        android:textColor="@{buttonColor}"
         app:chipStartPadding="8dp"
         android:textSize="14sp"
         android:textStyle="normal"
