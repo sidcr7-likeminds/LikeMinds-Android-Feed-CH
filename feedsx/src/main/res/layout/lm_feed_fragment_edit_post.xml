@@ -96,7 +96,7 @@
             android:layout_height="0dp"
             android:fillViewport="true"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_save"
             app:layout_constraintTop_toBottomOf="@id/toolbar"
             tools:visibility="visible">
 
@@ -370,39 +370,41 @@
                     app:layout_constraintTop_toBottomOf="@id/et_post_content"
                     tools:visibility="gone" />
 
-                <com.likeminds.feedsx.branding.customview.LMFeedButton
-                    android:id="@+id/btn_save"
-                    android:layout_width="142dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:layout_marginBottom="16dp"
-                    android:paddingVertical="12dp"
-                    android:text="@string/save"
-                    android:textAllCaps="true"
-                    android:textColor="@color/white"
-                    android:textSize="14sp"
-                    android:visibility="gone"
-                    app:cornerRadius="24dp"
-                    app:font_type="medium"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:text_type="normal"
-                    tools:visibility="visible" />
-
-                <include
-                    android:id="@+id/progress_bar"
-                    layout="@layout/lm_feed_progress_bar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent" />
-
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </androidx.core.widget.NestedScrollView>
+
+
+        <com.likeminds.feedsx.branding.customview.LMFeedButton
+            android:id="@+id/btn_save"
+            android:layout_width="142dp"
+            android:layout_height="wrap_content"
+            android:paddingVertical="12dp"
+            android:text="@string/save"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:visibility="gone"
+            app:cornerRadius="24dp"
+            app:font_type="medium"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nested_scroll"
+            app:layout_constraintVertical_bias="1"
+            app:text_type="normal"
+            tools:visibility="visible" />
+
+        <include
+            android:id="@+id/progress_bar"
+            layout="@layout/lm_feed_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/nested_scroll" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
