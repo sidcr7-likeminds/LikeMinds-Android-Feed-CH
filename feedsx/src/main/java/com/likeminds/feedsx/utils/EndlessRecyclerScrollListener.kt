@@ -3,7 +3,7 @@ package com.likeminds.feedsx.utils
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-internal abstract class EndlessRecyclerScrollListener(private val mLinearLayoutManager: LinearLayoutManager) :
+abstract class EndlessRecyclerScrollListener(private val mLinearLayoutManager: LinearLayoutManager) :
     RecyclerView.OnScrollListener() {
 
     var overallXScroll = 0

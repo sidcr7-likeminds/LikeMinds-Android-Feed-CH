@@ -45,6 +45,7 @@ class LMFeedItemPostSingleVideoViewDataBinder constructor(
                 authorFrame,
                 data,
                 position,
+                cgTopics,
                 listener,
                 returnBinder = {
                     return@initPostTypeBindData

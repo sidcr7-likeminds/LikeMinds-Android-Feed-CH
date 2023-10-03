@@ -65,7 +65,7 @@ class ItemPostDetailCommentViewDataBinder constructor(
             tvCommenterName.setOnClickListener {
                 SDKApplication.getLMFeedUICallback()?.openProfile(
                     data.user.sdkClientInfoViewData.uuid,
-                    data.id,
+                    data.user.id.toString(),
                     LMFeedAnalytics.Source.FEED
                 )
             }
@@ -153,14 +153,20 @@ class ItemPostDetailCommentViewDataBinder constructor(
                 }
 
                 val commentCreatorUUID = data.user.sdkClientInfoViewData.uuid
-                ivCommentMenu.setOnClickListener { view ->
-                    showMenu(
-                        view,
-                        data.postId,
-                        data.id,
-                        commentCreatorUUID,
-                        data.menuItems
-                    )
+                if (data.menuItems.isEmpty()) {
+                    ivCommentMenu.hide()
+                } else {
+                    ivCommentMenu.show()
+
+                    ivCommentMenu.setOnClickListener { view ->
+                        showMenu(
+                            view,
+                            data.postId,
+                            data.id,
+                            commentCreatorUUID,
+                            data.menuItems
+                        )
+                    }
                 }
 
                 if (data.replies.isNotEmpty()) {

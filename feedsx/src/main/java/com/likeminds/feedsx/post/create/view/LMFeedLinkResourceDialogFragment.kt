@@ -9,7 +9,7 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedDialogFragmentLinkResourceBinding
-import com.likeminds.feedsx.post.edit.viewmodel.HelperViewModel
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
@@ -21,7 +21,7 @@ class LMFeedLinkResourceDialogFragment :
     BaseDialogFragment<LmFeedDialogFragmentLinkResourceBinding>() {
 
     @Inject
-    lateinit var helperViewModel: HelperViewModel
+    lateinit var lmFeedHelperViewModel: LMFeedHelperViewModel
 
     private lateinit var linkResourceDialogListener: LinkResourceDialogListener
 
@@ -62,12 +62,12 @@ class LMFeedLinkResourceDialogFragment :
     override fun observeData() {
         super.observeData()
 
-        helperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) {
+        lmFeedHelperViewModel.decodeUrlResponse.observe(viewLifecycleOwner) {
             linkResourceDialogListener.linkOgTags(it)
             this.dismiss()
         }
 
-        helperViewModel.errorEventFlow.onEach { _ ->
+        lmFeedHelperViewModel.errorEventFlow.onEach { _ ->
             Toast.makeText(
                 requireContext(),
                 getString(R.string.something_went_wrong),
@@ -101,7 +101,7 @@ class LMFeedLinkResourceDialogFragment :
         val link = text.getUrlIfExist()
         if (!link.isNullOrEmpty()) {
             showLoader(true)
-            helperViewModel.decodeUrl(link)
+            lmFeedHelperViewModel.decodeUrl(link)
         } else {
             Toast.makeText(
                 requireContext(),

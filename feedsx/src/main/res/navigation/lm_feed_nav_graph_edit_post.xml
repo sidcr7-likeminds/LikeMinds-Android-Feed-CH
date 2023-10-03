@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/fragment_edit_post"
-        android:name="com.likeminds.feedsx.post.edit.view.EditPostFragment"
+        android:name="com.likeminds.feedsx.post.edit.view.LMFeedEditPostFragment"
         android:label="EditPostFragment"
         tools:layout="@layout/lm_feed_fragment_edit_post">
         <action

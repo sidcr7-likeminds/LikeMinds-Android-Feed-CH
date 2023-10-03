@@ -10,5 +10,10 @@ data class PostWithAttachments constructor(
         parentColumn = "post_id",
         entityColumn = "post_id"
     )
-    val attachments: List<AttachmentEntity>
+    val attachments: List<AttachmentEntity>,
+    @Relation(
+        parentColumn = "post_id",
+        entityColumn = "post_id"
+    )
+    val topics: List<TopicEntity>
 )

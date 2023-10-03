@@ -2,7 +2,9 @@ package com.likeminds.feedsx
 
 import android.app.Application
 import android.content.Context
-import com.amazonaws.mobile.client.*
+import com.amazonaws.mobile.client.AWSMobileClient
+import com.amazonaws.mobile.client.Callback
+import com.amazonaws.mobile.client.UserStateDetails
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
@@ -17,6 +19,7 @@ import com.likeminds.feedsx.di.notificationfeed.NotificationFeedComponent
 import com.likeminds.feedsx.di.post.create.CreatePostComponent
 import com.likeminds.feedsx.di.post.detail.PostDetailComponent
 import com.likeminds.feedsx.di.post.edit.EditPostComponent
+import com.likeminds.feedsx.di.topic.LMFeedTopicComponent
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.likemindsfeed.LMCallback
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -42,9 +45,10 @@ class SDKApplication : LMCallback {
     private var editPostComponent: EditPostComponent? = null
     private var reportComponent: ReportComponent? = null
     private var reasonChooseComponent: ReasonChooseComponent? = null
+    private var lmFeedTopicComponent: LMFeedTopicComponent? = null
 
     companion object {
-        const val LOG_TAG = "LikeMinds"
+        const val LOG_TAG = "LikeMindsFeed"
         private var sdkApplicationInstance: SDKApplication? = null
         private var lmUICallback: LMFeedUICallback? = null
 
@@ -201,6 +205,14 @@ class SDKApplication : LMCallback {
             reasonChooseComponent = likeMindsFeedComponent?.reasonChooseComponent()?.create()
         }
         return reasonChooseComponent
+    }
+
+    fun lmFeedTopicComponent(): LMFeedTopicComponent? {
+        if (lmFeedTopicComponent == null) {
+            lmFeedTopicComponent = likeMindsFeedComponent?.topicComponent()?.create()
+        }
+
+        return lmFeedTopicComponent
     }
 
     override fun login() {

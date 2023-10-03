@@ -42,6 +42,7 @@ class LMFeedItemPostDocumentsViewDataBinder constructor(
             binding.authorFrame,
             data,
             position,
+            binding.cgTopics,
             listener,
             returnBinder = {
                 return@initPostTypeBindData

@@ -23,6 +23,7 @@ class RoomModule {
                 DbMigration.MIGRATION_2_3,
                 DbMigration.MIGRATION_3_4
             )
+            .fallbackToDestructiveMigration()
             .build()
     }
 
