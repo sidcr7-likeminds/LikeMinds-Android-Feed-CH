@@ -38,6 +38,7 @@
             android:textColor="@color/raisin_black"
             android:textSize="16sp"
             app:fontType="medium"
+            android:maxLines="2"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toTopOf="@id/tv_member_name"
             app:layout_constraintEnd_toStartOf="@id/iv_pin"
