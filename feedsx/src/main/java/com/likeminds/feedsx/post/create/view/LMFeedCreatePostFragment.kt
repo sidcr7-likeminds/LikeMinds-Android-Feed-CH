@@ -210,7 +210,13 @@ class LMFeedCreatePostFragment :
     // initializes the view as per the selected post type
     private fun initView() {
         binding.apply {
-            createPostExtras.attachmentUri?.let { selectedMediaUris.add(it) }
+            if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
+                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
+            }
+
+            if (createPostExtras.attachmentType == DOCUMENT) {
+                initiateMediaPicker(listOf(PDF))
+            }
             ogTags = createPostExtras.linkOGTagsViewData
 
             if (createPostExtras.isAdmin) {
@@ -324,8 +330,8 @@ class LMFeedCreatePostFragment :
                     initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
                 }
 
-                if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.DOCUMENT) {
-                    initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.PDF))
+                if (createPostExtras.attachmentType == DOCUMENT) {
+                    initiateMediaPicker(listOf(PDF))
                 }
             }
 
@@ -770,7 +776,7 @@ class LMFeedCreatePostFragment :
                         ivAddMedia,
                         R.drawable.ic_add_video
                     )
-                } else if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.DOCUMENT) {
+                } else if (createPostExtras.attachmentType == DOCUMENT) {
                     ViewUtils.getMandatoryAsterisk(
                         getString(R.string.select_pdf_to_share),
                         tvAddMedia
@@ -790,11 +796,11 @@ class LMFeedCreatePostFragment :
                 }
                 grpMedia.show()
                 cvAddMedia.hide()
-                tvMediaName.text = createPostExtras.attachmentUri?.mediaName
+                tvMediaName.text = selectedMedia.mediaName
                 tvMediaSize.text =
                     getString(
                         R.string.f_MB,
-                        (selectedMediaUris.firstOrNull()?.size?.div(1000000.0))
+                        (selectedMedia.size.div(1000000.0))
                     )
             }
         }

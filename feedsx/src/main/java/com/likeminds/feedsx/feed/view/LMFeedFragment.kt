@@ -2,7 +2,6 @@ package com.likeminds.feedsx.feed.view
 
 import android.Manifest
 import android.app.Activity
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
@@ -10,7 +9,6 @@ import android.os.*
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationManagerCompat
@@ -38,9 +36,7 @@ import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
 import com.likeminds.feedsx.likes.view.LMFeedLikesActivity
 import com.likeminds.feedsx.media.model.*
-import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
-import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
 import com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
 import com.likeminds.feedsx.post.create.model.LMFeedCreatePostExtras
@@ -652,169 +648,6 @@ class LMFeedFragment :
             }
         }
 
-    // launcher to handle gallery (IMAGE/VIDEO) intent
-    private val galleryLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                val data = ExtrasUtil.getParcelable(
-                    result.data?.extras,
-                    LMFeedMediaPickerActivity.ARG_MEDIA_PICKER_RESULT,
-                    MediaPickerResult::class.java
-                )
-                checkMediaPickedResult(data)
-            }
-        }
-
-    private val mediaBrowseLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                onMediaPickedFromGallery(result.data)
-            }
-        }
-
-    private val documentBrowseLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == Activity.RESULT_OK) {
-                onPdfPicked(result.data)
-            }
-        }
-
-    // process the result obtained from media picker
-    private fun checkMediaPickedResult(result: MediaPickerResult?) {
-        if (result != null) {
-            when (result.mediaPickerResultType) {
-                MEDIA_RESULT_BROWSE -> {
-                    if (MediaType.isPDF(result.mediaTypes)) {
-                        val intent = AndroidUtils.getExternalDocumentPickerIntent(
-                            allowMultipleSelect = result.allowMultipleSelect
-                        )
-                        documentBrowseLauncher.launch(intent)
-                    } else {
-                        val intent = AndroidUtils.getExternalPickerIntent(
-                            result.mediaTypes,
-                            result.allowMultipleSelect,
-                            result.browseClassName
-                        )
-                        if (intent != null)
-                            mediaBrowseLauncher.launch(intent)
-                    }
-                }
-
-                MEDIA_RESULT_PICKED -> {
-                    onMediaPicked(result)
-                }
-            }
-        }
-    }
-
-    // converts the picked media to SingleUriData and adds to the selected media
-    private fun onMediaPicked(result: MediaPickerResult) {
-        val data =
-            MediaUtils.convertMediaViewDataToSingleUriData(requireContext(), result.medias)
-        // sends media attached event with media type and count
-        viewModel.sendMediaAttachedEvent(data)
-        if (data.isNotEmpty()) {
-            val attachmentType = getAttachmentType(data.first().fileType)
-            if (checkForValidAttachment(data.first())) {
-                val createPostExtras = LMFeedCreatePostExtras.Builder()
-                    .attachmentType(attachmentType)
-                    .attachmentUri(data.first())
-                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
-                    .isAdmin(initiateViewModel.isAdmin.value ?: false)
-                    .build()
-                startCreatePostActivity(createPostExtras)
-            }
-        }
-    }
-
-    // checks if the selected attachment is allowed or not
-    private fun checkForValidAttachment(uri: SingleUriData?): Boolean {
-        return when (uri?.fileType) {
-            com.likeminds.feedsx.media.model.VIDEO -> {
-                if (uri.duration != null && uri.duration > VIDEO_DURATION_LIMIT) {
-                    Toast.makeText(
-                        requireContext(),
-                        getString(R.string.video_duration_must_be_less_than_10_min),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    false
-                } else {
-                    true
-                }
-            }
-
-            else -> {
-                true
-            }
-        }
-    }
-
-    private fun onMediaPickedFromGallery(data: Intent?) {
-        val uris = MediaUtils.getExternalIntentPickerUris(data)
-        viewModel.fetchUriDetails(requireContext(), uris) {
-            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
-                requireContext(), it
-            )
-            // sends media attached event with media type and count
-            viewModel.sendMediaAttachedEvent(mediaUris)
-            if (mediaUris.isNotEmpty()) {
-                val attachmentType = getAttachmentType(mediaUris.first().fileType)
-                if (checkForValidAttachment(mediaUris.first())) {
-                    val createPostExtras = LMFeedCreatePostExtras.Builder()
-                        .attachmentType(attachmentType)
-                        .attachmentUri(mediaUris.first())
-                        .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
-                        .isAdmin(initiateViewModel.isAdmin.value ?: false)
-                        .build()
-                    startCreatePostActivity(createPostExtras)
-                }
-            }
-        }
-    }
-
-    private fun onPdfPicked(data: Intent?) {
-        val uris = MediaUtils.getExternalIntentPickerUris(data)
-        viewModel.fetchUriDetails(requireContext(), uris) {
-            val mediaUris = MediaUtils.convertMediaViewDataToSingleUriData(
-                requireContext(), it
-            )
-            // sends media attached event with media type and count
-            viewModel.sendMediaAttachedEvent(mediaUris)
-            if (mediaUris.isNotEmpty()) {
-                val attachmentType = getAttachmentType(mediaUris.first().fileType)
-                if (checkForValidAttachment(mediaUris.first())) {
-                    val createPostExtras = LMFeedCreatePostExtras.Builder()
-                        .attachmentType(attachmentType)
-                        .attachmentUri(mediaUris.first())
-                        .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
-                        .isAdmin(initiateViewModel.isAdmin.value ?: false)
-                        .build()
-                    startCreatePostActivity(createPostExtras)
-                }
-            }
-        }
-    }
-
-    private fun getAttachmentType(fileType: String): Int {
-        return when (fileType) {
-            com.likeminds.feedsx.media.model.IMAGE -> {
-                ARTICLE
-            }
-
-            com.likeminds.feedsx.media.model.VIDEO -> {
-                VIDEO
-            }
-
-            PDF -> {
-                DOCUMENT
-            }
-
-            else -> {
-                ARTICLE
-            }
-        }
-    }
-
     // initializes universal feed recyclerview
     private fun initFeedRecyclerView() {
         // item decorator to add spacing between items
@@ -1376,7 +1209,12 @@ class LMFeedFragment :
 
         when (attachmentType) {
             VIDEO -> {
-                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
+                val createPostExtras = LMFeedCreatePostExtras.Builder()
+                    .attachmentType(VIDEO)
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .isAdmin(initiateViewModel.isAdmin.value ?: false)
+                    .build()
+                startCreatePostActivity(createPostExtras)
             }
 
             LINK -> {
@@ -1393,7 +1231,12 @@ class LMFeedFragment :
             }
 
             DOCUMENT -> {
-                initiateMediaPicker(listOf(PDF))
+                val createPostExtras = LMFeedCreatePostExtras.Builder()
+                    .attachmentType(DOCUMENT)
+                    .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
+                    .isAdmin(initiateViewModel.isAdmin.value ?: false)
+                    .build()
+                startCreatePostActivity(createPostExtras)
             }
         }
     }
@@ -1406,15 +1249,6 @@ class LMFeedFragment :
             createPostExtras
         )
         createPostLauncher.launch(intent)
-    }
-
-    // triggers gallery launcher for (IMAGE)/(VIDEO)/(IMAGE & VIDEO)
-    private fun initiateMediaPicker(list: List<String>) {
-        val extras = MediaPickerExtras.Builder()
-            .mediaTypes(list)
-            .build()
-        val intent = LMFeedMediaPickerActivity.getIntent(requireContext(), extras)
-        galleryLauncher.launch(intent)
     }
 
     /**
