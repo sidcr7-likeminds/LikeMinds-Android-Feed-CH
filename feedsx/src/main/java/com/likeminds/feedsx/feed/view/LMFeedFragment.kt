@@ -43,7 +43,7 @@ import com.likeminds.feedsx.media.util.PostVideoAutoPlayHelper
 import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
 import com.likeminds.feedsx.notificationfeed.view.LMFeedNotificationFeedActivity
 import com.likeminds.feedsx.overflowmenu.model.*
-import com.likeminds.feedsx.post.create.model.CreatePostExtras
+import com.likeminds.feedsx.post.create.model.LMFeedCreatePostExtras
 import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
@@ -494,27 +494,23 @@ class LMFeedFragment :
             viewModel.fetchPendingPostFromDB()
         }
         if (this.isVisible) {
-            initiateAutoPlayer()
+            initiateAutoPlayer("onResume")
         }
     }
 
     override fun onPause() {
         super.onPause()
-        // removes the player and destroys the [postVideoAutoPlayHelper]
-        if (::postVideoAutoPlayHelper.isInitialized) {
-            postVideoAutoPlayHelper.destroy()
-        }
+        destroyAutoPlayer("onPause")
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
 
         if (hidden) {
-            // removes the player and destroys the [postVideoAutoPlayHelper]
-            if (::postVideoAutoPlayHelper.isInitialized) {
-                postVideoAutoPlayHelper.destroy()
-            }
+            Log.d("PUI", "onHiddenChanged111: ")
+            destroyAutoPlayer("hidden")
         } else {
+            Log.d("PUI", "onHiddenChanged: ")
             // sends feed opened event
             viewModel.sendFeedOpenedEvent()
 
@@ -523,7 +519,7 @@ class LMFeedFragment :
                 removePostingView()
                 viewModel.fetchPendingPostFromDB()
             }
-            initiateAutoPlayer()
+            initiateAutoPlayer("not hidden")
         }
     }
 
@@ -720,7 +716,7 @@ class LMFeedFragment :
         if (data.isNotEmpty()) {
             val attachmentType = getAttachmentType(data.first().fileType)
             if (checkForValidAttachment(data.first())) {
-                val createPostExtras = CreatePostExtras.Builder()
+                val createPostExtras = LMFeedCreatePostExtras.Builder()
                     .attachmentType(attachmentType)
                     .attachmentUri(data.first())
                     .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
@@ -764,7 +760,7 @@ class LMFeedFragment :
             if (mediaUris.isNotEmpty()) {
                 val attachmentType = getAttachmentType(mediaUris.first().fileType)
                 if (checkForValidAttachment(mediaUris.first())) {
-                    val createPostExtras = CreatePostExtras.Builder()
+                    val createPostExtras = LMFeedCreatePostExtras.Builder()
                         .attachmentType(attachmentType)
                         .attachmentUri(mediaUris.first())
                         .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
@@ -787,7 +783,7 @@ class LMFeedFragment :
             if (mediaUris.isNotEmpty()) {
                 val attachmentType = getAttachmentType(mediaUris.first().fileType)
                 if (checkForValidAttachment(mediaUris.first())) {
-                    val createPostExtras = CreatePostExtras.Builder()
+                    val createPostExtras = LMFeedCreatePostExtras.Builder()
                         .attachmentType(attachmentType)
                         .attachmentUri(mediaUris.first())
                         .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
@@ -1307,27 +1303,26 @@ class LMFeedFragment :
      * Initializes the [postVideoAutoPlayHelper] with the recyclerView
      * And starts observing
      **/
-    private fun initiateAutoPlayer() {
+    private fun initiateAutoPlayer(source: String = "nothing") {
+        Log.d("PUI", "initiateAutoPlayer: $source ${binding.recyclerView.isVisible}")
         postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.recyclerView)
         postVideoAutoPlayHelper.attachScrollListenerForVideo()
-        postVideoAutoPlayHelper.playMostVisibleItem()
+        postVideoAutoPlayHelper.playMostVisibleItem(source)
     }
 
     // removes the old player and refreshes auto play
     private fun refreshAutoPlayer() {
         if (!::postVideoAutoPlayHelper.isInitialized) {
-            initiateAutoPlayer()
+            initiateAutoPlayer("refreshAutoPlayer")
         }
-        postVideoAutoPlayHelper.removePlayer()
-        postVideoAutoPlayHelper.playMostVisibleItem()
+        postVideoAutoPlayHelper.removePlayer("refreshAutoPlayer")
+        postVideoAutoPlayHelper.playMostVisibleItem("refresh")
     }
 
     // shows all attachment documents in list view and updates [isExpanded]
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostAdapter.items().size - 1) {
-            binding.recyclerView.post {
-                scrollToPositionWithOffset(position)
-            }
+            scrollToPositionWithOffset(position)
         }
 
         mPostAdapter.update(
@@ -1364,14 +1359,13 @@ class LMFeedFragment :
     }
 
     override fun linkOgTags(linkOGTags: LinkOGTagsViewData) {
-        val createPostExtras = CreatePostExtras.Builder()
+        val createPostExtras = LMFeedCreatePostExtras.Builder()
             .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
             .attachmentType(LINK)
             .linkOGTagsViewData(linkOGTags)
             .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
             .isAdmin(initiateViewModel.isAdmin.value ?: false)
             .build()
-
         startCreatePostActivity(createPostExtras)
     }
 
@@ -1390,7 +1384,7 @@ class LMFeedFragment :
             }
 
             ARTICLE -> {
-                val createPostExtras = CreatePostExtras.Builder()
+                val createPostExtras = LMFeedCreatePostExtras.Builder()
                     .attachmentType(ARTICLE)
                     .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
                     .isAdmin(initiateViewModel.isAdmin.value ?: false)
@@ -1405,7 +1399,8 @@ class LMFeedFragment :
     }
 
     // starts create post activity with the required extras
-    private fun startCreatePostActivity(createPostExtras: CreatePostExtras) {
+    private fun startCreatePostActivity(createPostExtras: LMFeedCreatePostExtras) {
+        destroyAutoPlayer("startCreatePostActivity")
         val intent = LMFeedCreatePostActivity.getIntent(
             requireContext(),
             createPostExtras
@@ -1426,7 +1421,7 @@ class LMFeedFragment :
      * Adapter Util Block
      **/
 
-//get index and post from the adapter using postId
+    //get index and post from the adapter using postId
     private fun getIndexAndPostFromAdapter(postId: String): Pair<Int, PostViewData>? {
         val index = mPostAdapter.items().indexOfFirst {
             (it is PostViewData) && (it.id == postId)
@@ -1451,10 +1446,26 @@ class LMFeedFragment :
      * @param position Index of the item to scroll to
      */
     private fun scrollToPositionWithOffset(position: Int) {
-        val px = (ViewUtils.dpToPx(75) * 1.5).toInt()
-        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
-            position,
-            px
-        )
+        binding.recyclerView.post {
+            val px = (ViewUtils.dpToPx(75) * 1.5).toInt()
+            (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
+                position,
+                px
+            )
+        }
+    }
+
+    // removes the player and destroys the [postVideoAutoPlayHelper]
+    private fun destroyAutoPlayer(source: String = "nothing") {
+        Log.d("PUI", "destroyAutoPlayer: $source")
+        if (::postVideoAutoPlayHelper.isInitialized) {
+            postVideoAutoPlayHelper.detachScrollListenerForVideo()
+            postVideoAutoPlayHelper.destroy(source)
+        }
+    }
+
+    override fun doCleanup() {
+        super.doCleanup()
+        destroyAutoPlayer("doCleanup")
     }
 }

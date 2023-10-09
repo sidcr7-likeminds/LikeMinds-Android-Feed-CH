@@ -10,7 +10,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedActivityCreatePostBinding
-import com.likeminds.feedsx.post.create.model.CreatePostExtras
+import com.likeminds.feedsx.post.create.model.LMFeedCreatePostExtras
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.ViewUtils.currentFragment
@@ -29,7 +29,7 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         const val RESULT_UPLOAD_POST = Activity.RESULT_FIRST_USER + 1
 
         @JvmStatic
-        fun start(context: Context, extras: CreatePostExtras) {
+        fun start(context: Context, extras: LMFeedCreatePostExtras) {
             val intent = Intent(context, LMFeedCreatePostActivity::class.java)
             val bundle = Bundle()
             bundle.putParcelable(CREATE_POST_EXTRAS, extras)
@@ -38,7 +38,7 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         }
 
         @JvmStatic
-        fun getIntent(context: Context, extras: CreatePostExtras): Intent {
+        fun getIntent(context: Context, extras: LMFeedCreatePostExtras): Intent {
             val intent = Intent(context, LMFeedCreatePostActivity::class.java)
             val bundle = Bundle()
             bundle.putParcelable(CREATE_POST_EXTRAS, extras)
@@ -58,7 +58,7 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
         val createPostExtras = ExtrasUtil.getParcelable(
             intent.getBundleExtra("bundle"),
             CREATE_POST_EXTRAS,
-            CreatePostExtras::class.java
+            LMFeedCreatePostExtras::class.java
         )
 
         val args = Bundle().apply {

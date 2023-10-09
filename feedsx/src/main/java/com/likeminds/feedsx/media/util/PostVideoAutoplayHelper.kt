@@ -2,8 +2,10 @@ package com.likeminds.feedsx.media.util
 
 import android.graphics.Rect
 import android.net.Uri
+import android.util.Log
 import android.widget.ProgressBar
 import androidx.core.view.get
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.likeminds.feedsx.databinding.*
@@ -43,30 +45,39 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
 
     private var currentPlayingVideoItemPos = -1 // -1 indicates nothing playing
 
-    // attaches a scroll listener to auto play videos in the recycler view
-    fun attachScrollListenerForVideo() {
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                when (recyclerView.adapter) {
-                    // the recycler view is of [FeedFragment]
-                    is PostAdapter -> {
-                        playMostVisibleItem()
-                    }
+    private val autoPlayVideoScrollListener = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+            super.onScrolled(recyclerView, dx, dy)
+            when (recyclerView.adapter) {
+                // the recycler view is of [FeedFragment]
+                is PostAdapter -> {
+                    Log.d("PUI", "playMostVisibleItem: ${System.currentTimeMillis()}")
+                    playMostVisibleItem("scroll")
+                }
 
-                    // the recycler view is of [PostDetailFragment]
-                    is PostDetailAdapter -> {
-                        playIfPostVisible()
-                    }
+                // the recycler view is of [PostDetailFragment]
+                is PostDetailAdapter -> {
+                    playIfPostVisible()
                 }
             }
-        })
+        }
+    }
+
+    // attaches a scroll listener to auto play videos in the recycler view
+    fun attachScrollListenerForVideo() {
+        recyclerView.addOnScrollListener(autoPlayVideoScrollListener)
+    }
+
+    // detaches the scroll listener to auto play videos in the recycler view
+    fun detachScrollListenerForVideo() {
+        Log.d("PUI", "detachScrollListenerForVideo: ${System.currentTimeMillis()}")
+        recyclerView.removeOnScrollListener(autoPlayVideoScrollListener)
     }
 
     /**
      * Finds the most visible post and attaches the player to it
      */
-    fun playMostVisibleItem() {
+    fun playMostVisibleItem(source: String = "nothing") {
         val firstVisiblePosition: Int = findFirstVisibleItemPosition()
         val lastVisiblePosition: Int = findLastVisibleItemPosition()
 
@@ -95,14 +106,14 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                     /* check if current view's visibility is more than MIN_LIMIT_VISIBILITY */
                     val currentVisibility = getVisiblePercentage(viewHolder)
                     if (currentVisibility < MIN_LIMIT_VISIBILITY) {
-                        lastPlayerView?.removePlayer()
+                        removePlayer()
                     }
                     currentPlayingVideoItemPos = -1
                 }
             } else {
                 // if no video is playing, directly attach a player at the [pos]
                 currentPlayingVideoItemPos = pos
-                attachVideoPlayerAt(pos)
+                attachVideoPlayerAt(pos, source)
             }
         }
     }
@@ -116,13 +127,16 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
             val viewHolder: RecyclerView.ViewHolder =
                 recyclerView.findViewHolderForAdapterPosition(0) ?: return@post
 
-            if (getVisiblePercentage(viewHolder) > MIN_LIMIT_VISIBILITY) {
+            val currentVisiblePercentage = getVisiblePercentage(viewHolder)
+
+            if (currentVisiblePercentage == (-1).toFloat() || currentVisiblePercentage < MIN_LIMIT_VISIBILITY) {
+                // post item's visibility is less than [MIN_LIMIT_VISIBILITY] so remove the player
+                removePlayer()
+                currentPlayingVideoItemPos = -1
+            } else {
                 // post item's visibility is more than [MIN_LIMIT_VISIBILITY]
                 currentPlayingVideoItemPos = 0
                 attachVideoPlayerAt(0)
-            } else {
-                // post item's visibility is less than [MIN_LIMIT_VISIBILITY] so remove the player
-                removePlayer()
             }
         }
     }
@@ -188,7 +202,7 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
     }
 
     // attaches a player at specified position
-    private fun attachVideoPlayerAt(pos: Int) {
+    private fun attachVideoPlayerAt(pos: Int, source: String = "nothing") {
         recyclerView.adapter.apply {
             when (this) {
                 is PostAdapter -> {
@@ -197,7 +211,8 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                         handleVideoPlayAtHome(
                             pos,
                             (item.viewType),
-                            item
+                            item,
+                            source
                         )
                     }
                 }
@@ -223,7 +238,8 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
     private fun handleVideoPlayAtHome(
         pos: Int,
         viewType: Int,
-        data: PostViewData
+        data: PostViewData,
+        source: String = "nothing"
     ) {
         when (viewType) {
             ITEM_POST_SINGLE_VIDEO -> {
@@ -237,7 +253,9 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                     startNewPlayer(
                         itemPostSingleVideoBinding.videoPost,
                         itemPostSingleVideoBinding.pbVideoLoader,
-                        meta.url
+                        meta.url,
+                        7,
+                        source
                     )
                 }
                 lastPlayerView = itemPostSingleVideoBinding.videoPost
@@ -266,7 +284,9 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
                         startNewPlayer(
                             itemMultipleMediaVideoBinding.videoPost,
                             itemMultipleMediaVideoBinding.pbVideoLoader,
-                            meta.url
+                            meta.url,
+                            7,
+                            source
                         )
                     }
                     lastPlayerView = itemMultipleMediaVideoBinding.videoPost
@@ -345,8 +365,15 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
     private fun startNewPlayer(
         videoPost: LMFeedVideoPlayerView,
         progressBar: ProgressBar,
-        url: String?
+        url: String?,
+        source: Int? = 0,
+        source1: String = "nothing",
     ) {
+        Log.d(
+            "PUI",
+            "source: $source source1: $source1 ${System.currentTimeMillis()} - startNewPlayer: $videoPost" +
+                    "${recyclerView.isVisible}"
+        )
         progressBar.show()
         val videoUri = Uri.parse(url)
         videoPost.startPlayingRemoteUri(videoUri, progressBar)
@@ -354,7 +381,11 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
     }
 
     // removes the player from view and sets it to null
-    fun removePlayer() {
+    fun removePlayer(source: String = "nothing") {
+        Log.d(
+            "PUI",
+            "source: $source ${System.currentTimeMillis()} - destroy: $lastPlayerView"
+        )
         if (lastPlayerView != null) {
             // stop last player
             lastPlayerView?.removePlayer()
@@ -362,8 +393,8 @@ class PostVideoAutoPlayHelper private constructor(private val recyclerView: Recy
         }
     }
 
-    fun destroy() {
-        removePlayer()
+    fun destroy(source: String = "nothing") {
+        removePlayer(source)
         postVideoAutoPlayHelper = null
     }
 }

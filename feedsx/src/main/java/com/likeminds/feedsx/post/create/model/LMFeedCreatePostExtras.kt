@@ -6,7 +6,7 @@ import com.likeminds.feedsx.posttypes.model.*
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-class CreatePostExtras private constructor(
+class LMFeedCreatePostExtras private constructor(
     @AttachmentType
     val attachmentType: Int,
     val source: String?,
@@ -33,7 +33,7 @@ class CreatePostExtras private constructor(
 
         fun isAdmin(isAdmin: Boolean) = apply { this.isAdmin = isAdmin }
 
-        fun build() = CreatePostExtras(
+        fun build() = LMFeedCreatePostExtras(
             attachmentType,
             source,
             linkOGTagsViewData,

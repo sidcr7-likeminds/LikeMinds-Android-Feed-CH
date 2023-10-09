@@ -27,8 +27,8 @@ import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.util.VideoPreviewAutoPlayHelper
 import com.likeminds.feedsx.media.view.LMFeedImageCropFragment
 import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
-import com.likeminds.feedsx.post.create.model.CreatePostExtras
-import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
+import com.likeminds.feedsx.post.create.model.LMFeedCreatePostExtras
+import com.likeminds.feedsx.post.create.model.LMFeedRemoveDialogExtras
 import com.likeminds.feedsx.post.create.viewmodel.LMFeedCreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
@@ -69,7 +69,7 @@ class LMFeedCreatePostFragment :
     @Inject
     lateinit var userPreferences: LMFeedUserPreferences
 
-    private lateinit var createPostExtras: CreatePostExtras
+    private lateinit var createPostExtras: LMFeedCreatePostExtras
 
     private lateinit var etLinkTextChangeListener: TextWatcher
 
@@ -161,7 +161,7 @@ class LMFeedCreatePostFragment :
         createPostExtras = ExtrasUtil.getParcelable(
             arguments,
             LMFeedCreatePostActivity.CREATE_POST_EXTRAS,
-            CreatePostExtras::class.java
+            LMFeedCreatePostExtras::class.java
         ) ?: throw emptyExtrasException(TAG)
         checkForSource()
     }
@@ -298,7 +298,7 @@ class LMFeedCreatePostFragment :
             }
 
             ivDeleteArticle.setOnClickListener {
-                val removeExtras = RemoveDialogExtras.Builder()
+                val removeExtras = LMFeedRemoveDialogExtras.Builder()
                     .title(getString(R.string.remove_article_banner))
                     .description(getString(R.string.are_you_sure_you_want_to_remove_the_article_banner))
                     .build()
@@ -312,7 +312,7 @@ class LMFeedCreatePostFragment :
                     } else {
                         getString(R.string.are_you_sure_you_want_to_remove_the_attached_file)
                     }
-                val removeExtras = RemoveDialogExtras.Builder()
+                val removeExtras = LMFeedRemoveDialogExtras.Builder()
                     .title(getString(R.string.remove_attachment))
                     .description(description)
                     .build()
@@ -343,7 +343,7 @@ class LMFeedCreatePostFragment :
     }
 
     // shows media remove dialog
-    private fun showRemoveDialog(removeDialogExtras: RemoveDialogExtras) {
+    private fun showRemoveDialog(removeDialogExtras: LMFeedRemoveDialogExtras) {
         removeAttachmentDialogFragment = LMFeedRemoveAttachmentDialogFragment.showDialog(
             childFragmentManager,
             removeDialogExtras
@@ -886,7 +886,7 @@ class LMFeedCreatePostFragment :
             tvLinkUrl.text = ogTags?.url?.lowercase(Locale.getDefault())
 
             ivDeleteLink.setOnClickListener {
-                val removeDialogExtras = RemoveDialogExtras.Builder()
+                val removeDialogExtras = LMFeedRemoveDialogExtras.Builder()
                     .title(getString(R.string.remove_link))
                     .description(getString(R.string.are_you_sure_you_want_to_remove_the_attached_link))
                     .build()

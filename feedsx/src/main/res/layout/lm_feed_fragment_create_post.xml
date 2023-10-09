@@ -15,6 +15,7 @@
             android:fillViewport="true"
             app:layout_constraintBottom_toTopOf="@id/btn_post"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0"
             tools:context="com.likeminds.feedsx.post.create.view.LMFeedCreatePostFragment">
 
             <androidx.constraintlayout.widget.ConstraintLayout
