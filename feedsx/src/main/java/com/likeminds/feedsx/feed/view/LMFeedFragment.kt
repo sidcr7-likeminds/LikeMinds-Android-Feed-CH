@@ -490,23 +490,21 @@ class LMFeedFragment :
             viewModel.fetchPendingPostFromDB()
         }
         if (this.isVisible) {
-            initiateAutoPlayer("onResume")
+            initiateAutoPlayer()
         }
     }
 
     override fun onPause() {
         super.onPause()
-        destroyAutoPlayer("onPause")
+        destroyAutoPlayer()
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
 
         if (hidden) {
-            Log.d("PUI", "onHiddenChanged111: ")
-            destroyAutoPlayer("hidden")
+            destroyAutoPlayer()
         } else {
-            Log.d("PUI", "onHiddenChanged: ")
             // sends feed opened event
             viewModel.sendFeedOpenedEvent()
 
@@ -515,7 +513,7 @@ class LMFeedFragment :
                 removePostingView()
                 viewModel.fetchPendingPostFromDB()
             }
-            initiateAutoPlayer("not hidden")
+            initiateAutoPlayer()
         }
     }
 
@@ -1136,20 +1134,19 @@ class LMFeedFragment :
      * Initializes the [postVideoAutoPlayHelper] with the recyclerView
      * And starts observing
      **/
-    private fun initiateAutoPlayer(source: String = "nothing") {
-        Log.d("PUI", "initiateAutoPlayer: $source ${binding.recyclerView.isVisible}")
+    private fun initiateAutoPlayer() {
         postVideoAutoPlayHelper = PostVideoAutoPlayHelper.getInstance(binding.recyclerView)
         postVideoAutoPlayHelper.attachScrollListenerForVideo()
-        postVideoAutoPlayHelper.playMostVisibleItem(source)
+        postVideoAutoPlayHelper.playMostVisibleItem()
     }
 
     // removes the old player and refreshes auto play
     private fun refreshAutoPlayer() {
         if (!::postVideoAutoPlayHelper.isInitialized) {
-            initiateAutoPlayer("refreshAutoPlayer")
+            initiateAutoPlayer()
         }
-        postVideoAutoPlayHelper.removePlayer("refreshAutoPlayer")
-        postVideoAutoPlayHelper.playMostVisibleItem("refresh")
+        postVideoAutoPlayHelper.removePlayer()
+        postVideoAutoPlayHelper.playMostVisibleItem()
     }
 
     // shows all attachment documents in list view and updates [isExpanded]
@@ -1196,7 +1193,6 @@ class LMFeedFragment :
             .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
             .attachmentType(LINK)
             .linkOGTagsViewData(linkOGTags)
-            .source(LMFeedAnalytics.Source.UNIVERSAL_FEED)
             .isAdmin(initiateViewModel.isAdmin.value ?: false)
             .build()
         startCreatePostActivity(createPostExtras)
@@ -1243,7 +1239,7 @@ class LMFeedFragment :
 
     // starts create post activity with the required extras
     private fun startCreatePostActivity(createPostExtras: LMFeedCreatePostExtras) {
-        destroyAutoPlayer("startCreatePostActivity")
+        destroyAutoPlayer()
         val intent = LMFeedCreatePostActivity.getIntent(
             requireContext(),
             createPostExtras
@@ -1290,16 +1286,15 @@ class LMFeedFragment :
     }
 
     // removes the player and destroys the [postVideoAutoPlayHelper]
-    private fun destroyAutoPlayer(source: String = "nothing") {
-        Log.d("PUI", "destroyAutoPlayer: $source")
+    private fun destroyAutoPlayer() {
         if (::postVideoAutoPlayHelper.isInitialized) {
             postVideoAutoPlayHelper.detachScrollListenerForVideo()
-            postVideoAutoPlayHelper.destroy(source)
+            postVideoAutoPlayHelper.destroy()
         }
     }
 
     override fun doCleanup() {
         super.doCleanup()
-        destroyAutoPlayer("doCleanup")
+        destroyAutoPlayer()
     }
 }
