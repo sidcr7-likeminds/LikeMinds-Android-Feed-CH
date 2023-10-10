@@ -210,13 +210,14 @@ class LMFeedCreatePostFragment :
     // initializes the view as per the selected post type
     private fun initView() {
         binding.apply {
-            if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
-                initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
+            if (selectedMediaUris.isEmpty()) {
+                if (createPostExtras.attachmentType == com.likeminds.feedsx.posttypes.model.VIDEO) {
+                    initiateMediaPicker(listOf(com.likeminds.feedsx.media.model.VIDEO))
+                } else if (createPostExtras.attachmentType == DOCUMENT) {
+                    initiateMediaPicker(listOf(PDF))
+                }
             }
 
-            if (createPostExtras.attachmentType == DOCUMENT) {
-                initiateMediaPicker(listOf(PDF))
-            }
             ogTags = createPostExtras.linkOGTagsViewData
 
             if (createPostExtras.isAdmin) {
