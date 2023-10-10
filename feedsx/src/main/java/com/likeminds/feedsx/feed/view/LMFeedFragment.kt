@@ -311,8 +311,8 @@ class LMFeedFragment :
                     binding.apply {
                         ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
                         removePostingView()
-                        scrollToPositionWithOffset(0)
                         mPostAdapter.add(0, response.post)
+                        scrollToPositionWithOffset(0)
                         refreshAutoPlayer()
                     }
                 }
@@ -636,6 +636,7 @@ class LMFeedFragment :
             when (result.resultCode) {
                 Activity.RESULT_OK -> {
                     // post of type text/link has been created and posted
+                    addShimmer()
                     refreshFeed()
                 }
 
