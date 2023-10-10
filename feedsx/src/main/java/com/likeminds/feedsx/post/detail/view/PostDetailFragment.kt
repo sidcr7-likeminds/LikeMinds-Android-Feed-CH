@@ -1467,9 +1467,11 @@ class PostDetailFragment :
 
             etComment.focusAndShowKeyboard()
 
-            rvPostDetails.smoothScrollToPosition(
-                commentPosition
-            )
+            rvPostDetails.post {
+                rvPostDetails.smoothScrollToPosition(
+                    commentPosition
+                )
+            }
         }
     }
 
