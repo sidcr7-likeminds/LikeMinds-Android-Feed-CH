@@ -26,7 +26,7 @@ import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.media.util.MediaUtils
 import com.likeminds.feedsx.media.view.LMFeedImageCropFragment
 import com.likeminds.feedsx.media.view.LMFeedMediaPickerActivity
-import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
+import com.likeminds.feedsx.post.create.model.LMFeedRemoveDialogExtras
 import com.likeminds.feedsx.post.create.view.*
 import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
 import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity.Companion.EDIT_POST_EXTRAS
@@ -194,7 +194,7 @@ class LMFeedEditPostFragment :
             )
 
             ivDeleteArticle.setOnClickListener {
-                val removeExtras = RemoveDialogExtras.Builder()
+                val removeExtras = LMFeedRemoveDialogExtras.Builder()
                     .title(getString(R.string.remove_article_banner))
                     .description(getString(R.string.are_you_sure_you_want_to_remove_the_article_banner))
                     .build()
@@ -283,7 +283,7 @@ class LMFeedEditPostFragment :
     }
 
     // shows media remove dialog
-    private fun showRemoveDialog(removeDialogExtras: RemoveDialogExtras) {
+    private fun showRemoveDialog(removeDialogExtras: LMFeedRemoveDialogExtras) {
         removeAttachmentDialogFragment = LMFeedRemoveAttachmentDialogFragment.showDialog(
             childFragmentManager,
             removeDialogExtras
