@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.fragment.app.FragmentManager
 import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.databinding.LmFeedDialogFragmentRemoveAttachmentBinding
-import com.likeminds.feedsx.post.create.model.RemoveDialogExtras
+import com.likeminds.feedsx.post.create.model.LMFeedRemoveDialogExtras
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 
 class LMFeedRemoveAttachmentDialogFragment :
@@ -12,12 +12,12 @@ class LMFeedRemoveAttachmentDialogFragment :
 
     companion object {
         private const val TAG = "LMFeedRemoveAttachmentDialogFragment"
-        private lateinit var removeDialogExtras: RemoveDialogExtras
+        private lateinit var removeDialogExtras: LMFeedRemoveDialogExtras
 
         @JvmStatic
         fun showDialog(
             supportFragmentManager: FragmentManager,
-            removeDialogExtras: RemoveDialogExtras
+            removeDialogExtras: LMFeedRemoveDialogExtras
         ): LMFeedRemoveAttachmentDialogFragment {
             val sheet = LMFeedRemoveAttachmentDialogFragment()
             sheet.show(supportFragmentManager, TAG)
