@@ -127,8 +127,7 @@ class PostDetailFragment :
 
     override fun onPause() {
         super.onPause()
-        // removes the player and destroys the [postVideoAutoPlayHelper]
-        postVideoAutoPlayHelper.destroy()
+        destroyAutoPlayer()
     }
 
     override fun setUpViews() {
@@ -694,12 +693,6 @@ class PostDetailFragment :
         postVideoAutoPlayHelper.playIfPostVisible()
     }
 
-    // removes the old player and refreshes auto play
-    private fun refreshAutoPlayer() {
-        postVideoAutoPlayHelper.removePlayer()
-        postVideoAutoPlayHelper.playIfPostVisible()
-    }
-
     /*
     * UI Block
     */
@@ -1077,12 +1070,11 @@ class PostDetailFragment :
                 viewModel.getComment(post.id, postDetailExtras.commentId ?: "", 1)
             } else {
                 //scroll to that comment
-                binding.rvPostDetails.scrollToPosition(index)
+                scrollToPositionWithOffset(index, 0)
             }
         } else {
-            binding.rvPostDetails.scrollToPosition(postDataPosition)
+            scrollToPositionWithOffset(postDataPosition, 0)
         }
-        refreshAutoPlayer()
     }
 
     // updates the post and add comments to adapter
@@ -1094,8 +1086,6 @@ class PostDetailFragment :
         mPostDetailAdapter.update(postDataPosition, post)
         // adds the paginated comments
         mPostDetailAdapter.addAll(post.replies.toList())
-
-        refreshAutoPlayer()
     }
 
     // refreshes the whole post detail screen
@@ -1254,7 +1244,7 @@ class PostDetailFragment :
             //add comment to adapter
             mPostDetailAdapter.add(commentsStartPosition, comment)
             //scroll to the comment
-            binding.rvPostDetails.scrollToPosition(commentsStartPosition)
+            scrollToPositionWithOffset(commentsStartPosition, 0)
         } else {
             val index = indexAndComment.first
             val adapterComment = indexAndComment.second
@@ -1625,9 +1615,7 @@ class PostDetailFragment :
     // callback when +x more text is clicked to see more documents
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostDetailAdapter.items().size - 1) {
-            binding.rvPostDetails.post {
-                scrollToPositionWithOffset(position, 75)
-            }
+            scrollToPositionWithOffset(position, 75)
         }
 
         mPostDetailAdapter.update(
@@ -1715,10 +1703,25 @@ class PostDetailFragment :
      * @param offset value with which to scroll
      */
     private fun scrollToPositionWithOffset(position: Int, offset: Int) {
-        val px = (ViewUtils.dpToPx(offset) * 1.5).toInt()
-        (binding.rvPostDetails.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
-            position,
-            px
-        )
+        binding.rvPostDetails.post {
+            val px = (ViewUtils.dpToPx(offset) * 1.5).toInt()
+            (binding.rvPostDetails.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
+                position,
+                px
+            )
+        }
+    }
+
+    // removes the player and destroys the [postVideoAutoPlayHelper]
+    private fun destroyAutoPlayer() {
+        if (::postVideoAutoPlayHelper.isInitialized) {
+            postVideoAutoPlayHelper.detachScrollListenerForVideo()
+            postVideoAutoPlayHelper.destroy()
+        }
+    }
+
+    override fun doCleanup() {
+        super.doCleanup()
+        destroyAutoPlayer()
     }
 }
