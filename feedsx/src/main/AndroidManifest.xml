@@ -57,5 +57,9 @@
             android:name=".topic.view.LMFeedTopicSelectionActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".youtubeplayer.view.LMFeedYoutubePlayerActivity"
+            android:exported="false" />
     </application>
 </manifest>

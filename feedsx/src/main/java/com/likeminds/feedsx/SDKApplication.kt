@@ -2,9 +2,7 @@ package com.likeminds.feedsx
 
 import android.app.Application
 import android.content.Context
-import com.amazonaws.mobile.client.AWSMobileClient
-import com.amazonaws.mobile.client.Callback
-import com.amazonaws.mobile.client.UserStateDetails
+import com.amazonaws.mobile.client.*
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.branding.model.SetFeedBrandingRequest
@@ -20,6 +18,7 @@ import com.likeminds.feedsx.di.post.create.CreatePostComponent
 import com.likeminds.feedsx.di.post.detail.PostDetailComponent
 import com.likeminds.feedsx.di.post.edit.EditPostComponent
 import com.likeminds.feedsx.di.topic.LMFeedTopicComponent
+import com.likeminds.feedsx.di.youtubeplayer.LMFeedYoutubePlayerComponent
 import com.likeminds.feedsx.post.PostWithAttachmentsRepository
 import com.likeminds.likemindsfeed.LMCallback
 import com.likeminds.likemindsfeed.LMFeedClient
@@ -46,6 +45,7 @@ class SDKApplication : LMCallback {
     private var reportComponent: ReportComponent? = null
     private var reasonChooseComponent: ReasonChooseComponent? = null
     private var lmFeedTopicComponent: LMFeedTopicComponent? = null
+    private var lmFeedYoutubePlayerComponent: LMFeedYoutubePlayerComponent? = null
 
     companion object {
         const val LOG_TAG = "LikeMindsFeed"
@@ -207,12 +207,27 @@ class SDKApplication : LMCallback {
         return reasonChooseComponent
     }
 
+    /**
+     * initiate and return LMFeedTopicComponent: All dependencies required for topic feed
+     * */
     fun lmFeedTopicComponent(): LMFeedTopicComponent? {
         if (lmFeedTopicComponent == null) {
             lmFeedTopicComponent = likeMindsFeedComponent?.topicComponent()?.create()
         }
 
         return lmFeedTopicComponent
+    }
+
+    /**
+     * initiate and return LMFeedTopicComponent: All dependencies required for topic feed
+     * */
+    fun lmFeedYoutubePlayerComponent(): LMFeedYoutubePlayerComponent? {
+        if (lmFeedYoutubePlayerComponent == null) {
+            lmFeedYoutubePlayerComponent =
+                likeMindsFeedComponent?.lmFeedYoutubePlayerComponent()?.create()
+        }
+
+        return lmFeedYoutubePlayerComponent
     }
 
     override fun login() {
