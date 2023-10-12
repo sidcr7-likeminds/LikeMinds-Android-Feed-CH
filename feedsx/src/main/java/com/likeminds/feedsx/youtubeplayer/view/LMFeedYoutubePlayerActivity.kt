@@ -2,7 +2,12 @@ package com.likeminds.feedsx.youtubeplayer.view
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.likeminds.feedsx.R
@@ -11,6 +16,7 @@ import com.likeminds.feedsx.databinding.LmFeedActivityYoutubePlayerBinding
 import com.likeminds.feedsx.utils.ExtrasUtil
 import com.likeminds.feedsx.utils.customview.BaseAppCompatActivity
 import com.likeminds.feedsx.youtubeplayer.model.LMFeedYoutubePlayerExtras
+
 
 class LMFeedYoutubePlayerActivity : BaseAppCompatActivity() {
 
@@ -49,6 +55,8 @@ class LMFeedYoutubePlayerActivity : BaseAppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setStatusBarColor()
+
         binding = LmFeedActivityYoutubePlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -68,6 +76,17 @@ class LMFeedYoutubePlayerActivity : BaseAppCompatActivity() {
         navController = navHostFragment.navController
         navController.setGraph(R.navigation.lm_feed_nav_graph_youtube_player, args)
 
+    }
+
+    @Suppress("Deprecation")
+    private fun setStatusBarColor() {
+        window.apply {
+            clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+            addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            statusBarColor = Color.TRANSPARENT
+            @RequiresApi(Build.VERSION_CODES.M)
+            decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {

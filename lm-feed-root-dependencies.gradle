@@ -34,6 +34,7 @@ feed_versions.aws_s3 = '2.73.0'
 feed_versions.room = '2.5.2'
 feed_versions.firebase = '32.2.3'
 feed_versions.cropper = '3.1.2'
+feed_versions.youtubePlayer = '12.1.0'
 ext.feed_versions = feed_versions
 
 
@@ -126,7 +127,11 @@ firebase.messaging = "com.google.firebase:firebase-messaging-ktx"
 feed_deps.firebase = firebase
 
 def cropper = [:]
-cropper.main = "com.github.CanHub:Android-Image-Cropper:$versions.cropper"
+cropper.main = "com.github.CanHub:Android-Image-Cropper:$feed_versions.cropper"
 feed_deps.cropper = cropper
+
+def youtubePlayer = [:]
+youtubePlayer.main = "com.pierfrancescosoffritti.androidyoutubeplayer:core:$feed_versions.youtubePlayer"
+deps.youtubePlayer = youtubePlayer
 
 ext.feed_deps = feed_deps
