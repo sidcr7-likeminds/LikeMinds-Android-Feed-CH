@@ -14,7 +14,7 @@ import java.util.regex.Pattern
 object ValueUtils {
 
     private const val youtubeVideoIdRegex =
-        "^((?:https?:)?//)?((?:www|m)\\.)?(youtube(-nocookie)?\\.com|youtu.be)(/(?:[\\w\\-]+\\?v=|embed/|live/|v/|shorts/)?)([\\w\\-]+)(\\S+)?\$"
+        "^((?:https?:)?//)?((?:www|m)\\.)?(youtube(-nocookie)?\\.com|youtu.be)(/(?!user/)(?:[\\w\\-]+\\?v=|embed/|live/|v/|shorts/)?)([\\w\\-]+)(\\S+)?\$"
 
     @JvmStatic
     fun <K, V> getOrDefault(map: Map<K, V>, key: K, defaultValue: V): V? {

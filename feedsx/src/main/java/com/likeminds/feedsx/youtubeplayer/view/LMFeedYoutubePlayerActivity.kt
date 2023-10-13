@@ -53,9 +53,13 @@ class LMFeedYoutubePlayerActivity : BaseAppCompatActivity() {
         SDKApplication.getInstance().lmFeedYoutubePlayerComponent()?.inject(this)
     }
 
+    override fun onStart() {
+        super.onStart()
+        setStatusBarColor()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setStatusBarColor()
 
         binding = LmFeedActivityYoutubePlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
