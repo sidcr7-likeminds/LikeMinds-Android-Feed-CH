@@ -13,8 +13,8 @@ import java.util.regex.Pattern
 
 object ValueUtils {
 
-    private val youtubeVideoIdRegex =
-        "^https?://.*(?:youtu.be/|v/|u/\\w/|embed/|watch?v=)([^#&?]*).*\$"
+    private const val youtubeVideoIdRegex =
+        "^((?:https?:)?//)?((?:www|m)\\.)?(youtube(-nocookie)?\\.com|youtu.be)(/(?:[\\w\\-]+\\?v=|embed/|live/|v/|shorts/)?)([\\w\\-]+)(\\S+)?\$"
 
     @JvmStatic
     fun <K, V> getOrDefault(map: Map<K, V>, key: K, defaultValue: V): V? {
@@ -125,6 +125,7 @@ object ValueUtils {
     fun String.isValidYoutubeLink(): Boolean {
         val uri = Uri.parse(this)
         return uri.host.equals("youtube") ||
+                uri.host.equals("youtube.com") ||
                 uri.host.equals("youtu.be") ||
                 uri.host.equals("www.youtube.com")
     }
@@ -138,7 +139,7 @@ object ValueUtils {
         )
         val matcher: Matcher = pattern.matcher(this)
         if (matcher.matches()) {
-            videoId = matcher.group(1)
+            videoId = matcher.group(6)
         }
         return videoId
     }

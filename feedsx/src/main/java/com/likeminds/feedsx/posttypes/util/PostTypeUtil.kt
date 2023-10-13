@@ -3,6 +3,7 @@ package com.likeminds.feedsx.posttypes.util
 import android.content.Context
 import android.net.Uri
 import android.text.util.Linkify
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
@@ -25,6 +26,7 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ValueUtils.getYoutubeVideoId
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
@@ -459,7 +461,8 @@ object PostTypeUtil {
                 return@setOnClickListener
             }
             // creates a route and returns an intent to handle the link
-            val intent = Route.handleDeepLink(context, url)
+            val updatedUrl = url.getUrlIfExist()
+            val intent = Route.handleDeepLink(context, updatedUrl)
             if (intent != null) {
                 try {
                     // starts activity with the intent
@@ -573,7 +576,7 @@ object PostTypeUtil {
         data: LinkOGTagsViewData
     ) {
         val context = cvLinkPreview.context
-        val url = data.url
+        val url = data.url?.getUrlIfExist()
         val videoId = url?.getYoutubeVideoId()
 
         // shows the play button if link is of youtube and has a valid video id
@@ -604,7 +607,8 @@ object PostTypeUtil {
         url: String?
     ) {
         // creates a route and returns an intent to handle the link
-        val intent = Route.handleDeepLink(context, url)
+        val updatedUrl = url?.getUrlIfExist()
+        val intent = Route.handleDeepLink(context, updatedUrl)
         if (intent != null) {
             try {
                 // starts activity with the intent
@@ -626,18 +630,7 @@ object PostTypeUtil {
                 ivPlayYoutubeVideo,
                 data
             )
-            cvLinkPreview.setOnClickListener {
-                // creates a route and returns an intent to handle the link
-                val intent = Route.handleDeepLink(root.context, data.url)
-                if (intent != null) {
-                    try {
-                        // starts activity with the intent
-                        ActivityCompat.startActivity(root.context, intent, null)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
+
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
                 data.title
             } else {

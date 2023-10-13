@@ -15,6 +15,7 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailAdapter
 import com.likeminds.feedsx.posttypes.model.CommentViewData
 import com.likeminds.feedsx.utils.Route
 import com.likeminds.feedsx.utils.SeeMoreUtil
+import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -121,7 +122,8 @@ object PostDetailUtil {
                     return@setOnClickListener
                 }
                 // creates a route and returns an intent to handle the link
-                val intent = Route.handleDeepLink(context, url)
+                val updatedUrl = url.getUrlIfExist()
+                val intent = Route.handleDeepLink(context, updatedUrl)
                 if (intent != null) {
                     try {
                         // starts activity with the intent
