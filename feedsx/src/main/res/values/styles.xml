@@ -36,4 +36,8 @@
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
     </style>
+
+    <style name="LMFeedYoutubePlayerTheme" parent="LMFeedAppTheme">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
 </resources>

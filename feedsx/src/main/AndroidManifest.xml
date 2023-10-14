@@ -62,6 +62,7 @@
             android:name=".youtubeplayer.view.LMFeedYoutubePlayerActivity"
             android:configChanges="orientation|screenSize|keyboardHidden|smallestScreenSize|screenLayout"
             android:exported="false"
-            android:hardwareAccelerated="true" />
+            android:hardwareAccelerated="true"
+            android:theme="@style/LMFeedYoutubePlayerTheme"/>
     </application>
 </manifest>
