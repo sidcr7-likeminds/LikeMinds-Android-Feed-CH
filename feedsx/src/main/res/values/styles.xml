@@ -36,8 +36,4 @@
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
     </style>
-
-    <style name="YourTheme" parent="LMFeedAppTheme">
-        <item name="android:windowBackground">@android:color/black</item>
-    </style>
 </resources>

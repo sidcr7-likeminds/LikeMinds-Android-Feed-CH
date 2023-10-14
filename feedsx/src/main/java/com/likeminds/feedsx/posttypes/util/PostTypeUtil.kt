@@ -3,7 +3,6 @@ package com.likeminds.feedsx.posttypes.util
 import android.content.Context
 import android.net.Uri
 import android.text.util.Linkify
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
@@ -590,7 +589,9 @@ object PostTypeUtil {
             if (url?.isValidYoutubeLink() == true) {
                 // plays youtube video if link is of youtube and has a valid video id
                 if (!videoId.isNullOrEmpty()) {
-                    val extras = LMFeedYoutubePlayerExtras.Builder().videoId(videoId).build()
+                    val extras = LMFeedYoutubePlayerExtras.Builder()
+                        .videoId(videoId)
+                        .build()
                     LMFeedYoutubePlayerActivity.start(context, extras)
                 } else {
                     handleLink(context, url)

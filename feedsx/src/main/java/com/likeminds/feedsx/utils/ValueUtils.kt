@@ -124,10 +124,11 @@ object ValueUtils {
      */
     fun String.isValidYoutubeLink(): Boolean {
         val uri = Uri.parse(this)
-        return uri.host.equals("youtube") ||
-                uri.host.equals("youtube.com") ||
-                uri.host.equals("youtu.be") ||
-                uri.host.equals("www.youtube.com")
+        val host = uri.host ?: return false
+        return host.contains("youtube") ||
+                host.contains("youtube.com") ||
+                host.contains("youtu.be") ||
+                host.contains("www.youtube.com")
     }
 
     // returns video id from the youtube video link
