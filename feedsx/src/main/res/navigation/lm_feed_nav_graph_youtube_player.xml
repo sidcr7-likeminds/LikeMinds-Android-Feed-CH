@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_youtube_player.xml"
+    app:startDestination="@id/lm_feed_fragment_youtube_player">
+
+    <fragment
+        android:id="@+id/lm_feed_fragment_youtube_player"
+        android:name="com.likeminds.feedsx.youtubeplayer.view.LMFeedYoutubePlayerFragment"
+        android:label="YoutubePlayerFragment"
+        tools:layout="@layout/lm_feed_fragment_youtube_player" />
+</navigation>
