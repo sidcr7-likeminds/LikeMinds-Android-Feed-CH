@@ -32,6 +32,8 @@ object LMFeedAnalytics {
         const val REPLY_REPORTED = "Reply reported"
         const val POST_EDITED = "Post edited"
         const val POST_SHARED = "Post shared"
+        const val POST_LIKED  = "Post Liked"
+        const val POST_UNLIKED  = "Post Unliked"
 
         const val NOTIFICATION_RECEIVED = "Notification Received"
         const val NOTIFICATION_CLICKED = "Notification Clicked"
