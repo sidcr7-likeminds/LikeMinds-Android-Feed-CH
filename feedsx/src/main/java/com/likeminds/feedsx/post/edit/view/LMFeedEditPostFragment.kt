@@ -169,7 +169,6 @@ class LMFeedEditPostFragment :
     override fun setUpViews() {
         super.setUpViews()
         initView()
-        fetchUserFromDB()
         initMemberTaggingView()
         initToolbar()
         fetchPost()
@@ -288,11 +287,6 @@ class LMFeedEditPostFragment :
             childFragmentManager,
             removeDialogExtras
         )
-    }
-
-    // fetches user data from local db
-    private fun fetchUserFromDB() {
-        lmFeedHelperViewModel.fetchUserFromDB()
     }
 
     /**
@@ -510,11 +504,6 @@ class LMFeedEditPostFragment :
         observeErrors()
         observeMembersTaggingList()
 
-        // observes userData and initializes the user view
-        lmFeedHelperViewModel.userData.observe(viewLifecycleOwner) {
-            initAuthorFrame(it)
-        }
-
         viewModel.uploadingData.observe(viewLifecycleOwner) { response ->
             observeUploading(response)
         }
@@ -551,6 +540,7 @@ class LMFeedEditPostFragment :
                     // post from getPost response
                     post = response.post
                     initEditTextListener()
+                    initAuthorFrame(response.post.user)
                     setPostData(response.post)
                 }
             }
