@@ -461,7 +461,7 @@ object PostTypeUtil {
             }
             // creates a route and returns an intent to handle the link
             val updatedUrl = url.getUrlIfExist()
-            val intent = Route.handleDeepLink(context, updatedUrl)
+            val intent = Route.createWebsiteIntent(context, updatedUrl)
             if (intent != null) {
                 try {
                     // starts activity with the intent
@@ -609,7 +609,7 @@ object PostTypeUtil {
     ) {
         // creates a route and returns an intent to handle the link
         val updatedUrl = url?.getUrlIfExist()
-        val intent = Route.handleDeepLink(context, updatedUrl)
+        val intent = Route.createWebsiteIntent(context, updatedUrl)
         if (intent != null) {
             try {
                 // starts activity with the intent
@@ -631,7 +631,6 @@ object PostTypeUtil {
                 ivPlayYoutubeVideo,
                 data
             )
-
             tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
                 data.title
             } else {

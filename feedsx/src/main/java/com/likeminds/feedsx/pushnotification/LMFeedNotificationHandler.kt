@@ -34,7 +34,7 @@ class LMFeedNotificationHandler {
         const val NOTIFICATION_CATEGORY = "category"
         const val NOTIFICATION_SUBCATEGORY = "subcategory"
 
-        private const val NOTIFICATION_DATA = "lm_feed_notification_data"
+        const val NOTIFICATION_DATA = "lm_feed_notification_data"
 
         @JvmStatic
         fun getInstance(): LMFeedNotificationHandler {

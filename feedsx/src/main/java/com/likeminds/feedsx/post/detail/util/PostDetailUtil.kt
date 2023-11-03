@@ -122,8 +122,7 @@ object PostDetailUtil {
                     return@setOnClickListener
                 }
                 // creates a route and returns an intent to handle the link
-                val updatedUrl = url.getUrlIfExist()
-                val intent = Route.handleDeepLink(context, updatedUrl)
+                val intent = Route.createWebsiteIntent(context, url)
                 if (intent != null) {
                     try {
                         // starts activity with the intent
