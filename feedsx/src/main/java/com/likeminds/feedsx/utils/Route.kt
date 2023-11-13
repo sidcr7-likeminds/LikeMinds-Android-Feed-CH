@@ -84,13 +84,13 @@ object Route {
         )
     }
 
-    // creates route for url and returns corresponding intent
-    fun handleDeepLink(context: Context, url: String?): Intent? {
+    // creates a website intent for url
+    fun createWebsiteIntent(context: Context, url: String?): Intent? {
         val data = Uri.parse(url).normalizeScheme() ?: return null
-        val firstPath = getRouteFromDeepLink(data) ?: return null
+        val websiteRoute = createWebsiteRoute(data) ?: return null
         return getRouteIntent(
             context,
-            firstPath,
+            websiteRoute,
             0,
             source = LMFeedAnalytics.Source.DEEP_LINK
         )

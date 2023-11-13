@@ -22,7 +22,7 @@ object TimeUtil {
     // x h (if days are 0)
     // x d (if days are greater than 1)
     // Just Now (otherwise)
-    fun getDaysHoursOrMinutes(timestamp: Long): String {
+    private fun getDaysHoursOrMinutes(timestamp: Long): String {
         val days = (timestamp / DAY_IN_MILLIS).toInt()
         val hours = ((timestamp - (days * DAY_IN_MILLIS)) / HOUR_IN_MILLIS).toInt()
         val minutes =

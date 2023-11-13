@@ -929,7 +929,7 @@ class LMFeedFragment :
                 .build()
 
             //call api
-            postActionsViewModel.likePost(newViewData.id)
+            postActionsViewModel.likePost(newViewData.id, !item.isLiked)
             //update recycler
             mPostAdapter.update(position, newViewData)
         }

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal class LMFeedNotificationActionData private constructor(
+class LMFeedNotificationActionData private constructor(
     var chatroomId: Int?,
     var communityId: Int?,
     var groupRoute: String,
