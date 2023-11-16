@@ -3,6 +3,7 @@ package com.likeminds.feedsx.posttypes.util
 import android.content.Context
 import android.net.Uri
 import android.text.util.Linkify
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
@@ -545,12 +546,6 @@ object PostTypeUtil {
                 data
             )
 
-            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-                data.title
-            } else {
-                root.context.getString(R.string.link)
-            }
-
             val isImageValid = data.image.isImageValid()
             if (isImageValid) {
                 ivLink.show()
@@ -564,7 +559,11 @@ object PostTypeUtil {
                 ivLink.hide()
             }
 
-            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
+            val linkUri = Uri.parse(data.url) ?: return@apply
+            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: data.url?.lowercase(
+                Locale.getDefault()
+            )
+            tvLinkUrl.text = linkText
         }
     }
 
@@ -631,13 +630,6 @@ object PostTypeUtil {
                 ivPlayYoutubeVideo,
                 data
             )
-            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-                data.title
-            } else {
-                root.context.getString(R.string.link)
-            }
-            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-            tvLinkDescription.text = data.description
 
             val isImageValid = data.image.isImageValid()
             if (isImageValid) {
@@ -652,7 +644,11 @@ object PostTypeUtil {
                 ivLink.hide()
             }
 
-            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
+            val linkUri = Uri.parse(data.url) ?: return@apply
+            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: data.url?.lowercase(
+                Locale.getDefault()
+            )
+            tvLinkUrl.text = linkText
         }
     }
 
