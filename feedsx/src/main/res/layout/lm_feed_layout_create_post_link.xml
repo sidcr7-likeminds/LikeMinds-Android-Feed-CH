@@ -46,53 +46,20 @@
                     tools:ignore="ContentDescription" />
 
                 <com.likeminds.feedsx.branding.customview.LMFeedTextView
-                    android:id="@+id/tv_link_title"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginEnd="14dp"
-                    android:ellipsize="end"
-                    android:gravity="center_vertical"
-                    android:maxLines="2"
-                    android:textColor="@color/dark_grey"
-                    android:textSize="16sp"
-                    app:fontType="medium"
-                    app:layout_constraintEnd_toStartOf="@id/iv_delete_link"
-                    app:layout_constraintStart_toEndOf="@id/iv_link"
-                    app:layout_constraintTop_toTopOf="parent"
-                    tools:text="Twitter will soon let you schedule your tweets" />
-
-                <com.likeminds.feedsx.branding.customview.LMFeedTextView
-                    android:id="@+id/tv_link_description"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="end"
-                    android:gravity="center_vertical"
-                    android:lineSpacingExtra="2sp"
-                    android:maxLines="1"
-                    android:textColor="@color/grey"
-                    android:textSize="12sp"
-                    app:fontType="regular"
-                    app:layout_constraintEnd_toEndOf="@+id/tv_link_title"
-                    app:layout_constraintStart_toStartOf="@+id/tv_link_title"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_link_title"
-                    tools:text="The new feature has already been implemented in the United States and Other Eu…" />
-
-                <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_link_url"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginVertical="16dp"
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textColor="@color/grey"
                     android:textSize="12sp"
                     app:fontType="regular"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="@+id/tv_link_title"
-                    app:layout_constraintStart_toStartOf="@+id/tv_link_title"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_link_description"
+                    app:layout_constraintEnd_toStartOf="@id/iv_delete_link"
+                    app:layout_constraintStart_toEndOf="@id/iv_link"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:text="www.youtube.com" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
