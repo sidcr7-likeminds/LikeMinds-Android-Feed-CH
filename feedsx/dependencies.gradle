@@ -79,6 +79,9 @@ dependencies {
     implementation feed_deps.facebook.shimmer
     implementation feed_deps.cropper.main
 
+    //Youtube Player
+    implementation feed_deps.youtubePlayer.main
+
     // feed-sdk
     implementation 'community.likeminds:likemindsfeed:1.6.0'
 }

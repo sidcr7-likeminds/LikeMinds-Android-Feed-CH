@@ -1,7 +1,9 @@
 package com.likeminds.feedsx.posttypes.util
 
+import android.content.Context
 import android.net.Uri
 import android.text.util.Linkify
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
@@ -12,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.likeminds.feedsx.*
@@ -23,14 +26,19 @@ import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.view.adapter.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.getValidTextForLinkify
+import com.likeminds.feedsx.utils.ValueUtils.getYoutubeVideoId
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
+import com.likeminds.feedsx.utils.ValueUtils.isValidYoutubeLink
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.link.CustomLinkMovementMethod
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingDecoder
 import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.youtubeplayer.model.LMFeedYoutubePlayerExtras
+import com.likeminds.feedsx.youtubeplayer.view.LMFeedYoutubePlayerActivity
 import java.util.Locale
 
 object PostTypeUtil {
@@ -453,7 +461,8 @@ object PostTypeUtil {
                 return@setOnClickListener
             }
             // creates a route and returns an intent to handle the link
-            val intent = Route.createWebsiteIntent(context, url)
+            val updatedUrl = url.getUrlIfExist()
+            val intent = Route.createWebsiteIntent(context, updatedUrl)
             if (intent != null) {
                 try {
                     // starts activity with the intent
@@ -531,23 +540,11 @@ object PostTypeUtil {
         data: LinkOGTagsViewData
     ) {
         binding.apply {
-            cvLinkPreview.setOnClickListener {
-                // creates a route and returns an intent to handle the link
-                val intent = Route.createWebsiteIntent(root.context, data.url)
-                if (intent != null) {
-                    try {
-                        // starts activity with the intent
-                        ActivityCompat.startActivity(root.context, intent, null)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-                data.title
-            } else {
-                root.context.getString(R.string.link)
-            }
+            setupLinkViewClick(
+                cvLinkPreview,
+                ivPlayYoutubeVideo,
+                data
+            )
 
             val isImageValid = data.image.isImageValid()
             if (isImageValid) {
@@ -562,7 +559,63 @@ object PostTypeUtil {
                 ivLink.hide()
             }
 
-            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
+            val linkUri = Uri.parse(data.url) ?: return@apply
+            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: data.url?.lowercase(
+                Locale.getDefault()
+            )
+            tvLinkUrl.text = linkText
+        }
+    }
+
+    // setups the click listener on the link view
+    private fun setupLinkViewClick(
+        cvLinkPreview: MaterialCardView,
+        ivPlayYoutubeVideo: ImageView,
+        data: LinkOGTagsViewData
+    ) {
+        val context = cvLinkPreview.context
+        val url = data.url?.getUrlIfExist()
+        val videoId = url?.getYoutubeVideoId()
+
+        // shows the play button if link is of youtube and has a valid video id
+        if (!videoId.isNullOrEmpty()) {
+            ivPlayYoutubeVideo.show()
+        } else {
+            ivPlayYoutubeVideo.hide()
+        }
+
+        cvLinkPreview.setOnClickListener {
+            if (url?.isValidYoutubeLink() == true) {
+                // plays youtube video if link is of youtube and has a valid video id
+                if (!videoId.isNullOrEmpty()) {
+                    val extras = LMFeedYoutubePlayerExtras.Builder()
+                        .videoId(videoId)
+                        .build()
+                    LMFeedYoutubePlayerActivity.start(context, extras)
+                } else {
+                    handleLink(context, url)
+                }
+            } else {
+                handleLink(context, url)
+            }
+        }
+    }
+
+    // creates a route and returns an intent to handle the link
+    private fun handleLink(
+        context: Context,
+        url: String?
+    ) {
+        // creates a route and returns an intent to handle the link
+        val updatedUrl = url?.getUrlIfExist()
+        val intent = Route.createWebsiteIntent(context, updatedUrl)
+        if (intent != null) {
+            try {
+                // starts activity with the intent
+                ActivityCompat.startActivity(context, intent, null)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
@@ -572,25 +625,11 @@ object PostTypeUtil {
         data: LinkOGTagsViewData
     ) {
         binding.apply {
-            cvLinkPreview.setOnClickListener {
-                // creates a route and returns an intent to handle the link
-                val intent = Route.createWebsiteIntent(root.context, data.url)
-                if (intent != null) {
-                    try {
-                        // starts activity with the intent
-                        ActivityCompat.startActivity(root.context, intent, null)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-            }
-            tvLinkTitle.text = if (data.title?.isNotBlank() == true) {
-                data.title
-            } else {
-                root.context.getString(R.string.link)
-            }
-            tvLinkDescription.isVisible = !data.description.isNullOrEmpty()
-            tvLinkDescription.text = data.description
+            setupLinkViewClick(
+                cvLinkPreview,
+                ivPlayYoutubeVideo,
+                data
+            )
 
             val isImageValid = data.image.isImageValid()
             if (isImageValid) {
@@ -605,7 +644,11 @@ object PostTypeUtil {
                 ivLink.hide()
             }
 
-            tvLinkUrl.text = data.url?.lowercase(Locale.getDefault()) ?: ""
+            val linkUri = Uri.parse(data.url) ?: return@apply
+            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: data.url?.lowercase(
+                Locale.getDefault()
+            )
+            tvLinkUrl.text = linkText
         }
     }
 

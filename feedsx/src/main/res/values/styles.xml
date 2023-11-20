@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="LMFeedAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
@@ -34,5 +35,9 @@
         <item name="android:foreground">?attr/actionBarItemBackground</item>
         <item name="android:focusable">true</item>
         <item name="android:clickable">true</item>
+    </style>
+
+    <style name="LMFeedYoutubePlayerTheme" parent="LMFeedAppTheme">
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
 </resources>

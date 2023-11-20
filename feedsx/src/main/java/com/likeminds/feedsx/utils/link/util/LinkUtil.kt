@@ -41,21 +41,21 @@ object LinkUtil {
             val margin16 = ViewUtils.dpToPx(16)
             val margin4 = ViewUtils.dpToPx(4)
             constraintSet.connect(
-                tvLinkTitle.id,
+                tvLinkUrl.id,
                 ConstraintSet.TOP,
                 ConstraintSet.PARENT_ID,
                 ConstraintSet.TOP,
                 margin16
             )
             constraintSet.connect(
-                tvLinkTitle.id,
+                tvLinkUrl.id,
                 ConstraintSet.START,
                 ConstraintSet.PARENT_ID,
                 ConstraintSet.START,
                 margin16
             )
             constraintSet.connect(
-                tvLinkTitle.id,
+                tvLinkUrl.id,
                 ConstraintSet.END,
                 ivDeleteLink.id,
                 ConstraintSet.START,
@@ -72,21 +72,21 @@ object LinkUtil {
         binding.apply {
             val margin = ViewUtils.dpToPx(16)
             constraintSet.connect(
-                tvLinkTitle.id,
+                tvLinkUrl.id,
                 ConstraintSet.END,
                 ConstraintSet.PARENT_ID,
                 ConstraintSet.END,
                 margin
             )
             constraintSet.connect(
-                tvLinkTitle.id,
+                tvLinkUrl.id,
                 ConstraintSet.START,
                 ConstraintSet.PARENT_ID,
                 ConstraintSet.START,
                 margin
             )
             constraintSet.connect(
-                tvLinkTitle.id,
+                tvLinkUrl.id,
                 ConstraintSet.TOP,
                 ivLink.id,
                 ConstraintSet.BOTTOM,

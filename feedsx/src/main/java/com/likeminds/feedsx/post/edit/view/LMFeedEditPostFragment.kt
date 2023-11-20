@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -169,7 +170,6 @@ class LMFeedEditPostFragment :
     override fun setUpViews() {
         super.setUpViews()
         initView()
-        fetchUserFromDB()
         initMemberTaggingView()
         initToolbar()
         fetchPost()
@@ -288,11 +288,6 @@ class LMFeedEditPostFragment :
             childFragmentManager,
             removeDialogExtras
         )
-    }
-
-    // fetches user data from local db
-    private fun fetchUserFromDB() {
-        lmFeedHelperViewModel.fetchUserFromDB()
     }
 
     /**
@@ -510,11 +505,6 @@ class LMFeedEditPostFragment :
         observeErrors()
         observeMembersTaggingList()
 
-        // observes userData and initializes the user view
-        lmFeedHelperViewModel.userData.observe(viewLifecycleOwner) {
-            initAuthorFrame(it)
-        }
-
         viewModel.uploadingData.observe(viewLifecycleOwner) { response ->
             observeUploading(response)
         }
@@ -551,6 +541,7 @@ class LMFeedEditPostFragment :
                     // post from getPost response
                     post = response.post
                     initEditTextListener()
+                    initAuthorFrame(response.post.user)
                     setPostData(response.post)
                 }
             }
@@ -814,14 +805,11 @@ class LMFeedEditPostFragment :
                 placeholder = R.drawable.ic_link_primary_40dp
             )
 
-            tvLinkTitle.text = if (ogTags?.title?.isNotBlank() == true) {
-                ogTags?.title
-            } else {
-                root.context.getString(R.string.link)
-            }
-            tvLinkDescription.isVisible = !ogTags?.description.isNullOrEmpty()
-            tvLinkDescription.text = ogTags?.description
-            tvLinkUrl.text = ogTags?.url?.lowercase(Locale.getDefault())
+            val linkUri = Uri.parse(ogTags?.url) ?: return@apply
+            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: ogTags?.url?.lowercase(
+                Locale.getDefault()
+            )
+            tvLinkUrl.text = linkText
         }
     }
 

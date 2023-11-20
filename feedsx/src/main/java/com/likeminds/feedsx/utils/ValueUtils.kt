@@ -5,12 +5,16 @@ import android.net.Uri
 import android.util.Patterns
 import android.webkit.MimeTypeMap
 import android.webkit.URLUtil
-import com.likeminds.feedsx.media.model.IMAGE
-import com.likeminds.feedsx.media.model.PDF
-import com.likeminds.feedsx.media.model.VIDEO
+import com.likeminds.feedsx.media.model.*
 import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
 
 object ValueUtils {
+
+    private const val youtubeVideoIdRegex =
+        "^((?:https?:)?//)?((?:www|m)\\.)?(youtube(-nocookie)?\\.com|youtu.be)(/(?!user/)(?:[\\w\\-]+\\?v=|embed/|live/|v/|shorts/)?)([\\w\\-]+)(\\S+)?\$"
 
     @JvmStatic
     fun <K, V> getOrDefault(map: Map<K, V>, key: K, defaultValue: V): V? {
@@ -111,5 +115,33 @@ object ValueUtils {
 
     fun String?.isImageValid(): Boolean {
         return this?.isValidUrl() ?: false
+    }
+
+    /**
+     * http://www.youtube.com/watch?v=-wtIMTCHWuI
+     * http://www.youtube.com/v/-wtIMTCHWuI
+     * http://youtu.be/-wtIMTCHWuI
+     */
+    fun String.isValidYoutubeLink(): Boolean {
+        val uri = Uri.parse(this)
+        val host = uri.host ?: return false
+        return host.contains("youtube") ||
+                host.contains("youtube.com") ||
+                host.contains("youtu.be") ||
+                host.contains("www.youtube.com")
+    }
+
+    // returns video id from the youtube video link
+    fun String.getYoutubeVideoId(): String? {
+        var videoId: String? = null
+        val pattern: Pattern = Pattern.compile(
+            youtubeVideoIdRegex,
+            Pattern.CASE_INSENSITIVE
+        )
+        val matcher: Matcher = pattern.matcher(this)
+        if (matcher.matches()) {
+            videoId = matcher.group(6)
+        }
+        return videoId
     }
 }

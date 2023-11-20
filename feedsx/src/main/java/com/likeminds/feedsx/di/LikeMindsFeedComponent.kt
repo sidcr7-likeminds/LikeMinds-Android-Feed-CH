@@ -19,6 +19,8 @@ import com.likeminds.feedsx.di.post.detail.PostDetailComponent
 import com.likeminds.feedsx.di.post.edit.EditPostComponent
 import com.likeminds.feedsx.di.topic.LMFeedTopicComponent
 import com.likeminds.feedsx.di.topic.LMFeedTopicComponentModule
+import com.likeminds.feedsx.di.youtubeplayer.LMFeedYoutubePlayerComponent
+import com.likeminds.feedsx.di.youtubeplayer.LMFeedYoutubePlayerComponentModule
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -34,7 +36,8 @@ import javax.inject.Singleton
         NotificationFeedComponentModule::class,
         PostComponentModule::class,
         ModerationComponentModule::class,
-        LMFeedTopicComponentModule::class
+        LMFeedTopicComponentModule::class,
+        LMFeedYoutubePlayerComponentModule::class
     ]
 )
 interface LikeMindsFeedComponent {
@@ -49,6 +52,7 @@ interface LikeMindsFeedComponent {
     fun reportComponent(): ReportComponent.Factory
     fun reasonChooseComponent(): ReasonChooseComponent.Factory
     fun topicComponent(): LMFeedTopicComponent.Factory
+    fun lmFeedYoutubePlayerComponent(): LMFeedYoutubePlayerComponent.Factory
 
     @Component.Builder
     interface Builder {
