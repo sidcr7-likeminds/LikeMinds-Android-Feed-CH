@@ -132,6 +132,6 @@ feed_deps.cropper = cropper
 
 def youtubePlayer = [:]
 youtubePlayer.main = "com.pierfrancescosoffritti.androidyoutubeplayer:core:$feed_versions.youtubePlayer"
-deps.youtubePlayer = youtubePlayer
+feed_deps.youtubePlayer = youtubePlayer
 
 ext.feed_deps = feed_deps
