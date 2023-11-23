@@ -41,6 +41,7 @@ jobs:
       if: failure()
       with:
         name: lint-intermediate-report
+        retention-days: 400
         path: |
           /home/runner/work/LikeMinds-Android-Feed-SX/LikeMinds-Android-Feed-SX/app/build/intermediates/lint_intermediate_text_report/debug/lint-results-debug.txt
           /home/runner/work/LikeMinds-Android-Feed-SX/LikeMinds-Android-Feed-SX/feedsx/build/intermediates/lint_intermediate_text_report/debug/lint-results-debug.txt
@@ -49,6 +50,7 @@ jobs:
       if: always()
       with:
         name: lint-results-html
+        retention-days: 400
         path: |
           /home/runner/work/LikeMinds-Android-Feed-SX/LikeMinds-Android-Feed-SX/app/build/reports/lint-results-debug.html
           /home/runner/work/LikeMinds-Android-Feed-SX/LikeMinds-Android-Feed-SX/feedsx/build/reports/lint-results-debug.html
