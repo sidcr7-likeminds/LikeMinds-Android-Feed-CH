@@ -92,6 +92,9 @@ class InitiateViewModel @Inject constructor(
                     userPreferences.saveUserUniqueId(id)
                     userPreferences.saveUUID(uuid)
 
+                    //get community configuration
+                    getCommunityConfiguration()
+
                     //post the user response in LiveData
                     _userResponse.postValue(ViewDataConverter.convertUser(user))
                 }
@@ -188,6 +191,30 @@ class InitiateViewModel @Inject constructor(
 
             //call api
             lmFeedClient.registerDevice(request)
+        }
+    }
+
+    /**
+     * get community configurations
+     * and save it local db
+     */
+    private fun getCommunityConfiguration() {
+        viewModelScope.launchIO {
+            val response = lmFeedClient.getCommunityConfiguration()
+            if (response.success) {
+                val configurations = response.data?.configurations ?: return@launchIO
+                Log.d(
+                    "PUI", """
+                    configurations received: ${
+                        configurations.map {
+                            it
+                        }
+                    }
+                """.trimIndent()
+                )
+            } else {
+                Log.d(LOG_TAG, "community/configuration failed -> ${response.errorMessage}")
+            }
         }
     }
 
