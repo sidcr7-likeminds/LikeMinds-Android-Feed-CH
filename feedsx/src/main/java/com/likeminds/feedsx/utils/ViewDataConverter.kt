@@ -28,6 +28,7 @@ import com.likeminds.feedsx.utils.mediauploader.utils.AWSKeys
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.model.*
 import com.likeminds.likemindsfeed.comment.model.Comment
+import com.likeminds.likemindsfeed.configuration.model.Configuration
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
@@ -699,6 +700,17 @@ object ViewDataConverter {
             .title(memberRight.title)
             .subtitle(memberRight.subtitle)
             .userUniqueId(userUniqueId)
+            .build()
+    }
+
+    fun createConfigurationEntity(
+        configuration: Configuration
+    ): ConfigurationEntity {
+        val valueJSONString = configuration.value.toString()
+        return ConfigurationEntity.Builder()
+            .type(configuration.type)
+            .description(configuration.description)
+            .value(valueJSONString)
             .build()
     }
 
