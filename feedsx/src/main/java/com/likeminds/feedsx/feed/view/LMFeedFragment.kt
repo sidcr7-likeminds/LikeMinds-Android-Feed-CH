@@ -67,6 +67,7 @@ import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.databinding.ImageBindingUtil
 import com.likeminds.feedsx.utils.mediauploader.MediaUploadWorker
 import com.likeminds.feedsx.utils.model.BaseViewType
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
 import kotlinx.coroutines.flow.onEach
 import java.util.*
 import javax.inject.Inject
@@ -259,6 +260,7 @@ class LMFeedFragment :
         setUserImage(user)
         viewModel.getUnreadNotificationCount()
         lmFeedHelperViewModel.getAllTopics(false)
+        lmFeedHelperViewModel.getFeedMetaData()
         viewModel.getUniversalFeed(
             1,
             viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
@@ -776,7 +778,7 @@ class LMFeedFragment :
                 layoutSelectedTopics.root.hide()
 
                 //call api
-                ProgressHelper.showProgress(binding.progressBar,true)
+                ProgressHelper.showProgress(binding.progressBar, true)
                 viewModel.getUniversalFeed(1, null)
             } else {
                 //show layouts accordingly
@@ -788,7 +790,7 @@ class LMFeedFragment :
                 mSelectedTopicAdapter.replace(selectedTopics)
 
                 //call api
-                ProgressHelper.showProgress(binding.progressBar,true)
+                ProgressHelper.showProgress(binding.progressBar, true)
                 viewModel.getUniversalFeed(
                     1,
                     viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
@@ -826,7 +828,7 @@ class LMFeedFragment :
             //call apis
             mScrollListener.resetData()
             mPostAdapter.clearAndNotify()
-            ProgressHelper.showProgress(binding.progressBar,true)
+            ProgressHelper.showProgress(binding.progressBar, true)
             viewModel.getUniversalFeed(
                 1,
                 viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
@@ -839,7 +841,7 @@ class LMFeedFragment :
         //call api
         mSelectedTopicAdapter.clearAndNotify()
         mScrollListener.resetData()
-        ProgressHelper.showProgress(binding.progressBar,true)
+        ProgressHelper.showProgress(binding.progressBar, true)
         viewModel.getUniversalFeed(1, null)
 
         //show layout accordingly

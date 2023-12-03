@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.edit.viewmodel
 
 import androidx.lifecycle.*
 import com.likeminds.feedsx.LMFeedAnalytics
+import com.likeminds.feedsx.feed.ConfigurationRepository
 import com.likeminds.feedsx.feed.UserWithRightsRepository
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
@@ -10,16 +11,22 @@ import com.likeminds.feedsx.utils.ViewDataConverter
 import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
+import com.likeminds.feedsx.utils.model.ConfigurationType
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
+import com.likeminds.feedsx.utils.pluralize.pluralize
+import com.likeminds.feedsx.utils.pluralize.singularize
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.helper.model.*
 import com.likeminds.likemindsfeed.topic.model.GetTopicRequest
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
+import org.json.JSONObject
 import javax.inject.Inject
 
 class LMFeedHelperViewModel @Inject constructor(
     private val userWithRightsRepository: UserWithRightsRepository,
+    private val configurationRepository: ConfigurationRepository,
     private val userPreferences: LMFeedUserPreferences
 ) : ViewModel() {
 
@@ -33,6 +40,8 @@ class LMFeedHelperViewModel @Inject constructor(
 
     private val _showTopicFilter = MutableLiveData<Boolean>()
     val showTopicFilter: LiveData<Boolean> = _showTopicFilter
+
+    private var postVariable: String = "post"
 
     /**
      * [taggingData] contains first -> page called
@@ -49,6 +58,14 @@ class LMFeedHelperViewModel @Inject constructor(
 
     private val errorEventChannel = Channel<ErrorMessageEvent>(Channel.BUFFERED)
     val errorEventFlow = errorEventChannel.receiveAsFlow()
+
+    companion object {
+        const val POST_KEY = "post"
+    }
+
+    init {
+        getFeedMetaData()
+    }
 
     // calls DecodeUrl API
     fun decodeUrl(url: String) {
@@ -149,6 +166,64 @@ class LMFeedHelperViewModel @Inject constructor(
             } else {
                 _showTopicFilter.postValue(false)
                 errorEventChannel.send(ErrorMessageEvent.GetTopic(response.errorMessage))
+            }
+        }
+    }
+
+    fun getFeedMetaData() {
+        viewModelScope.launchIO {
+            //get data from db
+            val feedMetaDataEntity =
+                configurationRepository.getConfiguration(ConfigurationType.FEED_METADATA.value)
+
+            //if not null
+            feedMetaDataEntity?.let {
+                val valueString = it.value
+                //convert to JSON object
+                val value = JSONObject(valueString)
+
+                //check value has value
+                if (value.has(POST_KEY)) {
+                    postVariable = value.getString(POST_KEY)
+                }
+            }
+        }
+    }
+
+    fun pluralizeOrCapitalize(action: WordAction): String {
+        return when (action) {
+            WordAction.FIRST_LETTER_CAPITAL_SINGULAR -> {
+                val singular = postVariable.singularize()
+                singular.replaceFirstChar {
+                    it.uppercase()
+                }
+            }
+
+            WordAction.ALL_CAPITAL_SINGULAR -> {
+                val singular = postVariable.singularize()
+                singular.uppercase()
+            }
+
+            WordAction.ALL_SMALL_SINGULAR -> {
+                val singular = postVariable.singularize()
+                singular.lowercase()
+            }
+
+            WordAction.FIRST_LETTER_CAPITAL_PLURAL -> {
+                val plural = postVariable.pluralize()
+                plural.replaceFirstChar {
+                    it.uppercase()
+                }
+            }
+
+            WordAction.ALL_CAPITAL_PLURAL -> {
+                val plural = postVariable.pluralize()
+                plural.uppercase()
+            }
+
+            WordAction.ALL_SMALL_PLURAL -> {
+                val plural = postVariable.pluralize()
+                plural.lowercase()
             }
         }
     }

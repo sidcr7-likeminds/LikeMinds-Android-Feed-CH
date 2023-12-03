@@ -13,7 +13,7 @@ interface ConfigurationDao {
 
     //get a particular configuration
     @Query("SELECT * FROM ${DbConstants.CONFIGURATION_TABLE} WHERE type = :type")
-    suspend fun getConfiguration(type: String): ConfigurationEntity
+    suspend fun getConfiguration(type: String): ConfigurationEntity?
 
     //get all configurations
     @Query("SELECT * FROM ${DbConstants.CONFIGURATION_TABLE}")

@@ -12,7 +12,7 @@ class ConfigurationRepository @Inject constructor(
         configurationDao.insertConfigurations(configurations)
     }
 
-    suspend fun getConfiguration(type: String): ConfigurationEntity {
+    suspend fun getConfiguration(type: String): ConfigurationEntity? {
         return configurationDao.getConfiguration(type)
     }
 

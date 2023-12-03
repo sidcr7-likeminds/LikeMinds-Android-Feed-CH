@@ -37,6 +37,7 @@ import com.likeminds.likemindsfeed.post.model.*
 import com.likeminds.likemindsfeed.sdk.model.SDKClientInfo
 import com.likeminds.likemindsfeed.sdk.model.User
 import com.likeminds.likemindsfeed.topic.model.Topic
+import org.json.JSONObject
 
 object ViewDataConverter {
 
