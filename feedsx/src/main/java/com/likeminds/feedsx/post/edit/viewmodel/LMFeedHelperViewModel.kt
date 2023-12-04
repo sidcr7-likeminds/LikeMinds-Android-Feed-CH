@@ -13,9 +13,6 @@ import com.likeminds.feedsx.utils.coroutine.launchIO
 import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.model.ConfigurationType
-import com.likeminds.feedsx.utils.pluralize.model.WordAction
-import com.likeminds.feedsx.utils.pluralize.pluralize
-import com.likeminds.feedsx.utils.pluralize.singularize
 import com.likeminds.likemindsfeed.LMFeedClient
 import com.likeminds.likemindsfeed.LMResponse
 import com.likeminds.likemindsfeed.helper.model.*
@@ -196,6 +193,9 @@ class LMFeedHelperViewModel @Inject constructor(
                     val variable = value.getString(POST_KEY)
                     postAsVariable = variable
                     _postVariable.postValue(variable)
+                } else {
+                    postAsVariable = POST_KEY
+                    _postVariable.postValue(POST_KEY)
                 }
             }
         }

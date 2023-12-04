@@ -289,9 +289,12 @@ class LMFeedEditPostFragment :
         //create message string
         val topicNameString = disabledTopics.joinToString(", ") { it.name }
         val firstLineMessage = resources.getQuantityString(
-            R.plurals.topic_disabled_message,
+            R.plurals.topic_disabled_message_s,
             noOfDisabledTopics,
-            noOfDisabledTopics
+            PostUtil.pluralizeOrCapitalize(
+                lmFeedHelperViewModel.getPostVariable(),
+                WordAction.ALL_SMALL_SINGULAR
+            )
         )
         val finalMessage = "$firstLineMessage \n $topicNameString"
 

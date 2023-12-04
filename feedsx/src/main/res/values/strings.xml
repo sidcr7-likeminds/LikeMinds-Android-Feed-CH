@@ -150,9 +150,9 @@
         <item quantity="one">Topic is Disabled</item>
         <item quantity="other">Topics are Disabled</item>
     </plurals>
-    <plurals name="topic_disabled_message">
-        <item quantity="one">The following topic is disabled. Please remove it to save the post.</item>
-        <item quantity="other">The following topics are disabled. Please remove them to save the post.</item>
+    <plurals name="topic_disabled_message_s">
+        <item quantity="one">The following topic is disabled. Please remove it to save the %s.</item>
+        <item quantity="other">The following topics are disabled. Please remove them to save the %s.</item>
     </plurals>
     <string name="s_saved">%s Saved</string>
     <string name="s_unsaved">%s Unsaved</string>
