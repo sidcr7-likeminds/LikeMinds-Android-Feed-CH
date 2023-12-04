@@ -34,9 +34,9 @@
         <item quantity="one">1 Reply</item>
         <item quantity="other">%d Replies</item>
     </plurals>
-    <string name="create_a_post">Create a post</string>
+    <string name="create_a_s">Create a %s</string>
     <string name="done">Done</string>
-    <string name="post">Post</string>
+    <string name="create">Create</string>
     <string name="write_something_here">Write something here…</string>
     <string name="attach_files">Attach Files</string>
     <string name="add_video">Add Video</string>
@@ -131,7 +131,7 @@
     <string name="you_do_not_have_permission_to_create_a_s">You do not have permission to create a %s</string>
     <string name="you_do_not_have_permission_to_comment">You do not have permission to comment</string>
     <string name="share_s">Share %s</string>
-    <string name="edit_post">Edit Post</string>
+    <string name="edit_s">Edit %s</string>
     <string name="no_activities_to_showno_activities_to_show">No activities to show</string>
     <string name="nine_nine_plus">99+</string>
     <string name="no_notifications_yet">Oops! You don\'t have any notifications yet!</string>

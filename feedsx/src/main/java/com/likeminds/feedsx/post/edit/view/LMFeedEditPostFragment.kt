@@ -34,6 +34,7 @@ import com.likeminds.feedsx.post.edit.viewmodel.LMFeedEditPostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
+import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
@@ -54,6 +55,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -158,6 +160,24 @@ class LMFeedEditPostFragment :
         initToolbar()
         fetchPost()
         initPostSaveListener()
+    }
+
+    override fun setPostVariable() {
+        super.setPostVariable()
+        val postAsVariable = lmFeedHelperViewModel.getPostVariable()
+
+        binding.apply {
+            //toolbar title
+            //post header
+            tvToolbarTitle.text = getString(
+                R.string.edit_s,
+                PostUtil.pluralizeOrCapitalize(
+                    postAsVariable,
+                    WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                )
+            )
+
+        }
     }
 
     // sets the binding variables

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -37,6 +36,7 @@ import com.likeminds.feedsx.post.create.viewmodel.LMFeedCreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
+import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
@@ -56,6 +56,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -150,12 +151,14 @@ class LMFeedCreatePostFragment :
     override fun setPostVariable() {
         super.setPostVariable()
         val postVariable = lmFeedHelperViewModel.getPostVariable()
-        Log.d(
-            "PUI", """
-           setPostVariable ${System.currentTimeMillis()}
-           postVariable: $postVariable
-        """.trimIndent()
-        )
+
+        //toolbar title
+        //post header
+        (requireActivity() as LMFeedCreatePostActivity).binding.tvToolbarTitle.text =
+            getString(
+                R.string.create_a_s,
+                PostUtil.pluralizeOrCapitalize(postVariable, WordAction.ALL_SMALL_SINGULAR)
+            )
     }
 
     // fetches user data from local db
