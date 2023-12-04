@@ -1308,7 +1308,15 @@ class LMFeedFragment :
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data = result.data?.getStringExtra(LMFeedReportFragment.REPORT_RESULT)
-                LMFeedReportSuccessDialog(data ?: "").show(
+                val entityType = if (data == "Post") {
+                    PostUtil.pluralizeOrCapitalize(
+                        lmFeedHelperViewModel.getPostVariable(),
+                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                    )
+                } else {
+                    data
+                }
+                LMFeedReportSuccessDialog(entityType ?: "").show(
                     childFragmentManager,
                     LMFeedReportSuccessDialog.TAG
                 )

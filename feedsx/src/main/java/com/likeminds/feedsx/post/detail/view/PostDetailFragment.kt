@@ -151,6 +151,15 @@ class PostDetailFragment :
         initListeners()
     }
 
+    override fun setPostVariable() {
+        super.setPostVariable()
+        val postAsVariable = lmFeedHelperViewModel.getPostVariable()
+
+        //post header
+        (requireActivity() as PostDetailActivity).binding.tvToolbarTitle.text =
+            PostUtil.pluralizeOrCapitalize(postAsVariable, WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+    }
+
     // fetches post data to set initial data
     private fun fetchPostData(fromRefresh: Boolean = false) {
         if (!fromRefresh) {
@@ -1062,7 +1071,17 @@ class PostDetailFragment :
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
                 val data = result.data?.getStringExtra(LMFeedReportFragment.REPORT_RESULT)
-                LMFeedReportSuccessDialog(data ?: "").show(
+
+                val entityType = if (data == "Post") {
+                    PostUtil.pluralizeOrCapitalize(
+                        lmFeedHelperViewModel.getPostVariable(),
+                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                    )
+                } else {
+                    data
+                }
+
+                LMFeedReportSuccessDialog(entityType ?: "").show(
                     childFragmentManager,
                     LMFeedReportSuccessDialog.TAG
                 )
