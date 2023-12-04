@@ -2,6 +2,7 @@ package com.likeminds.feedsx.post.detail.view
 
 import android.app.Activity
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.*
@@ -25,8 +26,10 @@ import com.likeminds.feedsx.post.detail.view.adapter.PostDetailReplyAdapter.Post
 import com.likeminds.feedsx.post.detail.viewmodel.PostDetailViewModel
 import com.likeminds.feedsx.post.edit.model.LMFeedEditPostExtras
 import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity
+import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.*
+import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.*
@@ -38,6 +41,7 @@ import com.likeminds.feedsx.utils.membertagging.model.MemberTaggingExtras
 import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.BaseViewType
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -58,6 +62,9 @@ class PostDetailFragment :
 
     @Inject
     lateinit var userPreferences: LMFeedUserPreferences
+
+    @Inject
+    lateinit var lmFeedHelperViewModel: LMFeedHelperViewModel
 
     private lateinit var postDetailExtras: PostDetailExtras
 
@@ -382,7 +389,13 @@ class PostDetailFragment :
 
             ViewUtils.showShortToast(
                 requireContext(),
-                getString(R.string.post_deleted)
+                getString(
+                    R.string.s_deleted,
+                    PostUtil.pluralizeOrCapitalize(
+                        lmFeedHelperViewModel.getPostVariable(),
+                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                    )
+                )
             )
             requireActivity().finish()
         }
@@ -391,10 +404,27 @@ class PostDetailFragment :
         postActionsViewModel.pinPostResponse.observe(viewLifecycleOwner) {
             val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
+            val postAsVariable = lmFeedHelperViewModel.getPostVariable()
             if (post.isPinned) {
-                ViewUtils.showShortToast(requireContext(), getString(R.string.post_pinned_to_top))
+                ViewUtils.showShortToast(
+                    requireContext(), getString(
+                        R.string.s_pinned_to_top,
+                        PostUtil.pluralizeOrCapitalize(
+                            postAsVariable,
+                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                        )
+                    )
+                )
             } else {
-                ViewUtils.showShortToast(requireContext(), getString(R.string.post_unpinned))
+                ViewUtils.showShortToast(
+                    requireContext(), getString(
+                        R.string.s_unpinned,
+                        PostUtil.pluralizeOrCapitalize(
+                            postAsVariable,
+                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                        )
+                    )
+                )
             }
         }
     }
@@ -742,6 +772,7 @@ class PostDetailFragment :
         val deleteExtras = DeleteExtras.Builder()
             .postId(postId)
             .entityType(DELETE_TYPE_POST)
+            .postAsVariable(lmFeedHelperViewModel.getPostVariable())
             .build()
 
         showDeleteDialog(creatorId, deleteExtras)
@@ -1145,6 +1176,30 @@ class PostDetailFragment :
             // notifies the subscribers about the change
             postEvent.notify(Pair(newViewData.id, newViewData))
 
+            //create toast message
+            val postAsVariable = lmFeedHelperViewModel.getPostVariable()
+            val toastMessage = if (!item.isSaved) {
+                getString(
+                    R.string.s_saved,
+                    PostUtil.pluralizeOrCapitalize(
+                        postAsVariable,
+                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                    )
+                )
+            } else {
+                getString(
+                    R.string.s_unsaved,
+                    PostUtil.pluralizeOrCapitalize(
+                        postAsVariable,
+                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                    )
+                )
+            }
+
+            //show toast
+            Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
+
+
             //call api
             postActionsViewModel.savePost(newViewData.id)
 
@@ -1436,7 +1491,15 @@ class PostDetailFragment :
         val newPinPostMenuItem =
             pinPostMenuItem.toBuilder()
                 .id(UNPIN_POST_MENU_ITEM_ID)
-                .title(getString(R.string.unpin_this_post))
+                .title(
+                    getString(
+                        R.string.unpin_this_s,
+                        PostUtil.pluralizeOrCapitalize(
+                            lmFeedHelperViewModel.getPostVariable(),
+                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                        )
+                    )
+                )
                 .build()
         menuItems[pinPostIndex] = newPinPostMenuItem
 
@@ -1473,7 +1536,15 @@ class PostDetailFragment :
         val unPinPostMenuItem = menuItems[unPinPostIndex]
         val newUnPinPostMenuItem =
             unPinPostMenuItem.toBuilder().id(PIN_POST_MENU_ITEM_ID)
-                .title(getString(R.string.pin_this_post))
+                .title(
+                    getString(
+                        R.string.pin_this_s,
+                        PostUtil.pluralizeOrCapitalize(
+                            lmFeedHelperViewModel.getPostVariable(),
+                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                        )
+                    )
+                )
                 .build()
         menuItems[unPinPostIndex] = newUnPinPostMenuItem
 
