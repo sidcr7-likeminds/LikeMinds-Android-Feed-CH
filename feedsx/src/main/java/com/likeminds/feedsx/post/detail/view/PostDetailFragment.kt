@@ -1651,7 +1651,8 @@ class PostDetailFragment :
         ShareUtils.sharePost(
             requireContext(),
             postId,
-            ShareUtils.domain
+            ShareUtils.domain,
+            "" // todo add helperViewModel
         )
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
         postActionsViewModel.sendPostShared(post)

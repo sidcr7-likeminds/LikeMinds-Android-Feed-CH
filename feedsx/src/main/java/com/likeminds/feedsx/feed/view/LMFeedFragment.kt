@@ -1190,7 +1190,8 @@ class LMFeedFragment :
         ShareUtils.sharePost(
             requireContext(),
             postId,
-            ShareUtils.domain
+            ShareUtils.domain,
+            lmFeedHelperViewModel.getPostVariable()
         )
         val post = getIndexAndPostFromAdapter(postId)?.second ?: return
         postActionsViewModel.sendPostShared(post)
@@ -1268,7 +1269,12 @@ class LMFeedFragment :
         val pinPostMenuItem = menuItems[pinPostIndex]
         val newPinPostMenuItem =
             pinPostMenuItem.toBuilder().id(UNPIN_POST_MENU_ITEM_ID)
-                .title(getString(R.string.unpin_this_post))
+                .title(
+                    getString(
+                        R.string.pin_this_s,
+                        lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                )
                 .build()
         menuItems[pinPostIndex] = newPinPostMenuItem
 
@@ -1305,7 +1311,12 @@ class LMFeedFragment :
         val unPinPostMenuItem = menuItems[unPinPostIndex]
         val newUnPinPostMenuItem =
             unPinPostMenuItem.toBuilder().id(PIN_POST_MENU_ITEM_ID)
-                .title(getString(R.string.pin_this_post))
+                .title(
+                    getString(
+                        R.string.pin_this_s,
+                        lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                )
                 .build()
         menuItems[unPinPostIndex] = newUnPinPostMenuItem
 
