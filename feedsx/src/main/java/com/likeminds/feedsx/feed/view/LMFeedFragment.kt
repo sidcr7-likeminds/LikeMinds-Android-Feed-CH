@@ -12,6 +12,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -179,6 +180,34 @@ class LMFeedFragment :
         }
     }
 
+    override fun setPostVariable() {
+        super.setPostVariable()
+        Log.d(
+            "PUI", """
+           setPostVariable ${System.currentTimeMillis()}
+        """.trimIndent()
+        )
+        binding.apply {
+            //new post fab
+            newPostButton.text = getString(
+                R.string.new_s,
+                lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.ALL_CAPITAL_SINGULAR)
+            )
+
+            //no post layout
+            layoutNoPost.fabNewPost.text = getString(
+                R.string.new_s,
+                lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.ALL_CAPITAL_SINGULAR)
+            )
+
+            //posting layout
+            layoutPosting.tvPosting.text = getString(
+                R.string.creating_s,
+                lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+            )
+        }
+    }
+
     override fun observeData() {
         super.observeData()
         observePosting()
@@ -219,6 +248,16 @@ class LMFeedFragment :
 
         lmFeedHelperViewModel.showTopicFilter.observe(viewLifecycleOwner) { showTopicFilter ->
             binding.layoutAllTopics.root.isVisible = showTopicFilter
+        }
+
+        lmFeedHelperViewModel.postVariable.observe(viewLifecycleOwner) { variable ->
+            Log.d(
+                "PUI", """
+                lmFeedHelperViewModel.postVariable.observe: $variable
+                time: ${System.currentTimeMillis()}
+            """.trimIndent()
+            )
+            setPostVariable()
         }
 
         // observes deletePostResponse LiveData
@@ -362,7 +401,13 @@ class LMFeedFragment :
                 // when the post data comes from api response
                 is LMFeedViewModel.PostDataEvent.PostResponseData -> {
                     binding.apply {
-                        ViewUtils.showShortToast(requireContext(), getString(R.string.post_created))
+                        ViewUtils.showShortToast(
+                            requireContext(),
+                            getString(
+                                R.string.s_created,
+                                lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                            )
+                        )
                         refreshFeed()
                         removePostingView()
                     }
@@ -658,7 +703,10 @@ class LMFeedFragment :
                 if (alreadyPosting) {
                     ViewUtils.showShortToast(
                         requireContext(),
-                        getString(R.string.a_post_is_already_uploading)
+                        getString(
+                            R.string.a_s_is_already_uploading,
+                            lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
+                        )
                     )
                 } else {
                     // sends post creation started event
@@ -673,7 +721,10 @@ class LMFeedFragment :
             } else {
                 ViewUtils.showShortSnack(
                     root,
-                    getString(R.string.you_do_not_have_permission_to_create_a_post)
+                    getString(
+                        R.string.you_do_not_have_permission_to_create_a_s,
+                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                    )
                 )
             }
         }
@@ -996,6 +1047,22 @@ class LMFeedFragment :
                 .isSaved(!item.isSaved)
                 .build()
 
+            //create toast message
+            val toastMessage = if (!item.isSaved) {
+                getString(
+                    R.string.s_saved,
+                    lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                )
+            } else {
+                getString(
+                    R.string.s_unsaved,
+                    lmFeedHelperViewModel.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                )
+            }
+
+            //show toast
+            Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
+
             //call api
             postActionsViewModel.savePost(newViewData.id)
 
@@ -1024,7 +1091,7 @@ class LMFeedFragment :
                 .build()
 
             //call api
-            postActionsViewModel.likePost(newViewData.id)
+            postActionsViewModel.likePost(newViewData.id, !item.isLiked)
             //update recycler
             mPostAdapter.update(position, newViewData)
         }

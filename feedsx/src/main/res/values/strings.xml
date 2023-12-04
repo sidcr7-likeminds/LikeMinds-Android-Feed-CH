@@ -53,7 +53,7 @@
     <string name="following">Following</string>
     <string name="scalix">Scalix</string>
     <string name="likeMinds">LikeMinds</string>
-    <string name="new_post">New Post</string>
+    <string name="new_s">New %s</string>
     <plurals name="placeholder_pages">
         <item quantity="one">1 Page</item>
         <item quantity="other">%d Pages</item>
@@ -100,14 +100,14 @@
     <string name="something_went_wrong">Something went wrong!</string>
     <string name="access_denied">Access denied!</string>
     <string name="oops_you_don_t_seem_to_have_access_to_the_community">Oops! You don’t seem to have access to the community.</string>
-    <string name="post_created">Post created successfully!</string>
-    <string name="posting">Posting</string>
+    <string name="s_created">%s created successfully!</string>
+    <string name="creating_s">Creating %s</string>
     <string name="retry">Retry</string>
     <plurals name="you_can_select_upto_x_items">
         <item quantity="one">You can select up to 1 item!</item>
         <item quantity="other">You can select up to %d items!</item>
     </plurals>
-    <string name="a_post_is_already_uploading">A post is already uploading!</string>
+    <string name="a_s_is_already_uploading">A %s is already uploading!</string>
     <string name="post_pinned_to_top">Post pinned to top!</string>
     <string name="post_unpinned">Post unpinned!</string>
     <string name="no_comment_found">No comment found</string>
@@ -128,7 +128,7 @@
     <string name="be_the_first_one_to_post_here">Be the first one to post here</string>
     <string name="pin_this_post">Pin this Post</string>
     <string name="unpin_this_post">Unpin this Post</string>
-    <string name="you_do_not_have_permission_to_create_a_post">You do not have permission to create a post</string>
+    <string name="you_do_not_have_permission_to_create_a_s">You do not have permission to create a %s</string>
     <string name="you_do_not_have_permission_to_comment">You do not have permission to comment</string>
     <string name="share_post">Share Post</string>
     <string name="edit_post">Edit Post</string>
@@ -154,4 +154,6 @@
         <item quantity="one">The following topic is disabled. Please remove it to save the post.</item>
         <item quantity="other">The following topics are disabled. Please remove them to save the post.</item>
     </plurals>
+    <string name="s_saved">%s Saved</string>
+    <string name="s_unsaved">%s Unsaved</string>
 </resources>

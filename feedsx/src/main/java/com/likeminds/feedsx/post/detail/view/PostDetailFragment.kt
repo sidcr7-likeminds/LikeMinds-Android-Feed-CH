@@ -1126,7 +1126,7 @@ class PostDetailFragment :
             postEvent.notify(Pair(newViewData.id, newViewData))
 
             //call api
-            postActionsViewModel.likePost(newViewData.id)
+            postActionsViewModel.likePost(newViewData.id, !item.isLiked)
             //update recycler
             mPostDetailAdapter.update(position, newViewData)
         }
@@ -1295,7 +1295,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        viewModel.likeComment(newViewData.postId, newViewData.id)
+        viewModel.likeComment(newViewData.postId, newViewData.id, !comment.isLiked)
         //update recycler
         mPostDetailAdapter.update(position, newViewData)
     }
@@ -1335,7 +1335,7 @@ class PostDetailFragment :
             .build()
 
         //call api
-        viewModel.likeComment(newViewData.postId, updatedReply.id)
+        viewModel.likeComment(newViewData.postId, updatedReply.id, !replyViewData.isLiked)
         //update recycler
         mPostDetailAdapter.update(position, newViewData)
     }

@@ -54,7 +54,7 @@
             android:layout_height="40dp"
             android:layout_marginTop="12dp"
             android:gravity="center"
-            android:text="@string/new_post"
+            android:text="@string/new_s"
             android:textAllCaps="true"
             android:textColor="@color/white"
             android:textSize="12sp"

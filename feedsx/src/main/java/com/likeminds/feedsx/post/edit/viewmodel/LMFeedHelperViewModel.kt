@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.post.edit.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.*
 import com.likeminds.feedsx.LMFeedAnalytics
 import com.likeminds.feedsx.feed.ConfigurationRepository
@@ -41,7 +42,10 @@ class LMFeedHelperViewModel @Inject constructor(
     private val _showTopicFilter = MutableLiveData<Boolean>()
     val showTopicFilter: LiveData<Boolean> = _showTopicFilter
 
-    private var postVariable: String = "post"
+    private var postAsVariable: String = POST_KEY
+
+    private val _postVariable = MutableLiveData<String>(POST_KEY)
+    val postVariable: LiveData<String> = _postVariable
 
     /**
      * [taggingData] contains first -> page called
@@ -64,6 +68,11 @@ class LMFeedHelperViewModel @Inject constructor(
     }
 
     init {
+        Log.d(
+            "PUI", """
+            init getFeedMetaData called ${System.currentTimeMillis()}
+        """.trimIndent()
+        )
         getFeedMetaData()
     }
 
@@ -184,7 +193,9 @@ class LMFeedHelperViewModel @Inject constructor(
 
                 //check value has value
                 if (value.has(POST_KEY)) {
-                    postVariable = value.getString(POST_KEY)
+                    val variable = value.getString(POST_KEY)
+                    postAsVariable = variable
+                    _postVariable.postValue(variable)
                 }
             }
         }
@@ -193,39 +204,43 @@ class LMFeedHelperViewModel @Inject constructor(
     fun pluralizeOrCapitalize(action: WordAction): String {
         return when (action) {
             WordAction.FIRST_LETTER_CAPITAL_SINGULAR -> {
-                val singular = postVariable.singularize()
+                val singular = postAsVariable.singularize()
                 singular.replaceFirstChar {
                     it.uppercase()
                 }
             }
 
             WordAction.ALL_CAPITAL_SINGULAR -> {
-                val singular = postVariable.singularize()
+                val singular = postAsVariable.singularize()
                 singular.uppercase()
             }
 
             WordAction.ALL_SMALL_SINGULAR -> {
-                val singular = postVariable.singularize()
+                val singular = postAsVariable.singularize()
                 singular.lowercase()
             }
 
             WordAction.FIRST_LETTER_CAPITAL_PLURAL -> {
-                val plural = postVariable.pluralize()
+                val plural = postAsVariable.pluralize()
                 plural.replaceFirstChar {
                     it.uppercase()
                 }
             }
 
             WordAction.ALL_CAPITAL_PLURAL -> {
-                val plural = postVariable.pluralize()
+                val plural = postAsVariable.pluralize()
                 plural.uppercase()
             }
 
             WordAction.ALL_SMALL_PLURAL -> {
-                val plural = postVariable.pluralize()
+                val plural = postAsVariable.pluralize()
                 plural.lowercase()
             }
         }
+    }
+
+    fun getPostVariable(): String {
+        return postAsVariable
     }
 
 

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -144,6 +145,17 @@ class LMFeedCreatePostFragment :
         initAddAttachmentsView()
         initPostContentTextListener()
         initPostDoneListener()
+    }
+
+    override fun setPostVariable() {
+        super.setPostVariable()
+        val postVariable = lmFeedHelperViewModel.getPostVariable()
+        Log.d(
+            "PUI", """
+           setPostVariable ${System.currentTimeMillis()}
+           postVariable: $postVariable
+        """.trimIndent()
+        )
     }
 
     // fetches user data from local db
@@ -432,7 +444,11 @@ class LMFeedCreatePostFragment :
                 addView(LMFeedTopicChipUtil.createTopicChip(this, topic.name))
             }
             addView(
-                LMFeedTopicChipUtil.createEditChip(requireContext(), selectedTopic, this) { intent ->
+                LMFeedTopicChipUtil.createEditChip(
+                    requireContext(),
+                    selectedTopic,
+                    this
+                ) { intent ->
                     topicSelectionLauncher.launch(intent)
                 })
         }
