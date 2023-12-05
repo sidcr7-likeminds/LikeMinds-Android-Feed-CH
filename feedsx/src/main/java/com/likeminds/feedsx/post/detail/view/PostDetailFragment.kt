@@ -29,11 +29,11 @@ import com.likeminds.feedsx.post.edit.view.LMFeedEditPostActivity
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.*
-import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.*
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -157,7 +157,7 @@ class PostDetailFragment :
 
         //post header
         (requireActivity() as PostDetailActivity).binding.tvToolbarTitle.text =
-            PostUtil.pluralizeOrCapitalize(postAsVariable, WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+            postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
     }
 
     // fetches post data to set initial data
@@ -400,10 +400,8 @@ class PostDetailFragment :
                 requireContext(),
                 getString(
                     R.string.s_deleted,
-                    PostUtil.pluralizeOrCapitalize(
-                        lmFeedHelperViewModel.getPostVariable(),
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 )
             )
             requireActivity().finish()
@@ -418,20 +416,14 @@ class PostDetailFragment :
                 ViewUtils.showShortToast(
                     requireContext(), getString(
                         R.string.s_pinned_to_top,
-                        PostUtil.pluralizeOrCapitalize(
-                            postAsVariable,
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
             } else {
                 ViewUtils.showShortToast(
                     requireContext(), getString(
                         R.string.s_unpinned,
-                        PostUtil.pluralizeOrCapitalize(
-                            postAsVariable,
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
             }
@@ -1073,10 +1065,8 @@ class PostDetailFragment :
                 val data = result.data?.getStringExtra(LMFeedReportFragment.REPORT_RESULT)
 
                 val entityType = if (data == "Post") {
-                    PostUtil.pluralizeOrCapitalize(
-                        lmFeedHelperViewModel.getPostVariable(),
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 } else {
                     data
                 }
@@ -1200,18 +1190,12 @@ class PostDetailFragment :
             val toastMessage = if (!item.isSaved) {
                 getString(
                     R.string.s_saved,
-                    PostUtil.pluralizeOrCapitalize(
-                        postAsVariable,
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 )
             } else {
                 getString(
                     R.string.s_unsaved,
-                    PostUtil.pluralizeOrCapitalize(
-                        postAsVariable,
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 )
             }
 
@@ -1513,10 +1497,8 @@ class PostDetailFragment :
                 .title(
                     getString(
                         R.string.unpin_this_s,
-                        PostUtil.pluralizeOrCapitalize(
-                            lmFeedHelperViewModel.getPostVariable(),
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        lmFeedHelperViewModel.getPostVariable()
+                            .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
                 .build()
@@ -1558,10 +1540,8 @@ class PostDetailFragment :
                 .title(
                     getString(
                         R.string.pin_this_s,
-                        PostUtil.pluralizeOrCapitalize(
-                            lmFeedHelperViewModel.getPostVariable(),
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        lmFeedHelperViewModel.getPostVariable()
+                            .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
                 .build()
@@ -1742,7 +1722,7 @@ class PostDetailFragment :
             requireContext(),
             postId,
             ShareUtils.domain,
-            "" // todo add helperViewModel
+            lmFeedHelperViewModel.getPostVariable()
         )
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
         postActionsViewModel.sendPostShared(post)

@@ -203,15 +203,6 @@ class InitiateViewModel @Inject constructor(
             val response = lmFeedClient.getCommunityConfiguration()
             if (response.success) {
                 val configurations = response.data?.configurations ?: return@launchIO
-                Log.d(
-                    "PUI", """
-                    configurations received: ${
-                        configurations.map {
-                            it
-                        }
-                    }
-                """.trimIndent()
-                )
 
                 val configurationEntities = configurations.map { configuration ->
                     ViewDataConverter.createConfigurationEntity(configuration)

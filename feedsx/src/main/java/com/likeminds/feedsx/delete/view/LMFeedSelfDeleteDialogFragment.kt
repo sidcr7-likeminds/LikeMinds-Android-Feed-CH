@@ -7,8 +7,8 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.databinding.LmFeedDialogFragmentSelfDeleteBinding
 import com.likeminds.feedsx.delete.model.DELETE_TYPE_POST
 import com.likeminds.feedsx.delete.model.DeleteExtras
-import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.utils.ExtrasUtil
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 import com.likeminds.feedsx.utils.pluralize.model.WordAction
@@ -70,19 +70,14 @@ class LMFeedSelfDeleteDialogFragment : BaseDialogFragment<LmFeedDialogFragmentSe
     // sets data as per content type [COMMENT/POST]
     private fun initView() {
         if (deleteExtras.entityType == DELETE_TYPE_POST) {
+            val postAsVariable = deleteExtras.postAsVariable
             binding.tvTitle.text = getString(
                 R.string.delete_s_question,
-                PostUtil.pluralizeOrCapitalize(
-                    deleteExtras.postAsVariable,
-                    WordAction.ALL_SMALL_SINGULAR
-                )
+                postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
             )
             binding.tvDescription.text = getString(
                 R.string.delete_s_message,
-                PostUtil.pluralizeOrCapitalize(
-                    deleteExtras.postAsVariable,
-                    WordAction.ALL_SMALL_SINGULAR
-                )
+                postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
             )
         } else {
             binding.tvTitle.text = getString(R.string.delete_comment_question)

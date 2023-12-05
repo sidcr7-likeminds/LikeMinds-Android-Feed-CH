@@ -36,7 +36,6 @@ import com.likeminds.feedsx.post.create.viewmodel.LMFeedCreatePostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.LinkOGTagsViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
@@ -44,6 +43,7 @@ import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
@@ -157,7 +157,7 @@ class LMFeedCreatePostFragment :
         (requireActivity() as LMFeedCreatePostActivity).binding.tvToolbarTitle.text =
             getString(
                 R.string.create_a_s,
-                PostUtil.pluralizeOrCapitalize(postVariable, WordAction.ALL_SMALL_SINGULAR)
+                postVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
             )
     }
 

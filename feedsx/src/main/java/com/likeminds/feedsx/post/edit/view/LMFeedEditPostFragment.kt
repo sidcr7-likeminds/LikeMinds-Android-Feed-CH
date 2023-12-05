@@ -34,7 +34,6 @@ import com.likeminds.feedsx.post.edit.viewmodel.LMFeedEditPostViewModel
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.posttypes.model.*
 import com.likeminds.feedsx.posttypes.util.PostTypeUtil
-import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.posttypes.view.adapter.MultipleMediaPostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
@@ -44,6 +43,7 @@ import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
 import com.likeminds.feedsx.utils.ValueUtils.isImageValid
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -171,10 +171,7 @@ class LMFeedEditPostFragment :
             //post header
             tvToolbarTitle.text = getString(
                 R.string.edit_s,
-                PostUtil.pluralizeOrCapitalize(
-                    postAsVariable,
-                    WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                )
+                postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
             )
 
         }
@@ -291,10 +288,8 @@ class LMFeedEditPostFragment :
         val firstLineMessage = resources.getQuantityString(
             R.plurals.topic_disabled_message_s,
             noOfDisabledTopics,
-            PostUtil.pluralizeOrCapitalize(
-                lmFeedHelperViewModel.getPostVariable(),
-                WordAction.ALL_SMALL_SINGULAR
-            )
+            lmFeedHelperViewModel.getPostVariable()
+                .pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
         )
         val finalMessage = "$firstLineMessage \n $topicNameString"
 

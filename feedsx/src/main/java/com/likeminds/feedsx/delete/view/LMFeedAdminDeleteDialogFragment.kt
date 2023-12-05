@@ -10,8 +10,8 @@ import com.likeminds.feedsx.R
 import com.likeminds.feedsx.branding.model.LMFeedBranding
 import com.likeminds.feedsx.databinding.LmFeedDialogFragmentAdminDeleteBinding
 import com.likeminds.feedsx.delete.model.*
-import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.utils.ExtrasUtil
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.customview.BaseDialogFragment
 import com.likeminds.feedsx.utils.emptyExtrasException
 import com.likeminds.feedsx.utils.pluralize.model.WordAction
@@ -76,17 +76,11 @@ class LMFeedAdminDeleteDialogFragment :
         if (deleteExtras.entityType == DELETE_TYPE_POST) {
             binding.tvTitle.text = getString(
                 R.string.delete_s_question,
-                PostUtil.pluralizeOrCapitalize(
-                    deleteExtras.postAsVariable,
-                    WordAction.ALL_SMALL_SINGULAR
-                )
+                deleteExtras.postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
             )
             binding.tvDescription.text = getString(
                 R.string.delete_s_message,
-                PostUtil.pluralizeOrCapitalize(
-                    deleteExtras.postAsVariable,
-                    WordAction.ALL_SMALL_SINGULAR
-                )
+                deleteExtras.postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
             )
         } else {
             binding.tvTitle.text = getString(R.string.delete_comment_question)

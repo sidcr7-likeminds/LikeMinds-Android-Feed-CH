@@ -65,11 +65,7 @@ class LMFeedHelperViewModel @Inject constructor(
     }
 
     init {
-        Log.d(
-            "PUI", """
-            init getFeedMetaData called ${System.currentTimeMillis()}
-        """.trimIndent()
-        )
+        //get feed meta data
         getFeedMetaData()
     }
 

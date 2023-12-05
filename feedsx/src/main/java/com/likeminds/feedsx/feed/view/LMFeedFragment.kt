@@ -52,7 +52,6 @@ import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
 import com.likeminds.feedsx.post.viewmodel.PostActionsViewModel
 import com.likeminds.feedsx.posttypes.model.PostViewData
 import com.likeminds.feedsx.posttypes.model.UserViewData
-import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapter
 import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.report.model.REPORT_TYPE_POST
@@ -63,6 +62,7 @@ import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionResultExtras
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity.Companion.TOPIC_SELECTION_RESULT_EXTRAS
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -183,17 +183,12 @@ class LMFeedFragment :
 
     override fun setPostVariable() {
         super.setPostVariable()
-        Log.d(
-            "PUI", """
-           setPostVariable ${System.currentTimeMillis()}
-        """.trimIndent()
-        )
         val postAsVariable = lmFeedHelperViewModel.getPostVariable()
         binding.apply {
             //new post fab
             newPostButton.text = getString(
                 R.string.new_s,
-                PostUtil.pluralizeOrCapitalize(postAsVariable, WordAction.ALL_CAPITAL_SINGULAR)
+                postAsVariable.pluralizeOrCapitalize(WordAction.ALL_CAPITAL_SINGULAR)
             )
 
             //no post layout
@@ -202,10 +197,7 @@ class LMFeedFragment :
             //posting layout
             layoutPosting.tvPosting.text = getString(
                 R.string.creating_s,
-                PostUtil.pluralizeOrCapitalize(
-                    postAsVariable,
-                    WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                )
+                postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
             )
 
 
@@ -254,13 +246,7 @@ class LMFeedFragment :
             binding.layoutAllTopics.root.isVisible = showTopicFilter
         }
 
-        lmFeedHelperViewModel.postVariable.observe(viewLifecycleOwner) { variable ->
-            Log.d(
-                "PUI", """
-                lmFeedHelperViewModel.postVariable.observe: $variable
-                time: ${System.currentTimeMillis()}
-            """.trimIndent()
-            )
+        lmFeedHelperViewModel.postVariable.observe(viewLifecycleOwner) { _ ->
             setPostVariable()
         }
 
@@ -274,10 +260,8 @@ class LMFeedFragment :
                 requireContext(),
                 getString(
                     R.string.s_deleted,
-                    PostUtil.pluralizeOrCapitalize(
-                        lmFeedHelperViewModel.getPostVariable(),
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 )
             )
         }
@@ -290,20 +274,14 @@ class LMFeedFragment :
                 ViewUtils.showShortToast(
                     requireContext(), getString(
                         R.string.s_pinned_to_top,
-                        PostUtil.pluralizeOrCapitalize(
-                            postAsVariable,
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
             } else {
                 ViewUtils.showShortToast(
                     requireContext(), getString(
                         R.string.s_unpinned,
-                        PostUtil.pluralizeOrCapitalize(
-                            postAsVariable,
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
             }
@@ -432,10 +410,8 @@ class LMFeedFragment :
                             requireContext(),
                             getString(
                                 R.string.s_created,
-                                PostUtil.pluralizeOrCapitalize(
-                                    lmFeedHelperViewModel.getPostVariable(),
-                                    WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                                )
+                                lmFeedHelperViewModel.getPostVariable()
+                                    .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                             )
                         )
                         refreshFeed()
@@ -735,10 +711,8 @@ class LMFeedFragment :
                         requireContext(),
                         getString(
                             R.string.a_s_is_already_uploading,
-                            PostUtil.pluralizeOrCapitalize(
-                                lmFeedHelperViewModel.getPostVariable(),
-                                WordAction.ALL_SMALL_SINGULAR
-                            )
+                            lmFeedHelperViewModel.getPostVariable()
+                                .pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
                         )
                     )
                 } else {
@@ -840,21 +814,16 @@ class LMFeedFragment :
         val postAsVariable = lmFeedHelperViewModel.getPostVariable()
         binding.layoutNoPost.apply {
             //heading
-            tvNoPostHeading.text = PostUtil.pluralizeOrCapitalize(
-                postAsVariable,
-                WordAction.ALL_SMALL_PLURAL
-            )
+            tvNoPostHeading.text = postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_PLURAL)
 
             //subheading
-            tvNoPostSubHeading.text = PostUtil.pluralizeOrCapitalize(
-                postAsVariable,
-                WordAction.ALL_SMALL_SINGULAR
-            )
+            tvNoPostSubHeading.text =
+                postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
 
             //fab
             fabNewPost.text = getString(
                 R.string.new_s,
-                PostUtil.pluralizeOrCapitalize(postAsVariable, WordAction.ALL_CAPITAL_SINGULAR)
+                postAsVariable.pluralizeOrCapitalize(WordAction.ALL_CAPITAL_SINGULAR)
             )
         }
     }
@@ -1110,18 +1079,12 @@ class LMFeedFragment :
             val toastMessage = if (!item.isSaved) {
                 getString(
                     R.string.s_saved,
-                    PostUtil.pluralizeOrCapitalize(
-                        postAsVariable,
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 )
             } else {
                 getString(
                     R.string.s_unsaved,
-                    PostUtil.pluralizeOrCapitalize(
-                        postAsVariable,
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 )
             }
 
@@ -1309,10 +1272,8 @@ class LMFeedFragment :
             if (result.resultCode == Activity.RESULT_OK) {
                 val data = result.data?.getStringExtra(LMFeedReportFragment.REPORT_RESULT)
                 val entityType = if (data == "Post") {
-                    PostUtil.pluralizeOrCapitalize(
-                        lmFeedHelperViewModel.getPostVariable(),
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                    )
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                 } else {
                     data
                 }
@@ -1346,10 +1307,8 @@ class LMFeedFragment :
                 .title(
                     getString(
                         R.string.unpin_this_s,
-                        PostUtil.pluralizeOrCapitalize(
-                            lmFeedHelperViewModel.getPostVariable(),
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        lmFeedHelperViewModel.getPostVariable()
+                            .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
                 .build()
@@ -1391,10 +1350,8 @@ class LMFeedFragment :
                 .title(
                     getString(
                         R.string.pin_this_s,
-                        PostUtil.pluralizeOrCapitalize(
-                            lmFeedHelperViewModel.getPostVariable(),
-                            WordAction.FIRST_LETTER_CAPITAL_SINGULAR
-                        )
+                        lmFeedHelperViewModel.getPostVariable()
+                            .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
                 .build()

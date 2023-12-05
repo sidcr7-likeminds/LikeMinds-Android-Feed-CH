@@ -10,12 +10,12 @@ import com.likeminds.feedsx.SDKApplication
 import com.likeminds.feedsx.SDKApplication.Companion.LOG_TAG
 import com.likeminds.feedsx.databinding.LmFeedFragmentReportBinding
 import com.likeminds.feedsx.post.edit.viewmodel.LMFeedHelperViewModel
-import com.likeminds.feedsx.posttypes.util.PostUtil
 import com.likeminds.feedsx.report.model.*
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter
 import com.likeminds.feedsx.report.view.adapter.ReportAdapter.ReportAdapterListener
 import com.likeminds.feedsx.report.viewmodel.ReportViewModel
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.customview.BaseFragment
 import com.likeminds.feedsx.utils.pluralize.model.WordAction
 import javax.inject.Inject
@@ -166,10 +166,8 @@ class LMFeedReportFragment : BaseFragment<LmFeedFragmentReportBinding, ReportVie
             REPORT_TYPE_POST -> {
                 binding.tvReportSubHeader.text = getString(
                     R.string.report_sub_header,
-                    PostUtil.pluralizeOrCapitalize(
-                        lmFeedHelperViewModel.getPostVariable(),
-                        WordAction.ALL_SMALL_SINGULAR
-                    )
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
                 )
             }
 
