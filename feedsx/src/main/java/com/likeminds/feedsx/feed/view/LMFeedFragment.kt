@@ -574,8 +574,7 @@ class LMFeedFragment :
 
     override fun onPause() {
         super.onPause()
-        // removes the player and destroys the [postVideoAutoPlayHelper]
-        postVideoAutoPlayHelper.destroy()
+        destroyAutoPlayer()
     }
 
     override fun onDestroy() {
@@ -1279,9 +1278,7 @@ class LMFeedFragment :
     // shows all attachment documents in list view and updates [isExpanded]
     override fun onMultipleDocumentsExpanded(postData: PostViewData, position: Int) {
         if (position == mPostAdapter.items().size - 1) {
-            binding.recyclerView.post {
-                scrollToPositionWithOffset(position)
-            }
+            scrollToPositionWithOffset(position)
         }
 
         mPostAdapter.update(
@@ -1341,10 +1338,25 @@ class LMFeedFragment :
      * @param position Index of the item to scroll to
      */
     private fun scrollToPositionWithOffset(position: Int) {
-        val px = (ViewUtils.dpToPx(75) * 1.5).toInt()
-        (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
-            position,
-            px
-        )
+        binding.recyclerView.post {
+            val px = (ViewUtils.dpToPx(75) * 1.5).toInt()
+            (binding.recyclerView.layoutManager as? LinearLayoutManager)?.scrollToPositionWithOffset(
+                position,
+                px
+            )
+        }
+    }
+
+    // removes the player and destroys the [postVideoAutoPlayHelper]
+    private fun destroyAutoPlayer() {
+        if (::postVideoAutoPlayHelper.isInitialized) {
+            postVideoAutoPlayHelper.detachScrollListenerForVideo()
+            postVideoAutoPlayHelper.destroy()
+        }
+    }
+
+    override fun doCleanup() {
+        super.doCleanup()
+        destroyAutoPlayer()
     }
 }
