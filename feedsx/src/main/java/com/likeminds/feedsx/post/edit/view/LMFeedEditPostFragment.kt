@@ -41,6 +41,7 @@ import com.likeminds.feedsx.topic.util.LMFeedTopicChipUtil
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionAlert
 import com.likeminds.feedsx.utils.*
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -50,6 +51,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.*
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
 import com.likeminds.feedsx.utils.model.*
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
 import com.likeminds.feedsx.widgets.model.WidgetViewData
 import kotlinx.coroutines.flow.*
 import java.util.*
@@ -174,6 +176,27 @@ class LMFeedEditPostFragment :
         initToolbar()
         fetchPost()
         initPostSaveListener()
+    }
+
+    override fun setPostVariable() {
+        super.setPostVariable()
+        val postAsVariable = lmFeedHelperViewModel.getPostVariable()
+
+        binding.apply {
+            //toolbar title
+            //post header
+            tvToolbarTitle.text = getString(
+                R.string.edit_s,
+                postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+            )
+
+        }
+    }
+
+    // sets the binding variables
+    private fun setBindingVariables() {
+        binding.toolbarColor = LMFeedBranding.getToolbarColor()
+        binding.buttonColor = LMFeedBranding.getButtonsColor()
     }
 
     // initializes the view
@@ -349,7 +372,7 @@ class LMFeedEditPostFragment :
                 }
 
                 else -> {
-                    tvToolbarTitle.text = getString(R.string.edit_post)
+                    tvToolbarTitle.text = getString(R.string.edit_s)
                 }
             }
         }
@@ -391,7 +414,11 @@ class LMFeedEditPostFragment :
     }
 
     // processes save post request and calls api
-    private fun savePost(title: String, updatedText: String, topics: List<LMFeedTopicViewData>) {
+    private fun savePost(
+        title: String,
+        updatedText: String,
+        topics: List<LMFeedTopicViewData>
+    ) {
         binding.apply {
             progressBar.root.show()
             handleSaveButton(false)
@@ -424,9 +451,10 @@ class LMFeedEditPostFragment :
         //create message string
         val topicNameString = disabledTopics.joinToString(", ") { it.name }
         val firstLineMessage = resources.getQuantityString(
-            R.plurals.topic_disabled_message,
+            R.plurals.topic_disabled_message_s,
             noOfDisabledTopics,
-            noOfDisabledTopics
+            lmFeedHelperViewModel.getPostVariable()
+                .pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
         )
         val finalMessage = "$firstLineMessage \n $topicNameString"
 
@@ -806,9 +834,10 @@ class LMFeedEditPostFragment :
             )
 
             val linkUri = Uri.parse(ogTags?.url) ?: return@apply
-            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: ogTags?.url?.lowercase(
-                Locale.getDefault()
-            )
+            val linkText =
+                linkUri.host?.lowercase(Locale.getDefault()) ?: ogTags?.url?.lowercase(
+                    Locale.getDefault()
+                )
             tvLinkUrl.text = linkText
         }
     }
@@ -854,7 +883,9 @@ class LMFeedEditPostFragment :
                         widget?.widgetMetaData?.toBuilder()
                             ?.url(attachmentViewData.attachmentMeta.url ?: "")
                             ?.name(attachmentViewData.attachmentMeta.name ?: "")
-                            ?.coverImageUrl(attachmentViewData.attachmentMeta.coverImageUrl ?: "")
+                            ?.coverImageUrl(
+                                attachmentViewData.attachmentMeta.coverImageUrl ?: ""
+                            )
                             ?.size(attachmentViewData.attachmentMeta.size)
                             ?.build()
                     )
@@ -871,7 +902,10 @@ class LMFeedEditPostFragment :
             WorkInfo.State.FAILED -> {
                 handleSaveButton(visible = true)
                 binding.progressBar.root.hide()
-                ViewUtils.showShortToast(requireContext(), getString(R.string.something_went_wrong))
+                ViewUtils.showShortToast(
+                    requireContext(),
+                    getString(R.string.something_went_wrong)
+                )
             }
 
             else -> {}
@@ -912,9 +946,13 @@ class LMFeedEditPostFragment :
     private fun initTopicSelectionView() {
         binding.cgTopics.apply {
             removeAllViews()
-            addView(LMFeedTopicChipUtil.createSelectTopicsChip(requireContext(), this) { intent ->
-                topicSelectionLauncher.launch(intent)
-            })
+            addView(
+                LMFeedTopicChipUtil.createSelectTopicsChip(
+                    requireContext(),
+                    this
+                ) { intent ->
+                    topicSelectionLauncher.launch(intent)
+                })
         }
     }
 

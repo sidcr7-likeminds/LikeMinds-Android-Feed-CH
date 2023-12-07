@@ -101,7 +101,7 @@ class LMFeedCreatePostActivity : BaseAppCompatActivity() {
                 }
 
                 else -> {
-                    text = getString(R.string.create_a_post)
+                    text = getString(R.string.create_a_s)
                 }
             }
         }

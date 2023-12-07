@@ -40,6 +40,9 @@ import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionAlert
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
+import com.likeminds.feedsx.utils.ValueUtils.isImageValid
+import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
+import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -49,6 +52,7 @@ import com.likeminds.feedsx.utils.membertagging.model.UserTagViewData
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingUtil
 import com.likeminds.feedsx.utils.membertagging.util.MemberTaggingViewListener
 import com.likeminds.feedsx.utils.membertagging.view.LMFeedMemberTaggingView
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.awaitClose
@@ -206,6 +210,19 @@ class LMFeedCreatePostFragment :
         checkForEnabledTopics()
         initMemberTaggingView()
         initPostDoneListener()
+    }
+
+    override fun setPostVariable() {
+        super.setPostVariable()
+        val postVariable = lmFeedHelperViewModel.getPostVariable()
+
+        //toolbar title
+        //post header
+        (requireActivity() as LMFeedCreatePostActivity).binding.tvToolbarTitle.text =
+            getString(
+                R.string.create_a_s,
+                postVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
+            )
     }
 
     // initializes the view as per the selected post type

@@ -67,7 +67,7 @@
                     android:gravity="center_vertical"
                     android:includeFontPadding="false"
                     android:singleLine="true"
-                    android:text="@string/edit_post"
+                    android:text="@string/edit_s"
                     android:textSize="20sp"
                     app:fontType="regular"
                     app:layout_constraintBottom_toBottomOf="parent"

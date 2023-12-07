@@ -5,9 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
-import com.likeminds.feedsx.databinding.LmFeedEditTopicChipBinding
-import com.likeminds.feedsx.databinding.LmFeedSelectTopicChipBinding
-import com.likeminds.feedsx.databinding.LmFeedTopicChipBinding
+import com.likeminds.feedsx.databinding.*
 import com.likeminds.feedsx.topic.model.LMFeedTopicSelectionExtras
 import com.likeminds.feedsx.topic.model.LMFeedTopicViewData
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity

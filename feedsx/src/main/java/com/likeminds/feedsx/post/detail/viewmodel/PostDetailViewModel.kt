@@ -480,7 +480,7 @@ class PostDetailViewModel @Inject constructor(
             .postId(postId)
             .user(
                 UserViewData.Builder()
-                    .name(userPreferences.getUserName() ?: "")
+                    .name(userPreferences.getUserName())
                     .build()
             )
             .createdAt(createdAt)
