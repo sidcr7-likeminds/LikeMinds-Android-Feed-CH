@@ -25,7 +25,7 @@
             android:layout_marginTop="16dp"
             android:ellipsize="end"
             android:lineSpacingExtra="8sp"
-            android:text="@string/discard_resource"
+            android:text="@string/discard_s"
             android:textColor="@color/dark_grey"
             android:textSize="16sp"
             android:textStyle="normal"
@@ -40,7 +40,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginEnd="24dp"
             android:lineSpacingExtra="7sp"
-            android:text="@string/discard_resource_description"
+            android:text="@string/discard_s_description"
             android:textColor="@color/dark_grey"
             android:textSize="14sp"
             android:textStyle="normal"
@@ -61,6 +61,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_description">
 
             <ImageView
+                android:id="@+id/iv_delete"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -69,12 +70,13 @@
                 tools:ignore="ContentDescription" />
 
             <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                android:id="@+id/tv_discard_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="12dp"
                 android:lineSpacingExtra="7sp"
-                android:text="@string/discard_this_resource"
+                android:text="@string/discard_this_s"
                 android:textColor="@color/dark_grey"
                 android:textSize="14sp"
                 android:textStyle="normal"
@@ -93,6 +95,7 @@
             app:layout_constraintTop_toBottomOf="@id/ll_discard">
 
             <ImageView
+                android:id="@+id/iv_tick"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -101,12 +104,13 @@
                 tools:ignore="ContentDescription" />
 
             <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                android:id="@+id/tv_continue_creating_action"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginStart="12dp"
                 android:lineSpacingExtra="7sp"
-                android:text="@string/continue_creating_resource"
+                android:text="@string/continue_creating_s"
                 android:textColor="@color/dark_grey"
                 android:textSize="14sp"
                 android:textStyle="normal"

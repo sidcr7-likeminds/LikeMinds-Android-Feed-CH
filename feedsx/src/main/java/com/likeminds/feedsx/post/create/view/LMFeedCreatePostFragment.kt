@@ -40,9 +40,7 @@ import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionActivity
 import com.likeminds.feedsx.topic.view.LMFeedTopicSelectionAlert
 import com.likeminds.feedsx.utils.*
 import com.likeminds.feedsx.utils.ValueUtils.getUrlIfExist
-import com.likeminds.feedsx.utils.ValueUtils.isImageValid
 import com.likeminds.feedsx.utils.ValueUtils.pluralizeOrCapitalize
-import com.likeminds.feedsx.utils.ViewDataConverter.convertSingleDataUri
 import com.likeminds.feedsx.utils.ViewUtils.hide
 import com.likeminds.feedsx.utils.ViewUtils.show
 import com.likeminds.feedsx.utils.customview.BaseFragment
@@ -219,10 +217,36 @@ class LMFeedCreatePostFragment :
         //toolbar title
         //post header
         (requireActivity() as LMFeedCreatePostActivity).binding.tvToolbarTitle.text =
-            getString(
-                R.string.create_a_s,
-                postVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
-            )
+            when (createPostExtras.attachmentType) {
+                com.likeminds.feedsx.posttypes.model.VIDEO -> {
+                    getString(
+                        R.string.add_video_s,
+                        postVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                }
+
+                DOCUMENT -> {
+                    getString(
+                        R.string.add_pdf_s,
+                        postVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                }
+
+                LINK -> {
+                    getString(
+                        R.string.add_link_s,
+                        postVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                }
+
+                ARTICLE -> {
+                    getString(R.string.add_article)
+                }
+
+                else -> {
+                    getString(R.string.create_a_s)
+                }
+            }
     }
 
     // initializes the view as per the selected post type
@@ -951,7 +975,11 @@ class LMFeedCreatePostFragment :
                 root.hide()
             }
             ViewUtils.getMandatoryAsterisk(
-                getString(R.string.share_link_resource),
+                getString(
+                    R.string.share_link_s,
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
+                ),
                 etPostLink
             )
             etPostLink.show()

@@ -185,11 +185,39 @@ class LMFeedEditPostFragment :
         binding.apply {
             //toolbar title
             //post header
-            tvToolbarTitle.text = getString(
-                R.string.edit_s,
-                postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
-            )
+            when (editPostExtras.viewType) {
+                ITEM_POST_SINGLE_VIDEO -> {
+                    tvToolbarTitle.text = getString(
+                        R.string.edit_video_s,
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                }
 
+                ITEM_POST_DOCUMENTS -> {
+                    tvToolbarTitle.text = getString(
+                        R.string.edit_pdf_s,
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                }
+
+                ITEM_POST_LINK -> {
+                    tvToolbarTitle.text = getString(
+                        R.string.edit_link_s,
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                }
+
+                ITEM_POST_ARTICLE -> {
+                    tvToolbarTitle.text = getString(R.string.edit_article)
+                }
+
+                else -> {
+                    tvToolbarTitle.text = getString(
+                        R.string.edit_s,
+                        postAsVariable.pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                    )
+                }
+            }
         }
     }
 
@@ -352,28 +380,6 @@ class LMFeedEditPostFragment :
 
             ivBack.setOnClickListener {
                 openBackPressedPopup()
-            }
-
-            when (editPostExtras.viewType) {
-                ITEM_POST_SINGLE_VIDEO -> {
-                    tvToolbarTitle.text = getString(R.string.edit_video_resource)
-                }
-
-                ITEM_POST_DOCUMENTS -> {
-                    tvToolbarTitle.text = getString(R.string.edit_pdf_resource)
-                }
-
-                ITEM_POST_LINK -> {
-                    tvToolbarTitle.text = getString(R.string.edit_link_resource)
-                }
-
-                ITEM_POST_ARTICLE -> {
-                    tvToolbarTitle.text = getString(R.string.edit_article)
-                }
-
-                else -> {
-                    tvToolbarTitle.text = getString(R.string.edit_s)
-                }
             }
         }
     }

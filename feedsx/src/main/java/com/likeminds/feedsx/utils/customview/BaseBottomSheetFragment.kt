@@ -4,17 +4,13 @@ import android.app.Dialog
 import android.content.Context
 import android.graphics.Color
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.*
 import com.likeminds.feedsx.R
 import javax.inject.Inject
 
@@ -46,6 +42,10 @@ abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
 
     protected open fun attachDagger() {
         //implement this to attach screen to dagger sub-component
+    }
+
+    protected open fun setPostVariable() {
+        //This function can be called in case of set post as variable in any view
     }
 
     override fun onAttach(context: Context) {
@@ -84,6 +84,7 @@ abstract class BaseBottomSheetFragment<B : ViewBinding, VM : ViewModel> :
         if (_binding == null) {
             _binding = getViewBinding()
         }
+        setPostVariable()
         return binding.root
     }
 
