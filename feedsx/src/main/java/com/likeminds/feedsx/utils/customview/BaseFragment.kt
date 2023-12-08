@@ -50,13 +50,16 @@ abstract class BaseFragment<B : ViewBinding, VM : ViewModel> : Fragment() {
         //implement this to setup initial views related things
     }
 
-
     protected open fun observeData() {
         //implement this to add observers of all live data or flows
     }
 
     protected open fun doCleanup() {
         //This function can be called in case to clearing any view or listener or observer in fragment
+    }
+
+    protected open fun setPostVariable() {
+        //This function can be called in case of set post as variable in any view
     }
 
     override fun onAttach(context: Context) {
@@ -80,6 +83,7 @@ abstract class BaseFragment<B : ViewBinding, VM : ViewModel> : Fragment() {
         if (_binding == null) {
             _binding = getViewBinding()
         }
+        setPostVariable()
         return binding.root
     }
 

@@ -10,6 +10,9 @@ import com.likeminds.feedsx.utils.ViewUtils.isValidUrl
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
+import com.likeminds.feedsx.utils.pluralize.model.WordAction
+import com.likeminds.feedsx.utils.pluralize.pluralize
+import com.likeminds.feedsx.utils.pluralize.singularize
 
 object ValueUtils {
 
@@ -143,5 +146,43 @@ object ValueUtils {
             videoId = matcher.group(6)
         }
         return videoId
+    }
+
+    fun String.pluralizeOrCapitalize(action: WordAction): String {
+        return when (action) {
+            WordAction.FIRST_LETTER_CAPITAL_SINGULAR -> {
+                val singular = this.singularize()
+                singular.replaceFirstChar {
+                    it.uppercase()
+                }
+            }
+
+            WordAction.ALL_CAPITAL_SINGULAR -> {
+                val singular = this.singularize()
+                singular.uppercase()
+            }
+
+            WordAction.ALL_SMALL_SINGULAR -> {
+                val singular = this.singularize()
+                singular.lowercase()
+            }
+
+            WordAction.FIRST_LETTER_CAPITAL_PLURAL -> {
+                val plural = this.pluralize()
+                plural.replaceFirstChar {
+                    it.uppercase()
+                }
+            }
+
+            WordAction.ALL_CAPITAL_PLURAL -> {
+                val plural = this.pluralize()
+                plural.uppercase()
+            }
+
+            WordAction.ALL_SMALL_PLURAL -> {
+                val plural = this.pluralize()
+                plural.lowercase()
+            }
+        }
     }
 }
