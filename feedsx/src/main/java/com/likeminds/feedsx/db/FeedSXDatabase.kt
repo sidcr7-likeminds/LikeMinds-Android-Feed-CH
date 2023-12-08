@@ -2,10 +2,8 @@ package com.likeminds.feedsx.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.likeminds.feedsx.db.dao.PostWithAttachmentsDao
-import com.likeminds.feedsx.db.dao.UserWithRightsDao
-import com.likeminds.feedsx.db.models.*
 import com.likeminds.feedsx.db.dao.*
+import com.likeminds.feedsx.db.models.*
 
 @Database(
     entities = [
@@ -15,7 +13,7 @@ import com.likeminds.feedsx.db.dao.*
         MemberRightsEntity::class,
         TopicEntity::class,
         ConfigurationEntity::class
-    ], version = 5, exportSchema = false
+    ], version = 6, exportSchema = false
 )
 abstract class FeedSXDatabase : RoomDatabase() {
     //User related queries
