@@ -807,6 +807,10 @@ object ViewDataConverter {
             .build()
     }
 
+    /**
+     * converts [Configuration] to [ConfigurationEntity]
+     * @param configuration: [Configuration] network model for configuration
+     */
     fun createConfigurationEntity(
         configuration: Configuration
     ): ConfigurationEntity {
