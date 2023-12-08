@@ -2,16 +2,18 @@ package com.likeminds.feedsx.utils.databinding
 
 import android.app.Activity
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
+import android.graphics.*
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.view.View
 import android.widget.ImageView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.signature.ObjectKey
 import com.likeminds.feedsx.utils.ViewUtils
 
@@ -78,7 +80,8 @@ object ImageBindingUtil {
         isCircle: Boolean = false,
         cornerRadius: Int = 0,
         showGreyScale: Boolean = false,
-        objectKey: Any? = null
+        objectKey: Any? = null,
+        onFailed: (() -> Unit)? = null
     ) {
         if ((file == null && placeholder == null)
             || (file != null && file !is String &&
@@ -112,7 +115,30 @@ object ImageBindingUtil {
                 )
             }
 
-            builder.into(view)
+            builder.listener(object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    if (onFailed != null) {
+                        onFailed()
+                    }
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable,
+                    model: Any,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    return false
+                }
+            })
+                .into(view)
             if (showGreyScale) {
                 createImageFilter(view)
             } else {
