@@ -104,6 +104,7 @@ object MediaUtils {
         medias: List<MediaViewData>?
     ): ArrayList<SingleUriData> {
         var largeFileSelected = false
+        var largeVideoSelected = false
         val mediaUris = arrayListOf<SingleUriData>()
 
         if (!medias.isNullOrEmpty()) {
@@ -123,7 +124,7 @@ object MediaUtils {
                                     .build()
                             )
                         } else {
-                            largeFileSelected = true
+                            largeVideoSelected = true
                         }
                     }
 
@@ -151,6 +152,12 @@ object MediaUtils {
         if (largeFileSelected) {
             ViewUtils.showShortToast(
                 context, context.getString(R.string.large_file_select_error_message)
+            )
+        }
+
+        if (largeVideoSelected){
+            ViewUtils.showShortToast(
+                context, context.getString(R.string.large_video_select_error_message)
             )
         }
         return mediaUris
