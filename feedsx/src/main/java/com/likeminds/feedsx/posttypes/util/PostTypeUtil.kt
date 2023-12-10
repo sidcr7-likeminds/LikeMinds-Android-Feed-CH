@@ -561,7 +561,7 @@ object PostTypeUtil {
                         data.image,
                         placeholder = R.drawable.ic_link_primary_40dp,
                         cornerRadius = 8
-                    ) {
+                    ) { // onFailed callback in case glide fail to inflate the image
                         ivLink.hide()
                         layoutNoImageFound.apply {
                             root.show()
@@ -665,7 +665,7 @@ object PostTypeUtil {
                         data.image,
                         placeholder = R.drawable.ic_link_primary_40dp,
                         cornerRadius = 8
-                    ) {
+                    ) { // onFailed callback in case glide fail to inflate the image
                         ivLink.hide()
                         layoutNoImageFound.apply {
                             root.show()
