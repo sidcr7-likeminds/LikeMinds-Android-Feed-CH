@@ -48,7 +48,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    tools:text="@string/delete_post_question" />
+                    tools:text="@string/delete_s_question" />
 
                 <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_description"
@@ -63,7 +63,7 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_title"
-                    tools:text="@string/delete_post_message" />
+                    tools:text="@string/delete_s_message" />
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cv_reason"

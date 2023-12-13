@@ -99,6 +99,7 @@ class PostDetailFragment :
     }
 
     companion object {
+
         const val TAG = "PostDetailFragment"
         const val REPLIES_THRESHOLD = 5
     }
@@ -741,13 +742,8 @@ class PostDetailFragment :
                     //get post
                     val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
-                    //update post view data
-                    val updatedPost = post.toBuilder()
-                        .isPinned(!post.isPinned)
-                        .build()
-
-                    //update recycler view
-                    mPostDetailAdapter.update(postDataPosition, updatedPost)
+                    //locally
+                    updatePinUnpinLocally(post)
 
                     //show error message
                     val errorMessage = response.errorMessage
@@ -1311,7 +1307,6 @@ class PostDetailFragment :
             //show toast
             Toast.makeText(requireContext(), toastMessage, Toast.LENGTH_SHORT).show()
 
-
             //call api
             postActionsViewModel.savePost(newViewData.id)
 
@@ -1555,81 +1550,77 @@ class PostDetailFragment :
         //get item
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
-        //get pin menu item
-        val menuItems = post.menuItems.toMutableList()
-        val pinPostIndex = menuItems.indexOfFirst {
-            (it.id == PIN_POST_MENU_ITEM_ID)
-        }
-
-        //if pin item doesn't exist
-        if (pinPostIndex == -1) return
-
-        //update pin menu item
-        val pinPostMenuItem = menuItems[pinPostIndex]
-        val newPinPostMenuItem =
-            pinPostMenuItem.toBuilder()
-                .id(UNPIN_POST_MENU_ITEM_ID)
-                .title(
-                    getString(
-                        R.string.unpin_this_s,
-                        lmFeedHelperViewModel.getPostVariable()
-                            .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
-                    )
-                )
-                .build()
-        menuItems[pinPostIndex] = newPinPostMenuItem
-
-        //update the post view data
-        val newViewData = post.toBuilder()
-            .isPinned(!post.isPinned)
-            .menuItems(menuItems)
-            .build()
-
         //call api
         postActionsViewModel.pinPost(post)
 
-        //update recycler
-        mPostDetailAdapter.update(postDataPosition, newViewData)
-
-        // notifies the subscribers about the change in post data
-        postEvent.notify(Pair(newViewData.id, newViewData))
+        //locally post handle
+        updatePinUnpinLocally(post)
     }
 
     private fun unpinPost() {
         //get item
         val post = mPostDetailAdapter[postDataPosition] as PostViewData
 
-        //get unpin menu item
-        val menuItems = post.menuItems.toMutableList()
-        val unPinPostIndex = menuItems.indexOfFirst {
-            (it.id == UNPIN_POST_MENU_ITEM_ID)
+        //call api
+        postActionsViewModel.pinPost(post)
+
+        //locally post handle
+        updatePinUnpinLocally(post)
+    }
+
+    //handles pin/unpin of post locally
+    private fun updatePinUnpinLocally(post: PostViewData) {
+        /**
+         * Triple
+         * First -> menuItemMessage
+         * Second -> current post action id
+         * Third -> updated post action id
+         */
+        val menuItemTriple = if (post.isPinned) {
+            //unpin
+            Triple(
+                getString(
+                    R.string.pin_this_s,
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                ), UNPIN_POST_MENU_ITEM_ID,
+                PIN_POST_MENU_ITEM_ID
+            )
+        } else {
+            //pin
+            Triple(
+                getString(
+                    R.string.unpin_this_s,
+                    lmFeedHelperViewModel.getPostVariable()
+                        .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
+                ), PIN_POST_MENU_ITEM_ID,
+                UNPIN_POST_MENU_ITEM_ID
+            )
         }
 
-        //if unpin item doesn't exist
-        if (unPinPostIndex == -1) return
+        //get unpin menu item
+        val menuItems = post.menuItems.toMutableList()
+        val menuItemIndex = menuItems.indexOfFirst {
+            (it.id == menuItemTriple.second)
+        }
 
-        //update unpin menu item
-        val unPinPostMenuItem = menuItems[unPinPostIndex]
-        val newUnPinPostMenuItem =
-            unPinPostMenuItem.toBuilder().id(PIN_POST_MENU_ITEM_ID)
-                .title(
-                    getString(
-                        R.string.pin_this_s,
-                        lmFeedHelperViewModel.getPostVariable()
-                            .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
-                    )
-                )
+
+        if (menuItemIndex == -1) return
+
+        //update pin menu item
+        val menuItem = menuItems[menuItemIndex]
+        val updatedMenuItem =
+            menuItem.toBuilder().id(menuItemTriple.third)
+                .title(menuItemTriple.first)
                 .build()
-        menuItems[unPinPostIndex] = newUnPinPostMenuItem
+
+        menuItems[menuItemIndex] = updatedMenuItem
 
         //update the post view data
         val newViewData = post.toBuilder()
             .isPinned(!post.isPinned)
             .menuItems(menuItems)
             .build()
-
-        //call api
-        postActionsViewModel.pinPost(post)
 
         //update recycler
         mPostDetailAdapter.update(postDataPosition, newViewData)

@@ -3,7 +3,6 @@ package com.likeminds.feedsx.posttypes.util
 import android.content.Context
 import android.net.Uri
 import android.text.util.Linkify
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.ImageView
 import android.widget.TextView
@@ -42,7 +41,8 @@ import com.likeminds.feedsx.youtubeplayer.view.LMFeedYoutubePlayerActivity
 import java.util.Locale
 
 object PostTypeUtil {
-    const val SHOW_MORE_COUNT = 2
+
+    private const val SHOW_MORE_COUNT = 2
 
     // initializes author data frame on the post on home
     private fun initAuthorFrame(
@@ -540,6 +540,11 @@ object PostTypeUtil {
         data: LinkOGTagsViewData
     ) {
         binding.apply {
+            val linkUri = Uri.parse(data.url) ?: return@apply
+            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: data.url?.lowercase(
+                Locale.getDefault()
+            )
+
             setupLinkViewClick(
                 cvLinkPreview,
                 ivPlayYoutubeVideo,
@@ -548,21 +553,35 @@ object PostTypeUtil {
 
             val isImageValid = data.image.isImageValid()
             if (isImageValid) {
-                ivLink.show()
-                ImageBindingUtil.loadImage(
-                    ivLink,
-                    data.image,
-                    placeholder = R.drawable.ic_link_primary_40dp,
-                    cornerRadius = 8
-                )
+                try {
+                    ivLink.show()
+                    layoutNoImageFound.root.hide()
+                    ImageBindingUtil.loadImage(
+                        ivLink,
+                        data.image,
+                        placeholder = R.drawable.ic_link_primary_40dp,
+                        cornerRadius = 8
+                    ) { // onFailed callback in case glide fail to inflate the image
+                        ivLink.hide()
+                        layoutNoImageFound.apply {
+                            root.show()
+                            tvLinkUrl.text = linkText
+                        }
+                    }
+                } catch (e: Exception) {
+                    ivLink.hide()
+                    layoutNoImageFound.apply {
+                        root.show()
+                        tvLinkUrl.text = linkText
+                    }
+                }
             } else {
                 ivLink.hide()
+                layoutNoImageFound.apply {
+                    root.show()
+                    tvLinkUrl.text = linkText
+                }
             }
-
-            val linkUri = Uri.parse(data.url) ?: return@apply
-            val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: data.url?.lowercase(
-                Locale.getDefault()
-            )
             tvLinkUrl.text = linkText
         }
     }
@@ -631,23 +650,43 @@ object PostTypeUtil {
                 data
             )
 
-            val isImageValid = data.image.isImageValid()
-            if (isImageValid) {
-                ivLink.show()
-                ImageBindingUtil.loadImage(
-                    ivLink,
-                    data.image,
-                    placeholder = R.drawable.ic_link_primary_40dp,
-                    cornerRadius = 8
-                )
-            } else {
-                ivLink.hide()
-            }
-
             val linkUri = Uri.parse(data.url) ?: return@apply
             val linkText = linkUri.host?.lowercase(Locale.getDefault()) ?: data.url?.lowercase(
                 Locale.getDefault()
             )
+
+            val isImageValid = data.image.isImageValid()
+            if (isImageValid) {
+                try {
+                    ivLink.show()
+                    layoutNoImageFound.root.hide()
+                    ImageBindingUtil.loadImage(
+                        ivLink,
+                        data.image,
+                        placeholder = R.drawable.ic_link_primary_40dp,
+                        cornerRadius = 8
+                    ) { // onFailed callback in case glide fail to inflate the image
+                        ivLink.hide()
+                        layoutNoImageFound.apply {
+                            root.show()
+                            tvLinkUrl.text = linkText
+                        }
+                    }
+                } catch (e: Exception) {
+                    ivLink.hide()
+                    layoutNoImageFound.apply {
+                        root.show()
+                        tvLinkUrl.text = linkText
+                    }
+                }
+            } else {
+                ivLink.hide()
+                layoutNoImageFound.apply {
+                    root.show()
+                    tvLinkUrl.text = linkText
+                }
+            }
+
             tvLinkUrl.text = linkText
         }
     }
