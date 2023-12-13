@@ -22,6 +22,7 @@ import com.likeminds.feedsx.utils.model.*
 import com.likeminds.feedsx.widgets.model.WidgetMetaViewData
 import com.likeminds.feedsx.widgets.model.WidgetViewData
 import com.likeminds.likemindsfeed.comment.model.Comment
+import com.likeminds.likemindsfeed.configuration.model.Configuration
 import com.likeminds.likemindsfeed.initiateUser.model.ManagementRightPermissionData
 import com.likeminds.likemindsfeed.moderation.model.ReportTag
 import com.likeminds.likemindsfeed.notificationfeed.model.Activity
@@ -803,6 +804,21 @@ object ViewDataConverter {
             .title(memberRight.title)
             .subtitle(memberRight.subtitle)
             .userUniqueId(userUniqueId)
+            .build()
+    }
+
+    /**
+     * converts [Configuration] to [ConfigurationEntity]
+     * @param configuration: [Configuration] network model for configuration
+     */
+    fun createConfigurationEntity(
+        configuration: Configuration
+    ): ConfigurationEntity {
+        val valueJSONString = configuration.value.toString()
+        return ConfigurationEntity.Builder()
+            .type(configuration.type)
+            .description(configuration.description)
+            .value(valueJSONString)
             .build()
     }
 

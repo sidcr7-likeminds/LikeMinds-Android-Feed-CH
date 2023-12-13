@@ -41,17 +41,34 @@
                     app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
 
+                <include
+                    android:id="@+id/layout_no_image_found"
+                    layout="@layout/lm_feed_layout_no_image_link_found"
+                    android:layout_width="match_parent"
+                    android:layout_height="216dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
                 <ImageView
                     android:id="@+id/iv_play_youtube_video"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_play"
                     android:visibility="gone"
-                    app:layout_constraintBottom_toBottomOf="@id/iv_link"
+                    app:layout_constraintBottom_toBottomOf="@id/guide_link"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/iv_link"
+                    app:layout_constraintTop_toTopOf="parent"
                     tools:ignore="ContentDescription" />
+
+                <androidx.constraintlayout.widget.Guideline
+                    android:id="@+id/guide_link"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintGuide_begin="216dp" />
 
                 <com.likeminds.feedsx.branding.customview.LMFeedTextView
                     android:id="@+id/tv_link_url"
@@ -67,7 +84,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/iv_link"
+                    app:layout_constraintTop_toBottomOf="@id/guide_link"
                     tools:text="www.youtube.com" />
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>

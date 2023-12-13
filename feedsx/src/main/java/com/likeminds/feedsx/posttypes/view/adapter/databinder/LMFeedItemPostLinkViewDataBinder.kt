@@ -9,7 +9,7 @@ import com.likeminds.feedsx.posttypes.view.adapter.PostAdapterListener
 import com.likeminds.feedsx.utils.customview.ViewDataBinder
 import com.likeminds.feedsx.utils.model.ITEM_POST_LINK
 
-class LMFeedItemPostLinkViewDataBinder constructor(
+class LMFeedItemPostLinkViewDataBinder(
     val listener: PostAdapterListener
 ) : ViewDataBinder<LmFeedItemPostLinkBinding, PostViewData>() {
 
