@@ -676,7 +676,8 @@ class LMFeedFragment :
                     root,
                     getString(
                         R.string.you_do_not_have_permission_to_create_a_s,
-                        WordAction.FIRST_LETTER_CAPITAL_SINGULAR
+                        lmFeedHelperViewModel.getPostVariable()
+                            .pluralizeOrCapitalize(WordAction.FIRST_LETTER_CAPITAL_SINGULAR)
                     )
                 )
             }
@@ -972,7 +973,6 @@ class LMFeedFragment :
                 .fromPostSaved(true)
                 .isSaved(!item.isSaved)
                 .build()
-
 
             //create toast message
             val postAsVariable = lmFeedHelperViewModel.getPostVariable()
