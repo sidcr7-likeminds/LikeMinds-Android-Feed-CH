@@ -15,6 +15,108 @@
         android:layout_height="match_parent"
         android:background="@color/cultured">
 
+        <com.likeminds.feedsx.branding.customview.LMFeedToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/white"
+            android:contentInsetStart="0dp"
+            android:contentInsetLeft="0dp"
+            android:contentInsetEnd="0dp"
+            android:contentInsetRight="0dp"
+            android:elevation="6dp"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            app:contentInsetEnd="0dp"
+            app:contentInsetLeft="0dp"
+            app:contentInsetRight="0dp"
+            app:contentInsetStart="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                    android:id="@+id/toolbar_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="20dp"
+                    android:ellipsize="end"
+                    android:maxEms="15"
+                    android:maxLines="1"
+                    android:text="@string/likeMinds"
+                    android:textColor="@{toolbarColor}"
+                    android:textSize="22sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:fontType="medium" />
+
+                <ImageView
+                    android:id="@+id/iv_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:src="@drawable/ic_material_icons_white_search"
+                    android:tint="@{toolbarColor}"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/iv_notification"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription,UseAppTint" />
+
+                <ImageView
+                    android:id="@+id/iv_notification"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:foreground="?selectableItemBackground"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_notification_bell"
+                    android:tint="@{toolbarColor}"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/member_image"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="ContentDescription,UseAppTint"
+                    tools:visibility="visible" />
+
+                <com.likeminds.feedsx.branding.customview.LMFeedTextView
+                    android:id="@+id/tv_notification_count"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/notification_badge"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="10sp"
+                    android:translationX="2dp"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@id/iv_notification"
+                    app:layout_constraintEnd_toEndOf="@id/iv_notification"
+                    app:layout_constraintTop_toTopOf="@id/iv_notification"
+                    app:fontType="medium"
+                    tools:text="1"
+                    tools:visibility="visible" />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/member_image"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_marginEnd="15dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:src="@color/black" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </com.likeminds.feedsx.branding.customview.LMFeedToolbar>
+
         <LinearLayout
             android:id="@+id/ll_topics"
             android:layout_width="wrap_content"
@@ -23,7 +125,7 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/toolbar">
 
             <include
                 android:id="@+id/layout_all_topics"
@@ -103,8 +205,8 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:gravity="center"
-            android:paddingVertical="13dp"
             android:paddingHorizontal="16dp"
+            android:paddingVertical="13dp"
             android:text="@string/new_s"
             android:textAllCaps="true"
             android:textColor="@color/white"

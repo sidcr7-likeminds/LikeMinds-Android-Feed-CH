@@ -13,6 +13,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -202,7 +203,7 @@ class LMFeedFragment :
 
         // observes userResponse LiveData
         initiateViewModel.userResponse.observe(viewLifecycleOwner) {
-            observeUserResponse()
+            observeUserResponse(it)
         }
 
         // observes hasCreatePostRights LiveData
@@ -291,7 +292,9 @@ class LMFeedFragment :
     }
 
     // observes user response from InitiateUser
-    private fun observeUserResponse() {
+    private fun observeUserResponse(userViewData: UserViewData) {
+        initToolbar()
+        setUserImage(userViewData)
         viewModel.getUnreadNotificationCount()
         lmFeedHelperViewModel.getAllTopics(false)
         lmFeedHelperViewModel.getFeedMetaData()
@@ -567,6 +570,43 @@ class LMFeedFragment :
         super.onDestroy()
         // unsubscribes itself from the [PostPublisher]
         postPublisher.unsubscribe(this)
+    }
+
+    private fun initToolbar() {
+        (requireActivity() as AppCompatActivity).setSupportActionBar(binding.toolbar)
+
+        binding.apply {
+            //if user is guest user hide, profile icon from toolbar
+            memberImage.isVisible = !isGuestUser
+
+            //click listener -> open profile screen
+            memberImage.setOnClickListener {
+                // open profile on click
+            }
+
+            ivNotification.setOnClickListener {
+                viewModel.sendNotificationPageOpenedEvent()
+                LMFeedNotificationFeedActivity.start(requireContext())
+            }
+
+            ivSearch.setOnClickListener {
+                // perform search in feed
+            }
+        }
+    }
+
+    // sets user profile image
+    private fun setUserImage(user: UserViewData?) {
+        if (user != null) {
+            MemberImageUtil.setImage(
+                user.imageUrl,
+                user.name,
+                user.userUniqueId,
+                binding.memberImage,
+                showRoundImage = true,
+                objectKey = user.updatedAt
+            )
+        }
     }
 
     // initiates SDK

@@ -29,7 +29,7 @@ class AuthActivity : AppCompatActivity() {
 
     companion object {
         const val DEFAULT_HEADER_COLOR = "#FFFFFF"
-        const val DEFAULT_BUTTON_COLOR = "#6200EE"
+        const val DEFAULT_BUTTON_COLOR = "#00897B"
         const val DEFAULT_TEXT_LINK = "#007AFF"
     }
 
@@ -77,28 +77,6 @@ class AuthActivity : AppCompatActivity() {
     private fun loginUser() {
         binding.apply {
             val context = root.context
-
-            ivBrandingButton.setOnClickListener {
-                showColorDialog { colorRes, colorHex ->
-                    buttonColor = colorHex
-                    ivBrandingButton.backgroundTintList = ColorStateList.valueOf(colorRes)
-                }
-            }
-
-            ivBrandingHeader.setOnClickListener {
-                showColorDialog { colorRes, colorHex ->
-                    headerColor = colorHex
-                    ivBrandingHeader.backgroundTintList = ColorStateList.valueOf(colorRes)
-                }
-            }
-
-            ivBrandingTextLink.setOnClickListener {
-                showColorDialog { colorRes, colorHex ->
-                    textLinkColor = colorHex
-                    ivBrandingTextLink.backgroundTintList = ColorStateList.valueOf(colorRes)
-                }
-            }
-
 
             btnLogin.setOnClickListener {
                 val apiKey = binding.etApiKey.text.toString().trim()
@@ -157,17 +135,5 @@ class AuthActivity : AppCompatActivity() {
                 navigateToAfterLogin()
             }
         }
-    }
-
-    private fun showColorDialog(cb: (Int, String) -> Unit) {
-        MaterialColorPickerDialog
-            .Builder(this)
-            .setTitle("Pick Theme")
-            .setColorShape(ColorShape.SQAURE)
-            .setColorSwatch(ColorSwatch._300)
-            .setColorListener { colorRes, colorHex ->
-                cb(colorRes, colorHex)
-            }
-            .show()
     }
 }
