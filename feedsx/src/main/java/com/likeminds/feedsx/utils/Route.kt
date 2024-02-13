@@ -3,8 +3,8 @@ package com.likeminds.feedsx.utils
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.util.Log
 import com.likeminds.feedsx.LMFeedAnalytics
+import com.likeminds.feedsx.post.create.view.LMFeedCreatePostActivity
 import com.likeminds.feedsx.post.detail.model.PostDetailExtras
 import com.likeminds.feedsx.post.detail.view.PostDetailActivity
 
@@ -17,7 +17,7 @@ object Route {
     private const val ROUTE_BROWSER = "browser"
     private const val PARAM_COMMENT_ID = "comment_id"
 
-    const val DEEP_LINK_POST = "post"
+    private const val DEEP_LINK_POST = "post"
 
     private const val HTTPS_SCHEME = "https"
     private const val HTTP_SCHEME = "http"
@@ -39,15 +39,12 @@ object Route {
                     source
                 )
             }
-
             ROUTE_FEED -> {
                 // navigation to feed
             }
-
-            ROUTE_CREATE_POST -> {
+//            ROUTE_CREATE_POST -> {
 //                intent = getRouteToCreatePost(context, source)
-            }
-
+//            }
             ROUTE_BROWSER -> {
                 intent = getRouteToBrowser(route)
             }
@@ -63,7 +60,7 @@ object Route {
     }
 
     // route://post_detail?post_id=<post_id>&comment_id=<comment_id of new comment>
-    fun getRouteToPostDetail(
+    private fun getRouteToPostDetail(
         context: Context,
         route: Uri,
         source: String?
@@ -84,20 +81,20 @@ object Route {
         )
     }
 
-    // creates a website intent for url
-    fun createWebsiteIntent(context: Context, url: String?): Intent? {
+    // creates route for url and returns corresponding intent
+    fun handleDeepLink(context: Context, url: String?): Intent? {
         val data = Uri.parse(url).normalizeScheme() ?: return null
-        val websiteRoute = createWebsiteRoute(data) ?: return null
+        val firstPath = getRouteFromDeepLink(data) ?: return null
         return getRouteIntent(
             context,
-            websiteRoute,
+            firstPath,
             0,
             source = LMFeedAnalytics.Source.DEEP_LINK
         )
     }
 
     //create route string as per uri
-    fun getRouteFromDeepLink(data: Uri?): String? {
+    private fun getRouteFromDeepLink(data: Uri?): String? {
         if (data == null) {
             return null
         }
@@ -105,7 +102,6 @@ object Route {
             DEEP_LINK_POST -> {
                 createPostDetailRoute(data)
             }
-
             else -> {
                 createWebsiteRoute(data)
             }
@@ -124,7 +120,7 @@ object Route {
     }
 
     // creates a website route for the provided url
-    private fun createWebsiteRoute(data: Uri): String? {
+    fun createWebsiteRoute(data: Uri): String? {
         if (data.scheme == HTTPS_SCHEME || data.scheme == HTTP_SCHEME) {
             return Uri.Builder()
                 .scheme(ROUTE_SCHEME)
@@ -136,7 +132,6 @@ object Route {
         return null
     }
 
-    // todo:
     // route://create_post
 //    private fun getRouteToCreatePost(
 //        context: Context,
