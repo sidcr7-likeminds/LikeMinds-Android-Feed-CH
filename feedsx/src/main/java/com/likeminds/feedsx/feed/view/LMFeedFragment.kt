@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.util.TypedValue
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
@@ -33,7 +34,7 @@ import com.likeminds.feedsx.feed.adapter.LMFeedSelectedTopicAdapter
 import com.likeminds.feedsx.feed.adapter.LMFeedSelectedTopicAdapterListener
 import com.likeminds.feedsx.feed.model.LMFeedExtras
 import com.likeminds.feedsx.feed.util.PostEvent
-import com.likeminds.feedsx.feed.util.PostEvent.*
+import com.likeminds.feedsx.feed.util.PostEvent.PostObserver
 import com.likeminds.feedsx.feed.viewmodel.LMFeedViewModel
 import com.likeminds.feedsx.likes.model.LikesScreenExtras
 import com.likeminds.feedsx.likes.model.POST
@@ -227,6 +228,7 @@ class LMFeedFragment :
 
         // observe unread notification count
         viewModel.unreadNotificationCount.observe(viewLifecycleOwner) { count ->
+            observeUnreadNotificationCount(count)
             SDKApplication.getLMFeedUICallback()?.updateNotificationCount(count)
         }
 
@@ -302,6 +304,42 @@ class LMFeedFragment :
             1,
             viewModel.getTopicIdsFromAdapterList(mSelectedTopicAdapter.items())
         )
+    }
+
+    // observe unread notification count
+    private fun observeUnreadNotificationCount(count: Int) {
+        binding.apply {
+            ivNotification.show()
+            when (count) {
+                0 -> {
+                    tvNotificationCount.isVisible = false
+                }
+
+                in 1..99 -> {
+                    configureNotificationBadge(count.toString())
+                }
+
+                else -> {
+                    configureNotificationBadge(getString(R.string.nine_nine_plus))
+                }
+            }
+        }
+    }
+
+    /**
+     * Configure the notification badge based on the text length and visibility
+     * @param text Text to show on the counter, eg - 99+, 8, etc
+     */
+    private fun configureNotificationBadge(text: String) {
+        binding.tvNotificationCount.apply {
+            if (text.length > 2) {
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 7f)
+            } else {
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 10f)
+            }
+            this.text = text
+            visibility = View.VISIBLE
+        }
     }
 
     //observe feed response
@@ -834,11 +872,16 @@ class LMFeedFragment :
         val postAsVariable = lmFeedHelperViewModel.getPostVariable()
         binding.layoutNoPost.apply {
             //heading
-            tvNoPostHeading.text = postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_PLURAL)
+            tvNoPostHeading.text = getString(
+                R.string.no_s_to_show,
+                postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_PLURAL)
+            )
 
             //subheading
-            tvNoPostSubHeading.text =
+            tvNoPostSubHeading.text = getString(
+                R.string.be_the_first_one_to_s_here,
                 postAsVariable.pluralizeOrCapitalize(WordAction.ALL_SMALL_SINGULAR)
+            )
 
             //fab
             fabNewPost.text = getString(
