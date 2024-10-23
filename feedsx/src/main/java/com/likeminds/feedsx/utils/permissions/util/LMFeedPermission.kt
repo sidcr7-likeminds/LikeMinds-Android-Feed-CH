@@ -26,8 +26,12 @@ class LMFeedPermission private constructor(
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         private const val READ_MEDIA_IMAGES = Manifest.permission.READ_MEDIA_IMAGES
 
+        @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+        const val READ_MEDIA_VISUAL_USER_SELECTED =
+            Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+
         private const val REQUEST_STORAGE = 10101
-        private const val REQUEST_GALLERY = 10102
+        const val REQUEST_GALLERY = 10102
 
         fun getStoragePermissionData(): LMFeedPermission {
             return LMFeedPermission(
@@ -42,13 +46,21 @@ class LMFeedPermission private constructor(
         // returns the [PermissionExtras] for gallery permissions request
         @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         fun getGalleryPermissionExtras(context: Context): PermissionExtras {
-            return PermissionExtras.Builder()
-                .permissions(
+            val permissionsArray =
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    arrayOf(
+                        READ_MEDIA_IMAGES,
+                        READ_MEDIA_VIDEO,
+                        READ_MEDIA_VISUAL_USER_SELECTED
+                    )
+                } else {
                     arrayOf(
                         READ_MEDIA_VIDEO,
                         READ_MEDIA_IMAGES
                     )
-                )
+                }
+            return PermissionExtras.Builder()
+                .permissions(permissionsArray)
                 .requestCode(REQUEST_GALLERY)
                 .preDialogMessage(context.getString(R.string.pre_gallery_media_permission_dialog_message))
                 .deniedDialogMessage(context.getString(R.string.denied_gallery_media_permission_dialog_message))
