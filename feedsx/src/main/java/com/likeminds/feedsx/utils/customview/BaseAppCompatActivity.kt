@@ -1,5 +1,6 @@
 package com.likeminds.feedsx.utils.customview
 
+import android.Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
 import android.annotation.TargetApi
 import android.content.pm.PackageManager
 import android.os.Build
@@ -10,9 +11,9 @@ import android.view.WindowManager
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.likeminds.feedsx.branding.model.LMFeedBranding
-import com.likeminds.feedsx.utils.permissions.*
 import com.likeminds.feedsx.utils.permissions.model.PermissionExtras
 import com.likeminds.feedsx.utils.permissions.util.*
+import com.likeminds.feedsx.utils.permissions.util.LMFeedPermission.Companion.REQUEST_GALLERY
 import com.likeminds.feedsx.utils.snackbar.LMFeedCustomSnackBar
 import javax.inject.Inject
 
@@ -69,11 +70,18 @@ open class BaseAppCompatActivity : AppCompatActivity() {
             true
         } else {
             var hasPermission = true
+            var isPartialMediaPermission = false
             permissions.forEach { permission ->
+                if (permission == READ_MEDIA_VISUAL_USER_SELECTED
+                    && checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    isPartialMediaPermission = true
+                    return@forEach
+                }
                 hasPermission =
                     hasPermission && checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
             }
-            return hasPermission
+            return hasPermission || isPartialMediaPermission
         }
     }
 
@@ -134,11 +142,15 @@ open class BaseAppCompatActivity : AppCompatActivity() {
         if (grantResults.isNotEmpty()) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 callback.onGrant()
+            } else if (requestCode == REQUEST_GALLERY
+                && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                && checkSelfPermission(READ_MEDIA_VISUAL_USER_SELECTED) == PackageManager.PERMISSION_GRANTED
+            ) {
+                //if the API version >= 34 and the request code is REQUEST_GALLERY then we check if the READ_MEDIA_VISUAL_USER_SELECTED permission is granted
+                callback.onGrant()
             } else {
                 callback.onDeny()
             }
-        } else {
-            callback.onDeny()
         }
     }
 }
