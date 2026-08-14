@@ -72,3 +72,7 @@ Finally to see the magic of Feed inside your application, add `FeedFragment` nav
 | **apiKey**     	| String      	| Api key of your community. 	     |                  | 
 | **userName**     | String      	| Name of the logged in user. 	     |                  | 
 | **userId**     | String      	| Unique id of logged in user. 	     |                  | 
+
+## License
+
+Licensed under the Apache License, Version 2.0. See [LICENSE](LICENSE) for details.
